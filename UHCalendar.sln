@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AE5D1E37-B330-4B92-8FED-82506D652AB3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A19D46B5-D0A0-426E-9EEC-8CB0BFD460A2}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UHCalendar", "src\UHCalendar\UHCalendar.xproj", "{8AF92D63-D513-4056-84EF-ACBCADA27ABB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{2982C645-B2BB-4FC7-B1C8-A5FA233385A0}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDAV", "CalDAV\CalDAV.xproj", "{A1005221-05A4-47C1-8621-42D02C5DC5DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8AF92D63-D513-4056-84EF-ACBCADA27ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF92D63-D513-4056-84EF-ACBCADA27ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF92D63-D513-4056-84EF-ACBCADA27ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF92D63-D513-4056-84EF-ACBCADA27ABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1005221-05A4-47C1-8621-42D02C5DC5DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1005221-05A4-47C1-8621-42D02C5DC5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1005221-05A4-47C1-8621-42D02C5DC5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1005221-05A4-47C1-8621-42D02C5DC5DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8AF92D63-D513-4056-84EF-ACBCADA27ABB} = {AE5D1E37-B330-4B92-8FED-82506D652AB3}
+		{2982C645-B2BB-4FC7-B1C8-A5FA233385A0} = {AE5D1E37-B330-4B92-8FED-82506D652AB3}
+		{A1005221-05A4-47C1-8621-42D02C5DC5DF} = {2982C645-B2BB-4FC7-B1C8-A5FA233385A0}
+	EndGlobalSection
+EndGlobal
