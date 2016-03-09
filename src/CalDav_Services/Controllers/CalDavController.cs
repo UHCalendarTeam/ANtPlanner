@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV;
@@ -22,11 +23,13 @@ namespace CalDav_Services.Controllers
         }
         
         
-        //MKCAL \\api\caldav\{username}\calendars\{collection_name}
-        [AcceptVerbs("MkCal",Route = "{user}/calendars/{collection}")]
-        public string MkCal(string user, string collection)
+        //MKCAL api\caldav\{username}\calendars\{collection_name}
+        [AcceptVerbs("MkCalendar",Route = "{user}/calendars/{collection}")]
+        public string MkCalendar(string user, string collection)
         {
-            var body = HttpContext.Request.Body.ToString();
+            var bodyStream = HttpContext.Request.Body;
+            var stringReader = new StreamReader(bodyStream);
+            var body = stringReader.ReadToEnd();
             return CalDavRepository.MkCalendar(user, collection, body );
 
         }
@@ -34,19 +37,39 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind")]
         public string PropFind()
         {
-            var url = HttpContext.Request.GetDisplayUrl();
-            var body = HttpContext.Request.Body.ToString();
+            var bodyStream = HttpContext.Request.Body;
+            var stringReader = new StreamReader(bodyStream);
+            var body = stringReader.ReadToEnd();
 
-            return CalDavRepository.PropFind(url, body);
+            return CalDavRepository.PropFind(body);
         }
 
         [AcceptVerbs("Request")]
         public string Request()
         {
-            var url = HttpContext.Request.GetDisplayUrl();
-            var body = HttpContext.Request.Body.ToString();
+            var bodyStream = HttpContext.Request.Body;
+            var stringReader = new StreamReader(bodyStream);
+            var body = stringReader.ReadToEnd();
 
-            return CalDavRepository.Request(url, body);
+            return CalDavRepository.Request(body);
+        }
+
+        // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
+        [HttpPut("{user}/calendars/{collection}/{resourceId}")]
+        public void Put(string user, string collection, string resourceId)
+        {
+            var bodyStream = HttpContext.Request.Body;
+            var stringReader = new StreamReader(bodyStream);
+            var body = stringReader.ReadToEnd();
+
+            CalDavRepository.AddCOR(user, collection, resourceId,body);
+        }
+
+        // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
+        [HttpGet("{user}/calendars/{collection}/{resourceId}")]
+        public string Get(string  resourceId)
+        {
+            return CalDavRepository.ReadCOR();
         }
 
 
@@ -58,12 +81,7 @@ namespace CalDav_Services.Controllers
         //    return new string[] { "value1", "value2" };
         //}
 
-        //// GET api/values/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+
 
         //// POST api/values
         //[HttpPost]
@@ -71,11 +89,7 @@ namespace CalDav_Services.Controllers
         //{
         //}
 
-        //// PUT api/values/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
+
 
         //// DELETE api/values/5
         //[HttpDelete("{id}")]

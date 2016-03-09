@@ -8,7 +8,11 @@ namespace CalDAV
     public interface ICalDav
     {
         string MkCalendar(string userName, string collectionName,string body);
-        string PropFind(string uri, string body);
-        string Request(string uri, string body);
+        string PropFind(string body);
+        string Request(string body);
+
+        void AddCOR(string username, string collectionName, string resourceId,string body);
+
+        string ReadCOR();
     }
 }
