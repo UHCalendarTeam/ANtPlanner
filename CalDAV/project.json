@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "CalDAV Class Library",
   "authors": [ "MFrank" ],
@@ -13,7 +13,13 @@
         "System.Threading": "4.0.11-beta-23516"
       },
   "frameworks": {
-    "dnx451": { },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.XML": "4.0.0.0",
+        "System.Xml.Linq": "4.0.0.0",
+        "System.Xml.Serialization": "4.0.0.0"
+      }
+    },
     "dnxcore50": { }
   }
 }
