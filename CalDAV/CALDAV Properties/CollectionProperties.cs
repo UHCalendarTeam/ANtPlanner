@@ -21,7 +21,7 @@ namespace CalDAV.CALDAV_Properties
 
         public string SupportedCalendarComponentSet(string components)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("calendar-description", NameSpace, components);
+            return XML_Processors.XMLBuilders.XmlBuilder("supported-calendar-component-set", NameSpace, components);
         }
 
         public string MaxResourcesSize(string size)
