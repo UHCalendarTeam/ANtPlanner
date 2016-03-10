@@ -10,7 +10,7 @@ namespace CalDAV.CALDAV_Properties
     /// </summary>
     public interface ICollectionProperties
     {
-        string NameSpace { get; }
+         string NameSpace { get; }
 
         /// <summary>
         /// Provides a human-readable description of the calendar collection
