@@ -1,19 +1,22 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "CalDAV Class Library",
-  "authors": [ "MFrank" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
- "dependencies": {
+    "version": "1.0.0-*",
+    "description": "CalDAV Class Library",
+    "authors": [ "AdrianoFlechilla, NachoVazquez" ],
+    "tags": [ "" ],
+    "projectUrl": "",
+    "licenseUrl": "",
+    "dependencies": {
         "Microsoft.CSharp": "4.0.1-beta-23516",
         "System.Collections": "4.0.11-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
-      },
-  "frameworks": {
-    "dnx451": { },
-    "dnxcore50": { }
-  }
+        "System.Threading": "4.0.11-beta-23516",
+        "System.IO": "4.0.11-beta-23516"
+
+    },
+    "frameworks": {
+        "dnx451": {            
+        },
+        "dnxcore50": { }
+    }
 }
