@@ -24,6 +24,8 @@ namespace CalDAV.Models
 
         public User User { get; set; }
 
+        public CalendarCollection Collection { get; set; }
+
 
     }
 }

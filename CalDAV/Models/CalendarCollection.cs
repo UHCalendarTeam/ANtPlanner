@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CalDAV.Models
@@ -32,6 +33,8 @@ namespace CalDAV.Models
         public DateTime MaxDateTime { get; set; }
 
         public int MaxIntences { get; set; }
+
+        public ICollection<CalendarResource> Resources { get; set; }
 
 
 
