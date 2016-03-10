@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AE5D1E37-B330-4B92-8FED-82506D652AB3}"
 EndProject
@@ -18,7 +18,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDAV", "CalDAV\CalDAV.xpr
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDav_Services", "src\CalDav_Services\CalDav_Services.xproj", "{CEFC8B65-ACC7-4463-B270-D1C32F105A91}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6E276287-EC4A-412C-8510-6245BE434B08}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6E276287-EC4A-412C-8510-6245BE434B08}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDav_tests", "CalDav_tests\CalDav_tests.xproj", "{650A5A85-5956-491E-9312-5E25A27D1108}"
 EndProject
