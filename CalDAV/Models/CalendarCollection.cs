@@ -11,6 +11,8 @@ namespace CalDAV.Models
     {
         public int CalendarCollectionId { get; set; }
 
+        public string Name { get; set; }
+
         [Required]
         public string Url { get; set; }
 
@@ -34,7 +36,7 @@ namespace CalDAV.Models
 
         public int MaxIntences { get; set; }
 
-        public ICollection<CalendarResource> Resources { get; set; }
+        public ICollection<CalendarResource> CalendarResources { get; set; }
 
 
 

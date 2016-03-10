@@ -17,7 +17,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="description">The calendar collection description.</param>
         /// <returns>The XML with description.</returns>
-        string CalendarDescription(string description);
+         string CalendarDescription(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Specifies a time zone on a calendar collection.
@@ -26,7 +26,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="timeZone"></param>
         /// <returns></returns>
-        string CalendarTimeZone(string timeZone);
+        string CalendarTimeZone(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: This property SHOULD be defined on all calendar collections. If defined, it SHOULD NOT
@@ -36,7 +36,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="components"></param>
         /// <returns></returns>
-        string SupportedCalendarComponentSet(string components);
+        string SupportedCalendarComponentSet(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Provides a numeric value indicating the maximum size of a resource in octets that the server
@@ -44,7 +44,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="size"></param>
         /// <returns></returns>
-        string MaxResourcesSize(string size);
+        string MaxResourcesSize(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Provides a DATE-TIME value indicating the earliest date and time (in UTC) that the server is
@@ -53,7 +53,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        string MinDateTime(string date);
+        string MinDateTime(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Provides a DATE-TIME value indicating the latest date and time (in UTC) that the server is
@@ -62,7 +62,7 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        string MaxDateTime(string date);
+        string MaxDateTime(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Provides a numeric value indicating the maximum number of recurrence instances that a
@@ -70,6 +70,6 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="intances"></param>
         /// <returns></returns>
-        string MaxIntances(string intances);
+        string MaxIntances(string userEmail, string collectionName);
     }
 }

@@ -13,6 +13,9 @@ namespace CalDAV.Models
         public int UserId { get; set; }
 
         
+        public string Email { get; set; }
+
+
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
