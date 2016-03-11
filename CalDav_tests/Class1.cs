@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using CalDAV.Core;
+
 namespace CalDav_tests
 {
     // This project can output the Class library as a NuGet Package.
