@@ -62,8 +62,6 @@ namespace CalDAV.Core
                     CalendarTimeZone = calTimeZone
                     //TODO: take the other properties from the class that is gonna contain the 
                     //custom properties of the collections
-
-                                
                 };
                 user.CalendarCollections.Add(collection);
                 db.SaveChanges();
