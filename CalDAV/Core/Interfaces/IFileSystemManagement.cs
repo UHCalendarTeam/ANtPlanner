@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace CalDAV.Core
         /// <summary>
         /// Get the Root local directory location.
         /// </summary>
-        Uri Root { get; }
+        string Root { get; }
         /// <summary>
         /// Creates a new folder which will contain all user calendar collections.
         /// </summary>
