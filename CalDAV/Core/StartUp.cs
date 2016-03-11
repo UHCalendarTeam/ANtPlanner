@@ -18,6 +18,7 @@ namespace CalDAV.Core
             {
                 db.Users.Add(new User() {Email = userEmail, FirstName = userName, LastName = userLastName});
             }
+            return false;
         }
 
         public bool CreateCollectionForUser(string userEmail, string collectionName)
