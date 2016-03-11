@@ -26,6 +26,7 @@ namespace CalDAV.Core
         public string MkCalendar(string user, string collection, string body)
         {
             var properties = XMLParsers.XMLMKCalendarParser(body);
+            StartUp.CreateCollectionForUser(user, collection);
             return "";
 
         }

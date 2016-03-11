@@ -45,7 +45,7 @@ namespace CalDAV.Models
         {
             return source.GetCollection(userEmail, collectionName)
                 .CalendarResources
-                .First(cr => cr.Name == calResource);
+                .First(cr => cr.FileName == calResource);
         }
     }
 }

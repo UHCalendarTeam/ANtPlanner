@@ -27,7 +27,7 @@ namespace CalDAV.Core
         /// <param name="calendarDescription">THe calendar description.</param>
         /// <returns>True if success, false otherwise</returns>
         bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "",
-            string calDisplayName = "", List<string> supportedCalendarComponentSet = null);
+            string calDisplayName = "", string calTimeZone = "", List<string> supportedCalendarComponentSet = null);
 
 
     }

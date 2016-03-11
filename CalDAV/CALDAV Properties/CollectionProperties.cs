@@ -30,11 +30,13 @@ namespace CalDAV.CALDAV_Properties
 
         public string SupportedCalendarComponentSet(string userEmail, string collectionName)
         {
-            using (var db = new CalDavContext())
+            //TODO: fix this
+            return "";
+            /* using (var db = new CalDavContext())
             {
                 var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("supported-calendar-component-set", NameSpace, collection.SupportedCalendarComponentSet);
-            }
+            }*/
         }
 
         public string MaxResourcesSize(string userEmail, string collectionName)
