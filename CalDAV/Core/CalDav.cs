@@ -31,7 +31,7 @@ namespace CalDAV.Core
 
         }
 
-        public string PropFind(string userEmail, string collectionName,Stream body)
+        public string PropFind(string userEmail, string collectionName, Stream body)
         {
             //REQUEST PROPERTIES
             //prop property return the value of the specified property
@@ -74,7 +74,7 @@ namespace CalDAV.Core
         {
             using (var db = new CalDavContext())
             {
-                var resource = db.GetCollection(username, collectionName).CalendarResources.First(x => x.FileName == resourceId);
+                var resource = db.GetCollection(userEmail, collectionName).CalendarResources.First(x => x.FileName == resourceId);
                 db.CalendarResources.Remove(resource);
                 db.SaveChanges();
             }
@@ -85,17 +85,23 @@ namespace CalDAV.Core
         {
             using (var db = new CalDavContext())
             {
-                var resources = db.GetCollection(userEmail, collectionName).CalendarResources;
-              
+                var collection = db.GetCollection(userEmail, collectionName);
+                if (collection == null)
+                    return false;
+                db.CalendarCollections.Remove(collection);
+                return StorageManagement.DeleteCalendarCollection(userEmail, collectionName);
+
+
             }
-            return true;
+
+
         }
 
-        
+
         public string ReadCalendarObjectResource(string userEmail, string collectionName, string resourceId, out string etag)
         {
             //Must return the Etag header of the COR
-            
+
             using (var db = new CalDavContext())
             {
                 var calendarRes = db.GetCalendarResource(userEmail, collectionName, resourceId);
