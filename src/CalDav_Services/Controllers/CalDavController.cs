@@ -3,99 +3,87 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV;
+using CalDAV.Core;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
 
-
 namespace CalDav_Services.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class CalDavController : Controller
     {
+        //dependency injection
         [FromServices]
         ICalDav CalDavRepository { get; set; }
 
+        //Constructor
         public CalDavController(ICalDav repoCalDav)
         {
             CalDavRepository = repoCalDav;
         }
-        
-        
+
+
+        #region Collection Methods
+
         //MKCAL api\caldav\{username}\calendars\{collection_name}
-        [AcceptVerbs("MkCalendar",Route = "{user}/calendars/{collection}")]
+        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
         public string MkCalendar(string user, string collection)
         {
-            var bodyStream = HttpContext.Request.Body;
-            var stringReader = new StreamReader(bodyStream);
-            var body = stringReader.ReadToEnd();
-            return CalDavRepository.MkCalendar(user, collection, body );
-
+            return CalDavRepository.MkCalendar(user, collection, Request.Body);
         }
 
-        [AcceptVerbs("PropFind")]
-        public string PropFind()
+        //PROPFIND
+        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}")]
+        public string PropFind(string user, string collection)
         {
-            var bodyStream = HttpContext.Request.Body;
-            var stringReader = new StreamReader(bodyStream);
-            var body = stringReader.ReadToEnd();
 
-            return CalDavRepository.PropFind(body);
+            return CalDavRepository.PropFind(user, collection, Response.Body);
         }
 
-        [AcceptVerbs("Request")]
-        public string Request()
+        //REPORT
+        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}")]
+        public string Report(string user, string collection)
         {
-            var bodyStream = HttpContext.Request.Body;
-            var stringReader = new StreamReader(bodyStream);
-            var body = stringReader.ReadToEnd();
-
-            return CalDavRepository.Request(body);
+            return CalDavRepository.Report(user, collection, Request.Body);
         }
+        #endregion
 
+
+        #region Calendar Object Resource Methods
         // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpPut("{user}/calendars/{collection}/{resourceId}")]
         public void Put(string user, string collection, string resourceId)
         {
-            var bodyStream = HttpContext.Request.Body;
-            var stringReader = new StreamReader(bodyStream);
-            var body = stringReader.ReadToEnd();
-
-            CalDavRepository.AddCOR(user, collection, resourceId,body);
+            
+            CalDavRepository.AddCOR(user, collection, resourceId, Request.Body);
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("{user}/calendars/{collection}/{resourceId}")]
-        public string Get(string  resourceId)
+        public string Get(string user, string collection, string resourceId)
         {
-            return CalDavRepository.ReadCOR();
+            Response.Headers.Add("Etag", "testTag");
+            //if auth the this
+            return CalDavRepository.ReadCOR(user, collection, resourceId);
         }
 
+        // DELETE api/values/5
+        [HttpDelete("{user}/calendars/{collection}/{resourceId}")]
+        public void Delete(string user, string collection, string resourceId)
+        {
+            CalDavRepository.DeleteCOR(user, collection, resourceId);
+        }
 
-        #region Default Methods
-        //// GET: api/values
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-
-
-
-        //// POST api/values
-        //[HttpPost]
-        //public void Post([FromBody]string value)
-        //{
-        //}
-
-
-
-        //// DELETE api/values/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
         #endregion
+
+
+
+
+        
+
+       
+
+
     }
 }

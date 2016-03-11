@@ -7,7 +7,7 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using CalDAV;
+using CalDAV.Core;
 
 namespace CalDav_Services
 {

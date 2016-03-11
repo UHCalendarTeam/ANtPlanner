@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CalDAV
+namespace CalDAV.Core
 {
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
-    public class CalDav:ICalDav
+    public class CalDav : ICalDav
     {
-        /// <summary>
-        /// CalDAV HTTP Method for create a new collection of COR (new calendar)
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="collection"></param>
-        /// <param name="body"></param>
-        /// <returns></returns>
-        public string MkCalendar(string user, string collection, string body)
+        public string MkCalendar(string user, string collection, Stream body)
         {
             StringBuilder strBuilder = new StringBuilder();
             strBuilder.Append("This Method will create a new collection named " + collection + "\r");
@@ -27,35 +21,23 @@ namespace CalDAV
             return strBuilder.ToString();
         }
 
-        /// <summary>
-        /// WebDAV HTTP Method
-        /// </summary>
-        /// <param name="body"></param>
-        /// <returns></returns>
-        public string PropFind(string body)
+        public string PropFind(string userName, string collectionName,Stream body)
         {
+            //REQUEST PROPERTIES
+            //prop property return the value of the specified property
+            //allprop property return the value of all properties --the include elemen makes the server return 
+            //other properties that will not be returnes otherwise
             //getetag property return the etag of the COR for sincro options.
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// CalDAV Request HTTP Method
-        /// </summary>
-        /// <param name="body"></param>
-        /// <returns></returns>
-        public string Request(string body)
+
+        public string Report(string username, string collectionName, Stream body)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// CalDAV PUT for create a new COR
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="resourceId"></param>
-        /// <param name="body"></param>
-        public void AddCOR(string username, string collectionName, string resourceId,string body)
+        public void AddCOR(string username, string collectionName, string resourceId, Stream body)
         {
             //Note: calendar object resource = COR
 
@@ -67,26 +49,40 @@ namespace CalDAV
             //when created or updated the response header MUST have the Etag
 
             //body is a clean(without XML) iCalendar
-            
+
             //return HTTP 201 Created 
 
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// CalDAv HTTP Method Get for a COR
-        /// </summary>
-        public string ReadCOR()
+        public string PropPatch(string userName, string collectionName, Stream Body)
         {
-            //Must return the Etag header of the COR
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// CalDav Move
-        /// </summary>
-        public void Move ()
-        { }
-       
+        public void DeleteCOR(string username, string collectionName, string resourceId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteCalendarCollection(string username, string collectionName)
+        {
+            throw new NotImplementedException();
+        }
+
+        
+        public string ReadCOR(string username, string collectionName, string resourceId)
+        {
+            //Must return the Etag header of the COR
+
+
+            return "testing GET";
+        }
+
+        public string ReadCalendarCollection(string username, string collectionName)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
