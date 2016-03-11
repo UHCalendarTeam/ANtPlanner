@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CalDAV.Core.Interfaces
+namespace CalDAV.Core
 {
     public interface IStartUp
     {

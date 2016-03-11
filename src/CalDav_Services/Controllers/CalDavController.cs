@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV;
+using CalDAV.Core;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
-
 
 namespace CalDav_Services.Controllers
 {
@@ -22,7 +21,6 @@ namespace CalDav_Services.Controllers
         public CalDavController(ICalDav repoCalDav)
         {
             CalDavRepository = repoCalDav;
-            
         }
 
 

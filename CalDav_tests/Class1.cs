@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-
+using CalDAV.Core;
 namespace CalDav_tests
 {
     // This project can output the Class library as a NuGet Package.
@@ -14,7 +15,8 @@ namespace CalDav_tests
         [Fact]
         public void UniTest1()
         {
-            Assert.True(true);
+            var fsm = new FileSystemMangement();
+            Assert.True(fsm.AddUserFolder("Nacho"));
         }
     }
 }

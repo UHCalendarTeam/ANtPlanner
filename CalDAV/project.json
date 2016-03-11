@@ -1,21 +1,20 @@
 {
-    "version": "1.0.0-*",
-    "description": "CalDAV Library",
     "authors": [ "UHCalendarTeam" ],
-    "tags": [ "" ],
-    "projectUrl": "",
-    "licenseUrl": "",
+    "commands": {
+        "ef": "EntityFramework.Commands"
+    },
     "dependencies": {
+        "ICalendar": "1.0.0-beta1-00000",
         "EntityFramework.Commands": "7.0.0-rc1-final",
         "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
         "Microsoft.CSharp": "4.0.1-beta-23516",
         "System.Collections": "4.0.11-beta-23516",
+        "System.IO": "4.0.11-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.IO": "4.0.11-beta-23516"
-
+        "System.Threading": "4.0.11-beta-23516"
     },
+    "description": "CalDAV Library",
     "frameworks": {
         "dnx451": {
             "frameworkAssemblies": {
@@ -23,6 +22,7 @@
                 "System.Xml.Linq": "4.0.0.0"
             },
             "dependencies": {
+
             }
         },
         "dnxcore50": {
@@ -32,7 +32,8 @@
         }
 
     },
-    "commands": {
-        "ef": "EntityFramework.Commands"
-    }
+    "licenseUrl": "",
+    "projectUrl": "",
+    "tags": [ "" ],
+    "version": "1.0.0-*"
 }

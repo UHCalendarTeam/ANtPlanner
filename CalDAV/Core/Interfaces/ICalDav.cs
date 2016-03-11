@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CalDAV
+namespace CalDAV.Core
 {
     public interface ICalDav
     {

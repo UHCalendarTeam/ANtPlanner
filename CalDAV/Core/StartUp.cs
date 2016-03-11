@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Core.Interfaces;
 using CalDAV.Models;
 
 namespace CalDAV.Core
@@ -18,7 +17,7 @@ namespace CalDAV.Core
             {
                 db.Users.Add(new User() {Email = userEmail, FirstName = userName, LastName = userLastName});
             }
-            return false;
+            return true;
         }
 
         public bool CreateCollectionForUser(string userEmail, string collectionName)
