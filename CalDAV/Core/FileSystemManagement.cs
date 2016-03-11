@@ -11,25 +11,26 @@ namespace CalDAV.Core
 {
     public class FileSystemMangement : IFileSystemManagement
     {
-        public Uri Root { get; }
+        public string Root { get; }
 
-        public FileSystemMangement(string root = "/CalDav/Users")
+        public FileSystemMangement(string root ="/CalDav/Users")
         {
-            if (!string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.RelativeOrAbsolute))
-                Root = new Uri(root);
+            
+            if (!string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root) && root !="/CalDav/Users")
+                Root = root;
             else
-                Root = new Uri("/CalDav/Users", UriKind.Relative);
+                Root = Directory.GetCurrentDirectory() + root;
         }
         public bool AddUserFolder(string userName)
         {
-            var path = Root.AbsolutePath + "/" + userName;
+            var path = Path.GetFullPath(Root) + "\\" + userName;
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
 
         public bool AddCalendarFolder(string userName, string calendarCollectionName)
         {
-            var path = Root.AbsolutePath + "/" + userName + "/Calendars/" + calendarCollectionName;
+            var path = Path.GetFullPath(Root) + "/" + userName + "/Calendars/" + calendarCollectionName;
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
@@ -37,7 +38,7 @@ namespace CalDAV.Core
         public bool AddCalendarObjectResourceFile(string userName, string calendarCollectionName, string bodyIcalendar,
             out string objectResourceName)
         {
-            var path = Root.AbsolutePath + "/" + userName + "/Calendars/" + calendarCollectionName;
+            var path = Path.GetFullPath(Root) + "/" + userName + "/Calendars/" + calendarCollectionName;
             objectResourceName = null;
             if (Directory.Exists(path))
             {
@@ -46,7 +47,11 @@ namespace CalDAV.Core
                 if (iCalendar == null) return false;
                 var uniqueName = "";
                 if (iCalendar.CalendarComponents.Count>0)
-                     uniqueName = iCalendar.CalendarComponents.Keys.FirstOrDefault().ToLower() + DateTime.Now;
+                {
+                    var firstOrDefault = iCalendar.CalendarComponents.Keys.FirstOrDefault();
+                    if (firstOrDefault != null)
+                        uniqueName = firstOrDefault.ToLower() + DateTime.Now;
+                }
                 var stream = new FileStream(path + uniqueName, FileMode.CreateNew);
                 using (stream)
                 {
@@ -60,7 +65,7 @@ namespace CalDAV.Core
 
         public string GetCalendarObjectResource(string userName, string calendarCollectionName, string objectResourceName)
         {
-            var path = Root.AbsolutePath + "/" + userName + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = Path.GetFullPath(Root) + "/" + userName + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
             if (File.Exists(path))
             {
                 var stream = new FileStream(path, FileMode.Open);
