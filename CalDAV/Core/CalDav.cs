@@ -30,7 +30,7 @@ namespace CalDAV.Core
             return strBuilder.ToString();
         }
 
-        public string PropFind(string userName, string collectionName,Stream body)
+        public string PropFind(string userEmail, string collectionName,Stream body)
         {
             //REQUEST PROPERTIES
             //prop property return the value of the specified property
@@ -41,12 +41,12 @@ namespace CalDAV.Core
         }
 
 
-        public string Report(string username, string collectionName, Stream body)
+        public string Report(string userEmail, string collectionName, Stream body)
         {
             throw new NotImplementedException();
         }
 
-        public void AddCalendarObjectResource(string username, string collectionName, string resourceId, Stream body)
+        public void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, Stream body)
         {
             //Note: calendar object resource = COR
 
@@ -64,35 +64,44 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
-        public string PropPatch(string userName, string collectionName, Stream Body)
+        public string PropPatch(string userEmail, string collectionName, Stream Body)
         {
             throw new NotImplementedException();
         }
 
-        public bool DeleteCalendarObjectResource(string username, string collectionName, string resourceId)
+        public bool DeleteCalendarObjectResource(string userEmail, string collectionName, string resourceId)
         {
             using (var db = new CalDavContext())
             {
                 //delete from database
             }
-            return StorageManagement.DeleteCalendarObjectResource(username, collectionName, resourceId);
+            return StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
         }
 
-        public bool DeleteCalendarCollection(string username, string collectionName)
+        public bool DeleteCalendarCollection(string userEmail, string collectionName)
         {
-            throw new NotImplementedException();
+            using (var db = new CalDavContext())
+            {
+                var resources = db.GetCollection(userEmail, collectionName).CalendarResources;
+              
+            }
+            return true;
         }
 
         
-        public string ReadCalendarObjectResource(string username, string collectionName, string resourceId)
+        public string ReadCalendarObjectResource(string userEmail, string collectionName, string resourceId, out string etag)
         {
             //Must return the Etag header of the COR
-
-
-            return "testing GET";
+            
+            using (var db = new CalDavContext())
+            {
+                var calendarRes = db.GetCalendarResource(userEmail, collectionName, resourceId);
+                etag = calendarRes.Etag;
+            }
+            return StorageManagement.GetCalendarObjectResource(userEmail, collectionName, resourceId);
         }
 
-        public string ReadCalendarCollection(string username, string collectionName)
+        public string ReadCalendarCollection(string userEmail, string collectionName)
         {
             throw new NotImplementedException();
         }

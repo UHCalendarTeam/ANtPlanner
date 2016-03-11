@@ -51,7 +51,7 @@ namespace CalDAV.Core
             //TODO: check for the result of the collection creation in the DB
             using (var db = new CalDavContext())
             {
-                var user = db.getUser(userEmail);
+                var user = db.GetUser(userEmail);
                 CalendarCollection collection = new CalendarCollection()
                 {
                     User = user,
@@ -62,7 +62,7 @@ namespace CalDAV.Core
                 };
                 user.CalendarCollections.Add(collection);
                 db.SaveChanges();
-                var result = FileSystemMangement.AddCalendarFolder(userEmail, collectionName);
+                var result = FileSystemMangement.AddCalendarCollectionFolder(userEmail, collectionName);
                 return result;
             }
         }

@@ -63,9 +63,11 @@ namespace CalDav_Services.Controllers
         [HttpGet("{user}/calendars/{collection}/{resourceId}")]
         public string Get(string user, string collection, string resourceId)
         {
-            Response.Headers.Add("Etag", "testTag");
             //if auth the this
-            return CalDavRepository.ReadCalendarObjectResource(user, collection, resourceId);
+            string etag;
+            var result =  CalDavRepository.ReadCalendarObjectResource(user, collection, resourceId, out etag);
+            Response.Headers.Add("Etag", etag);
+            return result;
         }
 
         // DELETE api/values/5
