@@ -1,0 +1,11 @@
+Caldav:
+  ✔ using the the DB  to get the properties of the collection. @done (16-03-10 17:39)
+  ☐ Create the logic for the new users:
+         ✔ create it in DB @done (16-03-11 08:23)
+         ✔ Create the directory for the collection. @done (16-03-11 11:59)
+  ☐ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.)
+  ☐  Do a class for the common properties of the collections.
+
+Preconditions:
+  ☐ Do the preconditions checks of the methods.
+  ☐ Do the postcondition checks of the methods

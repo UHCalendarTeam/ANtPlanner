@@ -20,12 +20,12 @@ namespace CalDAV.Models
 
         public User User { get; set; }
 
-
+        public string DisplayName { get; set; }
         public string CalendarDescription { get; set; }
 
         public string CalendarTimeZone { get; set; }
 
-        public string SupportedCalendarComponentSet { get; set; }
+        public ICollection<string> SupportedCalendarComponentSet { get; set; }
 
 
         public int MaxResourceSize { get; set; }
