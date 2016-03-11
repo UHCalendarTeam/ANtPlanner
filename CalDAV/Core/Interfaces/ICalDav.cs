@@ -15,7 +15,7 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string MkCalendar(string userEmail, string collectionName, Stream body);
+        string MkCalendar(string userEmail, string collectionName, string body);
         /// <summary>
         /// WebDAV HTTP Method
         /// </summary>
