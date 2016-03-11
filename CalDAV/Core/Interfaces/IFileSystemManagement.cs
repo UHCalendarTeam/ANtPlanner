@@ -15,32 +15,56 @@ namespace CalDAV.Core
         /// <summary>
         /// Creates a new folder which will contain all user calendar collections.
         /// </summary>
-        /// <param name="userName">Name of the owner of the folder</param>
+        /// <param name="userEmail">Email of the owner of the folder</param>
         /// <returns></returns>
-        bool AddUserFolder(string userName);
+        bool AddUserFolder(string userEmail);
         /// <summary>
         /// Creates a new folder which will contain all calendar object resource.
         /// </summary>
-        /// <param name="userName">Name of the owner of the calendar collection</param>
+        /// <param name="userEmail">Email of the owner of the calendar collection</param>
         /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
         /// <returns></returns>
-        bool AddCalendarFolder(string userName, string calendarCollectionName);
+        bool AddCalendarCollectionFolder(string userEmail, string calendarCollectionName);
+
+        /// <summary>
+        /// Retrieves all iCalendar Objects stored in calendarCollection specified.
+        /// </summary>
+        /// <param name="userEmail">Email of the collection owner.</param>
+        /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
+        /// <param name="calendarObjectResources"></param>
+        /// <returns></returns>
+        bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName,out List<string> calendarObjectResources );
+        /// <summary>
+        /// Deletes the folder which represent the calendar collection and all the COR contained in it.
+        /// </summary>
+        /// <param name="userEmail">Email of the owner of the collection.</param>
+        /// <param name="calendarCollectionName">Name of the calendar collection.</param>
+        /// <returns></returns>
+        bool DeleteCalendarCollection(string userEmail, string calendarCollectionName);
         /// <summary>
         /// Adds a Calendar Object Resource to the calendar collection specified. 
         /// </summary>
-        /// <param name="userName">Name of the owner of the calendar collection</param>
+        /// <param name="userEmail">Email of the owner of the calendar collection</param>
         /// <param name="calendarCollectionName">Name of the calendar collection where is going to be stored</param>
         /// <param name="bodyIcalendar">Body of the iCalendar Object that is going to be stored with .ics extension.</param>
         /// <param name="objectResourceName">Returns the name assigned to the iCalendar file.</param>
         /// <returns></returns>
-        bool AddCalendarObjectResourceFile(string userName, string calendarCollectionName, string bodyIcalendar, out string objectResourceName);
+        bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string bodyIcalendar, out string objectResourceName);
         /// <summary>
         /// Returns the iCalendar Object stored in the user calendar collection.
         /// </summary>
-        /// <param name="userName">Name of the owner of the collection.</param>
+        /// <param name="userEmail">Email of the owner of the collection.</param>
         /// <param name="calendarCollectionName">Name of the collection where is stored.</param>
         /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
         /// <returns></returns>
-        string GetCalendarObjectResource(string userName, string calendarCollectionName, string objectResourceName);
+        string GetCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName);
+        /// <summary>
+        /// Deletes the COR specified
+        /// </summary>
+        /// <param name="userEmail">Email of the owner of the collection.</param>
+        /// <param name="calendarCollectionName">Name of the collection where is stored.</param>
+        /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
+        /// <returns></returns>
+        bool DeleteCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName);
     }
 }

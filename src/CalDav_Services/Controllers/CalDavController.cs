@@ -56,7 +56,7 @@ namespace CalDav_Services.Controllers
         public void Put(string user, string collection, string resourceId)
         {
             
-            CalDavRepository.AddCOR(user, collection, resourceId, Request.Body);
+            CalDavRepository.AddCalendarObjectResource(user, collection, resourceId, Request.Body);
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
@@ -65,14 +65,14 @@ namespace CalDav_Services.Controllers
         {
             Response.Headers.Add("Etag", "testTag");
             //if auth the this
-            return CalDavRepository.ReadCOR(user, collection, resourceId);
+            return CalDavRepository.ReadCalendarObjectResource(user, collection, resourceId);
         }
 
         // DELETE api/values/5
         [HttpDelete("{user}/calendars/{collection}/{resourceId}")]
         public void Delete(string user, string collection, string resourceId)
         {
-            CalDavRepository.DeleteCOR(user, collection, resourceId);
+            CalDavRepository.DeleteCalendarObjectResource(user, collection, resourceId);
         }
 
         #endregion
