@@ -17,12 +17,30 @@ namespace CalDAV.Core
             using (var db = new CalDavContext())
             {
                 db.Users.Add(new User() {Email = userEmail, FirstName = userName, LastName = userLastName});
+                db.SaveChanges();
+                //TODO: call the Directory User Creator
             }
+            return true;
         }
 
-        public bool CreateCollectionForUser(string userEmail, string collectionName)
+        public bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "")
         {
-            throw new NotImplementedException();
+            using (var db = new CalDavContext())
+            {
+                var user = db.getUser(userEmail);
+                CalendarCollection collection = new CalendarCollection()
+                {
+                    User = user,
+                    Name = collectionName,
+                    CalendarDescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
+                    //TODO: set here the other values that are gonna have the calendar collection by default
+                                
+                };
+                user.CalendarCollections.Add(collection);
+                db.SaveChanges();
+                //TODO: call here the directory collection creator.
+                return true;
+            }
         }
     }
 }
