@@ -22,5 +22,9 @@ namespace CalDAV.XML_Processors
             //doc.SetAttributeValue(nm, "urn:ietf:params:xml:ns:caldav");
             return doc.ToString().Replace("--", ":");
         }
+
+
+
+       
     }
 }
