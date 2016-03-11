@@ -30,7 +30,8 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
         public string MkCalendar(string user, string collection)
         {
-            return CalDavRepository.MkCalendar(user, collection, Request.Body);
+            //TODO: Change Request.body to string
+            return CalDavRepository.MkCalendar(user, collection, Request.Body.ToString());
         }
 
         //PROPFIND
