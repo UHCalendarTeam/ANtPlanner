@@ -26,7 +26,8 @@ namespace CalDAV.Core
         /// <param name="collectionName">THe name for the new collection.</param>
         /// <param name="calendarDescription">THe calendar description.</param>
         /// <returns>True if success, false otherwise</returns>
-        bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "");
+        bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "",
+            string calDisplayName = "", List<string> supportedCalendarComponentSet = null);
 
 
     }

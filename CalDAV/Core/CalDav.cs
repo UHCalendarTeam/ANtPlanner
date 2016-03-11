@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Models;
+using CalDAV.Utils.XML_Processors;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core
@@ -15,19 +16,18 @@ namespace CalDAV.Core
     {
         private IFileSystemManagement StorageManagement { get; }
 
+        private IStartUp StartUp { get; set; }
+
         public CalDav(IFileSystemManagement fsManagement)
         {
             StorageManagement = fsManagement;
         }
 
-        public string MkCalendar(string user, string collection, Stream body)
+        public string MkCalendar(string user, string collection, string body)
         {
-            StringBuilder strBuilder = new StringBuilder();
-            strBuilder.Append("This Method will create a new collection named " + collection + "\r");
-            strBuilder.Append("The owner of this calendar will be " + user + "\r");
-            strBuilder.Append("The body of the request containing calendar data is " + body);
+            var properties = XMLParsers.XMLMKCalendarParser(body);
+            return "";
 
-            return strBuilder.ToString();
         }
 
         public string PropFind(string userEmail, string collectionName,Stream body)
@@ -73,7 +73,9 @@ namespace CalDAV.Core
         {
             using (var db = new CalDavContext())
             {
-                //delete from database
+                var resource = db.GetCollection(username, collectionName).CalendarResources.First(x => x.FileName == resourceId);
+                db.CalendarResources.Remove(resource);
+                db.SaveChanges();
             }
             return StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
         }

@@ -9,6 +9,9 @@ namespace CalDAV.Models
     public class CalDavContext :DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<CalendarCollection> CalendarCollections { get; set; }
+
+        public DbSet<CalendarResource> CalendarResources { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {

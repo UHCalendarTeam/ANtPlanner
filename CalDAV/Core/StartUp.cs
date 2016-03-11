@@ -46,7 +46,8 @@ namespace CalDAV.Core
         /// <param name="collectionName">THe name for the new collection.</param>
         /// <param name="calendarDescription">THe calendar description.</param>
         /// <returns>True if success, false otherwise</returns>
-        public bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "")
+        public bool CreateCollectionForUser(string userEmail, string collectionName, string calendarDescription = "", 
+            string calDisplayName="", List<string> supportedCalendarComponentSet=null, string calTimeZone="")
         {
             //TODO: check for the result of the collection creation in the DB
             using (var db = new CalDavContext())
@@ -57,7 +58,11 @@ namespace CalDAV.Core
                     User = user,
                     Name = collectionName,
                     CalendarDescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
-                    //TODO: set here the other values that are gonna have the calendar collection by default
+                    DisplayName = calDisplayName,
+                    CalendarTimeZone = calTimeZone
+                    //TODO: take the other properties from the class that is gonna contain the 
+                    //custom properties of the collections
+
                                 
                 };
                 user.CalendarCollections.Add(collection);
