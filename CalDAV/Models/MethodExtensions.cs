@@ -15,7 +15,7 @@ namespace CalDAV.Models
         /// <param name="source"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public static User getUser(this CalDavContext source, string userEmail)
+        public static User GetUser(this CalDavContext source, string userEmail)
         {
             return source.Users.Where(u => u.Email == userEmail).First();
         }
@@ -27,9 +27,9 @@ namespace CalDAV.Models
         /// <param name="source"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public static CalendarCollection getCollection(this CalDavContext source, string userEmail, string collectionName)
+        public static CalendarCollection GetCollection(this CalDavContext source, string userEmail, string collectionName)
         {
-            return source.getUser(userEmail).CalendarCollections.Where(cl => cl.Name == collectionName).First();
+            return source.GetUser(userEmail).CalendarCollections.Where(cl => cl.Name == collectionName).First();
         }
 
         /// <summary>
@@ -43,9 +43,9 @@ namespace CalDAV.Models
         public static CalendarResource GetCalendarResource(this CalDavContext source, string userEmail,
             string collectionName, string calResource)
         {
-            return source.getCollection(userEmail, collectionName)
-                .CalendarResources.Where(cr => cr.Name == calResource)
-                .First();
+            return source.GetCollection(userEmail, collectionName)
+                .CalendarResources
+                .First(cr => cr.Name == calResource);
         }
     }
 }

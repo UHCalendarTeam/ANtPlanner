@@ -14,7 +14,7 @@ namespace CalDAV.CALDAV_Properties
         {           
             using(var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("calendar-description", NameSpace, collection.CalendarDescription);
             }
         }
@@ -23,7 +23,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("calendar-timezone", NameSpace, collection.CalendarTimeZone);
             }
         }
@@ -32,7 +32,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("supported-calendar-component-set", NameSpace, collection.SupportedCalendarComponentSet);
             }
         }
@@ -41,7 +41,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("max-resource-size", NameSpace, collection.MaxResourceSize.ToString());
             }
         }
@@ -50,7 +50,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("min-date-time", NameSpace, collection.MinDateTime.ToString());
             }
         }
@@ -59,7 +59,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("max-date-time", NameSpace, collection.MaxDateTime.ToString());
             }
         }
@@ -68,7 +68,7 @@ namespace CalDAV.CALDAV_Properties
         {
             using (var db = new CalDavContext())
             {
-                var collection = db.getCollection(userEmail, collectionName);
+                var collection = db.GetCollection(userEmail, collectionName);
                 return XML_Processors.XMLBuilders.XmlBuilder("max-intances", NameSpace, collection.MaxIntences.ToString());
             }
         }

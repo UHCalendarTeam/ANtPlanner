@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CalDAV.Models;
+using Microsoft.Data.Entity;
 
 namespace CalDAV.Core
 {
@@ -11,6 +13,13 @@ namespace CalDAV.Core
     // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
     public class CalDav : ICalDav
     {
+        private IFileSystemManagement StorageManagement { get; }
+
+        public CalDav(IFileSystemManagement fsManagement)
+        {
+            StorageManagement = fsManagement;
+        }
+
         public string MkCalendar(string user, string collection, Stream body)
         {
             StringBuilder strBuilder = new StringBuilder();
@@ -37,7 +46,7 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
-        public void AddCOR(string username, string collectionName, string resourceId, Stream body)
+        public void AddCalendarObjectResource(string username, string collectionName, string resourceId, Stream body)
         {
             //Note: calendar object resource = COR
 
@@ -60,18 +69,22 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
-        public void DeleteCOR(string username, string collectionName, string resourceId)
+        public bool DeleteCalendarObjectResource(string username, string collectionName, string resourceId)
         {
-            throw new NotImplementedException();
+            using (var db = new CalDavContext())
+            {
+                //delete from database
+            }
+            return StorageManagement.DeleteCalendarObjectResource(username, collectionName, resourceId);
         }
 
-        public void DeleteCalendarCollection(string username, string collectionName)
+        public bool DeleteCalendarCollection(string username, string collectionName)
         {
             throw new NotImplementedException();
         }
 
         
-        public string ReadCOR(string username, string collectionName, string resourceId)
+        public string ReadCalendarObjectResource(string username, string collectionName, string resourceId)
         {
             //Must return the Etag header of the COR
 

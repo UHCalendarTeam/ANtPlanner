@@ -47,20 +47,20 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="resourceId"></param>
         /// <param name="body"></param>
-        void AddCOR(string username, string collectionName, string resourceId, Stream body);
+        void AddCalendarObjectResource(string username, string collectionName, string resourceId, Stream body);
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
         /// </summary>
         /// <param name="username"></param>
         /// <param name="collectionName"></param>
         /// <param name="resourceId"></param>
-        void DeleteCOR(string username, string collectionName, string resourceId);
+        bool DeleteCalendarObjectResource(string username, string collectionName, string resourceId);
         /// <summary>
         /// CalDav & WebDav Method for delete a Collection
         /// </summary>
         /// <param name="username"></param>
         /// <param name="collectionName"></param>
-        void DeleteCalendarCollection(string username, string collectionName);
+        bool DeleteCalendarCollection(string username, string collectionName);
         /// <summary>
         /// CalDav HTTP Method Get for a COR
         /// </summary>
@@ -68,7 +68,7 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="resourceID"></param>
         /// <returns></returns>
-        string ReadCOR(string username, string collectionName, string resourceID);
+        string ReadCalendarObjectResource(string username, string collectionName, string resourceID);
         /// <summary>
         /// CalDav Http method for get a Calendar Collection
         /// </summary>
