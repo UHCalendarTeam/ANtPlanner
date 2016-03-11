@@ -12,7 +12,7 @@ namespace CalDAV.Models
         public int CalendarResourceId { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string FileName { get; set; }
 
         public string Etag { get; set; }
 
