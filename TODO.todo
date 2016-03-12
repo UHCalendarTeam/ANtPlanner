@@ -4,6 +4,8 @@ Caldav:
          ✔ create it in DB @done (16-03-11 08:23)
          ✔ Create the directory for the collection. @done (16-03-11 11:59)
   ☐ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.)
+        ☐ Do the precodintions methods.
+        ☐ Do the postconditions.
   ☐  Do a class for the common properties of the collections.
 
 Preconditions:

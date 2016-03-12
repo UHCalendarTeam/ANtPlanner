@@ -26,7 +26,12 @@ namespace CalDAV.Core
         public string MkCalendar(string user, string collection, string body)
         {
             var properties = XMLParsers.XMLMKCalendarParser(body);
-            StartUp.CreateCollectionForUser(user, collection);
+            var result = StartUp.CreateCollectionForUser(user, collection,
+                calendarDescription: properties.ContainsKey("calendar-description")?properties["calendar-description"].First():"",
+                calDisplayName:properties.ContainsKey("displayname")?properties["displayname"].First():"",
+                calTimeZone:properties.ContainsKey("calendar-timezone")?properties["calendar-timezone"].First():"",
+                supportedCalendarComponentSet:properties.ContainsKey("supported-calendar-component-set")?properties["supported-calendar-component-set"]:null);
+            //TODO: make the ETag and return it or something
             return "";
 
         }
