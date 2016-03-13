@@ -8,6 +8,7 @@ using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Utils;
 using Microsoft.Data.Entity;
+using ICalendar.GeneralInterfaces;
 
 namespace CalDAV.Core
 {
@@ -164,8 +165,16 @@ namespace CalDAV.Core
                 if (!db.CollectionExist(userEmail, collectionName))
                     return false;
                 CalendarResource resource = new CalendarResource();
+                //filling the resource
                 resource.User = db.GetUser(userEmail);
-                //resource.CalendarResourceId = iCal.;
+                resource.Collection = db.GetCollection(userEmail, collectionName);
+                IList<IComponentProperty> list;
+                if (iCal.Properties.TryGetValue("UID", out list))
+                {
+                    var firstOrDefault = list.FirstOrDefault();
+                    if (firstOrDefault != null) resource.Uid = ((IValue<string>)firstOrDefault).Value.ToLower();
+                }
+                //adding the resource to the db
                 db.CalendarResources.Add(resource);
 
 
