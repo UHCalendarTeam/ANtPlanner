@@ -66,5 +66,21 @@ namespace CalDAV.Core
         /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
         /// <returns></returns>
         bool DeleteCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName);
+        /// <summary>
+        /// Check if the folder corresponding with the Calendar Collection Exits
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <param name="calendarCollectionName"></param>
+        /// <returns></returns>
+        bool ExistCalendarCollection(string userEmail, string calendarCollectionName);
+        /// <summary>
+        /// Check if the file corresponding with the Calendar Object Resource exist.
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <param name="calendarCollectionName"></param>
+        /// <param name="objectResourceName"></param>
+        /// <returns></returns>
+        bool ExistCalendarObjectResource(string userEmail, string calendarCollectionName,
+            string objectResourceName);
     }
 }

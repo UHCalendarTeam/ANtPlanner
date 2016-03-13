@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
+using ICalendar.Utils;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core
@@ -23,15 +24,15 @@ namespace CalDAV.Core
             StorageManagement = fsManagement;
         }
 
-        public string MkCalendar(string user, string collection, string body)
+        public string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             var properties = XMLParsers.XMLMKCalendarParser(body);
-            StartUp.CreateCollectionForUser(user, collection);
+            StartUp.CreateCollectionForUser(propertiesAndHeaders["userEmail"], propertiesAndHeaders["collectionName"]);
             return "";
 
         }
         //TODO: ADriano
-        public string PropFind(string userEmail, string collectionName, string body)
+        public string PropFind(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             //REQUEST PROPERTIES
             //prop property return the value of the specified property
@@ -42,27 +43,50 @@ namespace CalDAV.Core
         }
 
         //TODO: Nacho
-        public string Report(string userEmail, string collectionName, string body)
+        public string Report(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             throw new NotImplementedException();
         }
 
-        //TODO: Nacho
-        public string Report(string userEmail, string collectionName, string obajectResourceId, string body)
-        {
-            throw  new NotImplementedException();
-        }
         //TODO: Adriano
-        public void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, string body)
+        public bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, string body)
         {
+
+            var userEmail = propertiesAndHeaders["userEmail"];
+            var collectionName = propertiesAndHeaders["collectionName"];
+            var resourceId = propertiesAndHeaders["resourceId"];
             //Note: calendar object resource = COR
 
             //check that resourceId don't exist but the collection does.
+            if (!StorageManagement.ExistCalendarCollection(userEmail, collectionName))
+                return false;
             //other case it updates the specified COR.
             //if the client intend to create (not update) a new COR it SHOULD add a HTTP header "If-None-Match : *" 
             // it secures that it will not update an COR in case that the id already exist without notice the client.
             //for an update use "If-Match" and the specific Etag
             //when created or updated the response header MUST have the Etag
+
+            //etag value of "If-Match"
+            string updateEtag;
+
+            if (propertiesAndHeaders.TryGetValue("If-Match", out updateEtag))
+            {
+                //check that the value do exist
+                if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, resourceId))
+                    return false;
+                return UpdateCalendarObjectResource(userEmail, collectionName, resourceId, updateEtag, body);
+            }
+            else if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
+            {
+                //check that the value dont exist
+                if (StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, resourceId))
+                    return false;
+                return CreateCalendarObjectResource(userEmail, collectionName, resourceId, body);
+            }
+            else
+            {
+                //update or create
+            }
 
             //body is a clean(without XML) iCalendar
 
@@ -71,13 +95,16 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
         //TODO:Nacho
-        public string PropPatch(string userEmail, string collectionName, string Body)
+        public string PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body)
         {
             throw new NotImplementedException();
         }
 
-        public bool DeleteCalendarObjectResource(string userEmail, string collectionName, string resourceId)
+        public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders)
         {
+            var userEmail = propertiesAndHeaders["userEmail"];
+            var collectionName = propertiesAndHeaders["collectionName"];
+            var resourceId = propertiesAndHeaders["resourceId"];
             using (var db = new CalDavContext())
             {
                 var resource = db.GetCollection(userEmail, collectionName).CalendarResources.First(x => x.FileName == resourceId);
@@ -87,8 +114,11 @@ namespace CalDAV.Core
             return StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
         }
 
-        public bool DeleteCalendarCollection(string userEmail, string collectionName)
+        public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
         {
+            var userEmail = propertiesAndHeaders["userEmail"];
+            var collectionName = propertiesAndHeaders["collectionName"];
+            var resourceId = propertiesAndHeaders["resourceId"];
             using (var db = new CalDavContext())
             {
                 var collection = db.GetCollection(userEmail, collectionName);
@@ -104,8 +134,12 @@ namespace CalDAV.Core
         }
 
 
-        public string ReadCalendarObjectResource(string userEmail, string collectionName, string resourceId, out string etag)
+        public string ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string etag)
         {
+            var userEmail = propertiesAndHeaders["userEmail"];
+            var collectionName = propertiesAndHeaders["collectionName"];
+            var resourceId = propertiesAndHeaders["resourceId"];
+
             //Must return the Etag header of the COR
 
             using (var db = new CalDavContext())
@@ -116,10 +150,33 @@ namespace CalDAV.Core
             return StorageManagement.GetCalendarObjectResource(userEmail, collectionName, resourceId);
         }
 
-        public string ReadCalendarCollection(string userEmail, string collectionName)
+        public string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
         {
             throw new NotImplementedException();
         }
 
+        public bool CreateCalendarObjectResource(string userEmail, string collectionName, string calendarResource, string body)
+        {
+            TextReader reader = new StringReader(body);
+            var iCal = ICalendar.Utils.Parser.CalendarBuilder(reader);
+            using (var db = new CalDavContext())
+            {
+                if (!db.CollectionExist(userEmail, collectionName))
+                    return false;
+                CalendarResource resource = new CalendarResource();
+                resource.User = db.GetUser(userEmail);
+                //resource.CalendarResourceId = iCal.;
+                db.CalendarResources.Add(resource);
+
+
+                return true;
+            }
+
+        }
+
+        public bool UpdateCalendarObjectResource(string userEmail, string collectionName, string resourceId, string etag, string body)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

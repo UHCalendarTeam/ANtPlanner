@@ -11,81 +11,88 @@ namespace CalDAV.Core
         /// <summary>
         /// CalDAV HTTP Method for create a new collection of COR (new calendar)
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string MkCalendar(string userEmail, string collectionName, string body);
+        string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body);
+
         /// <summary>
         /// WebDAV HTTP Method
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string PropFind(string userEmail, string collectionName, string  body);
+        string PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
+
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <param name="Body"></param>
         /// <returns></returns>
-        string PropPatch(string userEmail, string collectionName, string Body);
+        string PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body);
+
         /// <summary>
         /// CalDav HTTP Method REPORT for Calendar Collections
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string Report(string userEmail, string collectionName, string body);
-        /// <summary>
-        /// CalDav HTTP Method REPORT for Calendar Object Resources
-        /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="objectResource"></param>
-        /// <param name="body"></param>
-        /// <returns></returns>
-        string Report(string userEmail, string collectionName, string objectResource,string body);
+        string Report(Dictionary<string, string> propertiesAndHeaders, string body);
+
         /// <summary>
         /// CalDAV PUT for create a new COR
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="resourceId"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
-        void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, string body);
+        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, string body);
+
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="resourceId"></param>
-        bool DeleteCalendarObjectResource(string userEmail, string collectionName, string resourceId);
+        /// <param name="propertiesAndHeaders"></param>
+        bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders);
+
         /// <summary>
         /// CalDav & WebDav Method for delete a Collection
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        bool DeleteCalendarCollection(string userEmail, string collectionName);
+        /// <param name="propertiesAndHeaders"></param>
+        bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
 
         /// <summary>
         /// CalDav HTTP Method Get for a COR
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="resourceId"></param>
-        /// <param name="etag"></param>
         /// <returns></returns>
-        string ReadCalendarObjectResource(string userEmail, string collectionName, string resourceId, out string etag);
+        /// <param name="propertiesAndHeaders"></param>
+        /// <param name="etag"></param>
+        string ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string etag);
+
         /// <summary>
         /// CalDav Http method for get a Calendar Collection
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="propertiesAndHeaders"></param>
         /// <returns></returns>
-        string ReadCalendarCollection(string userEmail, string collectionName);
+        string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
+
+        /// <summary>
+        /// Creates a new COR from a PUT when a "If-Non-Match" header is included
+        /// </summary>
+        /// <param name="collectionName"></param>
+        /// <param name="body"></param>
+        /// <param name="resourceId"></param>
+        /// <param name="userEmail"></param>
+        bool CreateCalendarObjectResource(string userEmail, string collectionName, string resourceId,string body);
+
+        /// <summary>
+        /// Updates an existing COR from a PUT when a "If-Match" header is included using the corresponding etag.
+        /// </summary>
+        /// <param name="collectionName"></param>
+        /// <param name="userEmail"></param>
+        /// <param name="resourceId"></param>
+        /// <param name="body"></param>
+        /// <param name="etag"></param>
+        bool UpdateCalendarObjectResource(string userEmail, string collectionName, string resourceId, string etag, string body);
+
+
     }
 }

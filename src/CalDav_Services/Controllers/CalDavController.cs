@@ -7,6 +7,7 @@ using CalDAV.Core;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
+using Microsoft.Extensions.Primitives;
 
 namespace CalDav_Services.Controllers
 {
@@ -30,23 +31,34 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
         public string MkCalendar(string user, string collection)
         {
-            //TODO: Change Request.body to string
-            return CalDavRepository.MkCalendar(user, collection, StreamToString(Request.Body));
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            
+            return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body));
         }
 
         //PROPFIND
         [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}")]
         public string PropFind(string user, string collection)
         {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            
 
-            return CalDavRepository.PropFind(user, collection, StreamToString(Request.Body));
+            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body));
         }
 
         //REPORT
         [AcceptVerbs("Report", Route = "{user}/calendars/{collection}")]
         public string Report(string user, string collection)
         {
-            return CalDavRepository.Report(user, collection, StreamToString(Request.Body));
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            
+            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
         }
         #endregion
 
@@ -56,17 +68,37 @@ namespace CalDav_Services.Controllers
         [HttpPut("{user}/calendars/{collection}/{resourceId}")]
         public void Put(string user, string collection, string resourceId)
         {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail",user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("resourceId", resourceId);
+
+            StringValues IfMatch;
+
+            if (Request.Headers.TryGetValue("If-Match", out IfMatch) && IfMatch.Count==1)
+            {
+                propertiesAndHeaders.Add("If-Match", IfMatch.FirstOrDefault());
+            }
+            else if(Request.Headers.ContainsKey("If-None-Match"))
+            {
+                propertiesAndHeaders.Add("If-Match", "*");
+            }
             
-            CalDavRepository.AddCalendarObjectResource(user, collection, resourceId, StreamToString(Request.Body));
+
+            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body));
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("{user}/calendars/{collection}/{resourceId}")]
         public string Get(string user, string collection, string resourceId)
         {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("resourceId", resourceId);
             //if auth the this
             string etag;
-            var result =  CalDavRepository.ReadCalendarObjectResource(user, collection, resourceId, out etag);
+            var result =  CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, out etag);
             Response.Headers.Add("Etag", etag);
             return result;
         }
@@ -75,9 +107,26 @@ namespace CalDav_Services.Controllers
         [HttpDelete("{user}/calendars/{collection}/{resourceId}")]
         public void Delete(string user, string collection, string resourceId)
         {
-            CalDavRepository.DeleteCalendarObjectResource(user, collection, resourceId);
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("resourceId", resourceId);
+
+            CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders);
         }
 
+        //REPORT api/values/5
+        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}/{resourceId}")]
+        public string Report(string user, string collection, string resourceId)
+        {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("resourceId", resourceId);
+
+            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+
+        }
         #endregion
 
 

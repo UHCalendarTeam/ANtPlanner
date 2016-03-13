@@ -118,5 +118,17 @@ namespace CalDAV.Core
             return true;
 
         }
+
+        public bool ExistCalendarCollection(string userEmail, string calendarCollectionName)
+        {
+            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
+            return Directory.Exists(path);
+        }
+
+        public bool ExistCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        {
+            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            return File.Exists(path);
+        }
     }
 }
