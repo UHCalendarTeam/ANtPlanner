@@ -13,7 +13,7 @@ namespace CalDAV.Utils.XML_Processors
 
         List<IXMLTreeStructure> Children { get; }
 
-        void AddChild(IXMLTreeStructure child);
+        IXMLTreeStructure AddChild(IXMLTreeStructure child);
 
         IXMLTreeStructure GetChild(string childName);
 
