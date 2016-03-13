@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CalDAV.Utils.XML_Processors
@@ -17,6 +18,7 @@ namespace CalDAV.Utils.XML_Processors
             NodeName = name;
             Namespaces = namespaces ?? new List<string>();
             Children = new List<IXMLTreeStructure>();
+            Attributes = new Dictionary<string, string>();
         }
 
         #region Properties
@@ -34,6 +36,11 @@ namespace CalDAV.Utils.XML_Processors
         /// The children of the node.
         /// </summary>
         public List<IXMLTreeStructure> Children { get; set; }
+
+
+        public Dictionary<string, string> Attributes { get; }
+        public string Value { get; private set; }
+
         #endregion
 
         public IXMLTreeStructure AddChild(IXMLTreeStructure child)
@@ -67,13 +74,33 @@ namespace CalDAV.Utils.XML_Processors
             return Children.Select(child => child.GetChildAtAnyLevel(childName)).FirstOrDefault(childResult => childResult != null);
         }
 
-        public void AddNamespace(string nameSpace)
+        public IXMLTreeStructure AddNamespace(string nameSpace)
         {
             Namespaces.Add(nameSpace);
+            return this;
         }
 
-      
-       
-      
+        public IXMLTreeStructure AddAttribute(string name, string value)
+        {
+            Attributes.Add(name, value);
+            return this;
+        }
+
+        public IXMLTreeStructure AddValue(string value)
+        {
+            Value = value;
+            return this;
+        }
+
+
+        public override string ToString()
+        {
+            var strCh = new StringBuilder("\t");
+            foreach (var child in Children)
+            {
+                strCh.Append(child.ToString() + "\n\t");
+            }
+            return NodeName + "\n\t" + strCh.ToString();
+        }
     }
 }

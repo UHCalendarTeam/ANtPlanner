@@ -13,10 +13,22 @@ namespace CalDAV.Utils.XML_Processors
 
         List<IXMLTreeStructure> Children { get; }
 
+        Dictionary<string, string> Attributes { get; }
+
+        string Value { get; }
+
         IXMLTreeStructure AddChild(IXMLTreeStructure child);
 
         IXMLTreeStructure GetChild(string childName);
 
         IXMLTreeStructure GetChildAtAnyLevel(string childName);
+
+
+        IXMLTreeStructure AddNamespace(string ns);
+
+        IXMLTreeStructure AddAttribute(string name, string value);
+
+
+        IXMLTreeStructure AddValue(string value);
     }
 }
