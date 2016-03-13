@@ -31,7 +31,7 @@ namespace CalDAV.Core
 
         }
         //TODO: ADriano
-        public string PropFind(string userEmail, string collectionName, Stream body)
+        public string PropFind(string userEmail, string collectionName, string body)
         {
             //REQUEST PROPERTIES
             //prop property return the value of the specified property
@@ -42,12 +42,18 @@ namespace CalDAV.Core
         }
 
         //TODO: Nacho
-        public string Report(string userEmail, string collectionName, Stream body)
+        public string Report(string userEmail, string collectionName, string body)
         {
             throw new NotImplementedException();
         }
+
+        //TODO: Nacho
+        public string Report(string userEmail, string collectionName, string obajectResourceId, string body)
+        {
+            throw  new NotImplementedException();
+        }
         //TODO: Adriano
-        public void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, Stream body)
+        public void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, string body)
         {
             //Note: calendar object resource = COR
 
@@ -65,7 +71,7 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
         //TODO:Nacho
-        public string PropPatch(string userEmail, string collectionName, Stream Body)
+        public string PropPatch(string userEmail, string collectionName, string Body)
         {
             throw new NotImplementedException();
         }

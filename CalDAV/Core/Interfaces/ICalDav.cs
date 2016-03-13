@@ -23,7 +23,7 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string PropFind(string userEmail, string collectionName, Stream body);
+        string PropFind(string userEmail, string collectionName, string  body);
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
         /// </summary>
@@ -31,15 +31,24 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="Body"></param>
         /// <returns></returns>
-        string PropPatch(string userEmail, string collectionName, Stream Body);
+        string PropPatch(string userEmail, string collectionName, string Body);
         /// <summary>
-        /// CalDav HTTP Method REPORT
+        /// CalDav HTTP Method REPORT for Calendar Collections
         /// </summary>
         /// <param name="userEmail"></param>
         /// <param name="collectionName"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        string Report(string userEmail, string collectionName, Stream body);
+        string Report(string userEmail, string collectionName, string body);
+        /// <summary>
+        /// CalDav HTTP Method REPORT for Calendar Object Resources
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="objectResource"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        string Report(string userEmail, string collectionName, string objectResource,string body);
         /// <summary>
         /// CalDAV PUT for create a new COR
         /// </summary>
@@ -47,7 +56,7 @@ namespace CalDAV.Core
         /// <param name="collectionName"></param>
         /// <param name="resourceId"></param>
         /// <param name="body"></param>
-        void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, Stream body);
+        void AddCalendarObjectResource(string userEmail, string collectionName, string resourceId, string body);
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
         /// </summary>

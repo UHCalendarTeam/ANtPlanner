@@ -74,5 +74,15 @@ namespace CalDAV.CALDAV_Properties
                 return XML_Processors.XMLBuilders.XmlBuilder("max-intances", NameSpace, collection.MaxIntences.ToString());
             }
         }
+
+        //TODO: Fix this method it has to return multiples values 
+        public string ResourceType(string userEmail, string collectionName)
+        {
+            using (var db = new CalDavContext())
+            {
+                var collection = db.GetCollection(userEmail, collectionName);
+                return XML_Processors.XMLBuilders.XmlBuilder("resourcetype", NameSpace, collection.ResourceType.ToString());
+            }
+        } 
     }
 }

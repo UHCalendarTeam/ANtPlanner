@@ -27,6 +27,7 @@ namespace CalDAV.Models
 
         public ICollection<string> SupportedCalendarComponentSet { get; set; }
 
+        public List<string> ResourceType { get; set; } 
 
         public int MaxResourceSize { get; set; }
 

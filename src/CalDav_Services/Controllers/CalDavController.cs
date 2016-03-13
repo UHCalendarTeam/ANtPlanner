@@ -31,7 +31,7 @@ namespace CalDav_Services.Controllers
         public string MkCalendar(string user, string collection)
         {
             //TODO: Change Request.body to string
-            return CalDavRepository.MkCalendar(user, collection, Request.Body.ToString());
+            return CalDavRepository.MkCalendar(user, collection, StreamToString(Request.Body));
         }
 
         //PROPFIND
@@ -39,14 +39,14 @@ namespace CalDav_Services.Controllers
         public string PropFind(string user, string collection)
         {
 
-            return CalDavRepository.PropFind(user, collection, Response.Body);
+            return CalDavRepository.PropFind(user, collection, StreamToString(Request.Body));
         }
 
         //REPORT
         [AcceptVerbs("Report", Route = "{user}/calendars/{collection}")]
         public string Report(string user, string collection)
         {
-            return CalDavRepository.Report(user, collection, Request.Body);
+            return CalDavRepository.Report(user, collection, StreamToString(Request.Body));
         }
         #endregion
 
@@ -57,7 +57,7 @@ namespace CalDav_Services.Controllers
         public void Put(string user, string collection, string resourceId)
         {
             
-            CalDavRepository.AddCalendarObjectResource(user, collection, resourceId, Request.Body);
+            CalDavRepository.AddCalendarObjectResource(user, collection, resourceId, StreamToString(Request.Body));
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
@@ -81,7 +81,11 @@ namespace CalDav_Services.Controllers
         #endregion
 
 
-
+        private string StreamToString(Stream stream)
+        {
+            StreamReader reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
 
         
 
