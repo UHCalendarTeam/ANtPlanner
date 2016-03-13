@@ -1,14 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace CalDAV.Models
 {
-    public static  class Queries
+    public static class Queries
     {
-       
-     /// <summary>
+        /// <summary>
+        /// Check if a User exist in the system
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
+        public static bool UserExist(this CalDavContext source, string userEmail)
+        {
+            return (
+                from user in source.Users
+                where user.Email == userEmail
+                select user).Count() > 0;
+        }
+        /// <summary>
         /// return a User for a given name
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
@@ -20,6 +33,17 @@ namespace CalDAV.Models
             return source.Users.Where(u => u.Email == userEmail).First();
         }
 
+        public static bool CollectionExist(this CalDavContext source, string userEmail, string collectionName)
+        {
+            if (!UserExist(source, userEmail)) 
+            return false;
+
+            return (
+                from collection in GetUser(source, userEmail).CalendarCollections
+                where collection.Name == collectionName
+                select collection
+                ).Count() > 0;
+        }
         /// <summary>
         /// return a collection for a given user and collectionName
         /// </summary>
