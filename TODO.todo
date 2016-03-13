@@ -7,6 +7,7 @@ Caldav:
         ☐ Do the precodintions methods.
         ☐ Do the postconditions.
   ☐  Do a class for the common properties of the collections.
+  ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
 
 Preconditions:
   ☐ Do the preconditions checks of the methods.
