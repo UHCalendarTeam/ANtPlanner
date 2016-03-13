@@ -92,6 +92,9 @@ end=""20060105T000000Z""/>
             Assert.NotNull(result.GetChildAtAnyLevel("filter").GetChild("comp-filter"));
         }
 
+        /// <summary>
+        /// Checking the getChildAtAnyLevel
+        /// </summary>
         [Fact]
         public void UnitTest4()
         {
