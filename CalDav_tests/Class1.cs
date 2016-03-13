@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using CalDAV.Core;
+using CalDAV.Utils.XML_Processors;
 
 namespace CalDav_tests
 {
@@ -16,8 +17,13 @@ namespace CalDav_tests
         [Fact]
         public void UniTest1()
         {
-            var fsm = new FileSystemMangement();
-            Assert.True(fsm.AddUserFolder("Nacho"));
+            
+          var fsm = new FileSystemMangement();
+            Assert.False(fsm.AddUserFolder("Nacho"));
+         
         }
+
+
+
     }
 }
