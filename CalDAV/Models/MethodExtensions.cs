@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -96,6 +97,30 @@ namespace CalDAV.Models
             return source.GetCollection(userEmail, collectionName)
                 .CalendarResources
                 .First(cr => cr.FileName == calResource);
+        }
+
+        /// <summary>
+        /// Filter the resources of the user in the given collection
+        /// by filter of the dates.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="starTime">The startTime of the  </param>
+        /// <param name="endTime"></param>
+        /// <param name="ownerName"></param>
+        /// <param name="colName"></param>
+        /// <returns></returns>
+        public static IEnumerable<CalendarResource> TimeRangeFilter(this CalDavContext source, DateTime starTime,
+            DateTime endTime, string ownerName, string colName)
+        {
+            //TODO: expand the recurrence instances of the resources.
+            //TODO: convert the datetimes to the UTC of the request
+            //TODO: check if the where predicate is the same that in the protocol
+            var resources= source.GetCollection(ownerName, colName).CalendarResources;
+            var output =
+                resources.Select(resource => resource)
+                    .Where(resource => resource.DtStart == starTime && resource.DtEnd < endTime);
+            return output;
+
         }
     }
 }
