@@ -190,6 +190,7 @@ namespace CalDAV.Core
                 if (!db.CollectionExist(userEmail, collectionName))
                     return false;
 
+                //TODO:Calculate Etag
 
                 //filling the resource
                 var resource = FillResource(userEmail, collectionName, calendarResource, etag, db, iCal, out retEtag);
@@ -234,14 +235,28 @@ namespace CalDAV.Core
 
                 //Fill the resource
                 var resource = FillResource(userEmail, collectionName, resourceId, etag, db, iCal, out retEtag);
+                int prevEtag;
+                int actualEtag;
+                string tempEtag = db.GetCalendarResource(userEmail, collectionName, resourceId).Etag;
+                if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
+                {
+                    if (actualEtag > prevEtag)
+                    {
+                        //Adding to the dataBase
+                        db.CalendarResources.Update(resource);
 
-                //Adding to the dataBase
-                db.CalendarResources.Update(resource);
+                        //Removing old File 
+                        StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
+                        //Adding New File
+                        StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, resourceId, body);
 
-                //Removing old File 
-                StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
-                //Adding New File
-                StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, resourceId, body);
+                    }
+                    else
+                        retEtag = tempEtag;
+                }
+                else
+                    return false;
+
             }
             return true;
         }
