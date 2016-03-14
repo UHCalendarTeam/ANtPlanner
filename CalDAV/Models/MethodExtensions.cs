@@ -34,6 +34,13 @@ namespace CalDAV.Models
             return source.Users.Where(u => u.Email == userEmail).First();
         }
 
+        /// <summary>
+        /// Check if a collection exist in the system.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="userEmail"></param>
+        /// <param name="collectionName"></param>
+        /// <returns></returns>
         public static bool CollectionExist(this CalDavContext source, string userEmail, string collectionName)
         {
             if (!UserExist(source, userEmail)) 
@@ -56,7 +63,26 @@ namespace CalDAV.Models
         {
             return source.GetUser(userEmail).CalendarCollections.Where(cl => cl.Name == collectionName).First();
         }
+        /// <summary>
+        /// Check if a CalendarResource Exist
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="userEmail"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="calResource"></param>
+        /// <returns></returns>
+        public static bool CalendarResourceExist(this CalDavContext source, string userEmail, string collectionName,
+            string calResource)
+        {
+            if (!CollectionExist(source, userEmail, collectionName))
+                return false;
 
+            return (
+                from resource in GetCollection(source, userEmail, collectionName).CalendarResources
+                where resource.FileName == calResource
+                select resource
+                ).Count() > 0;
+        }
         /// <summary>
         /// 
         /// </summary>

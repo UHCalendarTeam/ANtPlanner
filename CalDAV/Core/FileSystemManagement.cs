@@ -60,30 +60,23 @@ namespace CalDAV.Core
             return true;
         }
 
-        public bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string bodyIcalendar,
-            out string objectResourceName)
+        public bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string objectResourceName, string bodyIcalendar)
         {
+
             var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
             objectResourceName = null;
 
+            //Check Directory
             if (!Directory.Exists(path)) return false;
 
             TextReader reader = new StringReader(bodyIcalendar);
 
+            //Parse the iCalendar Object
             var iCalendar = Parser.CalendarBuilder(reader);
             if (iCalendar == null) return false;
-
-            var uniqueName = "";
-            if (iCalendar.CalendarComponents.Count>0)
-            {
-                IList<IComponentProperty> list;
-                if(iCalendar.Properties.TryGetValue("UID", out list ))
-                {
-                    var firstOrDefault = list.FirstOrDefault();
-                    if (firstOrDefault != null) uniqueName = ((IValue<string>)firstOrDefault).Value.ToLower();
-                }
-            }
-            var stream = new FileStream(path + uniqueName, FileMode.CreateNew);
+            
+            //Write to Disk
+            var stream = new FileStream(path + objectResourceName, FileMode.CreateNew);
             using (stream)
             {
                 var writer = new StreamWriter(stream);

@@ -73,19 +73,26 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("resourceId", resourceId);
 
-            StringValues IfMatch;
+            StringValues ifMatch;
+            StringValues etags;
 
-            if (Request.Headers.TryGetValue("If-Match", out IfMatch) && IfMatch.Count==1)
+            string etag;
+
+            if (Request.Headers.TryGetValue("If-Match", out ifMatch) && ifMatch.Count==1)
             {
-                propertiesAndHeaders.Add("If-Match", IfMatch.FirstOrDefault());
+                propertiesAndHeaders.Add("If-Match", ifMatch.FirstOrDefault());
             }
             else if(Request.Headers.ContainsKey("If-None-Match"))
             {
                 propertiesAndHeaders.Add("If-Match", "*");
             }
+            if (Request.Headers.TryGetValue("Etag", out etags))
+            {
+                propertiesAndHeaders.Add("Etag", etags.FirstOrDefault());
+            }
             
 
-            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body));
+            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body), out etag);
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
