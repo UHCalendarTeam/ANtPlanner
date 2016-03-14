@@ -16,6 +16,7 @@ Caldav:
     ☐ 7.8 CALDAV:calendar-query REPORT
     ☐ Implement a tree structure for parsing and building the xml request and response.
      ☐ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice.
+     ☐ Servers MUST advertise the set of collations that they support via the CALDAV:supported-collation-set property defined on any resource that supports reports that use collations
 
 Preconditions:
   ☐ Do the preconditions checks of the methods.

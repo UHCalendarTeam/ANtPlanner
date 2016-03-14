@@ -20,7 +20,7 @@ namespace CalDAV.Models
             return (
                 from user in source.Users
                 where user.Email == userEmail
-                select user).Count() > 0;
+                select user).Any();
         }
         /// <summary>
         /// return a User for a given name
@@ -31,7 +31,7 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static User GetUser(this CalDavContext source, string userEmail)
         {
-            return source.Users.Where(u => u.Email == userEmail).First();
+            return source.Users.First(u => u.Email == userEmail);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace CalDAV.Models
                 from collection in GetUser(source, userEmail).CalendarCollections
                 where collection.Name == collectionName
                 select collection
-                ).Count() > 0;
+                ).Any();
         }
         /// <summary>
         /// return a collection for a given user and collectionName
@@ -61,7 +61,7 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static CalendarCollection GetCollection(this CalDavContext source, string userEmail, string collectionName)
         {
-            return source.GetUser(userEmail).CalendarCollections.Where(cl => cl.Name == collectionName).First();
+            return source.GetUser(userEmail).CalendarCollections.First(cl => cl.Name == collectionName);
         }
         /// <summary>
         /// Check if a CalendarResource Exist
@@ -81,7 +81,7 @@ namespace CalDAV.Models
                 from resource in GetCollection(source, userEmail, collectionName).CalendarResources
                 where resource.FileName == calResource
                 select resource
-                ).Count() > 0;
+                ).Any();
         }
         /// <summary>
         /// 
@@ -114,11 +114,11 @@ namespace CalDAV.Models
         {
             //TODO: expand the recurrence instances of the resources.
             //TODO: convert the datetimes to the UTC of the request
-            //TODO: check if the where predicate is the same that in the protocol
+            
             var resources= source.GetCollection(ownerName, colName).CalendarResources;
             var output =
                 resources.Select(resource => resource)
-                    .Where(resource => resource.DtStart == starTime && resource.DtEnd < endTime);
+                    .Where(resource => resource.DtStart >= starTime && resource.DtEnd < endTime);
             return output;
 
         }
