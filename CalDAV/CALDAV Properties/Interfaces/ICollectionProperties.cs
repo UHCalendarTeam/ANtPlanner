@@ -10,6 +10,7 @@ namespace CalDAV.CALDAV_Properties
     /// </summary>
     public interface ICollectionProperties
     {
+        
          string NameSpace { get; }
 
         /// <summary>

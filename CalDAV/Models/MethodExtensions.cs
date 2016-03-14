@@ -114,11 +114,18 @@ namespace CalDAV.Models
         {
             //TODO: expand the recurrence instances of the resources.
             //TODO: convert the datetimes to the UTC of the request
-            
+            //TODO: evaluate the condition depending on the definition fo the DTEND and DURATION(pg64 CALDAV)
             var resources= source.GetCollection(ownerName, colName).CalendarResources;
+
             var output =
                 resources.Select(resource => resource)
-                    .Where(resource => resource.DtStart >= starTime && resource.DtEnd < endTime);
+                    .Where(resource =>
+                    {
+                        if (resource.DtEnd != DateTime.MaxValue)
+                            return starTime < resource.DtEnd && endTime > resource.DtStart;
+                        else//TODO: sum the DTSart with the DURATION
+                            return true;
+                    });
             return output;
 
         }
