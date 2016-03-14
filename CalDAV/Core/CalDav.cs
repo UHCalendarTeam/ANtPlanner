@@ -190,6 +190,7 @@ namespace CalDAV.Core
                 if (!db.CollectionExist(userEmail, collectionName))
                     return false;
 
+                //TODO:Calculate Etag
 
                 //filling the resource
                 var resource = FillResource(userEmail, collectionName, calendarResource, etag, db, iCal, out retEtag);
@@ -204,7 +205,6 @@ namespace CalDAV.Core
             }
 
         }
-
 
         /// <summary>
         /// Updates an existing COR from a PUT when a "If-Match" header is included using the corresponding etag.
@@ -234,14 +234,31 @@ namespace CalDAV.Core
 
                 //Fill the resource
                 var resource = FillResource(userEmail, collectionName, resourceId, etag, db, iCal, out retEtag);
+                var prevResource = db.GetCalendarResource(userEmail, collectionName, resourceId);
+                int prevEtag;
+                int actualEtag;
+                string tempEtag = prevResource.Etag;
+                if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
+                {
+                    if (actualEtag > prevEtag)
+                    {
+                        if (resource.Uid != prevResource.Uid)
+                            return false;
+                        //Adding to the dataBase
+                        db.CalendarResources.Update(resource);
 
-                //Adding to the dataBase
-                db.CalendarResources.Update(resource);
+                        //Removing old File 
+                        StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
+                        //Adding New File
+                        StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, resourceId, body);
 
-                //Removing old File 
-                StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, resourceId);
-                //Adding New File
-                StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, resourceId, body);
+                    }
+                    else
+                        retEtag = tempEtag;
+                }
+                else
+                    return false;
+
             }
             return true;
         }

@@ -95,6 +95,12 @@ namespace CalDav_Services.Controllers
             CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body), out etag);
         }
 
+        [HttpGet]
+        public string test()
+        {
+            return "Test";
+        }
+
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("{user}/calendars/{collection}/{resourceId}")]
         public string Get(string user, string collection, string resourceId)
