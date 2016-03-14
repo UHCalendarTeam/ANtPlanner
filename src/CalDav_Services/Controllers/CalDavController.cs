@@ -95,8 +95,8 @@ namespace CalDav_Services.Controllers
             CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body), out etag);
         }
 
-        [HttpGet("test")]
-        public string gethello()
+        [HttpGet]
+        public string test()
         {
             return "Test";
         }

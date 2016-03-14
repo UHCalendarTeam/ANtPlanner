@@ -1,7 +1,7 @@
 ﻿{
     "commands": {
         "web": "Microsoft.AspNet.Server.Kestrel",
-        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.url http://192.168.99.1:5003"
+        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://192.168.99.1:5003"
     },
     "compilationOptions": {
         "emitEntryPoint": true
@@ -20,8 +20,7 @@
         "Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
         "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
         "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
-        "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final"
-        "web": "Microsoft.AspNet.Server.Kestrel"
+        "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final"    
     },
     "exclude": [
         "wwwroot",
