@@ -9,6 +9,23 @@ Caldav:
   ☐  Do a class for the common properties of the collections.
   ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
 
+  Report Method:
+    ☐ 7.3 Date and Floating Time
+    ✔ 7.4 Time Range Filtering @done (16-03-14 08:59)
+    ☐ 7.6 Partial Retrieval
+    ☐ 7.8 CALDAV:calendar-query REPORT
+    ☐ Implement a tree structure for parsing and building the xml request and response.
+     ☐ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice.
+
 Preconditions:
   ☐ Do the preconditions checks of the methods.
   ☐ Do the postcondition checks of the methods
+
+
+
+  questions:
+    ☐  Si implementar un versionging history of the resources.( mas data en el server)
+
+    to search:
+      ☐ How to mock in EF7.
+      ☐ EF7 unit test examples
