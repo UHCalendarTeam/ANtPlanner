@@ -206,7 +206,6 @@ namespace CalDAV.Core
 
         }
 
-
         /// <summary>
         /// Updates an existing COR from a PUT when a "If-Match" header is included using the corresponding etag.
         /// </summary>
@@ -235,13 +234,16 @@ namespace CalDAV.Core
 
                 //Fill the resource
                 var resource = FillResource(userEmail, collectionName, resourceId, etag, db, iCal, out retEtag);
+                var prevResource = db.GetCalendarResource(userEmail, collectionName, resourceId);
                 int prevEtag;
                 int actualEtag;
-                string tempEtag = db.GetCalendarResource(userEmail, collectionName, resourceId).Etag;
+                string tempEtag = prevResource.Etag;
                 if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
                 {
                     if (actualEtag > prevEtag)
                     {
+                        if (resource.Uid != prevResource.Uid)
+                            return false;
                         //Adding to the dataBase
                         db.CalendarResources.Update(resource);
 
