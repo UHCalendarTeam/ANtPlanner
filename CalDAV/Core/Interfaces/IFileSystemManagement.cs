@@ -41,15 +41,16 @@ namespace CalDAV.Core
         /// <param name="calendarCollectionName">Name of the calendar collection.</param>
         /// <returns></returns>
         bool DeleteCalendarCollection(string userEmail, string calendarCollectionName);
+
         /// <summary>
         /// Adds a Calendar Object Resource to the calendar collection specified. 
         /// </summary>
         /// <param name="userEmail">Email of the owner of the calendar collection</param>
         /// <param name="calendarCollectionName">Name of the calendar collection where is going to be stored</param>
-        /// <param name="bodyIcalendar">Body of the iCalendar Object that is going to be stored with .ics extension.</param>
         /// <param name="objectResourceName">Returns the name assigned to the iCalendar file.</param>
+        /// <param name="bodyIcalendar">Body of the iCalendar Object that is going to be stored with .ics extension.</param>
         /// <returns></returns>
-        bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string bodyIcalendar, out string objectResourceName);
+        bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string objectResourceName, string bodyIcalendar);
         /// <summary>
         /// Returns the iCalendar Object stored in the user calendar collection.
         /// </summary>

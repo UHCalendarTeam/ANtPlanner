@@ -45,7 +45,8 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
-        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, string body);
+        /// <param name="retEtag"></param>
+        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, string body, out string retEtag);
 
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
@@ -73,26 +74,6 @@ namespace CalDAV.Core
         /// <param name="propertiesAndHeaders"></param>
         /// <returns></returns>
         string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
-
-        /// <summary>
-        /// Creates a new COR from a PUT when a "If-Non-Match" header is included
-        /// </summary>
-        /// <param name="collectionName"></param>
-        /// <param name="body"></param>
-        /// <param name="resourceId"></param>
-        /// <param name="userEmail"></param>
-        bool CreateCalendarObjectResource(string userEmail, string collectionName, string resourceId,string body);
-
-        /// <summary>
-        /// Updates an existing COR from a PUT when a "If-Match" header is included using the corresponding etag.
-        /// </summary>
-        /// <param name="collectionName"></param>
-        /// <param name="userEmail"></param>
-        /// <param name="resourceId"></param>
-        /// <param name="body"></param>
-        /// <param name="etag"></param>
-        bool UpdateCalendarObjectResource(string userEmail, string collectionName, string resourceId, string etag, string body);
-
 
     }
 }
