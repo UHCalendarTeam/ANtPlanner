@@ -30,3 +30,6 @@ Preconditions:
     to search:
       ☐ How to mock in EF7.
       ☐ EF7 unit test examples
+
+  Nacho:
+    ✔ FileSystemMangement implemntar metodo para devolver todos los recursos de una coleccion. @done (16-03-14 15:54)
