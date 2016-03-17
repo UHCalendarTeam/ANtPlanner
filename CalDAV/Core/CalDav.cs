@@ -36,11 +36,21 @@ namespace CalDAV.Core
         //TODO: ADriano
         public string PropFind(Dictionary<string, string> propertiesAndHeaders, string body)
         {
+            var xmlTree = XMLParsers.GenericParser(body);
+
+            if (xmlTree.NodeName != "propfind")
+                return null;
+
+            //var propType = xmlTree.Children[0];
+            //if(propType.NodeName == "prop")
+            //    return  
             //REQUEST PROPERTIES
             //prop property return the value of the specified property
             //allprop property return the value of all properties --the include elemen makes the server return 
             //other properties that will not be returnes otherwise
             //getetag property return the etag of the COR for sincro options.
+
+            
             throw new NotImplementedException();
         }
 
@@ -71,12 +81,6 @@ namespace CalDAV.Core
             if (!preconditionCheck.PreconditionsOK(propertiesAndHeaders))
                 return false;
             
-            //other case it updates the specified COR.
-            //if the client intend to create (not update) a new COR it SHOULD add a HTTP header "If-None-Match : *" 
-            // it secures that it will not update an COR in case that the id already exist without notice the client.
-            //for an update use "If-Match" and the specific Etag
-            //when created or updated the response header MUST have the Etag
-
             //etag value of "If-Match"
             string updateEtag;
 
@@ -84,20 +88,15 @@ namespace CalDAV.Core
             {
                 //Taking etag from If-Match header.
                 propertiesAndHeaders["etag"] = updateEtag;
-                //check that the value do exist
-                if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
-                    return false;
                 return UpdateCalendarObjectResource(propertiesAndHeaders, out retEtag);
             }
             else if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
             {
-                //check that the value don't exist
-                if (StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
-                    return false;
                 return CreateCalendarObjectResource(propertiesAndHeaders, out retEtag);
             }
             else
             {
+                //update or create
                 using (var db = new CalDavContext())
                 {
                     if (db.CalendarResourceExist(userEmail, collectionName, calendarResourceId) &&
@@ -108,14 +107,9 @@ namespace CalDAV.Core
                     }
                     return CreateCalendarObjectResource(propertiesAndHeaders, out retEtag);
                 }
-                //update or create
+
             }
-
-            //body is a clean(without XML) iCalendar
-
             //return HTTP 201 Created 
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
