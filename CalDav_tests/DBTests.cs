@@ -67,7 +67,7 @@ namespace CalDav_tests
 
             var userResult = db.Users.First(x => x.FirstName == "John");
             Assert.NotNull(user);
-            //var a = 4;
+            
         }
     }
 }

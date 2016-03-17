@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CalDAV.Models;
+using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
 using ICalendar.Utils;
 
@@ -26,8 +27,8 @@ namespace CalDAV.Core.ConditionsCheck
             var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
             var etag = propertiesAndHeaders["etag"];
             var body = propertiesAndHeaders["body"];
-            var reader = new StringReader(body);
-            var iCalendar = Parser.CalendarBuilder(reader);
+            var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
+            var iCalendar = new VCalendar(body);//lo que no estoy seguro que en el body solo haya el iCal string
             #endregion
 
             //check that resourceId don't exist but the collection does.
@@ -67,18 +68,18 @@ namespace CalDAV.Core.ConditionsCheck
 
                 //A Calendar Component can be separated in multiples calendar components but all MUST
                 //have the same UID.
-                var uid = ((ComponentProperty<string>)calendarComponent.FirstOrDefault().Properties["UID"].FirstOrDefault()).Value;
+                var uid = ((ComponentProperty<string>)calendarComponent.FirstOrDefault().Properties["UID"]).Value;
                 string uidComp;
                 foreach (var component in calendarComponent)
                 {
-                    uidComp = ((ComponentProperty<string>)component.Properties["UID"].FirstOrDefault()).Value;
+                    uidComp = ((ComponentProperty<string>)component.Properties["UID"]).Value;
                     if (uid != uidComp)
                         return false;
                 }
             }
 
 
-            var uidCalendar = ((ComponentProperty<string>)iCalendar.Properties["UID"].FirstOrDefault()).Value;
+            var uidCalendar = ((ComponentProperty<string>)iCalendar.Properties["UID"]).Value;
             //Check that if the operation is create there is not another element in the collection with the same UID
             if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
             {

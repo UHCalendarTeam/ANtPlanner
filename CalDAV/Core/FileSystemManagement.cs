@@ -69,10 +69,11 @@ namespace CalDAV.Core
             //Check Directory
             if (!Directory.Exists(path)) return false;
 
-            TextReader reader = new StringReader(bodyIcalendar);
+            
 
             //Parse the iCalendar Object
-            var iCalendar = Parser.CalendarBuilder(reader);
+            //TODO: pa q estas construyendo esto??
+            var iCalendar = new VCalendar(bodyIcalendar);
             if (iCalendar == null) return false;
 
             //Write to Disk
@@ -142,10 +143,8 @@ namespace CalDAV.Core
                 temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
                 if (temp != null)
                 {
-                    reader = new StringReader(temp);
-                    iCalendar = ICalendar.Utils.Parser.CalendarBuilder(reader);
-                    if (iCalendar != null)
-                        calendarObjectResources.Add(iCalendar);
+                    iCalendar =new VCalendar(temp);
+                    calendarObjectResources.Add(iCalendar);
                 }
 
             }

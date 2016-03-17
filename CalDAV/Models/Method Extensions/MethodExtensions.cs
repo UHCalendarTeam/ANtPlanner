@@ -4,9 +4,14 @@ using System.Linq;
 using System.Resources;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using ICalendar.Utils;
+using ICalendar.ValueTypes; 
 
 namespace CalDAV.Models
 {
+    /// <summary>
+    /// This class contains method extension for the CaldavContext.
+    /// </summary>
     public static class Queries
     {
         /// <summary>
@@ -115,19 +120,61 @@ namespace CalDAV.Models
             //TODO: expand the recurrence instances of the resources.
             //TODO: convert the datetimes to the UTC of the request
             //TODO: evaluate the condition depending on the definition fo the DTEND and DURATION(pg64 CALDAV)
+            //TODO: check for when the dtStartTime if of type date.
             var resources= source.GetCollection(ownerName, colName).CalendarResources;
 
             var output =
                 resources.Select(resource => resource)
                     .Where(resource =>
                     {
+                        //If the comp defines a DTEND property then should be use
                         if (resource.DtEnd != DateTime.MaxValue)
                             return starTime < resource.DtEnd && endTime > resource.DtStart;
-                        else//TODO: sum the DTSart with the DURATION
-                            return true;
+                        //if exist the DURATION property
+                        if (resource.Duration != "")
+                        {
+                            DurationType duration;
+                            var result = resource.Duration.ToDuration(out duration);
+                            var startPlusDuration = resource.DtStart.AddDuration(duration);
+                            if (duration.IsPositive)
+                                return starTime < startPlusDuration && endTime > resource.DtStart;
+                            else
+                                return starTime <= resource.DtStart && endTime > resource.DtStart;
+                        }
+                        //if there is not DTEND nor DURATION then this is the default behavior
+                        return starTime < resource.DtStart.AddDays(1) && endTime > resource.DtStart;
                     });
             return output;
 
         }
+
+
+
+        
+
+
+        /// <summary>
+        /// To add a duration Property to the dtStart propery.
+        /// </summary>
+        /// <param name="dtStart"></param>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        private static DateTime AddDuration(this DateTime dtStart, DurationType duration)
+        {
+            if (duration.Weeks != null)
+                if (duration.IsPositive)
+                    return dtStart.AddDays(7*duration.Weeks.Value);
+                else
+                    return dtStart.Subtract(new TimeSpan(7*duration.Weeks.Value, 0, 0, 0));
+            var durationSpan = new TimeSpan(
+                duration.Days ?? 0,
+                duration.Hours ?? 0,
+                duration.Minutes ?? 0,
+                duration.Seconds ?? 0);
+            return duration.IsPositive?dtStart.Add(durationSpan):dtStart.Subtract(durationSpan);
+        }
+
+
+
     }
 }

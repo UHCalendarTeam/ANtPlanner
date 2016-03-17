@@ -47,9 +47,9 @@ namespace CalDAV.Models
 
         /// <summary>
         /// The duration of the resource if defined
-        /// Default value =-1.
+        /// Default value ="".
         /// </summary>
-        public int Duration { get; set; }
+        public string Duration { get; set; }
 
 
     }
