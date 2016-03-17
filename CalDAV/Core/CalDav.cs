@@ -181,8 +181,9 @@ namespace CalDAV.Core
         /// <param></param>
         private bool CreateCalendarObjectResource(string userEmail, string collectionName, string calendarResource, string etag, string body, out string retEtag)
         {
-            TextReader reader = new StringReader(body);
-            var iCal = ICalendar.Utils.Parser.CalendarBuilder(reader);
+            //TODO: no entiendo que se pretende hacer aki!
+            var calendarString = new StringReader(body).ReadToEnd();
+            var iCal = new VCalendar(calendarString);
             retEtag = etag;
 
             using (var db = new CalDavContext())
@@ -218,8 +219,8 @@ namespace CalDAV.Core
         private bool UpdateCalendarObjectResource(string userEmail, string collectionName, string resourceId,
             string etag, string body, out string retEtag)
         {
-            TextReader reader = new StringReader(body);
-            var iCal = ICalendar.Utils.Parser.CalendarBuilder(reader);
+            var calendarString = new StringReader(body).ReadToEnd();
+            var iCal = new VCalendar(calendarString);
 
             retEtag = etag;
 
@@ -274,34 +275,31 @@ namespace CalDAV.Core
         /// <param name="iCal"></param>
         /// <param name="retEtag"></param>
         /// <returns></returns>
-        private CalendarResource FillResource(string userEmail, string collectionName, string calendarResource, string etag, CalDavContext db, VCalendar iCal, out string retEtag)
+        private CalendarResource FillResource(string userEmail, string collectionName, string calendarResource, 
+            string etag, CalDavContext db, VCalendar iCal, out string retEtag)
         {
+            //TODO: aki estabas cogiendo las propiedades del VCALENDAR
+            //para coger las del CalComponent tienes que buscarlo
+            //en iCal.CalendarComponents y coger la q no es VTIMEZONE
             CalendarResource resource = new CalendarResource();
+            
             resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
-            IList<IComponentProperty> list;
-            if (iCal.Properties.TryGetValue("DTSTART", out list))
+            IComponentProperty property;
+            property = iCal.GetComponentProperties("DTSTART");
+            if (property != null)
             {
-                DateTime? temp;
-                var firstOrDefault = list.FirstOrDefault();
-                if (firstOrDefault != null &&
-                    ICalendar.Utils.Utils.ToDateTime(((IValue<string>)firstOrDefault).Value.ToLower(), out temp))
-                    resource.DtStart = temp.Value;
-
+                resource.DtStart = ((IValue<DateTime>) property).Value;
             }
-            if (iCal.Properties.TryGetValue("DTEND", out list))
+            property = iCal.GetComponentProperties("DTEND");
+            if (property != null)
             {
-                DateTime? temp;
-                var firstOrDefault = list.FirstOrDefault();
-                if (firstOrDefault != null &&
-                    ICalendar.Utils.Utils.ToDateTime(((IValue<string>)firstOrDefault).Value.ToLower(), out temp))
-                    resource.DtEnd = temp.Value;
-
+                resource.DtEnd = ((IValue<DateTime>)property).Value;
             }
-            if (iCal.Properties.TryGetValue("UID", out list))
+            property = iCal.GetComponentProperties("UID");
+            if (property!=null)
             {
-                var firstOrDefault = list.FirstOrDefault();
-                if (firstOrDefault != null) resource.Uid = ((IValue<string>)firstOrDefault).Value.ToLower();
+                resource.Uid = ((IValue<string>)property).Value;
             }
             //TODO: Take the resource Etag if the client send it if not assign one
             if (etag != null)
