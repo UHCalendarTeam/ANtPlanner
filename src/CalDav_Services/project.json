@@ -1,7 +1,7 @@
 {
     "commands": {
         "web": "Microsoft.AspNet.Server.Kestrel",
-        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://192.168.99.1:5003"
+        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://192.168.137.1:5003"
     },
     "compilationOptions": {
         "emitEntryPoint": true

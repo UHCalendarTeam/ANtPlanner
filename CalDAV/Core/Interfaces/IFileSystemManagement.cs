@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ICalendar.Calendar;
 
 namespace CalDAV.Core
 {
@@ -34,6 +35,14 @@ namespace CalDAV.Core
         /// <param name="calendarObjectResources"></param>
         /// <returns></returns>
         bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName,out List<string> calendarObjectResources );
+
+        /// <summary>
+        /// Returns all iCalendar Objects contained in the collection.
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <param name="calendarCollectionName"></param>
+        /// <returns></returns>
+        IEnumerable<VCalendar> GetAllCalendarObjectResource(string userEmail, string calendarCollectionName);
         /// <summary>
         /// Deletes the folder which represent the calendar collection and all the COR contained in it.
         /// </summary>

@@ -18,7 +18,7 @@ namespace CalDav_tests
         public void UniTest1()
         {
             
-          var fsm = new FileSystemMangement();
+          var fsm = new FileSystemManagement();
             Assert.False(fsm.AddUserFolder("Nacho"));
          
         }

@@ -10,14 +10,14 @@ using ICalendar.Utils;
 
 namespace CalDAV.Core
 {
-    public class FileSystemMangement : IFileSystemManagement
+    public class FileSystemManagement : IFileSystemManagement
     {
         public string Root { get; }
 
-        public FileSystemMangement(string root ="/CalDav/Users")
+        public FileSystemManagement(string root = "/CalDav/Users")
         {
-            
-            if (!string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root) && root !="/CalDav/Users")
+
+            if (!string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root) && root != "/CalDav/Users")
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
@@ -36,7 +36,7 @@ namespace CalDAV.Core
             return dirInfo.Exists;
         }
 
-        public bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName,out List<string> calendarObjectResources )
+        public bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName, out List<string> calendarObjectResources)
         {
             calendarObjectResources = new List<string>();
             var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
@@ -46,7 +46,7 @@ namespace CalDAV.Core
             foreach (var files in filesPath)
             {
                 var temp = GetCalendarObjectResource(userEmail, calendarCollectionName, files);
-                if(temp != null)
+                if (temp != null)
                     calendarObjectResources.Add(temp);
             }
             return true;
@@ -75,7 +75,7 @@ namespace CalDAV.Core
             //TODO: pa q estas construyendo esto??
             var iCalendar = new VCalendar(bodyIcalendar);
             if (iCalendar == null) return false;
-            
+
             //Write to Disk
             var stream = new FileStream(path + objectResourceName, FileMode.CreateNew);
             using (stream)
@@ -124,5 +124,34 @@ namespace CalDAV.Core
             var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
             return File.Exists(path);
         }
+
+        public IEnumerable<VCalendar> GetAllCalendarObjectResource(string userEmail, string calendarCollectionName)
+        {
+            var calendarObjectResources = new List<VCalendar>();
+            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
+            StringReader reader;
+            string temp;
+            VCalendar iCalendar;
+
+            if (!Directory.Exists(path))
+                return null;
+
+            var filesPath = Directory.EnumerateFiles(path);
+
+            foreach (var file in filesPath)
+            {
+                temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
+                if (temp != null)
+                {
+                    reader = new StringReader(temp);
+                    iCalendar = ICalendar.Utils.Parser.CalendarBuilder(reader);
+                    if (iCalendar != null)
+                        calendarObjectResources.Add(iCalendar);
+                }
+
+            }
+            return calendarObjectResources;
+        }
+      
     }
 }

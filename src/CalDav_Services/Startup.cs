@@ -38,6 +38,7 @@ namespace CalDav_Services
             services.AddMvc();
 
             services.AddSingleton<ICalDav, CalDav>();
+            services.AddSingleton<IFileSystemManagement, FileSystemManagement>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?

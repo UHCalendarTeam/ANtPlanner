@@ -65,13 +65,14 @@ namespace CalDav_Services.Controllers
 
         #region Calendar Object Resource Methods
         // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpPut("{user}/calendars/{collection}/{resourceId}")]
-        public void Put(string user, string collection, string resourceId)
+        [HttpPut("{user}/calendars/{collection}/{calendarResourceId}")]
+        public void Put(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail",user);
             propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("resourceId", resourceId);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+            propertiesAndHeaders.Add("body", StreamToString(Request.Body));
 
             StringValues ifMatch;
             StringValues etags;
@@ -92,7 +93,7 @@ namespace CalDav_Services.Controllers
             }
             
 
-            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, StreamToString(Request.Body), out etag);
+            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, out etag);
         }
 
         [HttpGet]
@@ -102,13 +103,13 @@ namespace CalDav_Services.Controllers
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpGet("{user}/calendars/{collection}/{resourceId}")]
-        public string Get(string user, string collection, string resourceId)
+        [HttpGet("{user}/calendars/{collection}/{calendarResourceId}")]
+        public string Get(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("resourceId", resourceId);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
             //if auth the this
             string etag;
             var result =  CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, out etag);
@@ -117,25 +118,25 @@ namespace CalDav_Services.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{user}/calendars/{collection}/{resourceId}")]
-        public void Delete(string user, string collection, string resourceId)
+        [HttpDelete("{user}/calendars/{collection}/{calendarResourceId}")]
+        public void Delete(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("resourceId", resourceId);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders);
         }
 
         //REPORT api/values/5
-        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}/{resourceId}")]
-        public string Report(string user, string collection, string resourceId)
+        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}/{calendarResourceId}")]
+        public string Report(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("resourceId", resourceId);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
 

@@ -44,9 +44,8 @@ namespace CalDAV.Core
         /// CalDAV PUT for create a new COR
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
         /// <param name="retEtag"></param>
-        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, string body, out string retEtag);
+        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag);
 
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
