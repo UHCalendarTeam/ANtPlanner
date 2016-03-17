@@ -8,7 +8,7 @@
     },
   "dependencies": {
     "CalDAV": "1.0.0",
-    "ICalendar": "1.0.0",
+    "ICalendar": "1.0.0-beta2",
     "Microsoft.AspNet.Cors": "6.0.0-rc1-final",
     "Microsoft.AspNet.Hosting": "1.0.0-rc1-final",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",

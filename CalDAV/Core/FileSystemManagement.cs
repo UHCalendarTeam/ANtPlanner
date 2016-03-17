@@ -143,10 +143,8 @@ namespace CalDAV.Core
                 temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
                 if (temp != null)
                 {
-                    reader = new StringReader(temp);
-                    iCalendar = ICalendar.Utils.Parser.CalendarBuilder(reader);
-                    if (iCalendar != null)
-                        calendarObjectResources.Add(iCalendar);
+                    iCalendar =new VCalendar(temp);
+                    calendarObjectResources.Add(iCalendar);
                 }
 
             }
