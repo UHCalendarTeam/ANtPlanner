@@ -69,7 +69,7 @@ namespace CalDAV.Core
             //Check Directory
             if (!Directory.Exists(path)) return false;
 
-            
+
 
             //Parse the iCalendar Object
             //TODO: pa q estas construyendo esto??
@@ -129,8 +129,8 @@ namespace CalDAV.Core
         {
             var calendarObjectResources = new List<VCalendar>();
             var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            StringReader reader;
-            string temp;
+            
+            string body;
             VCalendar iCalendar;
 
             if (!Directory.Exists(path))
@@ -140,10 +140,10 @@ namespace CalDAV.Core
 
             foreach (var file in filesPath)
             {
-                temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
-                if (temp != null)
+                body = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
+                if (body != null)
                 {
-                    iCalendar =new VCalendar(temp);
+                    iCalendar = new VCalendar(body);
                     calendarObjectResources.Add(iCalendar);
                 }
 

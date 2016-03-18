@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CalDAV.Models;
 using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
+using ICalendar.GeneralInterfaces;
 using ICalendar.Utils;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -105,8 +106,9 @@ namespace CalDAV.Core.ConditionsCheck
                 }
             }
 
+            var methodProp = iCalendar.GetComponentProperties("METHOD");
             //iCalendar object MUST NOT implement METHOD property
-            if (iCalendar.Method != null)
+            if (methodProp != null || ((IValue<string>)methodProp).Value != "")
                 return false;
 
 
