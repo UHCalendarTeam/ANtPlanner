@@ -14,7 +14,10 @@ namespace CalDAV.Utils.XML_Processors
     /// </summary>
     public class XmlTreeStructure :IXMLTreeStructure
     {
-
+        /// <summary>
+        /// Used for building an XMLTreeStrucure from a Xml doc.
+        /// </summary>
+        /// <param name="doc">The string represnetation of the xml.</param>
         public  XmlTreeStructure(string doc)
         {
             var temp = XMLParsers.GenericParser(doc);
@@ -25,11 +28,31 @@ namespace CalDAV.Utils.XML_Processors
             NodeName = temp.NodeName;
         }
 
+        /// <summary>
+        /// Used for construct an object with the given ns.
+        /// </summary>
+        /// <param name="name">Name of the node.</param>
+        /// <param name="nodeNamespace">Ns of the node.</param>
+        public XmlTreeStructure(string name, string nodeNamespace)
+        {
+            NodeName = name;
+            MainNamespace = nodeNamespace;
+            Children = new List<IXMLTreeStructure>();
+            Attributes = new Dictionary<string, string>();
+            Namespaces = new Dictionary<string, string>();
+        }
         
-        public XmlTreeStructure(string name, Dictionary<string, string> namespaces)
+        /// <summary>
+        /// Used for the first node of the object.  
+        /// </summary>
+        /// <param name="name">Name of the node</param>
+        /// <param name="nodeNamespace">The main ns of the nonde(the one that the prefix points to).</param>
+        /// <param name="namespaces">Namespaces of the node.</param>
+        public XmlTreeStructure(string name,string nodeNamespace, Dictionary<string, string> namespaces)
         {
             NodeName = name;
             Namespaces = namespaces ?? new Dictionary<string, string>();
+            MainNamespace = nodeNamespace;
             Children = new List<IXMLTreeStructure>();
             Attributes = new Dictionary<string, string>();
         }

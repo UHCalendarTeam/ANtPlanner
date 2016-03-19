@@ -47,8 +47,8 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest2()
         {
-            var dict = new Dictionary<string, string> {{"", ""}};
-            var tree = new XmlTreeStructure("node1",
+           
+            var tree = new XmlTreeStructure("node1","DAV",
                 new Dictionary<string, string>()
                 {
                     { "D", "DAV"},
