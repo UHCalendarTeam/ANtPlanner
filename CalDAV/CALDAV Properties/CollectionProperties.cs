@@ -11,6 +11,11 @@ namespace CalDAV.CALDAV_Properties
     {
         public static string NameSpace => "urn:ietf:params:xml:ns:caldav";
 
+        public static string ResolveProperty(this CalendarCollection collection, string propertyName)
+        {
+            throw new NotImplementedException();
+        }
+
         public static string CalendarDescription(this CalendarCollection collection, string userEmail,
             string collectionName)
         {

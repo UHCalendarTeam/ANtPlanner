@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace CalDAV.Utils.XML_Processors
 {
     public interface IXMLTreeStructure
     {
-         string NodeName { get;  }
+         string NodeName { get; set; }
 
-        List<string> Namespaces{get;}
+        string MainNamespace { get; set; }
 
-        List<IXMLTreeStructure> Children { get; }
+        Dictionary<string, string> Namespaces{get; set; }
 
-        Dictionary<string, string> Attributes { get; }
+        List<IXMLTreeStructure> Children { get; set; }
+
+        Dictionary<string, string> Attributes { get; set; }
 
         string Value { get; }
 
@@ -24,11 +27,14 @@ namespace CalDAV.Utils.XML_Processors
         IXMLTreeStructure GetChildAtAnyLevel(string childName);
 
 
-        IXMLTreeStructure AddNamespace(string ns);
+        IXMLTreeStructure AddNamespace(string ns, string nsLocal);
 
         IXMLTreeStructure AddAttribute(string name, string value);
 
 
         IXMLTreeStructure AddValue(string value);
+        
+
+         XElement ToXml(IXMLTreeStructure parent);
     }
 }

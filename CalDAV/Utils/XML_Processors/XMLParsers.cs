@@ -39,10 +39,13 @@ namespace CalDAV.Utils.XML_Processors
 
         private static IXMLTreeStructure xmlWalker(XElement node)
         {
-            var output = new XMLTreeStructure(node.Name.LocalName);
-            output.AddNamespace(node.Name.NamespaceName);
-            output.AddValue(node.Value);
-            foreach (var attribute in node.Attributes())
+            var output = new XmlTreeStructure(node.Name.LocalName, null)
+            {
+                Namespaces = node.Attributes().Where(x => x.IsNamespaceDeclaration).
+                    ToDictionary(x => x.Name.LocalName, x => x.Value),
+                Value = node.Value
+            };
+            foreach (var attribute in node.Attributes().Where(x=>!output.Namespaces.Keys.Contains(x.Name.LocalName)))
             {
                 output.AddAttribute(attribute.Name.LocalName, attribute.Value);
             }

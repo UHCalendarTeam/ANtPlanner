@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace CalDAV.Utils.XML_Processors
 {
@@ -11,26 +12,45 @@ namespace CalDAV.Utils.XML_Processors
     /// Tree structure class for parsing and 
     /// building the xml of the request and responses
     /// </summary>
-    public class XMLTreeStructure :IXMLTreeStructure
+    public class XmlTreeStructure :IXMLTreeStructure
     {
-        public XMLTreeStructure(string name, List<string> namespaces = null)
+
+        public  XmlTreeStructure(string doc)
+        {
+            var temp = XMLParsers.GenericParser(doc);
+            Value = temp.Value;
+            Attributes = temp.Attributes;
+            Children = temp.Children;
+            Namespaces = temp.Namespaces;
+            NodeName = temp.NodeName;
+        }
+
+        
+        public XmlTreeStructure(string name, Dictionary<string, string> namespaces)
         {
             NodeName = name;
-            Namespaces = namespaces ?? new List<string>();
+            Namespaces = namespaces ?? new Dictionary<string, string>();
             Children = new List<IXMLTreeStructure>();
             Attributes = new Dictionary<string, string>();
         }
 
+       
         #region Properties
         /// <summary>
         /// The name of the XML node.
         /// </summary>
         public string NodeName { get; set; }
+        
+        /// <summary>
+        /// This is for the ns that points the 
+        /// prefix of the node.
+        /// </summary>
+        public string MainNamespace { get; set; }
 
         /// <summary>
         /// The namespaces of the node.
         /// </summary>
-        public List<string> Namespaces { get; }
+        public Dictionary<string,string> Namespaces { get; set; }
 
         /// <summary>
         /// The children of the node.
@@ -38,8 +58,8 @@ namespace CalDAV.Utils.XML_Processors
         public List<IXMLTreeStructure> Children { get; set; }
 
 
-        public Dictionary<string, string> Attributes { get; }
-        public string Value { get; private set; }
+        public Dictionary<string, string> Attributes { get; set;  }
+        public string Value { get;  set; }
 
         #endregion
 
@@ -74,9 +94,9 @@ namespace CalDAV.Utils.XML_Processors
             return Children.Select(child => child.GetChildAtAnyLevel(childName)).FirstOrDefault(childResult => childResult != null);
         }
 
-        public IXMLTreeStructure AddNamespace(string nameSpace)
+        public IXMLTreeStructure AddNamespace(string nsLocal, string namespaceStr)
         {
-            Namespaces.Add(nameSpace);
+            Namespaces.Add(nsLocal, namespaceStr);
             return this;
         }
 
@@ -92,15 +112,61 @@ namespace CalDAV.Utils.XML_Processors
             return this;
         }
 
-
         public override string ToString()
         {
-            var strCh = new StringBuilder("\t");
+            return @"<?xml version=""1.0"" encoding=""utf - 8"" ?>"+ ToXml(this).ToString();
+        }
+
+      
+
+        public XElement ToXml(IXMLTreeStructure parent)
+        {
+            XNamespace thisXNamespace = MainNamespace;
+            XElement output = new XElement(thisXNamespace + NodeName, Value != string.Empty ? Value : null) ;
             foreach (var child in Children)
             {
-                strCh.Append(child.ToString() + "\n\t");
+                output.Add(child.ToXml(child));
             }
-            return NodeName + "\n\t" + strCh.ToString();
+            foreach (var ns in Namespaces)
+            {
+                output.Add(new XAttribute(XNamespace.Xmlns+ns.Key,ns.Value));
+            }
+            foreach (var attribute in Attributes)
+            {
+                output.Add(new XAttribute(attribute.Key, attribute.Value ));
+            }
+            return output;
+        }
+
+
+        public static IXMLTreeStructure Parse(string doc)
+        {
+            var xml = XDocument.Parse(doc);
+
+            var output = xmlWalker(xml.Root);
+            return output;
+        }
+
+        private static IXMLTreeStructure xmlWalker(XElement node)
+        {
+            var output = new XmlTreeStructure(node.Name.LocalName, null)
+            {
+                Namespaces = node.Attributes().Where(x => x.IsNamespaceDeclaration).
+                    ToDictionary(x => x.Name.LocalName, x => x.Value),
+                Value = node.Value,
+                MainNamespace = node.Name.NamespaceName
+            };
+            foreach (var attribute in node.Attributes().Where(x => !output.Namespaces.Keys.Contains(x.Name.LocalName)))
+            {
+                output.AddAttribute(attribute.Name.LocalName, attribute.Value);
+            }
+            var descendants = node.Elements();
+            var descNodes = node.DescendantNodes();
+            foreach (var descendant in descendants)
+            {
+                output.AddChild(xmlWalker(descendant));
+            }
+            return output;
         }
     }
 }
