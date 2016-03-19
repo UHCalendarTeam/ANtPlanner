@@ -14,7 +14,7 @@ namespace CalDAV.Models
         [Required]
         public string FileName { get; set; }
 
-        public string Etag { get; set; }
+        public string GetEtag { get; set; }
 
         public DateTime DtStart { get; set; }
 

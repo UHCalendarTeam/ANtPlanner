@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CalDAV.Models;
 using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
+using ICalendar.GeneralInterfaces;
 using ICalendar.Utils;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -34,6 +35,20 @@ namespace CalDAV.Core.ConditionsCheck
             //check that resourceId don't exist but the collection does.
             if (!StorageManagement.ExistCalendarCollection(userEmail, collectionName))
                 return false;
+
+            if (propertiesAndHeaders.ContainsKey("If-Match"))
+            {
+                //check that the value do exist
+                if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+                    return false;
+            }
+
+            if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
+            {
+                //check that the value do exist
+                if (StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+                    return false;
+            }
 
             //calendar data is ok
             if (iCalendar == null)
@@ -69,7 +84,6 @@ namespace CalDAV.Core.ConditionsCheck
             //Check that if the operation is create there is not another element in the collection with the same UID
             if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
             {
-                
                 using (var db = new CalDavContext())
                 {
                     if ((from calendarResource in db.CalendarResources
@@ -92,13 +106,25 @@ namespace CalDAV.Core.ConditionsCheck
                 }
             }
 
+            var methodProp = iCalendar.GetComponentProperties("METHOD");
+            //iCalendar object MUST NOT implement METHOD property
+            if (methodProp != null || ((IValue<string>)methodProp).Value != "")
+                return false;
+
+
             //TODO: Check if the size in octets of the resource is less-equal
             //than the max-resource-size property
 
 
-            //Cheking that all DateTime values are 
+            //TODO: Checking that all DateTime values are less-equal than
+            //the max-date-time 
 
+            //TODO: Checking that all DateTime values are grater-equal than
+            //the min-date-time
 
+            //TODO: Checking that the number of recurring instances is less-equal
+            //than the max-instances property value.
+            
             return true;
         }
     }

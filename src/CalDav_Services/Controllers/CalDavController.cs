@@ -38,7 +38,7 @@ namespace CalDav_Services.Controllers
             return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body));
         }
 
-        //PROPFIND
+        //PROPFIND COLLECTIONS
         [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}")]
         public string PropFind(string user, string collection)
         {
@@ -47,7 +47,20 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             
 
-            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body));
+            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
+        }
+
+        //PROPFIND RESOURCES
+        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}/{calendarResource}")]
+        public string PropFind(string user, string collection, string calendarResource)
+        {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResource);
+
+
+            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
         }
 
         //REPORT

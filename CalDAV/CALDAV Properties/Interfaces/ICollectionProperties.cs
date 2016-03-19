@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CalDAV.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,15 +11,31 @@ namespace CalDAV.CALDAV_Properties
     /// </summary>
     public interface ICollectionProperties
     {
-        
-         string NameSpace { get; }
+
+        string NameSpace { get; }
+
+        /// <summary>
+        /// Returns all the properties of a collection that must be returned for
+        /// an "allprop" property method of Propfind. 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        List<KeyValuePair<string, string>> GetAllVisibleProperties();
+
+        /// <summary>
+        /// Returns the value of a collection property given its name.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        string ResolveProperty(string propertyName);
 
         /// <summary>
         /// Provides a human-readable description of the calendar collection
         /// </summary>
         /// <param name="description">The calendar collection description.</param>
         /// <returns>The XML with description.</returns>
-         string CalendarDescription(string userEmail, string collectionName);
+        string CalendarDescription(string userEmail, string collectionName);
 
         /// <summary>
         /// Purpose: Specifies a time zone on a calendar collection.
