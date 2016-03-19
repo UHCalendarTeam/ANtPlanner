@@ -218,7 +218,10 @@ end=""20060105T000000Z""/>
 </C:calendar-query>";
             var xmlTreeStructure = XmlTreeStructure.Parse(doc);
             var xmlTreeStructure2 =XmlTreeStructure.Parse(xmlTreeStructure.ToString());
-            Assert.Equal(xmlTreeStructure, xmlTreeStructure2);
+            var xmlStr1 = xmlTreeStructure.ToString();
+            var xmlStr2 = xmlTreeStructure2.ToString();
+            
+            Assert.Equal(xmlStr1, xmlStr2);
         }
 
 

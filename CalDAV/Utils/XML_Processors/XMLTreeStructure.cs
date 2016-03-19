@@ -137,7 +137,11 @@ namespace CalDAV.Utils.XML_Processors
 
         public override string ToString()
         {
-            return @"<?xml version=""1.0"" encoding=""utf - 8"" ?>"+ ToXml(this).ToString();
+            XDocument doc =new XDocument( ToXml(this));
+            doc.Declaration = new XDeclaration("1.0", "utf-8", null);
+            StringWriter writer = new Utf8StringWriter();
+            doc.Save(writer, SaveOptions.None);
+            return writer.ToString();
         }
 
       
@@ -191,5 +195,13 @@ namespace CalDAV.Utils.XML_Processors
             }
             return output;
         }
+
+
+
+    }
+
+    internal class Utf8StringWriter : StringWriter
+    {
+        public override Encoding Encoding => Encoding.UTF8;
     }
 }
