@@ -53,6 +53,15 @@ namespace CalDAV.CALDAV_Properties
             //}
             list.Add(resourceType);
 
+            //creation date
+            var creationDate = new XMLTreeStructure("creationdate", new List<string>() {"D"});
+            creationDate.AddValue(collection.CreationDate.ToString());
+            list.Add(creationDate);
+
+            //supported lock
+
+            
+
             return list;
 
         }

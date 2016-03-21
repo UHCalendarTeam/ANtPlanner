@@ -31,8 +31,33 @@ namespace CalDAV.CALDAV_Properties
             list.Add(displayName);
 
             //TODO: creationdate
+            var creationDate = new XMLTreeStructure("creationdate", new List<string>() {"D"});
+            creationDate.AddValue(calendarResource.CreationDate.ToString());
+            list.Add(creationDate);
             
             //TODO: getcontentlenght
+            var getContentLenght = new XMLTreeStructure("getcontentlenght", new List<string>() {"D"});
+            getContentLenght.AddValue(calendarResource.GetContentLength);
+            list.Add(getContentLenght);
+
+            //getcontenttype
+            var getContentType = new XMLTreeStructure("getcontenttype", new List<string>() { "D" });
+            getContentType.AddValue(calendarResource.GetContentType);
+            list.Add(getContentType);
+
+            //getlastmodified
+            var getLastModified = new XMLTreeStructure("getlastmodified", new List<string>() {"D"});
+            getLastModified.AddValue(calendarResource.GetLastModified.ToString());
+            list.Add(getLastModified);
+
+            //resourcetype
+            list.Add(calendarResource.ResourceType);
+
+            //TODO: supported lock
+
+
+
+
             return list;
         }
 
@@ -43,7 +68,39 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static List<XMLTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
-            throw new NotImplementedException();
+            var list = new List<XMLTreeStructure>();
+            
+            //Display Name
+            var displayName = new XMLTreeStructure("displayname");
+            list.Add(displayName);
+
+            //resource type
+            var resourceType = new XMLTreeStructure("resourcetype");
+            list.Add(resourceType);
+            
+            //creation date
+            var creationDate = new XMLTreeStructure("creationdate");
+            list.Add(creationDate);
+
+            //getcontent length
+            var getcontentlegth = new XMLTreeStructure("getcontentlenght");
+            list.Add(getcontentlegth);
+
+            //getcontenttype
+            var getContentType = new XMLTreeStructure("getcontenttype");
+            list.Add(getContentType);
+
+            //getetag
+            var getEtag = new XMLTreeStructure("getetag");
+            list.Add(getEtag);
+
+            //getLastModified
+            var getLastModified = new XMLTreeStructure("getlastmodified");
+            list.Add(getLastModified);
+
+            //supported lock
+
+            return list;
         }
     }
 }

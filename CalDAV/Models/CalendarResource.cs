@@ -57,7 +57,8 @@ namespace CalDAV.Models
         /// <summary>
         /// Returns the datetime value of when was created the resource.
         /// </summary>
-        public string CreationDate { get; set; }
+        //public string CreationDate { get; set; }
+        public DateTime CreationDate { get; set; }
 
         /// <summary>
         /// Returns the Lenght of the file.
@@ -71,14 +72,7 @@ namespace CalDAV.Models
                 throw new NotImplementedException();
             }
         }
-
-        DateTime IDavProperties.CreationDate
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        
 
         public int GetContentLenght
         {
