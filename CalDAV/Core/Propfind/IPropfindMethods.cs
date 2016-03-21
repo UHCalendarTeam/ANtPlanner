@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Utils.XML_Processors;
+using CalDAV.XML_Processors;
+using TreeForXml;
+
 
 namespace CalDAV.Core.Propfind
 {
-    interface IPropfindMethods
+    public interface IPropfindMethods
     {
         /// <summary>
         /// Returns all dead properties and some live properties.
@@ -17,7 +20,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XMLTreeStructure result);
+        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure result);
 
         /// <summary>
         /// Returns the value of the specified properties.
@@ -28,7 +31,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="propFindBody"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropMethod(string userEmail, string collectionName, int? depth, XMLTreeStructure propFindBody, XMLTreeStructure result);
+        void PropMethod(string userEmail, string collectionName, int? depth, XmlTreeStructure propFindBody, XmlTreeStructure result);
 
         /// <summary>
         ///  Returns the name of all the properties of a collection.
@@ -38,7 +41,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropNameMethod(string userEmail, string collectionName, int? depth, XMLTreeStructure result);
+        void PropNameMethod(string userEmail, string collectionName, int? depth, XmlTreeStructure result);
 
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="propFindBody"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropObjectResource(string userEmail, string collectionName, string calendarResourceId, XMLTreeStructure propFindBody, XMLTreeStructure result);
+        void PropObjectResource(string userEmail, string collectionName, string calendarResourceId, XmlTreeStructure propFindBody, XmlTreeStructure result);
 
         /// <summary>
         /// Returns the name of all properties in a specified Calendar Object Resource.
@@ -60,6 +63,6 @@ namespace CalDAV.Core.Propfind
         /// <param name="calendarResourceId"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropNameObjectResource(string userEmail, string collectionName, string calendarResourceId, XMLTreeStructure result);
+        void PropNameObjectResource(string userEmail, string collectionName, string calendarResourceId, XmlTreeStructure result);
     }
 }

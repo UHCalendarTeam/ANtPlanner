@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Utils.XML_Processors;
+using TreeForXml;
+
 
 namespace CalDAV.Core
 {
@@ -23,7 +24,7 @@ namespace CalDAV.Core
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        XMLTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
+        XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
 
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
