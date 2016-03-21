@@ -17,7 +17,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth"></param>
         /// <param name="multistatusTree"></param>
         /// <returns></returns>
-        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XMLTreeStructure multistatusTree);
+        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
 
         /// <summary>
         /// Returns the value of the specified properties.
@@ -28,7 +28,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="propFindBody"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropMethod(string userEmail, string collectionName, int? depth, XMLTreeStructure propFindBody, XMLTreeStructure result);
+        void PropMethod(string userEmail, string collectionName, int? depth, XmlTreeStructure propFindBody, XmlTreeStructure result);
 
         /// <summary>
         ///  Returns the name of all the properties of a collection.
@@ -39,7 +39,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth"></param>
         /// <param name="multistatusTree"></param>
         /// <returns></returns>
-        void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XMLTreeStructure multistatusTree);
+        void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
 
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="propFindBody"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        void PropObjectResource(string userEmail, string collectionName, string calendarResourceId, XMLTreeStructure propFindBody, XMLTreeStructure result);
+        void PropObjectResource(string userEmail, string collectionName, string calendarResourceId, XmlTreeStructure propFindBody, XmlTreeStructure result);
 
         
     }

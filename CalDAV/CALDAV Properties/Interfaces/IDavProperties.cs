@@ -22,10 +22,10 @@ namespace CalDAV.CALDAV_Properties.Interfaces
 
         string GetContentLanguage { get; }
 
-        XMLTreeStructure LockDiscovery { get;}
+        XmlTreeStructure LockDiscovery { get;}
 
-        XMLTreeStructure ResourceType { get; }
+        XmlTreeStructure ResourceType { get; }
 
-        XMLTreeStructure SupportedLock { get; }
+        XmlTreeStructure SupportedLock { get; }
     }
 }

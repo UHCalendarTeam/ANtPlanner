@@ -29,18 +29,18 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static List<XMLTreeStructure> GetAllVisibleProperties(this CalendarCollection collection)
+        public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection)
         {
-            var list = new List<XMLTreeStructure>();
+            var list = new List<XmlTreeStructure>();
 
             //calendar desription
-            var description = new XMLTreeStructure("calendar-description", new List<string>() { "C" });
+            var description = new XmlTreeStructure("calendar-description", "C");
             description.AddAttribute("C", NameSpace);
             description.AddValue(collection.CalendarDescription);
             list.Add(description);
 
             //Display Name
-            var displayName = new XMLTreeStructure("displayname", new List<string>() { "D" });
+            var displayName = new XmlTreeStructure("displayname", "D");
             displayName.AddValue(collection.DisplayName);
             list.Add(displayName);
 
@@ -54,7 +54,7 @@ namespace CalDAV.CALDAV_Properties
             list.Add(resourceType);
 
             //creation date
-            var creationDate = new XMLTreeStructure("creationdate", new List<string>() {"D"});
+            var creationDate = new XmlTreeStructure("creationdate", "D");
             creationDate.AddValue(collection.CreationDate.ToString());
             list.Add(creationDate);
 
@@ -71,45 +71,45 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static List<XMLTreeStructure> GetAllPropertyNames(this CalendarCollection collection)
+        public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarCollection collection)
         {
-            var list = new List<XMLTreeStructure>();
+            var list = new List<XmlTreeStructure>();
 
             //calendar desription
-            var description = new XMLTreeStructure("calendar-description");
+            var description = new XmlTreeStructure("calendar-description");
             description.AddAttribute("C", NameSpace);
             list.Add(description);
 
             //Display Name
-            var displayName = new XMLTreeStructure("displayname");
+            var displayName = new XmlTreeStructure("displayname");
             list.Add(displayName);
 
             //resource type
-            var resourceType = new XMLTreeStructure("resourcetype");
+            var resourceType = new XmlTreeStructure("resourcetype");
             list.Add(resourceType);
 
             //calendar-timezone
-            var calendarTimeZone = new XMLTreeStructure("calendar-timezone");
+            var calendarTimeZone = new XmlTreeStructure("calendar-timezone");
             list.Add(resourceType);
 
             //supported-calendar-component-set
-            var supportedCalendarComp = new XMLTreeStructure("supported-calendar-component-set");
+            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set");
             list.Add(supportedCalendarComp);
 
             //max-resource-size
-            var maxResourceSize = new XMLTreeStructure("max-resource-size");
+            var maxResourceSize = new XmlTreeStructure("max-resource-size");
             list.Add(maxResourceSize);
 
             //min-date-time
-            var minDateTime = new XMLTreeStructure("min-date-time");
+            var minDateTime = new XmlTreeStructure("min-date-time");
             list.Add(minDateTime);
 
             //min-date-time
-            var maxDateTime = new XMLTreeStructure("min-date-time");
+            var maxDateTime = new XmlTreeStructure("min-date-time");
             list.Add(maxDateTime);
 
             //max-intances
-            var maxIntances = new XMLTreeStructure("max-intances");
+            var maxIntances = new XmlTreeStructure("max-intances");
             list.Add(maxIntances);
 
 

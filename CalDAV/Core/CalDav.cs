@@ -39,7 +39,7 @@ namespace CalDAV.Core
         }
 
         //TODO: Nacho
-        public XMLTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string body)
+        public XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             #region Extracting Properties
             string userEmail;
@@ -68,7 +68,7 @@ namespace CalDAV.Core
             #endregion
 
             //Creating and filling the root of the xml tree response
-            XMLTreeStructure response = new XMLTreeStructure("multistatus", new List<string> { "DAV:" });
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "D");
             response.Attributes.Add("D", "DAV:");
 
             //Tool that contains the methods for propfind.
@@ -94,10 +94,10 @@ namespace CalDAV.Core
                 case "prop":
                     if (calendarResourceId != null)
                     {
-                        PropFindMethods.PropObjectResource(userEmail, collectionName, calendarResourceId, (XMLTreeStructure)propType, response);
+                        PropFindMethods.PropObjectResource(userEmail, collectionName, calendarResourceId, (XmlTreeStructure)propType, response);
                     }
                     else
-                        PropFindMethods.PropMethod(userEmail, collectionName, depth, (XMLTreeStructure)propType, response);
+                        PropFindMethods.PropMethod(userEmail, collectionName, depth, (XmlTreeStructure)propType, response);
                     break;
                 case "allprop":
                     PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, response);

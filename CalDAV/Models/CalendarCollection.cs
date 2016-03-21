@@ -96,7 +96,7 @@ namespace CalDAV.Models
             }
         }
 
-        public XMLTreeStructure LockDiscovery
+        public XmlTreeStructure LockDiscovery
         {
             get
             {
@@ -104,9 +104,9 @@ namespace CalDAV.Models
             }
         }
 
-        public XMLTreeStructure ResourceType { get; set; }
+        public XmlTreeStructure ResourceType { get; set; }
 
-        public XMLTreeStructure SupportedLock
+        public XmlTreeStructure SupportedLock
         {
             get
             {

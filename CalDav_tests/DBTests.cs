@@ -55,7 +55,7 @@ namespace CalDav_tests
                     MaxIntences = 1,
                     CalendarTimeZone = "Timezone",
                     //ResourceType = new List<string>(),
-                    ResourceType = new XMLTreeStructure("resourcetype", new List<string>() {"D"}),
+                    ResourceType = new XmlTreeStructure("resourcetype", "D"),
                     MaxDateTime = DateTime.Now,
                     MinDateTime = DateTime.MinValue,
                     DisplayName = "Display name",

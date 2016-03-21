@@ -12,9 +12,9 @@ namespace CalDav_tests
         [Fact]
         public void CreateRootWithNamespace()
         {
-            XMLTreeStructure root = new XMLTreeStructure("multistatus", new List<string>() {"D= \"DAV: \""});
-            string test = root.Namespaces.Single();
-            Assert.True(root.NodeName == "multistatus" && test == "D= \"DAV: \"");
+            XmlTreeStructure root = new XmlTreeStructure("multistatus", "D");
+            string test = root.MainNamespace;
+            Assert.True(root.NodeName == "multistatus" && test == "D");
         }
     }
 }

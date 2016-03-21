@@ -17,36 +17,36 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static List<XMLTreeStructure> GetAllVisibleProperties(this CalendarResource calendarResource)
+        public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarResource calendarResource)
         {
-            List<XMLTreeStructure> list = new List<XMLTreeStructure>();
+            List<XmlTreeStructure> list = new List<XmlTreeStructure>();
             //getetag
-            var etag = new XMLTreeStructure("getetag", new List<string>() {"D"});
+            var etag = new XmlTreeStructure("getetag", "D");
             etag.AddValue(calendarResource.GetEtag);
             list.Add(etag);
 
             //displayname
-            var displayName = new XMLTreeStructure("displayname", new List<string>() {"D"});
+            var displayName = new XmlTreeStructure("displayname", "D");
             displayName.AddValue(calendarResource.FileName.Replace(".ics", ""));
             list.Add(displayName);
 
             //TODO: creationdate
-            var creationDate = new XMLTreeStructure("creationdate", new List<string>() {"D"});
+            var creationDate = new XmlTreeStructure("creationdate", "D");
             creationDate.AddValue(calendarResource.CreationDate.ToString());
             list.Add(creationDate);
             
             //TODO: getcontentlenght
-            var getContentLenght = new XMLTreeStructure("getcontentlenght", new List<string>() {"D"});
+            var getContentLenght = new XmlTreeStructure("getcontentlenght", "D");
             getContentLenght.AddValue(calendarResource.GetContentLength);
             list.Add(getContentLenght);
 
             //getcontenttype
-            var getContentType = new XMLTreeStructure("getcontenttype", new List<string>() { "D" });
+            var getContentType = new XmlTreeStructure("getcontenttype", "D");
             getContentType.AddValue(calendarResource.GetContentType);
             list.Add(getContentType);
 
             //getlastmodified
-            var getLastModified = new XMLTreeStructure("getlastmodified", new List<string>() {"D"});
+            var getLastModified = new XmlTreeStructure("getlastmodified", "D");
             getLastModified.AddValue(calendarResource.GetLastModified.ToString());
             list.Add(getLastModified);
 
@@ -66,36 +66,36 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="calendarResource"></param>
         /// <returns></returns>
-        public static List<XMLTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
+        public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
-            var list = new List<XMLTreeStructure>();
+            var list = new List<XmlTreeStructure>();
             
             //Display Name
-            var displayName = new XMLTreeStructure("displayname");
+            var displayName = new XmlTreeStructure("displayname");
             list.Add(displayName);
 
             //resource type
-            var resourceType = new XMLTreeStructure("resourcetype");
+            var resourceType = new XmlTreeStructure("resourcetype");
             list.Add(resourceType);
             
             //creation date
-            var creationDate = new XMLTreeStructure("creationdate");
+            var creationDate = new XmlTreeStructure("creationdate");
             list.Add(creationDate);
 
             //getcontent length
-            var getcontentlegth = new XMLTreeStructure("getcontentlenght");
+            var getcontentlegth = new XmlTreeStructure("getcontentlenght");
             list.Add(getcontentlegth);
 
             //getcontenttype
-            var getContentType = new XMLTreeStructure("getcontenttype");
+            var getContentType = new XmlTreeStructure("getcontenttype");
             list.Add(getContentType);
 
             //getetag
-            var getEtag = new XMLTreeStructure("getetag");
+            var getEtag = new XmlTreeStructure("getetag");
             list.Add(getEtag);
 
             //getLastModified
-            var getLastModified = new XMLTreeStructure("getlastmodified");
+            var getLastModified = new XmlTreeStructure("getlastmodified");
             list.Add(getLastModified);
 
             //supported lock

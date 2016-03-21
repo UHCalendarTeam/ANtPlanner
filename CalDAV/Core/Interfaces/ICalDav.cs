@@ -23,7 +23,7 @@ namespace CalDAV.Core
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        XMLTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
+        XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
 
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
