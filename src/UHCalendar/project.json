@@ -1,4 +1,4 @@
-﻿{
+{
   "userSecretsId": "aspnet5-UHCalendar-c2ec2852-9a1e-496a-9fe1-6e923cd5fa01",
   "version": "1.0.0-*",
   "compilationOptions": {
@@ -10,6 +10,7 @@
     "EntityFramework.Commands": "7.0.0-rc1-final",
     "EntityFramework.Core": "7.0.0-rc1-final",
     "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
+    "ICalendar": "1.0.0-beta3",
     "Microsoft.AspNet.Authentication.Cookies": "1.0.0-rc1-final",
     "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-rc1-final",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
