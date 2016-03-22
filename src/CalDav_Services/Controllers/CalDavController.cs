@@ -59,8 +59,13 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
 
+            StringValues depth;
+            if(Request.Headers.TryGetValue("Depth", out depth)) 
+                propertiesAndHeaders.Add("depth", depth);
 
-            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
+            var res = CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
+
+            return res;
         }
 
         //REPORT

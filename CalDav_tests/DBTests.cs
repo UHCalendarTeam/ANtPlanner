@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Models;
+using CalDAV.Utils.XML_Processors;
 using Microsoft.Data.Entity;
 using Xunit;
 
@@ -53,7 +54,8 @@ namespace CalDav_tests
                     SupportedCalendarComponentSet = new List<string>()*/,
                     MaxIntences = 1,
                     CalendarTimeZone = "Timezone",
-                    ResourceType = new List<string>(),
+                    //ResourceType = new List<string>(),
+                    ResourceType = new XmlTreeStructure("resourcetype", "D"),
                     MaxDateTime = DateTime.Now,
                     MinDateTime = DateTime.MinValue,
                     DisplayName = "Display name",

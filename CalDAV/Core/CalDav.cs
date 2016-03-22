@@ -106,12 +106,7 @@ namespace CalDAV.Core
                     PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, response);
                     break;
                 case "propname":
-                    if (calendarResourceId != null)
-                    {
-                        PropFindMethods.PropNameObjectResource(userEmail, collectionName, calendarResourceId, response);
-                    }
-                    else
-                        PropFindMethods.PropNameMethod(userEmail, collectionName, depth, response);
+                    PropFindMethods.PropNameMethod(userEmail, collectionName, calendarResourceId, depth, response);
                     break;
                 default:
                     return null;
@@ -380,7 +375,7 @@ namespace CalDAV.Core
 
             resource.UserId = resource.User.UserId;
 
-            resource.ResourceType = calendarComp.Name;
+            //resource.ResourceType = calendarComp.Name;
 
             //TODO: Recurrence figure out how to assign this
             //resource.Recurrence =

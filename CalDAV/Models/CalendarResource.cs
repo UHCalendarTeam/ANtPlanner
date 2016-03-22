@@ -1,12 +1,15 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using CalDAV.CALDAV_Properties.Interfaces;
+using CalDAV.Core;
+using CalDAV.Utils.XML_Processors;
 
 namespace CalDAV.Models
 {
     /// <summary>
     /// to store the main properties of a cal resource.
     /// </summary>
-    public class CalendarResource
+    public class CalendarResource: IDavProperties
     {
         [ScaffoldColumn(false)]
         public int CalendarResourceId { get; set; }
@@ -40,10 +43,10 @@ namespace CalDAV.Models
         /// </summary>
         public CalendarCollection Collection { get; set; }
 
-        /// <summary>
-        /// Define the comp type(i.e. VEVENT, VTODO)
-        /// </summary>
-        public string ResourceType { get; set; }
+        ///// <summary>
+        ///// Define the comp type(i.e. VEVENT, VTODO)
+        ///// </summary>
+        //public string ResourceType { get; set; }
 
         /// <summary>
         /// The duration of the resource if defined
@@ -51,6 +54,74 @@ namespace CalDAV.Models
         /// </summary>
         public string Duration { get; set; }
 
+        /// <summary>
+        /// Returns the datetime value of when was created the resource.
+        /// </summary>
+        //public string CreationDate { get; set; }
+        public DateTime CreationDate { get; set; }
 
+        /// <summary>
+        /// Returns the Lenght of the file.
+        /// </summary>
+        public string GetContentLength { get; }
+
+        public string DisplayName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+
+        public int GetContentLenght
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string GetContentType
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public DateTime GetLastModified
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string GetContentLanguage
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public XmlTreeStructure LockDiscovery
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public XmlTreeStructure ResourceType => null;
+
+        public XmlTreeStructure SupportedLock
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
