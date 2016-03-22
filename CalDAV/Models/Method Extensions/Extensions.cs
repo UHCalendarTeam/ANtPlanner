@@ -58,16 +58,29 @@ namespace CalDAV.Models.Method_Extensions
         {
             var propName = filter.Attributes["name"];
             //if the comp doesnt has the desired prop return false
-            if (!component.Properties.ContainsKey(propName))
-                return false;
-            var propValue = component.Properties[propName];
+           
+            IComponentProperty propValue;
             foreach (var propFilter in filter.Children)
             {
+                bool result;
                 switch (propFilter.NodeName)
                 {
                     case "text-match":
-                        var result = propValue.TextMatchFilter(propFilter);
+                        if (!component.Properties.TryGetValue(propName, out propValue))
+                            return false;
+                        result = propValue.StringValue.TextMatchFilter(propFilter);
                         if (!result)
+                            return false;
+                        break;
+                    case "param-filter":
+                        if (!component.Properties.TryGetValue(propName, out propValue))
+                            return false;
+                        result = propValue.ParamFilter(propFilter);
+                        if (!result)
+                            return false;
+                        break;
+                    case "is-not-defined":
+                        if (component.Properties.TryGetValue(propName, out propValue))
                             return false;
                         break;
                     default:
@@ -77,19 +90,50 @@ namespace CalDAV.Models.Method_Extensions
             return true;
         }
 
+        private static bool ParamFilter(this IComponentProperty property, IXMLTreeStructure filters)
+        {
+            var paramName = filters.Attributes["name"];
+            var param = property.PropertyParameters.First(x => x.Name == paramName);
+            if (param == null)
+                return false;
+            foreach (var filter in filters.Children)
+            {
+                switch (filter.NodeName)
+                {
+                    case "text-match":
+                        var result = param.Value.TextMatchFilter(filter);
+                        if (!result)
+                            return false;
+                        break;
+                    default:
+                        throw new NotImplementedException("Implement the filter name or return an error");
+                }
+            }
+            return true;
+        }
 
-        private static bool TextMatchFilter(this IComponentProperty property, IXMLTreeStructure filter)
+        private static bool TextMatchFilter(this string propertyValue, IXMLTreeStructure filter)
         {
             //TODO: coger aki el value del property de tipo string cuando este implementado.
+            bool negateCond = false;
+            string negCondStr;
+            //if the filter contains a negate condition attr then take it
+            if (filter.Attributes.TryGetValue("negate-condition", out negCondStr))
+                negateCond = negCondStr == "yes";
+            bool result;
             switch (filter.Attributes["collation"])
             {
                 case "i;octet":
-                    byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes(((IValue<string>)property).Value);
+                    byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes(propertyValue);
                     byte[] filterValueOctet = System.Text.Encoding.ASCII.GetBytes(filter.Value);
-                    return ApplyTextFilter(propValueOctet, filterValueOctet);
+                    result= ApplyTextFilter(propValueOctet, filterValueOctet);
+                    return negateCond ? !result : result;
                     
                 case "i;ascii-casemap":
-                    throw new ArgumentException("Not implemented exception!");
+                    var propValueAscii = propertyValue.Select(x => (int) x).ToArray();
+                    var filterValueAscii = propertyValue.Select(x => (int) x).ToArray();
+                    result= ApplyTextFilter(propValueAscii, filterValueAscii);
+                    return negateCond ? !result : result;
                 default:
                     throw new NotImplementedException("Implement the error for return");
             }
