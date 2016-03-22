@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
+using Microsoft.SqlServer.Server;
 using TreeForXml;
 
 namespace CalDAV.Models.Method_Extensions
@@ -13,8 +14,108 @@ namespace CalDAV.Models.Method_Extensions
     /// This class contains method extensions for 
     /// IEnumerable<VCALENDAR>
     /// </summary>
-    public static class Extensions
+    public static class ExtensionsForFilters
     {
+        /// <summary>
+        /// Apply the filter to the given calendar.
+        /// </summary>
+        /// <param name="calendar">THe calendar to apply the filter.</param>
+        /// <param name="filterTree">The filter container.</param>
+        /// <returns>True fi the calendar pass the filter, false otherwise</returns>
+        public static bool FilterResource(this VCalendar calendar, IXMLTreeStructure filterTree)
+        {
+            //first get the component in the calendar where to apply the filter.
+            IXMLTreeStructure filtersContainer = null;
+            ICalendarComponent component = null;
+            if(!RecursiveSeeker(calendar, filterTree,out filtersContainer,out component))
+                return false;//if the container doesnt have the requested comp ther return false;
+            bool result = true;
+            foreach (var filter in filtersContainer.Children)
+            {
+                switch (filter.NodeName)
+                {
+                    case "prop-filter":
+                        result = component.PropertyFilter(filter);
+                        if (!result)
+                            return false;
+                        break;
+                    
+                    default:
+                        throw new NotImplementedException($"The filter {filter.NodeName} isn't implemented");
+                    
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Apply filters to a property
+        /// </summary>
+        /// <param name="component">The component where to apply the filters.</param>
+        /// <param name="filter">Filters container.</param>
+        /// <returns>True if the component pass the filters, false otherwise.</returns>
+        private static bool PropertyFilter(this ICalendarComponent component, IXMLTreeStructure filter)
+        {
+            var propName = filter.Attributes["name"];
+            //if the comp doesnt has the desired prop return false
+            if (!component.Properties.ContainsKey(propName))
+                return false;
+            var propValue = component.Properties[propName];
+            foreach (var propFilter in filter.Children)
+            {
+                switch (propFilter.NodeName)
+                {
+                    case "text-match":
+                        var result = propValue.TextMatchFilter(propFilter);
+                        if (!result)
+                            return false;
+                        break;
+                    default:
+                        throw new NotImplementedException($"THe property filter {propFilter.NodeName} is not implemented");
+                }
+            }
+            return true;
+        }
+
+
+        private static bool TextMatchFilter(this IComponentProperty property, IXMLTreeStructure filter)
+        {
+            //TODO: coger aki el value del property de tipo string cuando este implementado.
+            switch (filter.Attributes["collation"])
+            {
+                case "i;octet":
+                    byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes(((IValue<string>)property).Value);
+                    byte[] filterValueOctet = System.Text.Encoding.ASCII.GetBytes(filter.Value);
+                    return ApplyTextFilter(propValueOctet, filterValueOctet);
+                    
+                case "i;ascii-casemap":
+                    throw new ArgumentException("Not implemented exception!");
+                default:
+                    throw new NotImplementedException("Implement the error for return");
+            }
+            
+        }
+
+
+        public static bool ApplyTextFilter<T>(T[] propValue, T[] filterValue)
+        {
+            // The substring operation returns "match" if the first string is the
+           // empty string, or if there exists a substring of the second string of
+            //length equal to the length of the first string, which would result in
+            // a "match" result from the equality function.Otherwise, the
+            //substring operation returns "no-match".
+            if (filterValue.Length == 0)
+                return true;
+            if (filterValue.Length > propValue.Length)
+                return false;
+            for (int i = 0; i < filterValue.Length; i++)
+            {
+                if (!propValue[i].Equals(filterValue[i]))
+                    return false;
+            }
+            return true;
+        }
+
 
         public static Dictionary<string, VCalendar> TimeFilter(this Dictionary<string, VCalendar> resources,
             DateTime start, DateTime end, IXMLTreeStructure filter)
@@ -37,7 +138,15 @@ namespace CalDAV.Models.Method_Extensions
             return null;
 
         }
-
+        /// <summary>
+        /// Go deeper in the calCOmponents following the treeStructure
+        /// till it get the component where to apply the filter.
+        /// </summary>
+        /// <param name="container">The container of the components.</param>
+        /// <param name="treeStructure">The IXMLTree where is the filter.</param>
+        /// <param name="filter">Return The node that contains the filter.</param>
+        /// <param name="component">THe component where to apply the filter.</param>
+        /// <returns>True if found the component, false otherwise.</returns>
         public static bool RecursiveSeeker(ICalendarComponentsContainer container, 
             IXMLTreeStructure treeStructure, out IXMLTreeStructure filter,out ICalendarComponent component)
         {
