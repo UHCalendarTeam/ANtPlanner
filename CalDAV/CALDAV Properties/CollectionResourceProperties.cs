@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
+using TreeForXml;
 
 namespace CalDAV.CALDAV_Properties
 {
     public static class CollectionResourceProperties
     {
-        public static string NameSpace => "urn:ietf:params:xml:ns:caldav";
+        public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
+        public static string DavNs => "DAV";
+
 
         /// <summary>
         /// Returns all the properties of a resource that must be returned for
@@ -21,37 +24,37 @@ namespace CalDAV.CALDAV_Properties
         {
             List<XmlTreeStructure> list = new List<XmlTreeStructure>();
             //getetag
-            var etag = new XmlTreeStructure("getetag", "D");
+            var etag = new XmlTreeStructure("getetag", DavNs);
             etag.AddValue(calendarResource.GetEtag);
             list.Add(etag);
 
             //displayname
-            var displayName = new XmlTreeStructure("displayname", "D");
+            var displayName = new XmlTreeStructure("displayname", DavNs);
             displayName.AddValue(calendarResource.FileName.Replace(".ics", ""));
             list.Add(displayName);
 
             //TODO: creationdate
-            var creationDate = new XmlTreeStructure("creationdate", "D");
+            var creationDate = new XmlTreeStructure("creationdate", DavNs);
             creationDate.AddValue(calendarResource.CreationDate.ToString());
             list.Add(creationDate);
             
             //TODO: getcontentlenght
-            var getContentLenght = new XmlTreeStructure("getcontentlenght", "D");
+            var getContentLenght = new XmlTreeStructure("getcontentlenght", DavNs);
             getContentLenght.AddValue(calendarResource.GetContentLength);
             list.Add(getContentLenght);
 
             //getcontenttype
-            var getContentType = new XmlTreeStructure("getcontenttype", "D");
+            var getContentType = new XmlTreeStructure("getcontenttype", DavNs);
             getContentType.AddValue(calendarResource.GetContentType);
             list.Add(getContentType);
 
             //getlastmodified
-            var getLastModified = new XmlTreeStructure("getlastmodified", "D");
+            var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
             getLastModified.AddValue(calendarResource.GetLastModified.ToString());
             list.Add(getLastModified);
 
             //resourcetype
-            list.Add(calendarResource.ResourceType);
+            //list.Add(calendarResource.ResourceType);
 
             //TODO: supported lock
 
@@ -69,7 +72,7 @@ namespace CalDAV.CALDAV_Properties
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
             var list = new List<XmlTreeStructure>();
-            
+            //TODO: annadir el ns a los de abajo
             //Display Name
             var displayName = new XmlTreeStructure("displayname");
             list.Add(displayName);
