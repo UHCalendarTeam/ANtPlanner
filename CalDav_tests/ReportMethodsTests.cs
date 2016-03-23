@@ -283,10 +283,10 @@ END:VCALENDAR";
 		}
 
 
-	    [Fact]
-	    public void RetrievalofAllPendingToDos()
-	    {
-	        var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+		[Fact]
+		public void RetrievalofAllPendingToDos()
+		{
+			var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 	<C:comp-filter name=""VTODO"">
 <C:prop-filter name=""COMPLETED"">
 <C:is-not-defined/>
@@ -297,7 +297,7 @@ negate-condition=""yes"">CANCELLED</C:text-match>
 </C:prop-filter>
 </C:comp-filter>
 </C:comp-filter>";
-	        var calStr = @"BEGIN:VCALENDAR
+			var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTODO
@@ -312,11 +312,11 @@ TRIGGER;RELATED=START:-PT10M
 END:VALARM
 END:VTODO
 END:VCALENDAR";
-            var calendar = new VCalendar(calStr);
-            var xmlTree = XmlTreeStructure.Parse(xmlStr);
-            var result = calendar.FilterResource(xmlTree);
-            Assert.True(result);
-        }
+			var calendar = new VCalendar(calStr);
+			var xmlTree = XmlTreeStructure.Parse(xmlStr);
+			var result = calendar.FilterResource(xmlTree);
+			Assert.True(result);
+		}
 
-    }
+	}
 }

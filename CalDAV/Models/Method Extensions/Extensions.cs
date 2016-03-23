@@ -121,6 +121,9 @@ namespace CalDAV.Models.Method_Extensions
             if (filter.Attributes.TryGetValue("negate-condition", out negCondStr))
                 negateCond = negCondStr == "yes";
             bool result;
+            //add the default collation if the node doesnt contains one.
+            if (!filter.Attributes.ContainsKey("collation"))
+                filter.Attributes["collation"] = "i;ascii-casemap";
             switch (filter.Attributes["collation"])
             {
                 case "i;octet":
@@ -131,7 +134,7 @@ namespace CalDAV.Models.Method_Extensions
                     
                 case "i;ascii-casemap":
                     var propValueAscii = propertyValue.Select(x => (int) x).ToArray();
-                    var filterValueAscii = propertyValue.Select(x => (int) x).ToArray();
+                    var filterValueAscii = filter.Value.Select(x => (int) x).ToArray();
                     result= ApplyTextFilter(propValueAscii, filterValueAscii);
                     return negateCond ? !result : result;
                 default:
