@@ -91,16 +91,13 @@ namespace CalDAV.Core
                 return null;
 
             //en cada object resource devolver el etag
+
             var propType = xmlTree.Children[0];
             switch (propType.NodeName)
             {
                 case "prop":
-                    if (calendarResourceId != null)
-                    {
-                        PropFindMethods.PropObjectResource(userEmail, collectionName, calendarResourceId, (XmlTreeStructure)propType, response);
-                    }
-                    else
-                        PropFindMethods.PropMethod(userEmail, collectionName, depth, (XmlTreeStructure)propType, response);
+                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
+                        PropFindMethods.PropMethod(userEmail, collectionName, calendarResourceId, depth, props, response);
                     break;
                 case "allprop":
                     PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, response);
@@ -118,6 +115,17 @@ namespace CalDAV.Core
 
             return response;
         }
+
+        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(XmlTreeStructure propFindTree)
+        {
+            var retList = new List<KeyValuePair<string, string>>();
+            var props = propFindTree.GetChildAtAnyLevel("prop");
+            foreach (var child in props.Children)
+            {
+                retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
+            }
+            return retList;
+        } 
 
         //TODO: Nacho
         public string Report(Dictionary<string, string> propertiesAndHeaders, string body)

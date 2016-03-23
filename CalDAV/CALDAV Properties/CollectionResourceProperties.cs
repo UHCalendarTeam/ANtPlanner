@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
 using TreeForXml;
+using System.Reflection;
 
 namespace CalDAV.CALDAV_Properties
 {
@@ -13,6 +14,21 @@ namespace CalDAV.CALDAV_Properties
         public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
         public static string DavNs => "DAV";
 
+        /// <summary>
+        /// Returns the value of a resource property given its name.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNS)
+        {
+            ////this must be fixed later because not all properties are of type string.
+            var value = (string)resource.GetType().GetProperty(propertyName).GetValue(resource);
+            var prop = new XmlTreeStructure(propertyName, mainNS);
+            prop.AddValue(value);
+
+            return prop;
+        }
 
         /// <summary>
         /// Returns all the properties of a resource that must be returned for

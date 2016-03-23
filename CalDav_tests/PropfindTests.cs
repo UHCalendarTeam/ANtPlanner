@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using CalDAV.XML_Processors;
 using TreeForXml;
 using Xunit;
 
