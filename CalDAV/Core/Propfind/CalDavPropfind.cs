@@ -79,7 +79,7 @@ namespace CalDAV.Core.Propfind
             #endregion
         }
 
-        
+
 
         #region Calendar Object Resource Propfind Methods.
 
