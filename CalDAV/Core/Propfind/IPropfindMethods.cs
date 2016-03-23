@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Utils.XML_Processors;
+using CalDAV.XML_Processors;
+using TreeForXml;
+
 
 namespace CalDAV.Core.Propfind
 {
-    interface IPropfindMethods
+    public interface IPropfindMethods
     {
         /// <summary>
         /// Returns all dead properties and some live properties.

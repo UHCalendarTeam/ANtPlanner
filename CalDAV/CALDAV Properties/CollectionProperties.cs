@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using CalDAV.XML_Processors;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
+using TreeForXml;
 
 namespace CalDAV.CALDAV_Properties
 {
     public static class CollectionProperties
     {
-        public static string NameSpace => "urn:ietf:params:xml:ns:caldav";
+        public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
+        public static string DavNs => "DAV";
 
         /// <summary>
         /// Returns the value of a collection property given its name.
@@ -34,13 +36,13 @@ namespace CalDAV.CALDAV_Properties
             var list = new List<XmlTreeStructure>();
 
             //calendar desription
-            var description = new XmlTreeStructure("calendar-description", "C");
-            description.AddAttribute("C", NameSpace);
+            var description = new XmlTreeStructure("calendar-description", CaldavNs);
+            description.AddNamespace("C", CaldavNs);
             description.AddValue(collection.CalendarDescription);
             list.Add(description);
 
             //Display Name
-            var displayName = new XmlTreeStructure("displayname", "D");
+            var displayName = new XmlTreeStructure("displayname", DavNs);
             displayName.AddValue(collection.DisplayName);
             list.Add(displayName);
 
@@ -54,7 +56,7 @@ namespace CalDAV.CALDAV_Properties
             list.Add(resourceType);
 
             //creation date
-            var creationDate = new XmlTreeStructure("creationdate", "D");
+            var creationDate = new XmlTreeStructure("creationdate", DavNs);
             creationDate.AddValue(collection.CreationDate.ToString());
             list.Add(creationDate);
 
@@ -76,10 +78,10 @@ namespace CalDAV.CALDAV_Properties
             var list = new List<XmlTreeStructure>();
 
             //calendar desription
-            var description = new XmlTreeStructure("calendar-description");
-            description.AddAttribute("C", NameSpace);
+            var description = new XmlTreeStructure("calendar-description", CaldavNs);
+            description.AddNamespace("C", CaldavNs);
             list.Add(description);
-
+            //a todos los que estan abajo le tienes q pasar el MainNs
             //Display Name
             var displayName = new XmlTreeStructure("displayname");
             list.Add(displayName);
@@ -124,7 +126,7 @@ namespace CalDAV.CALDAV_Properties
         public static string CalendarDescription(this CalendarCollection collection, string userEmail,
             string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("calendar-description", NameSpace,
+            return XML_Processors.XMLBuilders.XmlBuilder("calendar-description", CaldavNs,
                 collection.CalendarDescription);
         }
 
@@ -140,7 +142,7 @@ namespace CalDAV.CALDAV_Properties
         public static string CalendarTimeZone(this CalendarCollection collection, string userEmail,
             string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("calendar-timezone", NameSpace, collection.CalendarTimeZone);
+            return XML_Processors.XMLBuilders.XmlBuilder("calendar-timezone", CaldavNs, collection.CalendarTimeZone);
         }
 
         /// <summary>
@@ -175,7 +177,7 @@ namespace CalDAV.CALDAV_Properties
         public static string MaxResourcesSize(this CalendarCollection collection, string userEmail,
             string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("max-resource-size", NameSpace,
+            return XML_Processors.XMLBuilders.XmlBuilder("max-resource-size", CaldavNs,
                 collection.MaxResourceSize.ToString());
         }
 
@@ -190,7 +192,7 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static string MinDateTime(this CalendarCollection collection, string userEmail, string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("min-date-time", NameSpace, collection.MinDateTime.ToString());
+            return XML_Processors.XMLBuilders.XmlBuilder("min-date-time", CaldavNs, collection.MinDateTime.ToString());
         }
 
         /// <summary>
@@ -204,7 +206,7 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static string MaxDateTime(this CalendarCollection collection, string userEmail, string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("max-date-time", NameSpace, collection.MaxDateTime.ToString());
+            return XML_Processors.XMLBuilders.XmlBuilder("max-date-time", CaldavNs, collection.MaxDateTime.ToString());
         }
 
         /// <summary>
@@ -217,7 +219,7 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static string MaxIntances(this CalendarCollection collection, string userEmail, string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("max-intances", NameSpace, collection.MaxIntences.ToString());
+            return XML_Processors.XMLBuilders.XmlBuilder("max-intances", CaldavNs, collection.MaxIntences.ToString());
         }
 
         /// <summary>
@@ -230,7 +232,8 @@ namespace CalDAV.CALDAV_Properties
         //TODO: Fix this method it has to return multiples values 
         public static string ResourceType(this CalendarCollection collection, string userEmail, string collectionName)
         {
-            return XML_Processors.XMLBuilders.XmlBuilder("resourcetype", NameSpace, collection.ResourceType.ToString());
+            return "";
+            // return XML_Processors.XMLBuilders.XmlBuilder("resourcetype", CaldavNs, collection.ResourceType);
         }
     }
 }

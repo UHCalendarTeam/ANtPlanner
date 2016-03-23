@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
 using Microsoft.Data.Entity;
+using TreeForXml;
 using Xunit;
 
 namespace CalDav_tests
@@ -55,7 +56,7 @@ namespace CalDav_tests
                     MaxIntences = 1,
                     CalendarTimeZone = "Timezone",
                     //ResourceType = new List<string>(),
-                    ResourceType = new XmlTreeStructure("resourcetype", "D"),
+                    ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
                     MaxDateTime = DateTime.Now,
                     MinDateTime = DateTime.MinValue,
                     DisplayName = "Display name",

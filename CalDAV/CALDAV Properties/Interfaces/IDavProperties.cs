@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Utils.XML_Processors;
+using TreeForXml;
 
 namespace CalDAV.CALDAV_Properties.Interfaces
 {
-    interface IDavProperties
+    public interface IDavProperties
     {
         string DisplayName { get; }
 

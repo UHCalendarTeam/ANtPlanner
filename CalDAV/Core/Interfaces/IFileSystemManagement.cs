@@ -34,7 +34,7 @@ namespace CalDAV.Core
         /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
         /// <param name="calendarObjectResources"></param>
         /// <returns></returns>
-        bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName,out List<string> calendarObjectResources );
+        bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName,out Dictionary<string,string> calendarObjectResources );
 
         /// <summary>
         /// Returns all iCalendar Objects contained in the collection.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TreeForXml;
 
 namespace CalDAV.Core
 {
@@ -16,7 +17,7 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
-        public string CalendarQuery(List<string> filters)
+        public string CalendarQuery(IXMLTreeStructure filters)
         {
             throw new NotImplementedException();
         }

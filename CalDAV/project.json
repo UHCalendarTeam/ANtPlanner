@@ -1,37 +1,43 @@
 {
-    "authors": [ "UHCalendarTeam" ],
-    "commands": {
-        "ef": "EntityFramework.Commands"
-    },
+  "authors": [ "UHCalendarTeam" ],
+  "commands": {
+    "ef": "EntityFramework.Commands"
+  },
   "dependencies": {
     "EntityFramework.Commands": "7.0.0-rc1-final",
+    "EntityFramework.InMemory": "7.0.0-rc1-final",
     "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
+    "ICalendar": "1.0.0-beta3-22316",
     "Microsoft.CSharp": "4.0.1-beta-23516",
     "System.Collections": "4.0.11-beta-23516",
     "System.IO": "4.0.11-beta-23516",
     "System.Linq": "4.0.1-beta-23516",
     "System.Runtime": "4.0.21-beta-23516",
     "System.Threading": "4.0.11-beta-23516",
-    "EntityFramework.InMemory": "7.0.0-rc1-final",
-    "ICalendar": "1.0.0-beta2"
+    "TreeForXml": "1.0.0"
   },
-    "description": "CalDAV Library",
-    "frameworks": {
-        "dnx451": {
-            "frameworkAssemblies": {
-                "System.Xml": "4.0.0.0",
-                "System.Xml.Linq": "4.0.0.0"
-            }            
-        },
-        "dnxcore50": {
-            "dependencies": {
-                "System.Xml.XDocument": "4.0.10"
-            }
-        }
+ 
+  "description": "CalDAV Library",
+  "frameworks": {
+    "dnx451": {
+
+      "frameworkAssemblies": {
+        "System.Xml": "4.0.0.0",
+        "System.Xml.Linq": "4.0.0.0"
+      }
+
 
     },
-    "licenseUrl": "",
-    "projectUrl": "",
-    "tags": [ "" ],
-    "version": "1.0.0-*"
+    "dnxcore50": {
+      "dependencies": {
+        "System.Xml.XDocument": "4.0.10"
+
+      }
+    }
+
+  },
+  "licenseUrl": "",
+  "projectUrl": "",
+  "tags": [ "" ],
+  "version": "1.0.0-*"
 }

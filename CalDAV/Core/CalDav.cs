@@ -7,8 +7,10 @@ using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
+
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
+using TreeForXml;
 
 namespace CalDAV.Core
 {
@@ -68,8 +70,9 @@ namespace CalDAV.Core
             #endregion
 
             //Creating and filling the root of the xml tree response
-            XmlTreeStructure response = new XmlTreeStructure("multistatus", "D");
-            response.Attributes.Add("D", "DAV:");
+            XmlTreeStructure response = new XmlTreeStructure("multistatus","DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
             //Tool that contains the methods for propfind.
             PropFindMethods = new CalDavPropfind();
@@ -82,7 +85,7 @@ namespace CalDAV.Core
                 return response;
             }
 
-            var xmlTree = XMLParsers.GenericParser(body);
+            var xmlTree = XmlTreeStructure.Parse(body);
 
             if (xmlTree.NodeName != "propfind")
                 return null;

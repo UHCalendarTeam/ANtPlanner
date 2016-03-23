@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using CalDAV.CALDAV_Properties;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
+using CalDAV.XML_Processors;
+using TreeForXml;
 
 namespace CalDAV.Core.Propfind
 {
@@ -169,10 +171,10 @@ namespace CalDAV.Core.Propfind
         private XmlTreeStructure AllPropFillTree(string userEmail, string collectionName, string calendarResourceId)
         {
             #region Adding the response of the collection or resource.
-            var treeChild = new XmlTreeStructure("response", "D");
+            var treeChild = new XmlTreeStructure("response", "DAV:");
 
             #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
-            var href = new XmlTreeStructure("href", "D");
+            var href = new XmlTreeStructure("href", "DAV:");
 
             if (calendarResourceId == null)
                 href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
@@ -184,16 +186,16 @@ namespace CalDAV.Core.Propfind
 
             #region Adding the propstat
 
-            var propstat = new XmlTreeStructure("propstat", "D");
+            var propstat = new XmlTreeStructure("propstat", "DAV:");
 
             #region Adding nested status
-            var status = new XmlTreeStructure("status", "D");
+            var status = new XmlTreeStructure("status", "DAV:");
             status.AddValue("HTTP/1.1 200 OK");
             propstat.AddChild(status);
             #endregion
 
             #region Adding nested prop
-            var prop = new XmlTreeStructure("prop", "D");
+            var prop = new XmlTreeStructure("prop", "DAV:");
             CalendarCollection collection;
             CalendarResource resource;
             List<XmlTreeStructure> properties;

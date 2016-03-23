@@ -35,19 +35,20 @@ namespace CalDAV.Core
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
-
-        public bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName, out List<string> calendarObjectResources)
+        //TODO: esto tiene que devolver un Dict<string, string> que tenga el path del resource y el contenido
+        //
+        public bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName, out Dictionary<string,string> calendarObjectResources)
         {
-            calendarObjectResources = new List<string>();
+            calendarObjectResources = new Dictionary<string, string>();
             var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
             if (!Directory.Exists(path))
                 return false;
             var filesPath = Directory.EnumerateFiles(path);
-            foreach (var files in filesPath)
+            foreach (var file in filesPath)
             {
-                var temp = GetCalendarObjectResource(userEmail, calendarCollectionName, files);
+                var temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
                 if (temp != null)
-                    calendarObjectResources.Add(temp);
+                    calendarObjectResources.Add(path+"/file", temp);
             }
             return true;
         }
