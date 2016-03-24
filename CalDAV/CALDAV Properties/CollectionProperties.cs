@@ -6,6 +6,7 @@ using CalDAV.XML_Processors;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
 using TreeForXml;
+using System.Reflection;
 
 namespace CalDAV.CALDAV_Properties
 {
@@ -19,10 +20,16 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="propertyName"></param>
+        /// <param name="mainNS"></param>
         /// <returns></returns>
-        public static string ResolveProperty(this CalendarCollection collection, string propertyName)
+        public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNS)
         {
-            throw new NotImplementedException();
+            ////this must be fixed later because not all properties are of type string.
+            var value = (string)collection.GetType().GetProperty(propertyName).GetValue(collection);
+            var prop = new XmlTreeStructure(propertyName, mainNS);
+            prop.Value = value;
+
+            return prop;
         }
 
         /// <summary>
@@ -62,7 +69,7 @@ namespace CalDAV.CALDAV_Properties
 
             //supported lock
 
-            
+
 
             return list;
 

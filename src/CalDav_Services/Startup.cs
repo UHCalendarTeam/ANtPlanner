@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CalDAV.Core;
+using CalDAV.Models;
+using Microsoft.Data.Entity;
 
 namespace CalDav_Services
 {

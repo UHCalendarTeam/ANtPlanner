@@ -27,11 +27,12 @@ namespace CalDAV.Core.Propfind
         /// </summary>
         /// <param name="userEmail"></param>
         /// <param name="collectionName"></param>
+        /// <param name="calendarResourceId"></param>
         /// <param name="depth"></param>
-        /// <param name="propFindBody"></param>
-        /// <param name="result"></param>
+        /// <param name="propertiesReq"></param>
+        /// <param name="multistatusTree"></param>
         /// <returns></returns>
-        void PropMethod(string userEmail, string collectionName, int? depth, XmlTreeStructure propFindBody, XmlTreeStructure result);
+        void PropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq , XmlTreeStructure multistatusTree);
 
         /// <summary>
         ///  Returns the name of all the properties of a collection.
@@ -43,19 +44,5 @@ namespace CalDAV.Core.Propfind
         /// <param name="multistatusTree"></param>
         /// <returns></returns>
         void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
-
-
-        /// <summary>
-        /// Returns the values of the specified properties in a Calendar Object Resource.
-        /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="calendarResourceId"></param>
-        /// <param name="propFindBody"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        void PropObjectResource(string userEmail, string collectionName, string calendarResourceId, XmlTreeStructure propFindBody, XmlTreeStructure result);
-
-        
     }
 }
