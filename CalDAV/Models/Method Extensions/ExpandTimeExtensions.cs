@@ -17,30 +17,42 @@ namespace CalDAV.Models.Method_Extensions
     /// </summary>
     public static class ExpandTimeExtensions
     {
-        public static List<DateTime> Expand(this DateTime dateTime, List<Rrule> ruleProperties)
+        /// <summary>
+        /// Expand the given dateTIme following the given rules.
+        /// </summary>
+        /// <param name="dateTime">The dateTime to expand.</param>
+        /// <param name="ruleProperties">The set of rules to apply</param>
+        /// <returns>The expanded DateTImes.</returns>
+        public static IEnumerable<DateTime> ExpandTime(this DateTime dateTime, List<Recur> ruleProperties)
         {
-            foreach (var ruleProperty in ruleProperties)
-            {
-                var rule = ruleProperty.Value;
-               
-            }
-            return null;
+            
+            List<DateTime> output = new List<DateTime>();
+
+            return ruleProperties.SelectMany(rule => dateTime.ApplyFrequency(rule));
+            
         }
 
 
-        private static List<DateTime> ApplyFrequency(this DateTime dateTime, RecurValues.Frequencies freq, int count,
-            DateTime until, int interval)
+        private static IEnumerable<DateTime> ApplyFrequency(this DateTime dateTime, Recur rule)
         {
+            var count = rule.Count ?? 1000;
+            DateTime until = rule.Until ?? DateTime.Now.AddMonths(6);
 
             List<DateTime> output = new List<DateTime>() {dateTime};
+            List<DateTime> genDTs = new List<DateTime>();
+            var freq = rule.Frequency.Value;
+            var interval = rule.Interval ?? 1;
             //gonna create as dates as the count specify
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count-1; i++)
             {
                 //take the last added item and work with it
                 var lastestDate = output.Last();
                 //if reach the max date the return
                 if (lastestDate >= until)
-                    return output;
+                {
+                    output.RemoveAt(output.Count-1);
+                    break;
+                }
 
                 switch (freq)
                 {
@@ -65,35 +77,33 @@ namespace CalDAV.Models.Method_Extensions
 
                 }
             }
-            return output;
+            return output.ApplyByMonth(rule);
         }
 
 
-        private static IEnumerable<DateTime> AppplyByMonth(this IEnumerable<DateTime> dateTimes, Recur rule)
+        private static IEnumerable<DateTime> ApplyByMonth(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByMonth.Length == 0)
+            if (rule.ByMonth== null)
                 return dateTimes.ApplyByWeekNo(rule);
             
-            List<DateTime> daysOfMonths = new List<DateTime>();
-            var cal = CultureInfo.InvariantCulture.Calendar;
+           /* List<DateTime> daysOfMonths = new List<DateTime>();
+            var cal = CultureInfo.InvariantCulture.Calendar;*/
 
-
+            var output = new List<DateTime>(dateTimes);
             //generate all the days for the given months
             //if the FREQ rule is YEARLY
             if(rule.Frequency.Value==RecurValues.Frequencies.YEARLY)
             {
-                foreach (var dateTime in dateTimes)
+                foreach (var dt in dateTimes)
                 {
                     foreach (var month in rule.ByMonth)
                     {
-                        var daysInMonth = cal.GetDaysInMonth(dateTime.Year, month);
-                        for (int day = 0; day < daysInMonth; day++)
-                        {
-                            daysOfMonths.Add(new DateTime(dateTime.Year, month, day));
-                        }
+                        var dateToAdd = new DateTime(dt.Year,month,dt.Day, dt.Hour, dt.Minute,dt.Second);
+                        if(!output.Contains(dateToAdd))
+                            output.Add(dateToAdd);
                     }
                 }
-                return daysOfMonths.ApplyByWeekNo(rule);
+                return output.ApplyByWeekNo(rule);
             }
             //limit the dateTimes to those that have the month
             //equal to any of the given months if the FREQ is not YEARLY
@@ -104,10 +114,10 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyByWeekNo(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByWeekNo.Length == 0)
+            if (rule.ByWeekNo== null)
                 return dateTimes.ApplyByYearDay(rule);
             //if the FREQ is other than YEARLY then do nothing
-            if(rule.Frequency.Value!=null &&rule.Frequency.Value!=RecurValues.Frequencies.YEARLY)
+            if(rule.Frequency!=null &&rule.Frequency.Value!=RecurValues.Frequencies.YEARLY)
                 return dateTimes.ApplyByYearDay(rule);
             var cal = CultureInfo.InvariantCulture.Calendar;
             
@@ -121,7 +131,7 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyByYearDay(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByYearDay.Length == 0||
+            if (rule.ByYearDay== null||
                 rule.Frequency.Value==RecurValues.Frequencies.DAILY||
                 rule.Frequency.Value == RecurValues.Frequencies.WEEKLY||
                 rule.Frequency.Value == RecurValues.Frequencies.MONTHLY)
@@ -152,7 +162,7 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyByMonthDay(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByMonthDay.Length == 0||rule.Frequency.Value == RecurValues.Frequencies.WEEKLY)
+            if (rule.ByMonthDay== null||rule.Frequency.Value == RecurValues.Frequencies.WEEKLY)
                 return dateTimes.ApplyByDay(rule);
             var cal = CultureInfo.InvariantCulture.Calendar;
 
@@ -209,11 +219,11 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyByDay(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByDays.Length == 0)
+            if (rule.ByDays== null)
                 return dateTimes.ApplyByHour(rule);
 
 
-            var daysOfWeek = rule.ByDays.Select(day => ToDayOfWeek(day.WeekDay));
+            var daysOfWeek = rule.ByDays.Select(day => ToDayOfWeek(day.WeekDay)).ToArray();
             //limit the dateTImes if the FREQ is set to SECONDLY, MINUTELY or HOURLY
             if (rule.Frequency.Value == RecurValues.Frequencies.MINUTELY ||
                 rule.Frequency.Value == RecurValues.Frequencies.HOURLY)
@@ -227,9 +237,24 @@ namespace CalDAV.Models.Method_Extensions
 
             foreach (var dt in dateTimes)
             {
-                int weekNum = cal.GetWeekOfYear(dt, CalendarWeekRule.FirstFourDayWeek, ToDayOfWeek(rule.Wkst.Value));
-                output.AddRange(dt.GenerateDayOfWeek(weekNum, ToDayOfWeek(rule.Wkst.Value)).
-                    Where(x => daysOfWeek.Contains(x.DayOfWeek)));
+                switch (rule.Frequency.Value)
+                {
+                   case RecurValues.Frequencies.WEEKLY:
+                        int weekNum = cal.GetWeekOfYear(dt, CalendarWeekRule.FirstFourDayWeek, ToDayOfWeek(rule.Wkst));
+                        var result = dt.GenerateDayOfWeek(weekNum, ToDayOfWeek(rule.Wkst));
+                        foreach (var r in result)
+                        {
+                            if(daysOfWeek.Contains(r.DayOfWeek))
+                                output.Add(r);
+                        }
+                        break;
+                    case RecurValues.Frequencies.YEARLY:
+                    case RecurValues.Frequencies.MONTHLY:
+                        output.AddRange(dt.SpecialExpandMonth(rule));
+                        break;
+
+                }
+                
             }
 
             return output.ApplyByHour(rule);
@@ -242,7 +267,7 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyByHour(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByHours.Length == 0)
+            if (rule.ByHours== null)
                 return dateTimes.ApplyByMinute(rule);
 
 
@@ -265,7 +290,7 @@ namespace CalDAV.Models.Method_Extensions
         }
         private static IEnumerable<DateTime> ApplyByMinute(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByMinutes.Length == 0)
+            if (rule.ByMinutes== null)
                 return dateTimes.ApplyBySecond(rule);
 
             //limit the dateTImes if the FREQ is set to SECONDLY or MINUTELY //TODO: add the SECONDLY
@@ -289,7 +314,7 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyBySecond(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.BySeconds.Length == 0)
+            if (rule.BySeconds== null)
                 return dateTimes.ApplyBySetPos(rule);
 
             // TODO: add the SECONDLY
@@ -302,26 +327,28 @@ namespace CalDAV.Models.Method_Extensions
             {
                 //generate a dt per each dt and each given hour
                 output.AddRange(rule.BySeconds
-                    .Select(second => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, second, dt.Second)));
+                    .Select(second => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, second)));
             }
 
-            return output.ApplyBySecond(rule);
+            return output.ApplyBySetPos(rule);
 
-            throw new NotImplementedException();
+            
         }
 
         private static IEnumerable<DateTime> ApplyBySetPos(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByYearDay.Length == 0)
-                return dateTimes.ApplyBySetPos(rule);
-            throw new NotImplementedException();
+            if (rule.BySetPos== null)
+                return dateTimes;
+            throw new NotImplementedException($"THe rule isnt implemented yet :(.");
         }
 
 
 
-        private static DayOfWeek ToDayOfWeek(RecurValues.Weekday day)
+        private static DayOfWeek ToDayOfWeek(RecurValues.Weekday? day)
         {
-            switch (day)
+            if(day==null)
+                return DayOfWeek.Sunday;
+            switch (day.Value)
             {
                 case RecurValues.Weekday.SU:
                     return DayOfWeek.Sunday;
@@ -342,9 +369,18 @@ namespace CalDAV.Models.Method_Extensions
             }
         }
 
+
+        /// <summary>
+        /// Generate all the days inside the given weekNumber
+        /// that are in the same week that dt
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="weekNum"></param>
+        /// <param name="dw"></param>
+        /// <returns></returns>
         private static IEnumerable<DateTime> GenerateDayOfWeek(this DateTime dt, int weekNum, DayOfWeek dw)
         {
-            List<DateTime> output = new List<DateTime>(7);
+            List<DateTime> output = new List<DateTime>(7) {dt};
             var cal = CultureInfo.InvariantCulture.Calendar;
 
            
@@ -370,6 +406,30 @@ namespace CalDAV.Models.Method_Extensions
 
             return output;
 
+        }
+
+        /// <summary>
+        /// Return all the days of the month that its 
+        /// DayOfWeek is contained in the specified BYDAY.
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="rule"></param>
+        /// <returns></returns>
+        private static IEnumerable<DateTime> SpecialExpandMonth(this DateTime dt, Recur rule)
+        {
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            var daysOfMonth = cal.GetDaysInMonth(dt.Year, dt.Month);
+            var daysOfWeek = rule.ByDays.Select(day => ToDayOfWeek(day.WeekDay));
+
+            List<DateTime> output = new List<DateTime>(daysOfMonth);
+
+            for (int day = 1; day <= daysOfMonth; day++)
+            {
+                var dateToAdd = new DateTime(dt.Year, dt.Month, day, dt.Hour, dt.Minute, dt.Second);
+                if(daysOfWeek.Contains(dateToAdd.DayOfWeek))
+                    output.Add(dateToAdd);
+            }
+            return output;
         } 
 
 
