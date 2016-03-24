@@ -135,18 +135,74 @@ namespace CalDAV.Models.Method_Extensions
             //expand the datetimes if the FREQ is set to YEARLY
             List<DateTime> output = new List<DateTime>();
             foreach (var dateTime in dateTimes)
-            {
-                output.AddRange(rule.ByYearDay.Select(day=>new DateTime(dateTime.Year)));
-            }
-            return output;
+                foreach (var day in rule.ByYearDay)
+                {
+                    //if the day is negative then create the ref date the the last day of the year,
+                    //otherwise create it to the first day
+                    var refDate = day > 0
+                        ? new DateTime(dateTime.Year, 1, 1, dateTime.Hour, dateTime.Minute, dateTime.Second)
+                        : new DateTime(dateTime.Year, 12, 31, dateTime.Hour, dateTime.Minute, dateTime.Second);
+                    output.Add(refDate.AddDays(day));
+                }
+               
+            
+            return output.ApplyByMonthDay(rule);
         }
 
 
         private static IEnumerable<DateTime> ApplyByMonthDay(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
-            if (rule.ByMonthDay.Length == 0)
+            if (rule.ByMonthDay.Length == 0||rule.Frequency.Value == RecurValues.Frequencies.WEEKLY)
                 return dateTimes.ApplyByDay(rule);
-            throw  new NotImplementedException();
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            //limit the dateTImes if the FREQ is set to SECONDLY, MINUTELY or HOURLY or DAYLY
+            if(rule.Frequency.Value != RecurValues.Frequencies.MONTHLY &&
+                rule.Frequency.Value != RecurValues.Frequencies.YEARLY)
+                return dateTimes.Where(dateTime =>
+                {
+                    //if the givens ByMonthDay are negative then
+                    //subtract it to the total days of the month
+                    var tempDays = rule.ByMonthDay.Select(dayOfMonth =>
+                    {
+                        //if the day is positive dont do nothing
+                        if (dayOfMonth > 0)
+                            return dayOfMonth;
+                        //if the day is negative then substract it to the 
+                        //count of days in the month
+                        var day = cal.GetDaysInMonth(dateTime.Year, dateTime.Month) + dayOfMonth;
+                        //if the result day is not in the range of the month then dismiss it
+                        if (day < 0)
+                            return -1;
+                        return day;
+                    });
+                    return tempDays.Contains(dateTime.Day);
+                }).ApplyByDay(rule);
+
+            //if the FREQ is MONTHLY or YEARLY the expand the datetimes
+            List<DateTime> output = new List<DateTime>();
+            foreach (var dateTime in dateTimes)
+            {
+                //if the givens ByMonthDay are negative then
+                //subtract it to the total days of the month
+                var tempDays = rule.ByMonthDay.Select(dayOfMonth =>
+                {
+                    //if the day is positive dont do nothing
+                    if (dayOfMonth > 0)
+                        return dayOfMonth;
+                    //if the day is negative then substract it to the 
+                    //count of days in the month
+                    var day = cal.GetDaysInMonth(dateTime.Year, dateTime.Month) + dayOfMonth;
+                    //if the result day is not in the range of the month then dismiss it
+                    if (day < 0)
+                        return -1;
+                    return day;
+                }).Where(x=>x>=0);
+                output.AddRange(tempDays.Select(day=>new DateTime(dateTime.Year, dateTime.Month, day,
+                    dateTime.Hour, dateTime.Minute, dateTime.Second)));
+            }
+            return output.ApplyByDay(rule);
+
         }
 
 
@@ -155,7 +211,31 @@ namespace CalDAV.Models.Method_Extensions
         {
             if (rule.ByDays.Length == 0)
                 return dateTimes.ApplyByHour(rule);
-            throw new NotImplementedException();
+
+
+            var daysOfWeek = rule.ByDays.Select(day => ToDayOfWeek(day.WeekDay));
+            //limit the dateTImes if the FREQ is set to SECONDLY, MINUTELY or HOURLY
+            if (rule.Frequency.Value == RecurValues.Frequencies.MINUTELY ||
+                rule.Frequency.Value == RecurValues.Frequencies.HOURLY)
+                return dateTimes.Where(dateTime =>
+                    daysOfWeek.Contains(dateTime.DayOfWeek)).
+                    ApplyByHour(rule);
+            
+            //expand the dts to the given days of the week
+            var output = new List<DateTime>();
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            foreach (var dt in dateTimes)
+            {
+                int weekNum = cal.GetWeekOfYear(dt, CalendarWeekRule.FirstFourDayWeek, ToDayOfWeek(rule.Wkst.Value));
+                output.AddRange(dt.GenerateDayOfWeek(weekNum, ToDayOfWeek(rule.Wkst.Value)).
+                    Where(x => daysOfWeek.Contains(x.DayOfWeek)));
+            }
+
+            return output.ApplyByHour(rule);
+
+            //TODO:IMplement the dif behavior wher FREQ = MONTHLY or YEARLY
+
         }
 
 
@@ -164,19 +244,69 @@ namespace CalDAV.Models.Method_Extensions
         {
             if (rule.ByHours.Length == 0)
                 return dateTimes.ApplyByMinute(rule);
-            throw new NotImplementedException();
+
+
+            //limit the dateTImes if the FREQ is set to SECONDLY, MINUTELY or HOURLY
+            if (rule.Frequency.Value == RecurValues.Frequencies.MINUTELY ||//TODO: add the SECONDLY
+                rule.Frequency.Value == RecurValues.Frequencies.HOURLY)
+                return dateTimes.Where(dt=>rule.ByHours.Contains(dt.Hour)).ApplyByMinute(rule);
+
+            //expand
+            List<DateTime> output = new List<DateTime>();
+
+            foreach (var dt in dateTimes)
+            {
+                //generate a dt per each dt and each given hour
+                output.AddRange(rule.ByHours
+                    .Select(hour=>new DateTime(dt.Year, dt.Month, dt.Day,hour, dt.Minute,dt.Second)));
+            }
+
+            return output.ApplyByMinute(rule);
         }
         private static IEnumerable<DateTime> ApplyByMinute(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
             if (rule.ByMinutes.Length == 0)
                 return dateTimes.ApplyBySecond(rule);
-            throw new NotImplementedException();
+
+            //limit the dateTImes if the FREQ is set to SECONDLY or MINUTELY //TODO: add the SECONDLY
+            if (rule.Frequency.Value == RecurValues.Frequencies.MINUTELY)
+                return dateTimes.Where(dt => rule.ByMinutes.Contains(dt.Minute)).ApplyBySecond(rule);
+
+
+            //expand
+            List<DateTime> output = new List<DateTime>();
+
+            foreach (var dt in dateTimes)
+            {
+                //generate a dt per each dt and each given hour
+                output.AddRange(rule.ByMinutes
+                    .Select(minute => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, minute, dt.Second)));
+            }
+
+            return output.ApplyBySecond(rule);
+            
         }
 
         private static IEnumerable<DateTime> ApplyBySecond(this IEnumerable<DateTime> dateTimes, Recur rule)
         {
             if (rule.BySeconds.Length == 0)
                 return dateTimes.ApplyBySetPos(rule);
+
+            // TODO: add the SECONDLY
+            if (false/*rule.Frequency.Value == RecurValues.Frequencies.SECONDLY*/)
+                return dateTimes.Where(dt => rule.ByMinutes.Contains(dt.Minute)).ApplyBySecond(rule);
+
+            List<DateTime> output = new List<DateTime>();
+
+            foreach (var dt in dateTimes)
+            {
+                //generate a dt per each dt and each given hour
+                output.AddRange(rule.BySeconds
+                    .Select(second => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, second, dt.Second)));
+            }
+
+            return output.ApplyBySecond(rule);
+
             throw new NotImplementedException();
         }
 
@@ -211,6 +341,36 @@ namespace CalDAV.Models.Method_Extensions
                     return DayOfWeek.Sunday;
             }
         }
+
+        private static IEnumerable<DateTime> GenerateDayOfWeek(this DateTime dt, int weekNum, DayOfWeek dw)
+        {
+            List<DateTime> output = new List<DateTime>(7);
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+           
+            DateTime genDT = dt.AddDays(1);
+            int currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            //add the days til get to other week
+            while (currentWeekNum==weekNum)
+            {
+                output.Add(genDT);
+                genDT = genDT.AddDays(1);
+                currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            }
+
+            genDT = dt.AddDays(-1);
+            currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            //substract the days til get to other week
+            while (currentWeekNum == weekNum)
+            {
+                output.Add(genDT);
+                genDT = genDT.AddDays(-1);
+                currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            }
+
+            return output;
+
+        } 
 
 
 
