@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 using System.Xml;
 using ICalendar.ComponentProperties;
@@ -35,8 +36,9 @@ namespace CalDAV.Models.Method_Extensions
 
         private static IEnumerable<DateTime> ApplyFrequency(this DateTime dateTime, Recur rule)
         {
+            ///limit the COunt and Ultil if are not specified
             var count = rule.Count ?? 1000;
-            DateTime until = rule.Until ?? DateTime.Now.AddMonths(6);
+            DateTime until = rule.Until ?? dateTime.AddYears(10);
 
             List<DateTime> output = new List<DateTime>() {dateTime};
             List<DateTime> genDTs = new List<DateTime>();
@@ -135,9 +137,15 @@ namespace CalDAV.Models.Method_Extensions
             
             //just return the dates whos week of the year is one
             //of the specified
-            
-            return dateTimes.Where(x => rule.ByWeekNo.
-                Contains(cal.GetWeekOfYear(x, CalendarWeekRule.FirstFourDayWeek, rule.Wkst )));
+            var output = new List<DateTime>();
+            foreach (var weekNo in rule.ByWeekNo)
+            {
+                 output.AddRange(dateTimes.SelectMany(x=>x.GenerateDayOfWeek(weekNo,rule.Wkst)));
+            }
+           
+            return output.Where(x => rule.ByWeekNo.
+                Contains(cal.GetWeekOfYear(x, CalendarWeekRule.FirstFourDayWeek, rule.Wkst )))
+                .ApplyByYearDay(rule);
         }
 
 
@@ -260,6 +268,26 @@ namespace CalDAV.Models.Method_Extensions
                         break;
 
                     case RecurValues.Frequencies.YEARLY:
+                        //Limit if BYYEARDAY or BYMONTHDAY is present;
+                        if (rule.ByYearDay != null|| rule.ByMonthDay!=null
+                            || rule.ByWeekNo != null )
+                            if(daysOfWeek.Contains(dt.DayOfWeek))
+                                output.Add(dt);
+                            else
+                                continue;
+                        //otherwise, special expand for WEEKLY if BYWEEKNO present;
+                        /*else if(rule.ByWeekNo!=null)
+                            if (daysOfWeek.Contains(dt.DayOfWeek))
+                                output.Add(dt);*/
+
+                        else if (rule.ByMonth!=null)
+                            if (rule.ByDays.Any(x => x.OrdDay != null))
+                                output.AddRange(dt.SpecialExpandMonthDayWithInt(rule));
+                            else
+                                output.AddRange(dt.SpecialExpandMonth(rule));
+                        else
+                             output.AddRange(dt.ExpandYearByDay(rule));
+                        break;
                     case RecurValues.Frequencies.MONTHLY:
                         //if the BYDAYS contains integers then
                         if(rule.ByDays.Any(x=>x.OrdDay!=null))
@@ -369,32 +397,43 @@ namespace CalDAV.Models.Method_Extensions
         /// </summary>
         /// <param name="dt"></param>
         /// <param name="weekNum"></param>
-        /// <param name="dw"></param>
+        /// <param name="dw">The DayOfWeek value that start the week</param>
         /// <returns></returns>
         private static IEnumerable<DateTime> GenerateDayOfWeek(this DateTime dt, int weekNum, DayOfWeek dw)
         {
-            List<DateTime> output = new List<DateTime>(7) {dt};
+            List<DateTime> output = new List<DateTime>(7);
             var cal = CultureInfo.InvariantCulture.Calendar;
 
            
-            DateTime genDT = dt.AddDays(1);
-            int currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            DateTime startDT = new DateTime(dt.Year, 1, 1, dt.Hour, dt.Minute, dt.Second)
+                .AddDays((weekNum-1)*7);
+
+            var currentDT = startDT;
+            int currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            //make to start in the beginning of the week
+            if(currentWeekNum<weekNum)
+                while (currentWeekNum < weekNum)
+                {
+                    startDT = startDT.AddDays(1);
+                    currentWeekNum = cal.GetWeekOfYear(startDT, CalendarWeekRule.FirstFourDayWeek, dw);
+                }
+            currentDT = startDT;
             //add the days til get to other week
             while (currentWeekNum==weekNum)
             {
-                output.Add(genDT);
-                genDT = genDT.AddDays(1);
-                currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+                output.Add(currentDT);
+                currentDT = currentDT.AddDays(1);
+                currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
             }
 
-            genDT = dt.AddDays(-1);
-            currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+            currentDT = startDT.AddDays(-1);
+            currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
             //substract the days til get to other week
             while (currentWeekNum == weekNum)
             {
-                output.Add(genDT);
-                genDT = genDT.AddDays(-1);
-                currentWeekNum = cal.GetWeekOfYear(genDT, CalendarWeekRule.FirstFourDayWeek, dw);
+                output.Add(currentDT);
+                currentDT = currentDT.AddDays(-1);
+                currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
             }
 
             return output;
@@ -466,6 +505,70 @@ namespace CalDAV.Models.Method_Extensions
                 var dtToAdd = new DateTime(dt.Year, dt.Month, day, dt.Hour, dt.Minute, dt.Second);
                 dayOfWeekOcurrence.Add(dtToAdd,daysOfWeekCount[dtToAdd.DayOfWeek]+1);
                 daysOfWeekCount[dtToAdd.DayOfWeek] += 1;
+            }
+
+            //iterate over the datetimes and see if its DayOfWeek
+            //is one of the given in the rule.BYDAY
+            foreach (var dateTime in dayOfWeekOcurrence.Keys)
+                foreach (var wDay in daysOfWeek)
+                {
+                    //if the wDay integer is positive and is the same of the current dateTime
+                    //and its DayOfWeek is the same of wDay then add it
+                    if(wDay.OrdDay.Value>0)
+                        if (dateTime.DayOfWeek == wDay.DayOfWeek
+                            && dayOfWeekOcurrence[dateTime] == wDay.OrdDay.Value)
+                            output.Add(dateTime);
+                        else
+                            continue; 
+                        
+                        //if is negative and the total count of datetime.DayOfWeek
+                    else if(dateTime.DayOfWeek == wDay.DayOfWeek&&
+                       daysOfWeekCount[dateTime.DayOfWeek]- dayOfWeekOcurrence[dateTime]+1 == wDay.OrdDay.Value*-1)
+                        output.Add(dateTime);
+                }
+
+            return output;
+        } 
+ /// <summary>
+        /// Return all the days of the month that its 
+        /// DayOfWeek is contained in the specified BYDAY when these contains
+        /// ordinary values (i.e: BYDAY=1MO,-1MO).
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="rule"></param>
+        /// <returns></returns>
+        private static IEnumerable<DateTime> ExpandYearByDay(this DateTime dt, Recur rule)
+        {
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            var daysOfYear = cal.GetDaysInYear(dt.Year);
+            var daysOfWeek = rule.ByDays;
+            
+            List<DateTime> output = new List<DateTime>();
+
+            //Contains the ocurrence number of the DayOfWeek of the especific datetime
+            Dictionary<DateTime, int> dayOfWeekOcurrence = new Dictionary<DateTime, int>();
+
+            //Contains the count of ocurrence of the DayOfWeek
+            Dictionary<DayOfWeek,int> daysOfWeekCount = new Dictionary<DayOfWeek, int>(7)
+            {
+                { DayOfWeek.Sunday, 0},
+                {DayOfWeek.Monday, 0 },
+                {DayOfWeek.Tuesday, 0 },
+                {DayOfWeek.Wednesday, 0 },
+                {DayOfWeek.Thursday, 0 },
+                {DayOfWeek.Friday, 0 },
+                {DayOfWeek.Saturday, 0 }
+            };
+
+            var yearStartDate = new DateTime(dt.Year, 1, 1, dt.Hour, dt.Minute, dt.Second);
+            var currentDate = yearStartDate;
+            for (int days = 0; days < daysOfYear; days++)
+            {
+                //construct the datetime and check if the day of the week of one
+                //of the specified in the BYDAY property
+                currentDate = yearStartDate.AddDays(days);
+                dayOfWeekOcurrence.Add(currentDate, daysOfWeekCount[currentDate.DayOfWeek]+1);
+                daysOfWeekCount[currentDate.DayOfWeek] += 1;
             }
 
             //iterate over the datetimes and see if its DayOfWeek

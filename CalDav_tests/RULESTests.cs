@@ -889,6 +889,41 @@ namespace CalDav_tests
             };
             DateTime? otherDT;
             "19980518T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990517T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            
+
+            var dts = startTime.Value.ExpandTime(recurs).Take(3);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt in expected)
+            {
+                Assert.Contains(dt, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Monday of week number 20 (where the default start of the week is
+        ///Monday), forever:
+        /// </summary>
+        [Fact]
+        public void UnitTest24()
+        {
+            DateTime? startTime;
+            "19970512T090000".ToDateTime(out startTime);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=YEARLY;BYWEEKNO=20;BYDAY=MO".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>()
+            {
+                startTime.Value
+            };
+            DateTime? otherDT;
+            "19980511T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
             "19990517T090000".ToDateTime(out otherDT);
             expected.Add(otherDT.Value);
             
