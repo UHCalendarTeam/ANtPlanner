@@ -18,9 +18,10 @@ namespace CalDAV.Core.Propfind
         /// <param name="collectionName"></param>
         /// <param name="calendarResourceId"></param>
         /// <param name="depth"></param>
+        /// <param name="aditionalProperties"></param>
         /// <param name="multistatusTree"></param>
         /// <returns></returns>
-        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
+        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string,string>> aditionalProperties ,XmlTreeStructure multistatusTree);
 
         /// <summary>
         /// Returns the value of the specified properties.

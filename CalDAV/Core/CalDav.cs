@@ -7,7 +7,7 @@ using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
-
+using CalDAV.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using TreeForXml;
@@ -80,7 +80,7 @@ namespace CalDAV.Core
             //if the body is empty asumme that is an allprop request.          
             if (body == null)
             {
-                PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, response);
+                PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, null, response);
 
                 return response;
             }
@@ -100,7 +100,8 @@ namespace CalDAV.Core
                         PropFindMethods.PropMethod(userEmail, collectionName, calendarResourceId, depth, props, response);
                     break;
                 case "allprop":
-                    PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, response);
+                    var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure)xmlTree);
+                    PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, additionalProperties, response);
                     break;
                 case "propname":
                     PropFindMethods.PropNameMethod(userEmail, collectionName, calendarResourceId, depth, response);
@@ -115,7 +116,11 @@ namespace CalDAV.Core
 
             return response;
         }
-
+        /// <summary>
+        /// Extract all property names and property namespace from a prop element of a  propfind body.
+        /// </summary>
+        /// <param name="propFindTree"></param>
+        /// <returns></returns>
         private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(XmlTreeStructure propFindTree)
         {
             var retList = new List<KeyValuePair<string, string>>();
@@ -123,6 +128,25 @@ namespace CalDAV.Core
             foreach (var child in props.Children)
             {
                 retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
+            }
+            return retList;
+        }
+
+        /// <summary>
+        /// Extract all property names and property namespace from a include element of a  propfind body in the allproperty method.
+        /// </summary>
+        /// <param name="propFindTree"></param>
+        /// <returns></returns>
+        private List<KeyValuePair<string, string>> ExtractIncludePropertiesNameMainNS(XmlTreeStructure propFindTree)
+        {
+            var retList = new List<KeyValuePair<string,string>>();
+            var includes = propFindTree.GetChildAtAnyLevel("include");
+            if (includes != null)
+            {
+                foreach (var child in includes.Children)
+                {
+                    retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
+                }
             }
             return retList;
         } 
@@ -325,6 +349,8 @@ namespace CalDAV.Core
         /// <returns></returns>
         private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders, CalDavContext db, VCalendar iCal, out string retEtag)
         {
+
+            //TODO: Cambiar como se cogen las propiedades contruir como xml.
             #region Extracting Properties
             string userEmail;
             propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
@@ -364,15 +390,16 @@ namespace CalDAV.Core
 
             property = calendarComp.GetComponentProperty("DTSTART");
 
-            if (property != null)
-            {
-                resource.DtStart = ((IValue<DateTime>)property).Value;
-            }
-            property = calendarComp.GetComponentProperty("DTEND");
-            if (property != null)
-            {
-                resource.DtEnd = ((IValue<DateTime>)property).Value;
-            }
+            //if (property != null)
+            //{
+            //    //building as xml
+            //    resource.DtStart = XMLBuilders.XmlBuilder("dtstart", "urn:ietf:params:xml:ns:caldav", ((IValue<DateTime>)property).Value.ToString()) ;
+            //}
+            //property = calendarComp.GetComponentProperty("DTEND");
+            //if (property != null)
+            //{
+            //    resource.DtEnd = ((IValue<DateTime>)property).Value;
+            //}
             property = calendarComp.GetComponentProperty("UID");
             if (property != null)
             {

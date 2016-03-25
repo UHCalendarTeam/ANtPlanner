@@ -58,8 +58,8 @@ namespace CalDAV.Core
                     User = user,
                     Name = collectionName,
                     CalendarDescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
-                    DisplayName = calDisplayName,
-                    CalendarTimeZone = calTimeZone
+                    DisplayName = calDisplayName
+                    
                     //TODO: take the other properties from the class that is gonna contain the 
                     //custom properties of the collections
                 };

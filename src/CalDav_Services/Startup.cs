@@ -36,7 +36,14 @@ namespace CalDav_Services
                 builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
             });
+
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
             // Add framework services.
+            services.AddEntityFramework()
+               .AddSqlServer()
+               .AddDbContext<CalDavContext>(options =>
+                   options.UseSqlServer(connection));
+
             services.AddMvc();
 
             services.AddSingleton<ICalDav, CalDav>();
