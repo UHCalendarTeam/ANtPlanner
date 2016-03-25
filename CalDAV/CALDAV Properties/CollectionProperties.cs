@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.XML_Processors;
@@ -25,12 +26,15 @@ namespace CalDAV.CALDAV_Properties
             {"getcontentlength", "0" }
         };
 
-        private static List<string> VisibleGeneralProperties = new List<string>() {""};
+        private static List<string> VisibleGeneralProperties = new List<string>()
+        {
+            "calendar-description", "displayname", "resourcetype", "creationdate"
+        };
 
         private static string MinDateTime()
         {
             return
-                new DateTime(DateTime.Now.Year, (DateTime.Now.Month - 1)%12, DateTime.Now.Day).ToUniversalTime()
+                new DateTime(DateTime.Now.Year, (DateTime.Now.Month - 1) % 12, DateTime.Now.Day).ToUniversalTime()
                     .ToString("yyyyMMddTHHmmssZ");
         }
 
@@ -50,10 +54,21 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNS)
         {
+            //First I look to see if is one of the static ones.
+            if (XmlGeneralProperties.ContainsKey(propertyName))
+            {
+                var svalue = XmlGeneralProperties[propertyName];
+                var sprop = new XmlTreeStructure(propertyName, mainNS);
+                sprop.AddValue(svalue);
+                return sprop;
+            }
+
             ////this must be fixed later because not all properties are of type string.
             var value = (string)collection.GetType().GetProperty(propertyName).GetValue(collection);
-            var prop = new XmlTreeStructure(propertyName, mainNS);
-            prop.Value = value;
+            if (value == null)
+                throw new Exception("The value could not be retrieved");
+            var prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+
 
             return prop;
         }
@@ -67,36 +82,10 @@ namespace CalDAV.CALDAV_Properties
         public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection)
         {
             var list = new List<XmlTreeStructure>();
-
-            //calendar desription
-            var description = new XmlTreeStructure("calendar-description", CaldavNs);
-            description.AddNamespace("C", CaldavNs);
-            description.AddValue(collection.CalendarDescription);
-            list.Add(description);
-
-            //Display Name
-            var displayName = new XmlTreeStructure("displayname", DavNs);
-            displayName.AddValue(collection.DisplayName);
-            list.Add(displayName);
-
-            //resource type
-            var resourceType = collection.ResourceType;
-            //var resourceType = new XMLTreeStructure("resourcetype", new List<string>() {"D"});
-            //foreach (var res in collection.ResourceType)
-            //{
-            //    resourceType.AddChild(new XMLTreeStructure(res, new List<string>() { NameSpace }));
-            //}
-            list.Add((XmlTreeStructure)XmlTreeStructure.Parse(resourceType));
-
-            //creation date
-            var creationDate = new XmlTreeStructure("creationdate", DavNs);
-            creationDate.AddValue(collection.CreationDate.ToString());
-            list.Add(creationDate);
-
-            //supported lock
-
-
-
+            foreach (var property in VisibleGeneralProperties)
+            {
+                list.Add(ResolveProperty(collection, property, "DAV"));
+            }
             return list;
 
         }
@@ -150,6 +139,6 @@ namespace CalDAV.CALDAV_Properties
 
             return list;
         }
-        
+
     }
 }
