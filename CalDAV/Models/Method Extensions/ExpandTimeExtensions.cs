@@ -199,9 +199,10 @@ namespace CalDAV.Models.Method_Extensions
                             return dayOfMonth;
                         //if the day is negative then substract it to the 
                         //count of days in the month
-                        var day = cal.GetDaysInMonth(dateTime.Year, dateTime.Month) + dayOfMonth;
+                        var daysInMonth = cal.GetDaysInMonth(dateTime.Year, dateTime.Month);
+                        var day = daysInMonth + dayOfMonth;
                         //if the result day is not in the range of the month then dismiss it
-                        if (day < 0)
+                        if (day < 0||day>daysInMonth)
                             return -1;
                         return day;
                     });
@@ -212,6 +213,7 @@ namespace CalDAV.Models.Method_Extensions
             List<DateTime> output = new List<DateTime>();
             foreach (var dateTime in dateTimes)
             {
+                var daysInMonth = cal.GetDaysInMonth(dateTime.Year, dateTime.Month);
                 //if the givens ByMonthDay are negative then
                 //subtract it to the total days of the month
                 var tempDays = rule.ByMonthDay.Select(dayOfMonth =>
@@ -220,13 +222,13 @@ namespace CalDAV.Models.Method_Extensions
                     if (dayOfMonth > 0)
                         return dayOfMonth;
                     //if the day is negative then substract it to the 
-                    //count of days in the month
-                    var day = cal.GetDaysInMonth(dateTime.Year, dateTime.Month) + dayOfMonth+1;
+                    //count of days in the month                    
+                    var day = daysInMonth + dayOfMonth+1;
                     //if the result day is not in the range of the month then dismiss it
                     if (day < 0)
                         return -1;
                     return day;
-                }).Where(x => x >= 0);
+                }).Where(x => x >= 0&&x<daysInMonth);
                 output.AddRange(tempDays.Select(day => new DateTime(dateTime.Year, dateTime.Month, day,
                     dateTime.Hour, dateTime.Minute, dateTime.Second)));
             }
@@ -453,7 +455,7 @@ namespace CalDAV.Models.Method_Extensions
                 currentDT = currentDT.AddDays(-1);
                 currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
             }
-
+            output.Sort();
             return output;
 
         }

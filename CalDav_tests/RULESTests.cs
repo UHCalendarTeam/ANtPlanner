@@ -1213,5 +1213,294 @@ namespace CalDav_tests
             }
 
         }
+
+
+        /// <summary>
+        ///Every 3 hours from 9:00 AM to 5:00 PM on a specific day:   
+        /// </summary>
+        [Fact]
+        public void UnitTest31()
+        {
+            DateTime? dt;
+            "19970902T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=HOURLY;INTERVAL=3;UNTIL=19970902T170000Z".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if (recur.ByDays != null)
+                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            //int interval = recur.Interval != null ? recur.Interval.Value : 1;
+            //for (int year = dt.Value.Year; year < dt.Value.Year + 10; year += interval)
+            //    for (int month = 1; month < 13; month++)
+            //        for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+            //        {
+            //            if (recur.ByMonthDay != null && !recur.ByMonthDay.Contains(day))
+            //                continue;
+            //            if (recur.ByMonth != null && !recur.ByMonth.Contains(month))
+            //                continue;
+            //            var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+            //            if (daysOfWeek != null && daysOfWeek.Contains(dateToAdd.DayOfWeek))
+            //                expected.Add(dateToAdd);
+            //        }
+            //expected = expected.Where(x => x >= dt).Take(10).ToList();
+            "19970902T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970902T120000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970902T150000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Every 15 minutes for 6 occurrences:   
+        /// </summary>
+        [Fact]
+        public void UnitTest32()
+        {
+            DateTime? dt;
+            "19970902T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MINUTELY;INTERVAL=15;COUNT=6".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if (recur.ByDays != null)
+                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            int interval = recur.Interval != null ? recur.Interval.Value : 1;            
+            for (int i = 0; i < 6; i++)
+            {                       
+                var dateToAdd = dt.Value.AddMinutes(i*interval);                       
+                    expected.Add(dateToAdd);
+            }
+          
+
+
+
+            var dts = dt.Value.ExpandTime(recurs);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+
+        /// <summary>
+        ///Every hour and a half for 4 occurrences:   
+        /// </summary>
+        [Fact]
+        public void UnitTest33()
+        {
+            DateTime? dt;
+            "19970902T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MINUTELY;INTERVAL=90;COUNT=4".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if (recur.ByDays != null)
+                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            int interval = recur.Interval != null ? recur.Interval.Value : 1;
+            for (int i = 0; i < 4; i++)
+            {
+                var dateToAdd = dt.Value.AddMinutes(i * interval);
+                expected.Add(dateToAdd);
+            }
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Every 20 minutes from 9:00 AM to 4:40 PM every day: 
+        /// </summary>
+        [Fact]
+        public void UnitTest34()
+        {
+            DateTime? dt;
+            "19970902T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=DAILY;BYHOUR=9,10,11,12,13,14,15,16;BYMINUTE=0,20,40".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if (recur.ByDays != null)
+                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            int interval = recur.Interval != null ? recur.Interval.Value : 1;
+            for (int day = 2; day < 5; day++)
+            {
+                for (int hour = 9; hour < 17; hour++)
+                {
+                    var dateToAdd = new DateTime(dt.Value.Year, dt.Value.Month, day, hour, 0, dt.Value.Second);
+                    expected.Add(dateToAdd);
+                    for (int i = 0; i <2; i ++)
+                    {
+                        dateToAdd = dateToAdd.AddMinutes(20);
+                        expected.Add(dateToAdd);
+                    }
+                }
+            }
+           
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+            "RRULE:FREQ=MINUTELY;INTERVAL=20;BYHOUR=9,10,11,12,13,14,15,16".ToRecur(out recur);
+            recurs.Clear();
+            recurs.Add(recur);
+            dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+
+        /// <summary>
+        ///An example where the days generated makes a difference because of
+        ///WKST
+        /// </summary>
+        [Fact]
+        public void UnitTest35()
+        {
+            DateTime? dt;
+            "19970805T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            "19970805T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970810T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970819T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970824T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+
+            var dts = dt.Value.ExpandTime(recurs);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+            //changing only WKST from MO to SU, yields different results...
+
+            "RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU".ToRecur(out recur);
+
+            recurs.Clear();
+            recurs.Add(recur);
+            expected.Clear();
+            "19970805T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970817T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970819T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970831T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            dts = dt.Value.ExpandTime(recurs);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+
+        /// <summary>
+        ///An example where an invalid date (i.e., February 30) is ignored.
+        /// </summary>
+        [Fact]
+        public void UnitTest36()
+        {
+            DateTime? dt;
+            "20070115T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MONTHLY;BYMONTHDAY=15,30;COUNT=5".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            "20070115T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "20070130T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "20070215T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "20070315T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "20070330T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+
+            var dts = dt.Value.ExpandTime(recurs);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+           
+
+        }
+
+
+
+
     }
 }
