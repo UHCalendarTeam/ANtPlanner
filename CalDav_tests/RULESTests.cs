@@ -6,6 +6,7 @@ using CalDAV.Models.Method_Extensions;
 using ICalendar.Utils;
 using ICalendar.ValueTypes;
 using Xunit;
+using System.Globalization;
 
 namespace CalDav_tests
 {
@@ -937,9 +938,280 @@ namespace CalDav_tests
 
         }
 
+        /// <summary>
+        ///Every Thursday in March, forever:
+        /// </summary>
+        [Fact]
+        public void UnitTest25()
+        {
+            DateTime? startTime;
+            "19970313T090000".ToDateTime(out startTime);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=TH".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>()
+            {
+                startTime.Value
+            };
+            DateTime? otherDT;
+            "19970320T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19970327T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19980305T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19980312T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19980319T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19980326T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990311T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990318T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990325T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990304T090000".ToDateTime(out otherDT);
+            expected.Add(otherDT.Value);
+            "19990318T090000".ToDateTime(out otherDT);
 
 
 
 
+            var dts = startTime.Value.ExpandTime(recurs).Take(11);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt in expected)
+            {
+                Assert.Contains(dt, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Every Thursday, but only during June, July, and August, forever:
+        /// </summary>
+        [Fact]
+        public void UnitTest26()
+        {
+            DateTime? dt;
+            "19970605T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=YEARLY;BYDAY=TH;BYMONTH=6,7,8".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>(){};
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            for (int year = 1997; year < 2000; year++)
+                for (int month = 6; month < 9; month++)
+                    for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+                    {
+                        var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+                        if (dateToAdd.DayOfWeek == DayOfWeek.Thursday)
+                            expected.Add(dateToAdd);
+                    }
+                    
+             
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Every Friday the 13th, forever:
+        /// </summary>
+        [Fact]
+        public void UnitTest27()
+        {
+            DateTime? dt;
+            "19970902T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+
+            for (int year = 1998; year < 2001; year++)
+                for (int month = 1; month < 13; month++)
+                    for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+                    {
+                        if (day != 13)
+                            continue;
+                        var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+                        if (dateToAdd.DayOfWeek == DayOfWeek.Friday)
+                            expected.Add(dateToAdd);
+                    }
+
+
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///The first Saturday that follows the first Sunday of the month,       
+        /// </summary>
+        [Fact]
+        public void UnitTest28()
+        {
+            DateTime? dt;
+            "19970913T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MONTHLY;BYDAY=SA;BYMONTHDAY=7,8,9,10,11,12,13".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            var daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            for (int year = dt.Value.Year; year < dt.Value.Year+10; year++)
+                for (int month = 1; month < 13; month++)
+                    for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+                    {
+                        if (!recur.ByMonthDay.Contains(day))
+                            continue;
+                        var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+                        if (daysOfWeek.Contains(dateToAdd.DayOfWeek))
+                            expected.Add(dateToAdd);
+                    }
+            expected = expected.Where(x=>x>=dt).Take(10).ToList();
+
+
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+        /// <summary>
+        ///Every 4 years, the first Tuesday after a Monday in November,       
+        /// </summary>
+        [Fact]
+        public void UnitTest29()
+        {
+            DateTime? dt;
+            "19961105T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=YEARLY;INTERVAL=4;BYMONTH=11;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if(recur.ByDays!=null)
+            daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            int interval = recur.Interval != null ? recur.Interval.Value : 1;
+            for (int year = dt.Value.Year; year < dt.Value.Year + 10; year+=interval)
+                for (int month = 1; month < 13; month++)
+                    for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+                    {
+                        if (recur.ByMonthDay!=null&&!recur.ByMonthDay.Contains(day))
+                            continue;
+                        if (recur.ByMonth != null && !recur.ByMonth.Contains(month))
+                            continue;
+                        var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+                        if (daysOfWeek!=null&& daysOfWeek.Contains(dateToAdd.DayOfWeek))
+                            expected.Add(dateToAdd);
+                    }
+            expected = expected.Where(x => x >= dt).Take(10).ToList();
+
+
+
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
+
+
+        /// <summary>
+        ///The third instance into the month of one of Tuesday, Wednesday, or
+        ///Thursday, for the next 3 months:    
+        /// </summary>
+        [Fact]
+        public void UnitTest30()
+        {
+            DateTime? dt;
+            "19970904T090000".ToDateTime(out dt);
+            List<Recur> recurs = new List<Recur>();
+            Recur recur;
+            "RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=3".ToRecur(out recur);
+
+            recurs.Add(recur);
+            List<DateTime> expected = new List<DateTime>() { };
+            DateTime? otherDT;
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            IEnumerable<DayOfWeek> daysOfWeek = null;
+            if (recur.ByDays != null)
+                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
+            //int interval = recur.Interval != null ? recur.Interval.Value : 1;
+            //for (int year = dt.Value.Year; year < dt.Value.Year + 10; year += interval)
+            //    for (int month = 1; month < 13; month++)
+            //        for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
+            //        {
+            //            if (recur.ByMonthDay != null && !recur.ByMonthDay.Contains(day))
+            //                continue;
+            //            if (recur.ByMonth != null && !recur.ByMonth.Contains(month))
+            //                continue;
+            //            var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
+            //            if (daysOfWeek != null && daysOfWeek.Contains(dateToAdd.DayOfWeek))
+            //                expected.Add(dateToAdd);
+            //        }
+            //expected = expected.Where(x => x >= dt).Take(10).ToList();
+            "19971007T090000".ToDateTime(out dt);
+            expected.Add(dt.Value);
+            "19971106T090000".ToDateTime(out dt);
+            expected.Add(dt.Value);
+
+
+
+            var dts = dt.Value.ExpandTime(recurs).Take(expected.Count);
+            Assert.Equal(expected.Count(), dts.Count());
+            foreach (var dt1 in expected)
+            {
+                Assert.Contains(dt1, dts);
+            }
+
+        }
     }
 }

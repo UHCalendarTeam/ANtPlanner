@@ -5,7 +5,7 @@ using Microsoft.Data.Entity.Metadata;
 
 namespace CalDav_Services.Migrations
 {
-    public partial class FirstMigrationsUHServices : Migration
+    public partial class InitialMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -102,22 +102,19 @@ namespace CalDAV.Models.Method_Extensions
                 return dateTimes.ApplyByWeekNo(rule);
 
             /* List<DateTime> daysOfMonths = new List<DateTime>();
-             var cal = CultureInfo.InvariantCulture.Calendar;*/
-
+            */
+ var cal = CultureInfo.InvariantCulture.Calendar;
             var output = new List<DateTime>();
             //generate all the days for the given months
             //if the FREQ rule is YEARLY
             if (rule.Frequency.Value == RecurValues.Frequencies.YEARLY)
             {
                 foreach (var dt in dateTimes)
-                {
-                    foreach (var month in rule.ByMonth)
-                    {
-                        var dateToAdd = new DateTime(dt.Year, month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-                        if (!output.Contains(dateToAdd))
+                    foreach (var month in rule.ByMonth)                        
+                        {
+                            var dateToAdd = new DateTime(dt.Year, month, dt.Day, dt.Hour, dt.Minute, dt.Second);
                             output.Add(dateToAdd);
-                    }
-                }
+                        }
                 return output.ApplyByWeekNo(rule);
             }
             //limit the dateTimes to those that have the month
@@ -249,10 +246,25 @@ namespace CalDAV.Models.Method_Extensions
             //limit the dateTImes if the FREQ is set to SECONDLY, MINUTELY or HOURLY
             if (rule.Frequency.Value == RecurValues.Frequencies.MINUTELY ||
                 rule.Frequency.Value == RecurValues.Frequencies.HOURLY||
-                rule.Frequency.Value == RecurValues.Frequencies.SECONDLY)
+                rule.Frequency.Value == RecurValues.Frequencies.SECONDLY||
+                rule.Frequency.Value == RecurValues.Frequencies.DAILY)
                 return dateTimes.Where(dateTime =>
                     daysOfWeek.Contains(dateTime.DayOfWeek)).
                     ApplyByHour(rule);
+
+            //Limit if BYYEARDAY or BYMONTHDAY is present; otherwise
+            if (rule.Frequency.Value == RecurValues.Frequencies.YEARLY)
+                if (rule.ByYearDay != null || rule.ByMonthDay != null)
+                    return dateTimes.Where(x => daysOfWeek.Contains(x.DayOfWeek))
+                        .ApplyByHour(rule);
+                //special expand for WEEKLY if BYWEEKNO present;
+                else if (rule.ByWeekNo != null)
+                    return dateTimes.Where(x => daysOfWeek.Contains(x.DayOfWeek))
+                        .ApplyByHour(rule);
+                //special expand for MONTHLY if BYMONTH present;
+                //else if (rule.ByMonth != null)
+                //    return dateTimes.Where(x => daysOfWeek.Contains(x.DayOfWeek))
+                //       .ApplyByHour(rule);
 
             //expand the dts to the given days of the week
             var output = new List<DateTime>();
@@ -268,20 +280,15 @@ namespace CalDAV.Models.Method_Extensions
                         output.AddRange(result.Where(r => daysOfWeek.Contains(r.DayOfWeek)));
                         break;
 
-                    case RecurValues.Frequencies.YEARLY:
-                        //Limit if BYYEARDAY or BYMONTHDAY is present;
-                        if (rule.ByYearDay != null|| rule.ByMonthDay!=null
-                            || rule.ByWeekNo != null )
-                            if(daysOfWeek.Contains(dt.DayOfWeek))
-                                output.Add(dt);
-                            else
-                                continue;
-                        //otherwise, special expand for WEEKLY if BYWEEKNO present;
-                        /*else if(rule.ByWeekNo!=null)
-                            if (daysOfWeek.Contains(dt.DayOfWeek))
-                                output.Add(dt);*/
+                    case RecurValues.Frequencies.YEARLY:                     
 
-                        else if (rule.ByMonth!=null)
+                        //corresponds to an offset within the year when the
+                        //BYWEEKNO or BYMONTH rule parts are present.
+                        if (rule.ByWeekNo != null)
+                            output.AddRange(dt.ExpandYearByDay(rule));
+                        //corresponds to an offset within the 
+                        //month when the BYMONTH rule part is present
+                        if (rule.ByMonth!=null)
                             if (rule.ByDays.Any(x => x.OrdDay != null))
                                 output.AddRange(dt.SpecialExpandMonthDayWithInt(rule));
                             else
@@ -290,8 +297,18 @@ namespace CalDAV.Models.Method_Extensions
                              output.AddRange(dt.ExpandYearByDay(rule));
                         break;
                     case RecurValues.Frequencies.MONTHLY:
-                        //if the BYDAYS contains integers then
-                        if(rule.ByDays.Any(x=>x.OrdDay!=null))
+                        //Limit if BYMONTHDAY is present;
+                        if (rule.ByMonthDay != null)
+                        {
+                            if (daysOfWeek.Contains(dt.DayOfWeek))
+                            {
+                                output.Add(dt);
+                                
+                            }
+                            continue;
+                        }
+                            //if the BYDAYS contains integers then
+                        if (rule.ByDays.Any(x => x.OrdDay != null))
                             output.AddRange(dt.SpecialExpandMonthDayWithInt(rule));
                         else
                             output.AddRange(dt.SpecialExpandMonth(rule));
