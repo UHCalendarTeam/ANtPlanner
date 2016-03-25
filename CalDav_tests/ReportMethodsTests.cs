@@ -166,7 +166,7 @@ END:VCALENDAR";
 
 
 		[Fact]
-		public void TextFilterTest1()
+		public void RetrievalofEventsbyPARTSTAT()
 		{
 			byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.comwithsomemore");
 			byte[] filterValueOctet = System.Text.Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.com");
@@ -317,6 +317,61 @@ END:VCALENDAR";
 			var result = calendar.FilterResource(xmlTree);
 			Assert.True(result);
 		}
+
+		[Fact]
+		public void PartialRetrievalofEventsbyTimeRange()
+		{
+			var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+	<C:comp-filter name=""VEVENT"">
+		<C:time-range start=""20060104T000000Z"" end=""20060105T000000Z""/>
+	</C:comp-filter>
+</C:comp-filter>";
+			var calStr = @"BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VTIMEZONE
+LAST-MODIFIED:20040110T032845Z
+TZID:US/Eastern
+BEGIN:DAYLIGHT
+DTSTART:20000404T020000
+RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
+TZNAME:EDT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20001026T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZNAME:EST
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=US/Eastern:20060102T120000
+DURATION:PT1H
+RRULE:FREQ=DAILY;COUNT=5
+SUMMARY:Event #2
+UID:00959BC664CA650E933C892C@example.com
+END:VEVENT
+END:VCALENDAR";
+			var calendar = new VCalendar(calStr);
+			var xmlTree = XmlTreeStructure.Parse(xmlStr);
+			var result = calendar.FilterResource(xmlTree);
+			Assert.True(result);
+		}
+
+
+	    [Fact]
+	    public void TestingStuffs()
+	    {
+	        var timeSpan = TimeSpan.FromDays(34);
+            var d1 = new DateTime(2000);
+	        var d2 = d1.AddDays(34);
+            var d3 = new DateTime(2000, 12, 31);
+	        var d4 = d3.AddDays(-300);
+
+	    }
+
 
 	}
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Resources;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using CalDAV.Models.Method_Extensions;
 using ICalendar.Utils;
 using ICalendar.ValueTypes; 
 
@@ -149,34 +150,5 @@ namespace CalDAV.Models
         //    return output;
 
         //}
-
-
-
-
-
-
-        /// <summary>
-        /// To add a duration Property to the dtStart propery.
-        /// </summary>
-        /// <param name="dtStart"></param>
-        /// <param name="duration"></param>
-        /// <returns></returns>
-        private static DateTime AddDuration(this DateTime dtStart, DurationType duration)
-        {
-            if (duration.Weeks != null)
-                if (duration.IsPositive)
-                    return dtStart.AddDays(7*duration.Weeks.Value);
-                else
-                    return dtStart.Subtract(new TimeSpan(7*duration.Weeks.Value, 0, 0, 0));
-            var durationSpan = new TimeSpan(
-                duration.Days ?? 0,
-                duration.Hours ?? 0,
-                duration.Minutes ?? 0,
-                duration.Seconds ?? 0);
-            return duration.IsPositive?dtStart.Add(durationSpan):dtStart.Subtract(durationSpan);
-        }
-
-
-
     }
 }

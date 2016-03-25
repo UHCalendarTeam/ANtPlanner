@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
+using ICalendar.ComponentProperties;
 using ICalendar.GeneralInterfaces;
+using ICalendar.Utils;
+using ICalendar.ValueTypes;
 using Microsoft.SqlServer.Server;
 using TreeForXml;
 
@@ -17,7 +21,7 @@ namespace CalDAV.Models.Method_Extensions
     public static class ExtensionsForFilters
     {
         /// <summary>
-        /// Apply the filter to the given calendar.
+        /// Apply filters to the given calendar.
         /// </summary>
         /// <param name="calendar">THe calendar to apply the filter.</param>
         /// <param name="filterTree">The filter container.</param>
@@ -39,7 +43,12 @@ namespace CalDAV.Models.Method_Extensions
                         if (!result)
                             return false;
                         break;
-                    
+                    case "time-range":
+                        result = component.ApplyTimeFilter(filter);
+                        if (!result)
+                            return false;
+                        break;
+
                     default:
                         throw new NotImplementedException($"The filter {filter.NodeName} isn't implemented");
                     
@@ -127,8 +136,8 @@ namespace CalDAV.Models.Method_Extensions
             switch (filter.Attributes["collation"])
             {
                 case "i;octet":
-                    byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes(propertyValue);
-                    byte[] filterValueOctet = System.Text.Encoding.ASCII.GetBytes(filter.Value);
+                    byte[] propValueOctet = Encoding.ASCII.GetBytes(propertyValue);
+                    byte[] filterValueOctet = Encoding.ASCII.GetBytes(filter.Value);
                     result= ApplyTextFilter(propValueOctet, filterValueOctet);
                     return negateCond ? !result : result;
                     
@@ -239,6 +248,63 @@ namespace CalDAV.Models.Method_Extensions
                 
                 
             }
+        }
+        /// <summary>
+        /// Apply the time filter to the given component.
+        /// </summary>
+        /// <param name="component">The component where to apply the filter.</param>
+        /// <param name="filter">The filter to apply.</param>
+        /// <returns>True if the component pass the filter, false otherwise.</returns>
+        private static bool ApplyTimeFilter(this ICalendarComponent component, IXMLTreeStructure filter)
+        {
+            DateTime? starTime;
+            DateTime? endTime;
+            filter.Attributes["start"].ToDateTime(out starTime);
+            filter.Attributes["end"].ToDateTime(out endTime);
+            var compStartTime = ((IValue<DateTime>)component.GetComponentProperty("DTSTART")).Value;
+            var compEndTimeProp = component.GetComponentProperty("DTEND");
+          
+            //If the comp defines a DTEND property then should be use
+            if (compEndTimeProp != null)
+            {
+                var compEndTime = ((IValue<DateTime>) compEndTimeProp).Value;
+                return starTime < compEndTime&& endTime > compStartTime;
+            }
+            var durationProp = component.GetComponentProperty("DURATION");
+            //if exist the DURATION property
+            if (durationProp!=null)
+            {
+                DurationType duration = ((IValue<DurationType>)durationProp).Value;
+                var startPlusDuration = compStartTime.AddDuration(duration);
+                if (duration.IsPositive)
+                    return starTime < startPlusDuration && endTime > compStartTime;
+                else
+                    return starTime <= compStartTime && endTime > compStartTime;
+            }
+            //if there is not DTEND nor DURATION then this is the default behavior
+            return starTime < compStartTime.AddDays(1) && endTime > compStartTime;
+        }
+
+
+        /// <summary>
+        /// To add a duration Property to the dtStart propery.
+        /// </summary>
+        /// <param name="dtStart"></param>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        public static DateTime AddDuration(this DateTime dtStart, DurationType duration)
+        {
+            if (duration.Weeks != null)
+                if (duration.IsPositive)
+                    return dtStart.AddDays(7 * duration.Weeks.Value);
+                else
+                    return dtStart.Subtract(new TimeSpan(7 * duration.Weeks.Value, 0, 0, 0));
+            var durationSpan = new TimeSpan(
+                duration.Days ?? 0,
+                duration.Hours ?? 0,
+                duration.Minutes ?? 0,
+                duration.Seconds ?? 0);
+            return duration.IsPositive ? dtStart.Add(durationSpan) : dtStart.Subtract(durationSpan);
         }
     }
 }
