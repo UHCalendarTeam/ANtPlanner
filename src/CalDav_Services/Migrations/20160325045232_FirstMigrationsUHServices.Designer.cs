@@ -8,8 +8,8 @@ using CalDAV.Models;
 namespace CalDav_Services.Migrations
 {
     [DbContext(typeof(CalDavContext))]
-    [Migration("20160325024719_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20160325045232_FirstMigrationsUHServices")]
+    partial class FirstMigrationsUHServices
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

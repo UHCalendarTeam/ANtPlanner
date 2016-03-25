@@ -37,7 +37,7 @@ namespace CalDav_Services
 
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.AspNet5.NewDb;Trusted_Connection=True;";
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
             // Add framework services.
             services.AddEntityFramework()
                .AddSqlServer()
