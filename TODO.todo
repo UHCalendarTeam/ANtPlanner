@@ -10,7 +10,7 @@ Caldav:
   ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
 
   Report Method:
-    ☐ 7.3 Date and Floating Time
+    ☐ 7.3 Date and Floating Time    
     ✔ 7.4 Time Range Filtering @done (16-03-14 08:59)
     ☐ 7.6 Partial Retrieval
     ☐ 7.8 CALDAV:calendar-query REPORT
@@ -33,3 +33,9 @@ Preconditions:
 
   Nacho:
     ✔ FileSystemMangement implemntar metodo para devolver todos los recursos de una coleccion. @done (16-03-14 15:54)
+    ✔ base de datos @done (16-03-24 23:03)
+    ☐ recur
+    ☐ test propfind
+    ✔ cambiar las propiedades @done (16-03-24 23:03)
+    ✔ mandar lo de katrib @done (16-03-24 23:03)
+    ☐ proppatch

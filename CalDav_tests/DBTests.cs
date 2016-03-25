@@ -36,10 +36,11 @@ namespace CalDav_tests
             {
                 new CalendarResource()
                 {
-                    DtStart = DateTime.Now,
-                    DtEnd = DateTime.Now,
+                    //TODO: Adriano ver esto
+                    //DtStart = DateTime.Now,
+                    //DtEnd = DateTime.Now,
                     FileName = "test.ics",
-                    Recurrence = "test",
+                    //Recurrence = "test",
                     User = user
 
                 }
@@ -53,12 +54,10 @@ namespace CalDav_tests
                     User = user,
                     CalendarResources = resources/*,
                     SupportedCalendarComponentSet = new List<string>()*/,
-                    MaxIntences = 1,
-                    CalendarTimeZone = "Timezone",
                     //ResourceType = new List<string>(),
-                    ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
-                    MaxDateTime = DateTime.Now,
-                    MinDateTime = DateTime.MinValue,
+
+                    //TODO: Adriano ver esto ahora es xml hecho string
+                    //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
                     DisplayName = "Display name",
                     Url = "url"
                     

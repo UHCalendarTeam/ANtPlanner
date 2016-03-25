@@ -17,7 +17,7 @@ namespace CalDav_tests
             /// en este caso fijate q el prefix de multistatus es D, so como este apunta a DAV:
             /// se le pasa como segundo parametro. Como tercer parametro le pasas un Dict con los 
             /// namespaces del nodo, las llaves seran los prefijos.
-            XmlTreeStructure root = new XmlTreeStructure("multistatus","DAV:", new Dictionary<string, string>()
+            XmlTreeStructure root = new XmlTreeStructure("multistatus", "DAV:", new Dictionary<string, string>()
             {
                 {"D", "DAV:" },
                 {"C", "urn:ietf:params:xml:ns:caldav" }

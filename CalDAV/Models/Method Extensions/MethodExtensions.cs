@@ -104,6 +104,8 @@ namespace CalDAV.Models
                 .First(cr => cr.FileName == calResource);
         }
 
+
+        //TODO: Adriano ver esto
         /// <summary>
         /// Filter the resources of the user in the given collection
         /// by filter of the dates.
@@ -114,43 +116,43 @@ namespace CalDAV.Models
         /// <param name="ownerName"></param>
         /// <param name="colName"></param>
         /// <returns></returns>
-        public static IEnumerable<CalendarResource> TimeRangeFilter(this CalDavContext source, DateTime starTime,
-            DateTime endTime, string ownerName, string colName)
-        {
-            //TODO: expand the recurrence instances of the resources.
-            //TODO: convert the datetimes to the UTC of the request
-            //TODO: evaluate the condition depending on the definition fo the DTEND and DURATION(pg64 CALDAV)
-            //TODO: check for when the dtStartTime if of type date.
-            var resources= source.GetCollection(ownerName, colName).CalendarResources;
+        //public static IEnumerable<CalendarResource> TimeRangeFilter(this CalDavContext source, DateTime starTime,
+        //    DateTime endTime, string ownerName, string colName)
+        //{
+        //    //TODO: expand the recurrence instances of the resources.
+        //    //TODO: convert the datetimes to the UTC of the request
+        //    //TODO: evaluate the condition depending on the definition fo the DTEND and DURATION(pg64 CALDAV)
+        //    //TODO: check for when the dtStartTime if of type date.
+        //    var resources= source.GetCollection(ownerName, colName).CalendarResources;
 
-            var output =
-                resources.Select(resource => resource)
-                    .Where(resource =>
-                    {
-                        //If the comp defines a DTEND property then should be use
-                        if (resource.DtEnd != DateTime.MaxValue)
-                            return starTime < resource.DtEnd && endTime > resource.DtStart;
-                        //if exist the DURATION property
-                        if (resource.Duration != "")
-                        {
-                            DurationType duration;
-                            var result = resource.Duration.ToDuration(out duration);
-                            var startPlusDuration = resource.DtStart.AddDuration(duration);
-                            if (duration.IsPositive)
-                                return starTime < startPlusDuration && endTime > resource.DtStart;
-                            else
-                                return starTime <= resource.DtStart && endTime > resource.DtStart;
-                        }
-                        //if there is not DTEND nor DURATION then this is the default behavior
-                        return starTime < resource.DtStart.AddDays(1) && endTime > resource.DtStart;
-                    });
-            return output;
+        //    var output =
+        //        resources.Select(resource => resource)
+        //            .Where(resource =>
+        //            {
+        //                //If the comp defines a DTEND property then should be use
+        //                if (resource.DtEnd != DateTime.MaxValue)
+        //                    return starTime < resource.DtEnd && endTime > resource.DtStart;
+        //                //if exist the DURATION property
+        //                if (resource.Duration != "")
+        //                {
+        //                    DurationType duration;
+        //                    var result = resource.Duration.ToDuration(out duration);
+        //                    var startPlusDuration = resource.DtStart.AddDuration(duration);
+        //                    if (duration.IsPositive)
+        //                        return starTime < startPlusDuration && endTime > resource.DtStart;
+        //                    else
+        //                        return starTime <= resource.DtStart && endTime > resource.DtStart;
+        //                }
+        //                //if there is not DTEND nor DURATION then this is the default behavior
+        //                return starTime < resource.DtStart.AddDays(1) && endTime > resource.DtStart;
+        //            });
+        //    return output;
 
-        }
+        //}
 
 
 
-        
+
 
 
         /// <summary>

@@ -45,20 +45,20 @@ namespace CalDAV.Core
 
         }
 
-
-        private IEnumerable<CalendarResource> TimeRangeFilter(string start, string end)
-        {
-            DateTime? startTime;
-            DateTime? endTime;
-            if (!start.ToDateTime(out startTime))
-                return null;
-            if (!end.ToDateTime(out endTime))
-                return null;
-            using (var context = new CalDavContext())
-            {
-               var resources = context.TimeRangeFilter(startTime.Value, endTime.Value, UserEmail, CollectionName);
-                return resources;
-            }
-        }
+        //TODO: Adriano ver esto
+        //private IEnumerable<CalendarResource> TimeRangeFilter(string start, string end)
+        //{
+        //    DateTime? startTime;
+        //    DateTime? endTime;
+        //    if (!start.ToDateTime(out startTime))
+        //        return null;
+        //    if (!end.ToDateTime(out endTime))
+        //        return null;
+        //    using (var context = new CalDavContext())
+        //    {
+        //       var resources = context.TimeRangeFilter(startTime.Value, endTime.Value, UserEmail, CollectionName);
+        //        return resources;
+        //    }
+        //}
     }
 }

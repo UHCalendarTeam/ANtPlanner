@@ -31,6 +31,16 @@ namespace CalDAV.CALDAV_Properties
         }
 
         /// <summary>
+        /// Contains all the properties that are common for all Calendar Collection Resources.
+        /// </summary>
+        private static Dictionary<string, string> XmlGeneralProperties = new Dictionary<string, string>()
+        {
+            {"getcontentlanguage","es"}, {"resourcetype", ""}
+        };
+
+       
+
+        /// <summary>
         /// Returns all the properties of a resource that must be returned for
         /// an "allprop" property method of Propfind. 
         /// </summary>
@@ -56,7 +66,7 @@ namespace CalDAV.CALDAV_Properties
             
             //TODO: getcontentlenght
             var getContentLenght = new XmlTreeStructure("getcontentlenght", DavNs);
-            getContentLenght.AddValue(calendarResource.GetContentLength);
+            getContentLenght.AddValue(calendarResource.GetContentLength.ToString());
             list.Add(getContentLenght);
 
             //getcontenttype
