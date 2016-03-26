@@ -47,7 +47,7 @@ end=""20060107T100000Z""/>
 			};
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = ExtensionsForFilters.RecursiveSeeker(calendar, xmlTree, out tree, out comp);
+			var result = calendar.RecursiveSeeker(xmlTree, out tree, out comp);
 			Assert.True(result);
 			Assert.Equal("VALARM", comp.Name);
 		}
@@ -361,16 +361,16 @@ END:VCALENDAR";
 		}
 
 
-	    [Fact]
-	    public void TestingStuffs()
-	    {
-	        var timeSpan = TimeSpan.FromDays(34);
-            var d1 = new DateTime(2000);
-	        var d2 = d1.AddDays(34);
-            var d3 = new DateTime(2000, 12, 31);
-	        var d4 = d3.AddDays(-300);
+		[Fact]
+		public void TestingStuffs()
+		{
+			var timeSpan = TimeSpan.FromDays(34);
+			var d1 = new DateTime(2000);
+			var d2 = d1.AddDays(34);
+			var d3 = new DateTime(2000, 12, 31);
+			var d4 = d3.AddDays(-300);
 
-	    }
+		}
 
 
 	}

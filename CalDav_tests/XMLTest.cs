@@ -57,12 +57,18 @@ namespace CalDav_tests
                 });
             tree.AddChild(new XmlTreeStructure("child1", null)).
                 AddChild(new XmlTreeStructure("child2", null));
-            tree.GetChildAtAnyLevel("child2").AddChild(new XmlTreeStructure("child3", null))
-                .GetChild("child3").AddChild(new XmlTreeStructure("child4", null)).GetChildAtAnyLevel("child4")
-                .AddChild(new XmlTreeStructure("child5", null));
+            IXMLTreeStructure temp = null;
+
+            tree.GetChildAtAnyLevel("child2", out temp);
+            temp= temp.AddChild(new XmlTreeStructure("child3", null))
+                .GetChild("child3").AddChild(new XmlTreeStructure("child4", null));
+            temp.GetChildAtAnyLevel("child4", out temp);
+                temp.AddChild(new XmlTreeStructure("child5", null));
             var child6 = new XmlTreeStructure("child6", null);
-            tree.GetChildAtAnyLevel("child5").AddChild(child6);
-            Assert.Equal(tree.GetChildAtAnyLevel("child6"), child6);
+            tree.GetChildAtAnyLevel("child5", out temp);
+            temp.AddChild(child6);
+            tree.GetChildAtAnyLevel("child6", out temp);
+            Assert.Equal(temp, child6);
         }
 
 
@@ -103,7 +109,9 @@ end=""20060105T000000Z""/>
 </C:filter>
 </C:calendar-query>";
             var result = XmlTreeStructure.Parse(doc);
-            Assert.NotNull(result.GetChildAtAnyLevel("filter").GetChild("comp-filter"));
+            IXMLTreeStructure temp = null;
+            result.GetChildAtAnyLevel("filter", out temp);
+            Assert.NotNull(temp.GetChild("comp-filter"));
         }
 
         /// <summary>
@@ -151,7 +159,9 @@ end=""20060105T000000Z""/>
             var item = xDoc.CreateWriter();
             
             var result = XmlTreeStructure.Parse(doc);
-            Assert.Equal(result.GetChildAtAnyLevel("filter").GetChild("comp-filter").Attributes["name"], "VCALENDAR");
+            IXMLTreeStructure temp = null;
+            result.GetChildAtAnyLevel("filter", out temp);
+            Assert.Equal(temp.GetChild("comp-filter").Attributes["name"], "VCALENDAR");
         }
 
         [Fact]
