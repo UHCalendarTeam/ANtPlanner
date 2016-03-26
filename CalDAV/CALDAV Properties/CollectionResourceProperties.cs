@@ -32,10 +32,34 @@ namespace CalDAV.CALDAV_Properties
             }
 
             ////this must be fixed later because not all properties are of type string.
-            var value = (string)resource.GetType().GetProperty(propertyName).GetValue(resource);
-            if(value == null)
-                throw new Exception("Property is not accesible or not exist");
-            var prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+            var realPropName = propertyName.ToLower();
+            realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
+            realPropName = realPropName.Replace("-", "");
+            string value;
+            try
+            {
+                value = (string)resource.GetType().GetProperty(realPropName).GetValue(resource);
+            }
+            catch (Exception)
+            {
+                value = null;
+                throw new Exception("The value could not be retrieved");
+            }
+
+            XmlTreeStructure prop;
+            try
+            {
+                if (value != null)
+                    prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+                else
+                    return null;
+
+            }
+            catch (Exception)
+            {
+                prop = null;
+                throw new Exception("The Property Value Could Not Be Parsed");
+            }
 
 
             return prop;
@@ -51,7 +75,7 @@ namespace CalDAV.CALDAV_Properties
 
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
-            "getetag", "displayname", "creationdate", "getcontentlenght", "getcontenttype", "getlastmodified"
+            "getetag", "displayname", "creationdate", "getcontentlenght", "getcontenttype", "getlastmodified", "resourcetype"
         };
 
         /// <summary>
@@ -78,33 +102,39 @@ namespace CalDAV.CALDAV_Properties
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
             var list = new List<XmlTreeStructure>();
+
+            foreach (var property in XmlGeneralProperties)
+            {
+                list.Add(new XmlTreeStructure(property.Key, DavNs));
+            }
+
             //TODO: annadir el ns a los de abajo
             //Display Name
-            var displayName = new XmlTreeStructure("displayname");
+            var displayName = new XmlTreeStructure("displayname", DavNs);
             list.Add(displayName);
 
             //resource type
-            var resourceType = new XmlTreeStructure("resourcetype");
+            var resourceType = new XmlTreeStructure("resourcetype", DavNs);
             list.Add(resourceType);
 
             //creation date
-            var creationDate = new XmlTreeStructure("creationdate");
+            var creationDate = new XmlTreeStructure("creationdate", DavNs);
             list.Add(creationDate);
 
             //getcontent length
-            var getcontentlegth = new XmlTreeStructure("getcontentlenght");
+            var getcontentlegth = new XmlTreeStructure("getcontentlenght", DavNs);
             list.Add(getcontentlegth);
 
             //getcontenttype
-            var getContentType = new XmlTreeStructure("getcontenttype");
+            var getContentType = new XmlTreeStructure("getcontenttype", DavNs);
             list.Add(getContentType);
 
             //getetag
-            var getEtag = new XmlTreeStructure("getetag");
+            var getEtag = new XmlTreeStructure("getetag", DavNs);
             list.Add(getEtag);
 
             //getLastModified
-            var getLastModified = new XmlTreeStructure("getlastmodified");
+            var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
             list.Add(getLastModified);
 
             //supported lock

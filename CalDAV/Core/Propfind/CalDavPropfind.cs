@@ -7,6 +7,12 @@ namespace CalDAV.Core.Propfind
 {
     public class CalDavPropfind : IPropfindMethods
     {
+        CalDavContext db;
+
+        public CalDavPropfind(CalDavContext _context)
+        {
+            db = _context;
+        }
 
         public void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree)
         {
@@ -21,8 +27,8 @@ namespace CalDAV.Core.Propfind
             multistatusTree.AddChild(primaryResponse);
 
             //check if there was any error
-            var errorNode = primaryResponse.GetChildAtAnyLevel("responsedescription");
-            errorOcurred = errorNode != null;
+            IXMLTreeStructure errorNode;
+            errorOcurred = primaryResponse.GetChildAtAnyLevel("responsedescription", out errorNode); 
 
             //Now I start putting all objectResource responses if the primary target was a collection
             //and if depth is greater than depth 0.
@@ -31,11 +37,13 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId != null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-                using (var db = new CalDavContext())
-                {
+
+                //TODO: Trying to get db by dependency injection
+               // using (var db = new CalDavContext())
+             //   {
                     collection = db.GetCollection(userEmail, collectionName);
-                }
-                foreach (var calendarResource in collection.CalendarResources)
+              //  }
+                foreach (var calendarResource in collection.Calendarresources)
                 {
                     var resourceResponse = AllPropFillTree(userEmail, collectionName, calendarResource.FileName, aditionalProperties);
                     multistatusTree.AddChild(resourceResponse);
@@ -43,8 +51,7 @@ namespace CalDAV.Core.Propfind
                     //error check
                     if (!errorOcurred)
                     {
-                        errorNode = resourceResponse.GetChildAtAnyLevel("responsedescription");
-                        errorOcurred = errorNode != null;
+                        errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
                     }
                 }
 
@@ -73,8 +80,8 @@ namespace CalDAV.Core.Propfind
             multistatusTree.AddChild(primaryResponse);
 
             //check if there was any error
-            var errorNode = primaryResponse.GetChildAtAnyLevel("responsedescription");
-            errorOcurred = errorNode != null;
+            IXMLTreeStructure errorNode;
+            errorOcurred = primaryResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
 
             //Now I start putting all objectResource responses if the primary target was a collection
             //and if depth is greater than depth 0.
@@ -83,11 +90,12 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId != null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-                using (var db = new CalDavContext())
-                {
+                //TODO: Trying to get db by dependency injection
+              //  using (var db = new CalDavContext())
+             //   {
                     collection = db.GetCollection(userEmail, collectionName);
-                }
-                foreach (var calendarResource in collection.CalendarResources)
+             //   }
+                foreach (var calendarResource in collection.Calendarresources)
                 {
                     var resourceResponse = PropFillTree(userEmail, collectionName, calendarResource.FileName, propertiesReq);
                     multistatusTree.AddChild(resourceResponse);
@@ -95,8 +103,7 @@ namespace CalDAV.Core.Propfind
                     //error check
                     if (!errorOcurred)
                     {
-                        errorNode = resourceResponse.GetChildAtAnyLevel("responsedescription");
-                        errorOcurred = errorNode != null;
+                        errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode); 
                     }
                 }
 
@@ -128,11 +135,12 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId != null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-                using (var db = new CalDavContext())
-                {
+                //TODO: Trying to get db by dependency injection
+              //  using (var db = new CalDavContext())
+              //  {
                     collection = db.GetCollection(userEmail, collectionName);
-                }
-                foreach (var calendarResource in collection.CalendarResources)
+              //  }
+                foreach (var calendarResource in collection.Calendarresources)
                 {
                     var resourceResponse = PropNameFillTree(userEmail, collectionName, calendarResource.FileName);
                     multistatusTree.AddChild(resourceResponse);
@@ -185,8 +193,9 @@ namespace CalDAV.Core.Propfind
             CalendarCollection collection;
             CalendarResource resource;
             List<XmlTreeStructure> properties;
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+           // using (var db = new CalDavContext())
+          //  {
                 if (calendarResourceId == null)
                 {
                     collection = db.GetCollection(userEmail, collectionName);
@@ -203,7 +212,7 @@ namespace CalDAV.Core.Propfind
                 {
                     prop.AddChild(property);
                 }
-            }
+          //  }
 
             propstat.AddChild(prop);
             #endregion
@@ -250,8 +259,9 @@ namespace CalDAV.Core.Propfind
             List<XmlTreeStructure> propertiesOk = new List<XmlTreeStructure>();
             List<XmlTreeStructure> propertiesWrong = new List<XmlTreeStructure>();
 
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+           // using (var db = new CalDavContext())
+           // {
                 if (calendarResourceId == null)
                 {
                     collection = db.GetCollection(userEmail, collectionName);
@@ -272,7 +282,7 @@ namespace CalDAV.Core.Propfind
                             propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV"));
                         }
                 }
-            }
+           // }
 
             //Here there are divided all properties between recovered and error recovering
             foreach (var propTree in propertiesCol)
@@ -377,8 +387,9 @@ namespace CalDAV.Core.Propfind
             List<XmlTreeStructure> propertiesOk = new List<XmlTreeStructure>();
             List<XmlTreeStructure> propertiesWrong = new List<XmlTreeStructure>();
 
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+            //using (var db = new CalDavContext())
+            //{
                 if (calendarResourceId == null)
                 {
                     collection = db.GetCollection(userEmail, collectionName);
@@ -395,7 +406,7 @@ namespace CalDAV.Core.Propfind
                         propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV"));
                     }
                 }
-            }
+            //}
 
             //Here there are divided all properties between recovered and error recovering
             foreach (var propTree in propertiesCol)

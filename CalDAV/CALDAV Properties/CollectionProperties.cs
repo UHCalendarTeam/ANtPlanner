@@ -28,7 +28,7 @@ namespace CalDAV.CALDAV_Properties
 
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
-            "calendar-description", "displayname", "resourcetype", "creationdate"
+            "displayname", "resourcetype", "creationdate", "calendar-description", "getcontenttype"
         };
 
         private static string MinDateTime()
@@ -62,13 +62,38 @@ namespace CalDAV.CALDAV_Properties
                 sprop.AddValue(svalue);
                 return sprop;
             }
-
-            ////this must be fixed later because not all properties are of type string.
-            var value = (string)collection.GetType().GetProperty(propertyName).GetValue(collection);
-            if (value == null)
+            //TODO: Check all property names
+            //this must be fixed later because not all properties are of type string.
+            var realPropName = propertyName.ToLower();
+            string value;
+            realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
+            realPropName = realPropName.Replace("-", "");
+            try
+            {
+                value = (string)collection.GetType().GetProperty(realPropName).GetValue(collection);
+            }
+            catch (Exception)
+            {
+                value = null;
                 throw new Exception("The value could not be retrieved");
-            var prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+            }
+            XmlTreeStructure prop;
+            try
+            {
 
+                //TODO: Why this motherfucker is not parsing ok.
+                if (value != null)
+                    prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+                else
+                    return null;
+                
+            }
+            catch (Exception e)
+            {
+                prop = null;
+                //throw new Exception("The Property Value Could Not Be Parsed");
+                throw e;
+            }
 
             return prop;
         }
@@ -99,41 +124,46 @@ namespace CalDAV.CALDAV_Properties
         {
             var list = new List<XmlTreeStructure>();
 
+            foreach (var property in XmlGeneralProperties)
+            {
+                list.Add(new XmlTreeStructure(property.Key, DavNs));
+            }
+
             //calendar desription
             var description = new XmlTreeStructure("calendar-description", CaldavNs);
             description.AddNamespace("C", CaldavNs);
             list.Add(description);
             //a todos los que estan abajo le tienes q pasar el MainNs
             //Display Name
-            var displayName = new XmlTreeStructure("displayname");
+            var displayName = new XmlTreeStructure("displayname", DavNs);
             list.Add(displayName);
 
             //resource type
-            var resourceType = new XmlTreeStructure("resourcetype");
+            var resourceType = new XmlTreeStructure("resourcetype", DavNs);
             list.Add(resourceType);
 
             //calendar-timezone
-            var calendarTimeZone = new XmlTreeStructure("calendar-timezone");
+            var calendarTimeZone = new XmlTreeStructure("calendar-timezone", DavNs);
             list.Add(resourceType);
 
             //supported-calendar-component-set
-            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set");
+            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set", DavNs);
             list.Add(supportedCalendarComp);
 
             //max-resource-size
-            var maxResourceSize = new XmlTreeStructure("max-resource-size");
+            var maxResourceSize = new XmlTreeStructure("max-resource-size", DavNs);
             list.Add(maxResourceSize);
 
             //min-date-time
-            var minDateTime = new XmlTreeStructure("min-date-time");
+            var minDateTime = new XmlTreeStructure("min-date-time", DavNs);
             list.Add(minDateTime);
 
             //min-date-time
-            var maxDateTime = new XmlTreeStructure("min-date-time");
+            var maxDateTime = new XmlTreeStructure("min-date-time", DavNs);
             list.Add(maxDateTime);
 
             //max-intances
-            var maxIntances = new XmlTreeStructure("max-intances");
+            var maxIntances = new XmlTreeStructure("max-intances", DavNs);
             list.Add(maxIntances);
 
 

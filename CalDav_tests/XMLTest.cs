@@ -15,7 +15,7 @@ using TreeForXml;
 
 namespace CalDav_tests
 {
-    
+
     public class XMLTest
     {
         [Fact]
@@ -33,14 +33,14 @@ namespace CalDav_tests
 </D:prop>
 </D:set>
 </C:mkcalendar>";
-           /* var dict =XMLParsers.XMLMKCalendarParser(doc);
-            var expectedDict = new Dictionary<string, List<string>>
-            {
-                {"displayname", new List<string>() {"Lisa Events"}},
-                {"calendar-description", new List<string>() {"Calendar restricted to events."}},
-                {"supported-calendar-component-set", new List<string>() {"VEVENT"}}
-            };
-            Assert.Equal(dict.Count, expectedDict.Count);*/
+            /* var dict =XMLParsers.XMLMKCalendarParser(doc);
+             var expectedDict = new Dictionary<string, List<string>>
+             {
+                 {"displayname", new List<string>() {"Lisa Events"}},
+                 {"calendar-description", new List<string>() {"Calendar restricted to events."}},
+                 {"supported-calendar-component-set", new List<string>() {"VEVENT"}}
+             };
+             Assert.Equal(dict.Count, expectedDict.Count);*/
         }
 
 
@@ -48,8 +48,8 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest2()
         {
-           
-            var tree = new XmlTreeStructure("node1","DAV:",
+
+            var tree = new XmlTreeStructure("node1", "DAV:",
                 new Dictionary<string, string>()
                 {
                     { "D", "DAV:"},
@@ -57,18 +57,20 @@ namespace CalDav_tests
                 });
             tree.AddChild(new XmlTreeStructure("child1", null)).
                 AddChild(new XmlTreeStructure("child2", null));
-            IXMLTreeStructure temp = null;
-
-            tree.GetChildAtAnyLevel("child2", out temp);
-            temp= temp.AddChild(new XmlTreeStructure("child3", null))
+            IXMLTreeStructure child2;
+            tree.GetChildAtAnyLevel("child2", out child2);
+            child2.AddChild(new XmlTreeStructure("child3", null))
                 .GetChild("child3").AddChild(new XmlTreeStructure("child4", null));
-            temp.GetChildAtAnyLevel("child4", out temp);
-                temp.AddChild(new XmlTreeStructure("child5", null));
+            IXMLTreeStructure child4;
+            tree.GetChildAtAnyLevel("child4", out child4);
+                child4.AddChild(new XmlTreeStructure("child5", null));
             var child6 = new XmlTreeStructure("child6", null);
-            tree.GetChildAtAnyLevel("child5", out temp);
-            temp.AddChild(child6);
-            tree.GetChildAtAnyLevel("child6", out temp);
-            Assert.Equal(temp, child6);
+            IXMLTreeStructure child5;
+            tree.GetChildAtAnyLevel("child5", out child5);
+            child5.AddChild(child6);
+            IXMLTreeStructure child6_1;
+            tree.GetChildAtAnyLevel("child6", out child6_1);
+            Assert.Equal(child6_1, child6);
         }
 
 
@@ -109,9 +111,9 @@ end=""20060105T000000Z""/>
 </C:filter>
 </C:calendar-query>";
             var result = XmlTreeStructure.Parse(doc);
-            IXMLTreeStructure temp = null;
-            result.GetChildAtAnyLevel("filter", out temp);
-            Assert.NotNull(temp.GetChild("comp-filter"));
+            IXMLTreeStructure filter;
+            Assert.True(result.GetChildAtAnyLevel("filter", out filter));
+            Assert.NotNull(filter.GetChild("comp-filter"));
         }
 
         /// <summary>
@@ -155,24 +157,24 @@ end=""20060105T000000Z""/>
 </C:calendar-query>";
             var xDoc = XDocument.Parse(doc);
             xDoc.ToString();
-            var temp1 = xDoc.Root.Attributes().Where(x=>x.IsNamespaceDeclaration);
+            var temp1 = xDoc.Root.Attributes().Where(x => x.IsNamespaceDeclaration);
             var item = xDoc.CreateWriter();
-            
+
             var result = XmlTreeStructure.Parse(doc);
-            IXMLTreeStructure temp = null;
-            result.GetChildAtAnyLevel("filter", out temp);
-            Assert.Equal(temp.GetChild("comp-filter").Attributes["name"], "VCALENDAR");
+            IXMLTreeStructure filter;
+            Assert.True(result.GetChildAtAnyLevel("filter", out filter));
+            Assert.Equal(filter.GetChild("comp-filter").Attributes["name"], "VCALENDAR");
         }
 
         [Fact]
         public void UnitTestFoo()
         {
-            
-            XNamespace ns= "DAV:";
+
+            XNamespace ns = "DAV:";
             XNamespace ns1 = "Attribute:";
             XElement xmlTree1 = new XElement("Root",
-     new XElement(ns+"Child1", null),
-     new XElement(ns+"Child2", 2),
+     new XElement(ns + "Child1", null),
+     new XElement(ns + "Child2", 2),
      new XElement(ns1 + "Child3", 3),
      new XElement(ns + "Child4", 4),
      new XElement(ns + "Child5", 5),
@@ -180,10 +182,10 @@ end=""20060105T000000Z""/>
  );
             xmlTree1.Add(new XAttribute(XNamespace.Xmlns + "D", "DAV:"));
             xmlTree1.Add(new XAttribute(XNamespace.Xmlns + "R", "Attribute:"));
-          
 
-            XDocument document = new XDocument(new XDeclaration("1.0","utf-8",null), xmlTree1);
-             
+
+            XDocument document = new XDocument(new XDeclaration("1.0", "utf-8", null), xmlTree1);
+
             var docStr = document.ToString(SaveOptions.DisableFormatting);
         }
 
@@ -228,7 +230,7 @@ end=""20060105T000000Z""/>
             var xmlTreeStructure2 = XmlTreeStructure.Parse(xmlTreeStructure.ToString());
             var xmlStr1 = xmlTreeStructure.ToString();
             var xmlStr2 = xmlTreeStructure2.ToString();
-            
+
             Assert.Equal(xmlStr1, xmlStr2);
         }
 

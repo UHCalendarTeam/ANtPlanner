@@ -27,9 +27,12 @@ namespace CalDAV.Core
 
         private IStartUp StartUp { get; set; }
 
-        public CalDav(IFileSystemManagement fsManagement)
+        private CalDavContext db { get; }
+
+        public CalDav(IFileSystemManagement fsManagement, CalDavContext _context)
         {
             StorageManagement = fsManagement;
+            db = _context;
         }
 
         public string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
@@ -75,7 +78,7 @@ namespace CalDAV.Core
             response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
             //Tool that contains the methods for propfind.
-            PropFindMethods = new CalDavPropfind();
+            PropFindMethods = new CalDavPropfind(db);
 
             //if the body is empty asumme that is an allprop request.          
             if (body == null)
@@ -121,14 +124,13 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propFindTree"></param>
         /// <returns></returns>
-        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(XmlTreeStructure propFindTree)
+        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(IXMLTreeStructure propFindTree)
         {
             var retList = new List<KeyValuePair<string, string>>();
-            var props = propFindTree.GetChildAtAnyLevel("prop");
-            foreach (var child in props.Children)
-            {
-                retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
-            }
+            IXMLTreeStructure props;
+            
+            if(propFindTree.GetChildAtAnyLevel("prop", out props))
+                retList.AddRange(props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
             return retList;
         }
 
@@ -140,13 +142,10 @@ namespace CalDAV.Core
         private List<KeyValuePair<string, string>> ExtractIncludePropertiesNameMainNS(XmlTreeStructure propFindTree)
         {
             var retList = new List<KeyValuePair<string,string>>();
-            var includes = propFindTree.GetChildAtAnyLevel("include");
-            if (includes != null)
+            IXMLTreeStructure includes;
+            if (propFindTree.GetChildAtAnyLevel("include", out includes))
             {
-                foreach (var child in includes.Children)
-                {
-                    retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
-                }
+                retList.AddRange(includes.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
             }
             return retList;
         } 
@@ -203,9 +202,10 @@ namespace CalDAV.Core
             }
             else
             {
+                //TODO: Trying to get db by dependency injection
                 //update or create
-                using (var db = new CalDavContext())
-                {
+                //using (var db = new CalDavContext())
+               // {
                     if (db.CalendarResourceExist(userEmail, collectionName, calendarResourceId) &&
                         StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
                     {
@@ -213,7 +213,7 @@ namespace CalDAV.Core
                             out retEtag);
                     }
                     return CreateCalendarObjectResource(propertiesAndHeaders, out retEtag);
-                }
+               // }
 
             }
             //return HTTP 201 Created 
@@ -249,15 +249,16 @@ namespace CalDAV.Core
             var iCal = new VCalendar(body);
             retEtag = etag;
 
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+            //using (var db = new CalDavContext())
+            //{
                 if (!db.CollectionExist(userEmail, collectionName))
                     return false;
 
                 //TODO:Calculate Etag
 
                 //filling the resource
-                var resource = FillResource(propertiesAndHeaders, db, iCal, out retEtag);
+                var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
                 //adding the resource to the db
                 db.CalendarResources.Add(resource);
 
@@ -266,7 +267,7 @@ namespace CalDAV.Core
 
 
                 return true;
-            }
+            //}
 
         }
 
@@ -303,17 +304,18 @@ namespace CalDAV.Core
             if (iCal == null)
                 return false;
 
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+          //  using (var db = new CalDavContext())
+           // {
                 if (!db.CollectionExist(userEmail, collectionName) || !db.CalendarResourceExist(userEmail, collectionName, calendarResourceId))
                     return false;
 
                 //Fill the resource
-                var resource = FillResource(propertiesAndHeaders, db, iCal, out retEtag);
+                var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
                 var prevResource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 int prevEtag;
                 int actualEtag;
-                string tempEtag = prevResource.GetEtag;
+                string tempEtag = prevResource.Getetag;
                 if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
                 {
                     if (actualEtag > prevEtag)
@@ -335,7 +337,7 @@ namespace CalDAV.Core
                 else
                     return false;
 
-            }
+           // }
             return true;
         }
 
@@ -343,11 +345,10 @@ namespace CalDAV.Core
         /// Method in charge of fill a CalendarResource and Return it.
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="db"></param>
         /// <param name="iCal"></param>
         /// <param name="retEtag"></param>
         /// <returns></returns>
-        private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders, CalDavContext db, VCalendar iCal, out string retEtag)
+        private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders,  VCalendar iCal, out string retEtag)
         {
 
             //TODO: Cambiar como se cogen las propiedades contruir como xml.
@@ -373,12 +374,12 @@ namespace CalDAV.Core
 
             //TODO: Take the resource Etag if the client send it if not assign one
             if (etag != null)
-                resource.GetEtag = etag;
+                resource.Getetag = etag;
             else
             {
                 //resource.Etag    
             }
-            retEtag = resource.GetEtag;
+            retEtag = resource.Getetag;
 
             resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
@@ -430,12 +431,14 @@ namespace CalDAV.Core
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceId"];
-            using (var db = new CalDavContext())
-            {
-                var resource = db.GetCollection(userEmail, collectionName).CalendarResources.First(x => x.FileName == calendarResourceId);
+
+            //TODO: Trying to get db by dependency injection
+            //using (var db = new CalDavContext())
+           // {
+                var resource = db.GetCollection(userEmail, collectionName).Calendarresources.First(x => x.FileName == calendarResourceId);
                 db.CalendarResources.Remove(resource);
                 db.SaveChanges();
-            }
+          //  }
             return StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, calendarResourceId);
         }
 
@@ -444,8 +447,10 @@ namespace CalDAV.Core
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var resourceId = propertiesAndHeaders["resourceId"];
-            using (var db = new CalDavContext())
-            {
+
+            //TODO: Trying to get db by dependency injection
+          //  using (var db = new CalDavContext())
+            //{
                 var collection = db.GetCollection(userEmail, collectionName);
                 if (collection == null)
                     return false;
@@ -453,7 +458,7 @@ namespace CalDAV.Core
                 return StorageManagement.DeleteCalendarCollection(userEmail, collectionName);
 
 
-            }
+          //  }
 
 
         }
@@ -465,12 +470,12 @@ namespace CalDAV.Core
             var calendarResourceId = propertiesAndHeaders["calendarResourceId"];
 
             //Must return the Etag header of the COR
-
-            using (var db = new CalDavContext())
-            {
+            //TODO: Trying to get db by dependency injection
+           // using (var db = new CalDavContext())
+            //{
                 var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                etag = calendarRes.GetEtag;
-            }
+                etag = calendarRes.Getetag;
+           // }
             return StorageManagement.GetCalendarObjectResource(userEmail, collectionName, calendarResourceId);
         }
 
