@@ -42,7 +42,8 @@ namespace CalDav_tests
 
             var propMethods = new CalDavPropfind(db);
             propMethods.PropNameMethod("foo@gmail.com", "Foocollection", null, 0, response);
-            var prop = response.GetChildAtAnyLevel("prop");
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
             Assert.NotNull(prop);
             Assert.True(prop.Children.Count > 0);
         }
@@ -57,7 +58,8 @@ namespace CalDav_tests
 
             var propMethods = new CalDavPropfind(db);
             propMethods.AllPropMethod("foo@gmail.com", "Foocollection", null, 0, null, response);
-            var prop = response.GetChildAtAnyLevel("prop");
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
             Assert.NotNull(prop);
             Assert.True(prop.Children.Count > 0);
         }

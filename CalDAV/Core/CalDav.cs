@@ -124,14 +124,13 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propFindTree"></param>
         /// <returns></returns>
-        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(XmlTreeStructure propFindTree)
+        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(IXMLTreeStructure propFindTree)
         {
             var retList = new List<KeyValuePair<string, string>>();
-            var props = propFindTree.GetChildAtAnyLevel("prop");
-            foreach (var child in props.Children)
-            {
-                retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
-            }
+            IXMLTreeStructure props;
+            
+            if(propFindTree.GetChildAtAnyLevel("prop", out props))
+                retList.AddRange(props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
             return retList;
         }
 
@@ -143,13 +142,10 @@ namespace CalDAV.Core
         private List<KeyValuePair<string, string>> ExtractIncludePropertiesNameMainNS(XmlTreeStructure propFindTree)
         {
             var retList = new List<KeyValuePair<string,string>>();
-            var includes = propFindTree.GetChildAtAnyLevel("include");
-            if (includes != null)
+            IXMLTreeStructure includes;
+            if (propFindTree.GetChildAtAnyLevel("include", out includes))
             {
-                foreach (var child in includes.Children)
-                {
-                    retList.Add(new KeyValuePair<string, string>(child.NodeName, child.MainNamespace));
-                }
+                retList.AddRange(includes.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
             }
             return retList;
         } 

@@ -27,8 +27,8 @@ namespace CalDAV.Core.Propfind
             multistatusTree.AddChild(primaryResponse);
 
             //check if there was any error
-            var errorNode = primaryResponse.GetChildAtAnyLevel("responsedescription");
-            errorOcurred = errorNode != null;
+            IXMLTreeStructure errorNode;
+            errorOcurred = primaryResponse.GetChildAtAnyLevel("responsedescription", out errorNode); 
 
             //Now I start putting all objectResource responses if the primary target was a collection
             //and if depth is greater than depth 0.
@@ -51,8 +51,7 @@ namespace CalDAV.Core.Propfind
                     //error check
                     if (!errorOcurred)
                     {
-                        errorNode = resourceResponse.GetChildAtAnyLevel("responsedescription");
-                        errorOcurred = errorNode != null;
+                        errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
                     }
                 }
 
@@ -81,8 +80,8 @@ namespace CalDAV.Core.Propfind
             multistatusTree.AddChild(primaryResponse);
 
             //check if there was any error
-            var errorNode = primaryResponse.GetChildAtAnyLevel("responsedescription");
-            errorOcurred = errorNode != null;
+            IXMLTreeStructure errorNode;
+            errorOcurred = primaryResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
 
             //Now I start putting all objectResource responses if the primary target was a collection
             //and if depth is greater than depth 0.
@@ -104,8 +103,7 @@ namespace CalDAV.Core.Propfind
                     //error check
                     if (!errorOcurred)
                     {
-                        errorNode = resourceResponse.GetChildAtAnyLevel("responsedescription");
-                        errorOcurred = errorNode != null;
+                        errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode); 
                     }
                 }
 
