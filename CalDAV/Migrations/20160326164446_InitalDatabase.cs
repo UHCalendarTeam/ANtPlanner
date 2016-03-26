@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Metadata;
 
-namespace CalDav_Services.Migrations
+namespace CalDAV.Migrations
 {
-    public partial class FirstMigrationsUHServices : Migration
+    public partial class InitalDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,17 +29,17 @@ namespace CalDav_Services.Migrations
                 {
                     CalendarCollectionId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CalendarDescription = table.Column<string>(nullable: true),
-                    CreationDate = table.Column<string>(nullable: true),
-                    DisplayName = table.Column<string>(nullable: true),
-                    GetContentLanguage = table.Column<string>(nullable: true),
-                    GetContentType = table.Column<string>(nullable: true),
-                    GetEtag = table.Column<string>(nullable: true),
-                    GetLastModified = table.Column<string>(nullable: true),
-                    LockDiscovery = table.Column<string>(nullable: true),
+                    Calendardescription = table.Column<string>(nullable: true),
+                    Creationdate = table.Column<string>(nullable: true),
+                    Displayname = table.Column<string>(nullable: true),
+                    GetContenttype = table.Column<string>(nullable: true),
+                    Getcontentlanguage = table.Column<string>(nullable: true),
+                    Getetag = table.Column<string>(nullable: true),
+                    Getlastmodified = table.Column<string>(nullable: true),
+                    Lockdiscovery = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    ResourceType = table.Column<string>(nullable: true),
-                    SupportedLock = table.Column<string>(nullable: true),
+                    Resourcetype = table.Column<string>(nullable: true),
+                    Supportedlock = table.Column<string>(nullable: true),
                     Url = table.Column<string>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
@@ -60,16 +60,16 @@ namespace CalDav_Services.Migrations
                     CalendarResourceId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CollectionCalendarCollectionId = table.Column<int>(nullable: true),
-                    CreationDate = table.Column<string>(nullable: true),
-                    DisplayName = table.Column<string>(nullable: true),
+                    Creationdate = table.Column<string>(nullable: true),
+                    Displayname = table.Column<string>(nullable: true),
                     FileName = table.Column<string>(nullable: false),
-                    GetContentLanguage = table.Column<string>(nullable: true),
-                    GetContentLength = table.Column<string>(nullable: true),
-                    GetContentType = table.Column<string>(nullable: true),
-                    GetEtag = table.Column<string>(nullable: true),
-                    GetLastModified = table.Column<string>(nullable: true),
-                    LockDiscovery = table.Column<string>(nullable: true),
-                    SupportedLock = table.Column<string>(nullable: true),
+                    Getcontentlanguage = table.Column<string>(nullable: true),
+                    Getcontentlength = table.Column<string>(nullable: true),
+                    Getcontenttype = table.Column<string>(nullable: true),
+                    Getetag = table.Column<string>(nullable: true),
+                    Getlastmodified = table.Column<string>(nullable: true),
+                    Lockdiscovery = table.Column<string>(nullable: true),
+                    Supportedlock = table.Column<string>(nullable: true),
                     Uid = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false)
                 },

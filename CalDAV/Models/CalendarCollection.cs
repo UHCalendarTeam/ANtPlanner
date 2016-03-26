@@ -32,7 +32,7 @@ namespace CalDAV.Models
 
         public string Creationdate { get; set; }
 
-        public string GetContenttype { get; set; }
+        public string Getcontenttype { get; set; }
 
         public string Getetag { get; set; }
 

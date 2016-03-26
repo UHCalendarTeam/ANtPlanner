@@ -13,6 +13,8 @@ namespace CalDav_tests
 {
     public class PropfindTests
     {
+        private Dictionary<string, string> Namespaces = new Dictionary<string, string>() { {"D", @"xmlns:D=""DAV:"""}};
+
         [Fact]
         public void CreateRootWithNamespace()
         {
@@ -98,7 +100,7 @@ namespace CalDav_tests
             {
                 new CalendarCollection()
                 {
-                    Calendardescription = " <C:calendar-description xmlns:C=\"urn:ietf:params:xml: ns: caldav\">empty description</C:calendar-description>",
+                    Calendardescription = "<C:calendar-description xmlns:C=\"urn:ietf:params:xml:ns:caldav\">empty description</C:calendar-description>",
                     Name = "Foocollection",
                     User = user,
                     Calendarresources = resources/*,
@@ -107,10 +109,10 @@ namespace CalDav_tests
 
                     //TODO: Adriano ver esto ahora es xml hecho string
                     //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
-                    Displayname = "<D:displayname>Mocking Collection</D:displayname>",
-                    GetContenttype = " <D:getcontenttype>text/calendar; component=vevent</D:getcontenttype>",
+                    Displayname = $"<D:displayname {Namespaces["D"]}>Mocking Collection</D:displayname>",
+                    Getcontenttype = $"<D:getcontenttype {Namespaces["D"]}>text/calendar; component=vevent</D:getcontenttype>",
                     Url = "url",
-                    Resourcetype = "<D:resourcetype><D:collection />< C:calendar xmlns:C = \"urn:ietf:params:xml:ns:caldav\" /></ D:resourcetype > "
+                    Resourcetype = $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>"
 
                 }
             };

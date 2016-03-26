@@ -27,9 +27,9 @@ namespace CalDAV.Migrations
 
                     b.Property<string>("Displayname");
 
-                    b.Property<string>("GetContenttype");
-
                     b.Property<string>("Getcontentlanguage");
+
+                    b.Property<string>("Getcontenttype");
 
                     b.Property<string>("Getetag");
 
