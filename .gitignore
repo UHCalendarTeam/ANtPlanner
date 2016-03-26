@@ -312,3 +312,8 @@ _Pvt_Extensions
 .fake/
 
 *.orig
+CalDAV/Migrations/20160326164446_InitalDatabase.Designer.cs
+CalDAV/Migrations/20160326171603_MinorChanges.cs
+CalDAV/Migrations/20160326204925_InitalDatabase.cs
+CalDAV/Migrations/20160326204925_InitalDatabase.Designer.cs
+CalDAV/Migrations/CalDavContextModelSnapshot.cs
