@@ -23,11 +23,12 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static bool UserExist(this CalDavContext source, string userEmail)
         {
-            return (
+                return (
                 from user in source.Users
                 where user.Email == userEmail
                 select user).Any();
         }
+
         /// <summary>
         /// return a User for a given name
         /// </summary>
@@ -37,7 +38,16 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static User GetUser(this CalDavContext source, string userEmail)
         {
-            return source.Users.First(u => u.Email == userEmail);
+            try
+            {
+                return source.Users.First(u => u.Email == userEmail);
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+            
         }
 
         /// <summary>
@@ -67,7 +77,16 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static CalendarCollection GetCollection(this CalDavContext source, string userEmail, string collectionName)
         {
-            return source.GetUser(userEmail).CalendarCollections.First(cl => cl.Name == collectionName);
+            try
+            {
+                return source.GetUser(userEmail).CalendarCollections.First(cl => cl.Name == collectionName);
+            }
+            catch (Exception e)
+            {
+                
+                throw e;
+            }
+           
         }
         /// <summary>
         /// Check if a CalendarResource Exist
@@ -84,7 +103,7 @@ namespace CalDAV.Models
                 return false;
 
             return (
-                from resource in GetCollection(source, userEmail, collectionName).CalendarResources
+                from resource in GetCollection(source, userEmail, collectionName).Calendarresources
                 where resource.FileName == calResource
                 select resource
                 ).Any();
@@ -101,7 +120,7 @@ namespace CalDAV.Models
             string collectionName, string calResource)
         {
             return source.GetCollection(userEmail, collectionName)
-                .CalendarResources
+                .Calendarresources
                 .First(cr => cr.FileName == calResource);
         }
 

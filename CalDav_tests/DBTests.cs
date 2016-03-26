@@ -41,7 +41,10 @@ namespace CalDav_tests
                     //DtEnd = DateTime.Now,
                     FileName = "test.ics",
                     //Recurrence = "test",
-                    User = user
+                    User = user,
+                    Getetag = "12345",
+                    Creationdate = DateTime.Now.ToString(),
+
 
                 }
             };
@@ -49,16 +52,16 @@ namespace CalDav_tests
             {
                 new CalendarCollection()
                 {
-                    CalendarDescription = "Foo description",
+                    Calendardescription = "Foo description",
                     Name = "Foo collection",
                     User = user,
-                    CalendarResources = resources/*,
+                    Calendarresources = resources/*,
                     SupportedCalendarComponentSet = new List<string>()*/,
                     //ResourceType = new List<string>(),
 
                     //TODO: Adriano ver esto ahora es xml hecho string
                     //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
-                    DisplayName = "Display name",
+                    Displayname = "Display name",
                     Url = "url"
                     
                 }
@@ -66,8 +69,9 @@ namespace CalDav_tests
             user.CalendarCollections = collection;
             user.Resources = resources;
             db.Users.Add(user);
+            db.SaveChanges();
 
-            var userResult = db.Users.First(x => x.FirstName == "John");
+            var userResult = db.GetUser("foo@gmail.com");
             Assert.NotNull(user);
             
         }

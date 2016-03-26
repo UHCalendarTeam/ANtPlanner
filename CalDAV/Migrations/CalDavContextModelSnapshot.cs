@@ -5,7 +5,7 @@ using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations;
 using CalDAV.Models;
 
-namespace CalDav_Services.Migrations
+namespace CalDAV.Migrations
 {
     [DbContext(typeof(CalDavContext))]
     partial class CalDavContextModelSnapshot : ModelSnapshot
@@ -21,27 +21,27 @@ namespace CalDav_Services.Migrations
                     b.Property<int>("CalendarCollectionId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("CalendarDescription");
+                    b.Property<string>("Calendardescription");
 
-                    b.Property<string>("CreationDate");
+                    b.Property<string>("Creationdate");
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("Displayname");
 
-                    b.Property<string>("GetContentLanguage");
+                    b.Property<string>("GetContenttype");
 
-                    b.Property<string>("GetContentType");
+                    b.Property<string>("Getcontentlanguage");
 
-                    b.Property<string>("GetEtag");
+                    b.Property<string>("Getetag");
 
-                    b.Property<string>("GetLastModified");
+                    b.Property<string>("Getlastmodified");
 
-                    b.Property<string>("LockDiscovery");
+                    b.Property<string>("Lockdiscovery");
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("ResourceType");
+                    b.Property<string>("Resourcetype");
 
-                    b.Property<string>("SupportedLock");
+                    b.Property<string>("Supportedlock");
 
                     b.Property<string>("Url")
                         .IsRequired();
@@ -58,26 +58,26 @@ namespace CalDav_Services.Migrations
 
                     b.Property<int?>("CollectionCalendarCollectionId");
 
-                    b.Property<string>("CreationDate");
+                    b.Property<string>("Creationdate");
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("Displayname");
 
                     b.Property<string>("FileName")
                         .IsRequired();
 
-                    b.Property<string>("GetContentLanguage");
+                    b.Property<string>("Getcontentlanguage");
 
-                    b.Property<string>("GetContentLength");
+                    b.Property<string>("Getcontentlength");
 
-                    b.Property<string>("GetContentType");
+                    b.Property<string>("Getcontenttype");
 
-                    b.Property<string>("GetEtag");
+                    b.Property<string>("Getetag");
 
-                    b.Property<string>("GetLastModified");
+                    b.Property<string>("Getlastmodified");
 
-                    b.Property<string>("LockDiscovery");
+                    b.Property<string>("Lockdiscovery");
 
-                    b.Property<string>("SupportedLock");
+                    b.Property<string>("Supportedlock");
 
                     b.Property<string>("Uid");
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Metadata;
 
-namespace CalDav_Services.Migrations
+namespace CalDAV.Migrations
 {
-    public partial class FirstMigrationsUHServices : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

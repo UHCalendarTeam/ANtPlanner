@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Core;
+using CalDAV.Models;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
@@ -18,10 +19,13 @@ namespace CalDav_Services.Controllers
         [FromServices]
         ICalDav CalDavRepository { get; set; }
 
+        CalDavContext _context;
+
         //Constructor
-        public CalDavController(ICalDav repoCalDav)
+        public CalDavController(ICalDav repoCalDav, CalDavContext context)
         {
             CalDavRepository = repoCalDav;
+            _context = context;
         }
 
 
