@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Models.Method_Extensions;
+using CalDAV.Core.Method_Extensions;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using TreeForXml;

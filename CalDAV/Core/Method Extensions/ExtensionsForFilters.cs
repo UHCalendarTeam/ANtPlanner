@@ -12,7 +12,7 @@ using ICalendar.ValueTypes;
 using Microsoft.SqlServer.Server;
 using TreeForXml;
 
-namespace CalDAV.Models.Method_Extensions
+namespace CalDAV.Core.Method_Extensions
 {
     /// <summary>
     /// This class contains method extensions for 
@@ -21,7 +21,7 @@ namespace CalDAV.Models.Method_Extensions
     public static class ExtensionsForFilters
     {
         /// <summary>
-        /// Apply filters to the given calendar.
+        /// Apply different filters to the given calendar.
         /// </summary>
         /// <param name="calendar">THe calendar to apply the filter.</param>
         /// <param name="filterTree">The filter container.</param>
@@ -68,6 +68,8 @@ namespace CalDAV.Models.Method_Extensions
             var propName = filter.Attributes["name"];
             //if the comp doesnt has the desired prop return false
            
+            ///iterate over the filters, if one is false then 
+            ///returns false
             IComponentProperty propValue;
             foreach (var propFilter in filter.Children)
             {
@@ -99,6 +101,13 @@ namespace CalDAV.Models.Method_Extensions
             return true;
         }
 
+        /// <summary>
+        /// Apply a filter to the param of the property with name
+        ///equal the given param
+        /// </summary>
+        /// <param name="component">The component where to apply the filters.</param>
+        /// <param name="filter">Filters container.</param>
+        /// <returns>True if the param pass the filters, false otherwise.</returns>
         private static bool ParamFilter(this IComponentProperty property, IXMLTreeStructure filters)
         {
             var paramName = filters.Attributes["name"];
@@ -115,15 +124,20 @@ namespace CalDAV.Models.Method_Extensions
                             return false;
                         break;
                     default:
-                        throw new NotImplementedException("Implement the filter name or return an error");
+                        throw new NotImplementedException(@"The filter {filter.NodeName} is not implemented yet.");
                 }
             }
             return true;
         }
 
+        /// <summary>
+        /// Apply a text-match filter to the given value.
+        /// </summary>
+        /// <param name="propertyValue">The property value where to apply the filter.</param>
+        /// <param name="filter">The filter to apply.</param>
+        /// <returns>True if pass the filter, false otherwise.</returns>
         private static bool TextMatchFilter(this string propertyValue, IXMLTreeStructure filter)
         {
-            //TODO: coger aki el value del property de tipo string cuando este implementado.
             bool negateCond = false;
             string negCondStr;
             //if the filter contains a negate condition attr then take it
@@ -152,7 +166,13 @@ namespace CalDAV.Models.Method_Extensions
             
         }
 
-
+        /// <summary>
+        /// Compares to values and see if the filterValue is 
+        /// is container in the propValue.
+        /// </summary>
+        /// <param name="component">The property value .</param>
+        /// <param name="filter">Filters container.</param>
+        /// <returns>True if the component pass the filters, false otherwise.</returns>
         public static bool ApplyTextFilter<T>(T[] propValue, T[] filterValue)
         {
             // The substring operation returns "match" if the first string is the

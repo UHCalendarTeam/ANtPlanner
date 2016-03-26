@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using CalDAV.Models.Method_Extensions;
-using ICalendar.Utils;
-using ICalendar.ValueTypes; 
+﻿using System.Linq;
 
 namespace CalDAV.Models
 {
