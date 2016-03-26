@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
+using ICalendar.CalendarComponents;
 using ICalendar.ComponentProperties;
 using ICalendar.GeneralInterfaces;
 using ICalendar.Utils;
@@ -170,8 +171,8 @@ namespace CalDAV.Core.Method_Extensions
         /// Compares to values and see if the filterValue is 
         /// is container in the propValue.
         /// </summary>
-        /// <param name="component">The property value .</param>
-        /// <param name="filter">Filters container.</param>
+        /// <param name="propValue">The property value .</param>
+        /// <param name="filterValue">Filters container.</param>
         /// <returns>True if the component pass the filters, false otherwise.</returns>
         public static bool ApplyTextFilter<T>(T[] propValue, T[] filterValue)
         {
@@ -214,6 +215,8 @@ namespace CalDAV.Core.Method_Extensions
             return null;
 
         }
+
+
         /// <summary>
         /// Go deeper in the calCOmponents following the treeStructure
         /// till it get the component where to apply the filter.
@@ -223,7 +226,7 @@ namespace CalDAV.Core.Method_Extensions
         /// <param name="filter">Return The node that contains the filter.</param>
         /// <param name="component">THe component where to apply the filter.</param>
         /// <returns>True if found the component, false otherwise.</returns>
-        public static bool RecursiveSeeker(ICalendarComponentsContainer container, 
+        public static bool RecursiveSeeker(this ICalendarComponentsContainer container, 
             IXMLTreeStructure treeStructure, out IXMLTreeStructure filter,out ICalendarComponent component)
         {
             filter = null;
@@ -279,30 +282,54 @@ namespace CalDAV.Core.Method_Extensions
         {
             DateTime? starTime;
             DateTime? endTime;
+
+            ///get the start and time attributes of the filter.
             filter.Attributes["start"].ToDateTime(out starTime);
             filter.Attributes["end"].ToDateTime(out endTime);
+
+            ///Get the DTSTART and DTEND of the component.
             var compStartTime = ((IValue<DateTime>)component.GetComponentProperty("DTSTART")).Value;
             var compEndTimeProp = component.GetComponentProperty("DTEND");
-          
-            //If the comp defines a DTEND property then should be use
-            if (compEndTimeProp != null)
+
+            ///if the component contains rrules then espand the dts
+            var comp = component as CalendarComponent;
+            IEnumerable<DateTime> expandedDates = null;
+            if (comp.RRules.Any())
+                expandedDates = compStartTime.ExpandTime(comp.RRules.Select(
+                    x=>((IValue<Recur>)x).Value).ToList());
+            if(expandedDates == null)
+                expandedDates = new List<DateTime>() {compStartTime};
+
+            ///iterate over the expanded dts and see if one pass the filter
+
+            foreach (var dt in expandedDates)
             {
-                var compEndTime = ((IValue<DateTime>) compEndTimeProp).Value;
-                return starTime < compEndTime&& endTime > compStartTime;
+
+
+                //If the comp defines a DTEND property then should be use
+                if (compEndTimeProp != null)
+                {
+                    var compEndTime = ((IValue<DateTime>) compEndTimeProp).Value;
+                    if (starTime < compEndTime && endTime > dt)
+                        return true;
+                }
+                var durationProp = component.GetComponentProperty("DURATION");
+                //if exist the DURATION property
+                if (durationProp != null)
+                {
+                    DurationType duration = ((IValue<DurationType>) durationProp).Value;
+                    var startPlusDuration = dt.AddDuration(duration);
+                    if (duration.IsPositive)
+                        if (starTime < startPlusDuration && endTime > dt)
+                            return true;
+                    else if (starTime <= dt && endTime > dt)
+                        return true;
+                }
+                //if there is not DTEND nor DURATION then this is the default behavior
+                if (starTime < dt.AddDays(1) && endTime > dt)
+                    return true;
             }
-            var durationProp = component.GetComponentProperty("DURATION");
-            //if exist the DURATION property
-            if (durationProp!=null)
-            {
-                DurationType duration = ((IValue<DurationType>)durationProp).Value;
-                var startPlusDuration = compStartTime.AddDuration(duration);
-                if (duration.IsPositive)
-                    return starTime < startPlusDuration && endTime > compStartTime;
-                else
-                    return starTime <= compStartTime && endTime > compStartTime;
-            }
-            //if there is not DTEND nor DURATION then this is the default behavior
-            return starTime < compStartTime.AddDays(1) && endTime > compStartTime;
+            return false;
         }
 
 

@@ -607,7 +607,7 @@ namespace CalDav_tests
             expected.Add(otherDT.Value);
          
             var dts = startTime.Value.ExpandTime(recurs);
-            Assert.Equal(expected.Count(), dts.Count());
+             Assert.Equal(expected.Count(), dts.Count());
             foreach (var dt in expected)
             {
                 Assert.Contains(dt, dts);
@@ -1166,7 +1166,8 @@ namespace CalDav_tests
 
         /// <summary>
         ///The third instance into the month of one of Tuesday, Wednesday, or
-        ///Thursday, for the next 3 months:    
+        ///Thursday, for the next 3 months:   
+        /// Gonna fails till is implemented ApplyBySetPos 
         /// </summary>
         [Fact]
         public void UnitTest30()
@@ -1184,20 +1185,7 @@ namespace CalDav_tests
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
                 daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
-            //int interval = recur.Interval != null ? recur.Interval.Value : 1;
-            //for (int year = dt.Value.Year; year < dt.Value.Year + 10; year += interval)
-            //    for (int month = 1; month < 13; month++)
-            //        for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
-            //        {
-            //            if (recur.ByMonthDay != null && !recur.ByMonthDay.Contains(day))
-            //                continue;
-            //            if (recur.ByMonth != null && !recur.ByMonth.Contains(month))
-            //                continue;
-            //            var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
-            //            if (daysOfWeek != null && daysOfWeek.Contains(dateToAdd.DayOfWeek))
-            //                expected.Add(dateToAdd);
-            //        }
-            //expected = expected.Where(x => x >= dt).Take(10).ToList();
+           
             "19971007T090000".ToDateTime(out dt);
             expected.Add(dt.Value);
             "19971106T090000".ToDateTime(out dt);
@@ -1232,22 +1220,7 @@ namespace CalDav_tests
             DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
-            if (recur.ByDays != null)
-                daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
-            //int interval = recur.Interval != null ? recur.Interval.Value : 1;
-            //for (int year = dt.Value.Year; year < dt.Value.Year + 10; year += interval)
-            //    for (int month = 1; month < 13; month++)
-            //        for (int day = 1; day <= cal.GetDaysInMonth(year, month); day++)
-            //        {
-            //            if (recur.ByMonthDay != null && !recur.ByMonthDay.Contains(day))
-            //                continue;
-            //            if (recur.ByMonth != null && !recur.ByMonth.Contains(month))
-            //                continue;
-            //            var dateToAdd = new DateTime(year, month, day, dt.Value.Hour, dt.Value.Minute, dt.Value.Second);
-            //            if (daysOfWeek != null && daysOfWeek.Contains(dateToAdd.DayOfWeek))
-            //                expected.Add(dateToAdd);
-            //        }
-            //expected = expected.Where(x => x >= dt).Take(10).ToList();
+          
             "19970902T090000".ToDateTime(out otherDT);
             expected.Add(otherDT.Value);
             "19970902T120000".ToDateTime(out otherDT);
