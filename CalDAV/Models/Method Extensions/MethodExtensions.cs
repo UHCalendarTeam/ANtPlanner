@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace CalDAV.Models
 {
@@ -24,9 +25,8 @@ namespace CalDAV.Models
         /// <summary>
         /// return a User for a given name
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
-        /// <param name="userName"></param>
+        /// <param name="userEmail"></param>
         /// <returns></returns>
         public static User GetUser(this CalDavContext source, string userEmail)
         {
@@ -60,12 +60,13 @@ namespace CalDAV.Models
                 select collection
                 ).Any();
         }
+
         /// <summary>
         /// return a collection for a given user and collectionName
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
-        /// <param name="userName"></param>
+        /// <param name="userEmail"></param>
+        /// <param name="collectionName"></param>
         /// <returns></returns>
         public static CalendarCollection GetCollection(this CalDavContext source, string userEmail, string collectionName)
         {
@@ -73,10 +74,9 @@ namespace CalDAV.Models
             {
                 return source.GetUser(userEmail).CalendarCollections.First(cl => cl.Name == collectionName);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                
-                throw e;
+                return null;
             }
            
         }

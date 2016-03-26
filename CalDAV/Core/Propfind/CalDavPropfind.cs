@@ -27,7 +27,7 @@ namespace CalDAV.Core.Propfind
             multistatusTree.AddChild(primaryResponse);
 
             //check if there was any error
-            IXMLTreeStructure errorNode;
+            IXMLTreeStructure errorNode = null;
             errorOcurred = primaryResponse.GetChildAtAnyLevel("responsedescription", out errorNode); 
 
             //Now I start putting all objectResource responses if the primary target was a collection
@@ -253,18 +253,17 @@ namespace CalDAV.Core.Propfind
             #region Adding the propstat
 
             #region Selecting properties
-            CalendarCollection collection;
-            CalendarResource resource;
-            List<XmlTreeStructure> propertiesCol = new List<XmlTreeStructure>();
-            List<XmlTreeStructure> propertiesOk = new List<XmlTreeStructure>();
-            List<XmlTreeStructure> propertiesWrong = new List<XmlTreeStructure>();
+
+            var propertiesCol = new List<XmlTreeStructure>();
+            List<XmlTreeStructure> propertiesOk;
+            var propertiesWrong = new List<XmlTreeStructure>();
 
             //TODO: Trying to get db by dependency injection
            // using (var db = new CalDavContext())
            // {
                 if (calendarResourceId == null)
                 {
-                    collection = db.GetCollection(userEmail, collectionName);
+                    var collection = db.GetCollection(userEmail, collectionName);
                     propertiesOk = collection.GetAllVisibleProperties();
                     if (additionalProperties != null && additionalProperties.Count > 0)
                         foreach (var property in additionalProperties)
@@ -274,7 +273,7 @@ namespace CalDAV.Core.Propfind
                 }
                 else
                 {
-                    resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                    var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                     propertiesOk = resource.GetAllVisibleProperties();
                     if (additionalProperties != null && additionalProperties.Count > 0)
                         foreach (var property in additionalProperties)
@@ -421,7 +420,7 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #region Adding nested propOK
-            var propstatOK = new XmlTreeStructure("propstat", "DAV:");
+            var propstatOk = new XmlTreeStructure("propstat", "DAV:");
             var propOk = new XmlTreeStructure("prop", "DAV:");
 
             //Here i add all properties to the prop. 
@@ -430,12 +429,12 @@ namespace CalDAV.Core.Propfind
                 propOk.AddChild(property);
             }
 
-            propstatOK.AddChild(propOk);
+            propstatOk.AddChild(propOk);
 
             #region Adding nested status OK
-            var statusOK = new XmlTreeStructure("status", "DAV:");
-            statusOK.AddValue("HTTP/1.1 200 OK");
-            propstatOK.AddChild(statusOK);
+            var statusOk = new XmlTreeStructure("status", "DAV:");
+            statusOk.AddValue("HTTP/1.1 200 OK");
+            propstatOk.AddChild(statusOk);
             #endregion
 
             #endregion
@@ -468,7 +467,7 @@ namespace CalDAV.Core.Propfind
 
 
             if (propertiesOk.Count > 0)
-                treeChild.AddChild(propstatOK);
+                treeChild.AddChild(propstatOk);
             if (propertiesWrong.Count > 0)
                 treeChild.AddChild(propstatWrong);
             #endregion
