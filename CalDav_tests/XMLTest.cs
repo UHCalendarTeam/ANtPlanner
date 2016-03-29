@@ -50,11 +50,11 @@ namespace CalDav_tests
         {
 
             var tree = new XmlTreeStructure("node1", "DAV:",
-                new Dictionary<string, string>()
-                {
+               new Dictionary<string, string>()
+               {
                     { "D", "DAV:"},
                     {"C","urn:ietf:params:xml: ns: caldav"}
-                });
+               });
             tree.AddChild(new XmlTreeStructure("child1", null)).
                 AddChild(new XmlTreeStructure("child2", null));
             IXMLTreeStructure child2;
@@ -63,13 +63,21 @@ namespace CalDav_tests
                 .GetChild("child3").AddChild(new XmlTreeStructure("child4", null));
             IXMLTreeStructure child4;
             tree.GetChildAtAnyLevel("child4", out child4);
-                child4.AddChild(new XmlTreeStructure("child5", null));
+            child4.AddChild(new XmlTreeStructure("child5", null));
             var child6 = new XmlTreeStructure("child6", null);
             IXMLTreeStructure child5;
             tree.GetChildAtAnyLevel("child5", out child5);
             child5.AddChild(child6);
             IXMLTreeStructure child6_1;
             tree.GetChildAtAnyLevel("child6", out child6_1);
+            IXMLTreeStructure test;
+            tree.GetChildAtAnyLevel("prop", out test);
+
+            Assert.Null(test);
+
+            test = tree.GetChild("prop");
+
+            Assert.Null(test);
             Assert.Equal(child6_1, child6);
         }
 

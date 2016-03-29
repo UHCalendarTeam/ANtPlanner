@@ -47,7 +47,7 @@ end=""20060107T100000Z""/>
 			};
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = calendar.RecursiveSeeker(xmlTree, out tree, out comp);
+			var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
 			Assert.True(result);
 			Assert.Equal("VALARM", comp.Name);
 		}
@@ -102,7 +102,7 @@ END:VCALENDAR";
 			var xmlTree = XmlTreeStructure.Parse(xmlStr);
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = ExtensionsForFilters.RecursiveSeeker(calendar, xmlTree, out tree, out comp);
+			var result = ExtensionsForFilters.ComponentSeeker(calendar, xmlTree, out tree, out comp);
 			Assert.True(result);
 			Assert.Equal("VEVENT", comp.Name);
 			Assert.Equal("VEVENT", tree.Attributes["name"]);
@@ -157,7 +157,7 @@ END:VCALENDAR";
 			var xmlTree = XmlTreeStructure.Parse(xmlStr);
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = ExtensionsForFilters.RecursiveSeeker(calendar, xmlTree, out tree, out comp);
+			var result = ExtensionsForFilters.ComponentSeeker(calendar, xmlTree, out tree, out comp);
 			Assert.False(result);
 			/*Assert.Equal("VEVENT", comp.Name);
 			Assert.Equal("VEVENT", tree.Attributes["name"]);*/

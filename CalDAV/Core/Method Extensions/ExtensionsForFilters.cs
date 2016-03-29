@@ -32,7 +32,7 @@ namespace CalDAV.Core.Method_Extensions
             //first get the component in the calendar where to apply the filter.
             IXMLTreeStructure filtersContainer = null;
             ICalendarComponent component = null;
-            if(!RecursiveSeeker(calendar, filterTree,out filtersContainer,out component))
+            if(!ComponentSeeker(calendar, filterTree,out filtersContainer,out component))
                 return false;//if the container doesnt have the requested comp ther return false;
             bool result = true;
             foreach (var filter in filtersContainer.Children)
@@ -59,15 +59,16 @@ namespace CalDAV.Core.Method_Extensions
         }
 
         /// <summary>
-        /// Apply filters to a property
+        /// Apply the given filters to to a property in the cal component.
         /// </summary>
         /// <param name="component">The component where to apply the filters.</param>
         /// <param name="filter">Filters container.</param>
         /// <returns>True if the component pass the filters, false otherwise.</returns>
         private static bool PropertyFilter(this ICalendarComponent component, IXMLTreeStructure filter)
         {
+            //take the property where to apply the filter.
             var propName = filter.Attributes["name"];
-            //if the comp doesnt has the desired prop return false
+            //if the comp doesn't has the desired prop return false
            
             ///iterate over the filters, if one is false then 
             ///returns false
@@ -78,8 +79,11 @@ namespace CalDAV.Core.Method_Extensions
                 switch (propFilter.NodeName)
                 {
                     case "text-match":
+                        ///have to check this line in each of the cases because the
+                        ///"is not defined"
                         if (!component.Properties.TryGetValue(propName, out propValue))
                             return false;
+
                         result = propValue.StringValue.TextMatchFilter(propFilter);
                         if (!result)
                             return false;
@@ -218,15 +222,16 @@ namespace CalDAV.Core.Method_Extensions
 
 
         /// <summary>
-        /// Go deeper in the calCOmponents following the treeStructure
-        /// till it get the component where to apply the filter.
+        /// The filters have to be applied in an specific component, property 
+        /// or param of a property. This method go deep in the calCOmponents following the 
+        /// treeStructure of the filter till it get the component where to apply the filter. 
         /// </summary>
         /// <param name="container">The container of the components.</param>
         /// <param name="treeStructure">The IXMLTree where is the filter.</param>
-        /// <param name="filter">Return The node that contains the filter.</param>
-        /// <param name="component">THe component where to apply the filter.</param>
+        /// <param name="filter">Return The XmlTreeStructure node that contains the filter.</param>
+        /// <param name="component">The final component where to apply the filter.</param>
         /// <returns>True if found the component, false otherwise.</returns>
-        public static bool RecursiveSeeker(this ICalendarComponentsContainer container, 
+        public static bool ComponentSeeker(this ICalendarComponentsContainer container, 
             IXMLTreeStructure treeStructure, out IXMLTreeStructure filter,out ICalendarComponent component)
         {
             filter = null;
@@ -291,11 +296,11 @@ namespace CalDAV.Core.Method_Extensions
             var compStartTime = ((IValue<DateTime>)component.GetComponentProperty("DTSTART")).Value;
             var compEndTimeProp = component.GetComponentProperty("DTEND");
 
-            ///if the component contains rrules then espand the dts
+            ///if the component contains RRULES then expand the dts
             var comp = component as CalendarComponent;
             IEnumerable<DateTime> expandedDates = null;
-            if (comp.RRules.Any())
-                expandedDates = compStartTime.ExpandTime(comp.RRules.Select(
+            if (comp.MultipleValuesProperties["RRULE"].Any())
+                expandedDates = compStartTime.ExpandTime(comp.MultipleValuesProperties["RRULE"].Select(
                     x=>((IValue<Recur>)x).Value).ToList());
             if(expandedDates == null)
                 expandedDates = new List<DateTime>() {compStartTime};
@@ -313,8 +318,10 @@ namespace CalDAV.Core.Method_Extensions
                     if (starTime < compEndTime && endTime > dt)
                         return true;
                 }
+
+
                 var durationProp = component.GetComponentProperty("DURATION");
-                //if exist the DURATION property
+                ///if exist the DURATION property the add it to the DTSTART of the component
                 if (durationProp != null)
                 {
                     DurationType duration = ((IValue<DurationType>) durationProp).Value;
@@ -334,7 +341,8 @@ namespace CalDAV.Core.Method_Extensions
 
 
         /// <summary>
-        /// To add a duration Property to the dtStart propery.
+        /// If the component doest specifies a DTEND so it should has a DURATION.
+        /// Use this to add the duration to the DTSTART property of a component.
         /// </summary>
         /// <param name="dtStart"></param>
         /// <param name="duration"></param>
