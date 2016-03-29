@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TreeForXml;
 using CalDAV.Core;
@@ -13,7 +14,8 @@ namespace CalDav_tests
 {
     public class PropfindTests
     {
-        private Dictionary<string, string> Namespaces = new Dictionary<string, string>() { {"D", @"xmlns:D=""DAV:"""}};
+        private Dictionary<string, string> Namespaces = new Dictionary<string, string>() { { "D", @"xmlns:D=""DAV:""" } };
+
 
         [Fact]
         public void CreateRootWithNamespace()
@@ -32,7 +34,7 @@ namespace CalDav_tests
         }
 
         [Fact]
-        public void PropFindGetAllNames()
+        public void GetAllNames()
         {
             var db = MockDatabase();
 
@@ -47,8 +49,9 @@ namespace CalDav_tests
             Assert.NotNull(prop);
             Assert.True(prop.Children.Count > 0);
         }
+
         [Fact]
-        public void PropFindAllVisible()
+        public void AllVisibleNotEmpty()
         {
             var db = MockDatabase();
 
@@ -62,6 +65,204 @@ namespace CalDav_tests
             response.GetChildAtAnyLevel("prop", out prop);
             Assert.NotNull(prop);
             Assert.True(prop.Children.Count > 0);
+        }
+
+        [Fact]
+        public void PropCollectionEmptyBody()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, null, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.Null(prop);
+            //Assert.True(prop.Children.Count == 0);
+        }
+        #region PropFind PropMethod Prop by Prop
+        [Fact]
+        public void PropCollectionDisplayname()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("displayname", "D") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "Mocking Collection");
+        }
+
+        [Fact]
+        public void PropCollectionCalendarDescription()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("calendar-description", "C") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "empty description");
+        }
+
+        [Fact]
+        public void PropCollectionGetcontenttype()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getcontenttype", "D") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "text/calendar; component=vevent");
+        }
+
+        [Fact]
+        public void PropCollectionGetetag()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getetag", "DAV") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "0");
+        }
+        [Fact]
+        public void PropCollectionGetlastmodified()
+        {
+           var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getlastmodified", "DAV:") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "Mon, 12 Jan 1998 09:25:56 GMT");
+        }
+        [Fact]
+        public void PropCollectionContentLanguange()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getcontentlanguage", "DAV:") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Value, "en");
+        }
+
+        [Fact]
+        public void PropCollectionResourceType()
+        {
+            var db = MockDatabase();
+
+            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+            response.Namespaces.Add("D", "DAV:");
+            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var propMethods = new CalDavPropfind(db);
+            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("resourcetype", "DAV:") }, response);
+            IXMLTreeStructure prop;
+            response.GetChildAtAnyLevel("prop", out prop);
+            Assert.NotNull(prop);
+            Assert.True(prop.Children.Count == 1);
+            Assert.Equal(prop.Children[0].Children[0].NodeName, "collection");
+            Assert.Equal(prop.Children[0].Children[1].NodeName, "calendar");
+        }
+
+        #endregion
+
+        [Fact]
+        public void ComparingFinalsXmlPropName()
+        {
+            var db = MockDatabase();
+            FileSystemManagement fs = new FileSystemManagement();
+            CalDav calDav = new CalDav(fs, db);
+
+            var prop = new Dictionary<string, string>();
+            prop.Add("depth", "0");
+            prop.Add("userEmail", "foo@gmail.com");
+            prop.Add("collectionName", "Foocollection");
+
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine(@"<?xml version=""1.0"" encoding=""utf-8"" ?>");
+            strBuilder.AppendLine(@"<propfind xmlns=""DAV:"">");
+            strBuilder.AppendLine(@"<propname/>");
+            strBuilder.AppendLine("</propfind>"); 
+
+
+            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+
+            var strFinal = xmFinal.ToString();
+
+            var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:status>HTTP/1.1 200 OK</D:status>
+      <D:prop>
+        <C:calendar-timezone />
+        <D:max-resource-size />
+        <C:min-date-time />
+        <C:max-date-time />
+        <C:max-instances />
+        <D:getcontentlength />
+        <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"" />
+        <D:displayname />
+        <D:resourcetype />
+        <C:calendar-timezone />
+        <C:supported-calendar-component-set />
+        <D:max-resource-size />
+        <C:min-date-time />
+        <C:max-date-time />
+        <C:max-intances />
+      </D:prop>
+    </D:propstat>
+  </D:response>
+</D:multistatus>";
+
+            Assert.Equal(xmFinal.ToString(),trueSolution);
+
         }
 
         private CalDavContext MockDatabase()
@@ -114,7 +315,12 @@ namespace CalDav_tests
                     Displayname = $"<D:displayname {Namespaces["D"]}>Mocking Collection</D:displayname>",
                     Getcontenttype = $"<D:getcontenttype {Namespaces["D"]}>text/calendar; component=vevent</D:getcontenttype>",
                     Url = "url",
-                    Resourcetype = $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>"
+                    Resourcetype = $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>",
+                    Creationdate = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>",
+                    Getetag = $"<D:getetag {Namespaces["D"]}>0</D:getetag>",
+                    Getlastmodified = $"<D:getlastmodified {Namespaces["D"]}>Mon, 12 Jan 1998 09:25:56 GMT</D:getlastmodified>",
+                    Getcontentlanguage = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>"
+
 
                 }
             };

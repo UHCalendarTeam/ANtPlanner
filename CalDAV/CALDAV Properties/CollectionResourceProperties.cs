@@ -12,7 +12,7 @@ namespace CalDAV.CALDAV_Properties
     public static class CollectionResourceProperties
     {
         public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
-        public static string DavNs => "DAV";
+        public static string DavNs => "DAV:";
 
         /// <summary>
         /// Returns the value of a resource property given its name.
@@ -89,7 +89,7 @@ namespace CalDAV.CALDAV_Properties
             List<XmlTreeStructure> list = new List<XmlTreeStructure>();
             foreach (var property in VisibleGeneralProperties)
             {
-                list.Add(ResolveProperty(calendarResource, property, "DAV"));
+                list.Add(ResolveProperty(calendarResource, property, "DAV:"));
             }
             return list;
         }

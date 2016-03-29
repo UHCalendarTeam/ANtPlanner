@@ -14,18 +14,22 @@ namespace CalDAV.CALDAV_Properties
     public static class CollectionProperties
     {
         public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
-        public static string DavNs => "DAV";
+        public static string DavNs => "DAV:";
 
         /// <summary>
         /// Contains all the properties that are common for all Calendar Collection.
         /// </summary>
-        private static Dictionary<string, string> XmlGeneralProperties = new Dictionary<string, string>()
+        private static Dictionary<string, KeyValuePair<string, string>> XmlGeneralProperties = new Dictionary<string, KeyValuePair<string, string>>()
         {
-            { "calendar-timezone", DateTimeKind.Local.ToString() }, {"max-resource-size", "102400"},
-            { "min-date-time", MinDateTime()}, {"max-date-time", MaxDateTime()}, { "max-instances", "10"},
-            {"getcontentlength", "0" }
+             {"calendar-timezone", new KeyValuePair<string,string>(DateTimeKind.Local.ToString(), CaldavNs)},
+             {"max-resource-size", new KeyValuePair<string, string>("102400", DavNs)},
+             {"min-date-time", new KeyValuePair<string, string>(MinDateTime(), CaldavNs)},
+             {"max-date-time",new KeyValuePair<string, string>( MaxDateTime(), CaldavNs)},
+             {"max-instances", new KeyValuePair<string,string>("10", CaldavNs)},
+             {"getcontentlength", new KeyValuePair<string,string>("0", DavNs) }
         };
 
+        
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
             "displayname", "resourcetype", "creationdate", "calendar-description", "getcontenttype"
@@ -52,18 +56,17 @@ namespace CalDAV.CALDAV_Properties
         /// <param name="propertyName"></param>
         /// <param name="mainNS"></param>
         /// <returns></returns>
-        public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNS)
+        public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNS = "DAV:")
         {
             //First I look to see if is one of the static ones.
             if (XmlGeneralProperties.ContainsKey(propertyName))
             {
                 var svalue = XmlGeneralProperties[propertyName];
-                var sprop = new XmlTreeStructure(propertyName, mainNS);
-                sprop.AddValue(svalue);
+                var sprop = new XmlTreeStructure(propertyName, svalue.Value);
+                sprop.AddValue(svalue.Key);
                 return sprop;
             }
             //TODO: Check all property names
-            //this must be fixed later because not all properties are of type string.
             var realPropName = propertyName.ToLower();
             string value;
             realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
@@ -80,13 +83,10 @@ namespace CalDAV.CALDAV_Properties
             XmlTreeStructure prop;
             try
             {
-
-                //TODO: Why this motherfucker is not parsing ok.
                 if (value != null)
                     prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
                 else
                     return null;
-                
             }
             catch (Exception e)
             {
@@ -109,7 +109,7 @@ namespace CalDAV.CALDAV_Properties
             var list = new List<XmlTreeStructure>();
             foreach (var property in VisibleGeneralProperties)
             {
-                list.Add(ResolveProperty(collection, property, "DAV"));
+                list.Add(ResolveProperty(collection, property));
             }
             return list;
 
@@ -126,7 +126,8 @@ namespace CalDAV.CALDAV_Properties
 
             foreach (var property in XmlGeneralProperties)
             {
-                list.Add(new XmlTreeStructure(property.Key, DavNs));
+                //I took the namespace from the last letter in general properties
+                list.Add(new XmlTreeStructure(property.Key, property.Value.Value));
             }
 
             //calendar desription
@@ -143,11 +144,11 @@ namespace CalDAV.CALDAV_Properties
             list.Add(resourceType);
 
             //calendar-timezone
-            var calendarTimeZone = new XmlTreeStructure("calendar-timezone", DavNs);
-            list.Add(resourceType);
+            var calendarTimeZone = new XmlTreeStructure("calendar-timezone", CaldavNs);
+            list.Add(calendarTimeZone);
 
             //supported-calendar-component-set
-            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set", DavNs);
+            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set", CaldavNs);
             list.Add(supportedCalendarComp);
 
             //max-resource-size
@@ -155,15 +156,15 @@ namespace CalDAV.CALDAV_Properties
             list.Add(maxResourceSize);
 
             //min-date-time
-            var minDateTime = new XmlTreeStructure("min-date-time", DavNs);
+            var minDateTime = new XmlTreeStructure("min-date-time", CaldavNs);
             list.Add(minDateTime);
 
             //min-date-time
-            var maxDateTime = new XmlTreeStructure("min-date-time", DavNs);
+            var maxDateTime = new XmlTreeStructure("max-date-time", CaldavNs);
             list.Add(maxDateTime);
 
             //max-intances
-            var maxIntances = new XmlTreeStructure("max-intances", DavNs);
+            var maxIntances = new XmlTreeStructure("max-intances", CaldavNs);
             list.Add(maxIntances);
 
 

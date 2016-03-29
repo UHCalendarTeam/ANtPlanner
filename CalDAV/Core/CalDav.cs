@@ -22,7 +22,7 @@ namespace CalDAV.Core
 
         private IPropfindMethods PropFindMethods { get; set; }
 
-        private IPrecondition preconditionCheck { get; set; }
+        private IPrecondition PreconditionCheck { get; set; }
         private IPostcondition postconditionCheck { get; }
 
         private IStartUp StartUp { get; set; }
@@ -183,8 +183,8 @@ namespace CalDAV.Core
             //Note: calendar object resource = COR
 
             //CheckAllPreconditions
-            preconditionCheck = new PutPrecondition(StorageManagement);
-            if (!preconditionCheck.PreconditionsOK(propertiesAndHeaders))
+            PreconditionCheck = new PutPrecondition(StorageManagement);
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders))
                 return false;
 
             //etag value of "If-Match"
