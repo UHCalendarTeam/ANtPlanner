@@ -364,11 +364,7 @@ END:VCALENDAR";
 		[Fact]
 		public void TestingStuffs()
 		{
-			var timeSpan = TimeSpan.FromDays(34);
-			var d1 = new DateTime(2000);
-			var d2 = d1.AddDays(34);
-			var d3 = new DateTime(2000, 12, 31);
-			var d4 = d3.AddDays(-300);
+		    var temp =TimeZoneInfo.GetSystemTimeZones();
 
 		}
 
