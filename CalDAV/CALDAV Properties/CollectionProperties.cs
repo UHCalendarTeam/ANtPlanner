@@ -21,15 +21,17 @@ namespace CalDAV.CALDAV_Properties
         /// </summary>
         private static Dictionary<string, KeyValuePair<string, string>> XmlGeneralProperties = new Dictionary<string, KeyValuePair<string, string>>()
         {
-             {"calendar-timezone", new KeyValuePair<string,string>(DateTimeKind.Local.ToString(), CaldavNs)},
-             {"max-resource-size", new KeyValuePair<string, string>("102400", DavNs)},
+             {"calendar-timezone", new KeyValuePair<string,string>("LaHabana/Cuba", CaldavNs)},
+             {"max-resource-size", new KeyValuePair<string, string>("102400", CaldavNs)},
              {"min-date-time", new KeyValuePair<string, string>(MinDateTime(), CaldavNs)},
              {"max-date-time",new KeyValuePair<string, string>( MaxDateTime(), CaldavNs)},
              {"max-instances", new KeyValuePair<string,string>("10", CaldavNs)},
-             {"getcontentlength", new KeyValuePair<string,string>("0", DavNs) }
+             {"getcontentlength", new KeyValuePair<string,string>("0", DavNs)},
+             {"supported-calendar-component-set", new KeyValuePair<string, string>(@"<C:comp name=""VEVENT""/><C:comp name=""VTODO""/>",CaldavNs)},
+             {"supported-calendar-data", new KeyValuePair<string, string>(@"<C:calendar-data content-type=""text/calendar""version=""2.0""/>", CaldavNs) }
         };
 
-        
+
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
             "displayname", "resourcetype", "creationdate", "calendar-description", "getcontenttype"
@@ -146,14 +148,7 @@ namespace CalDAV.CALDAV_Properties
             //calendar-timezone
             var calendarTimeZone = new XmlTreeStructure("calendar-timezone", CaldavNs);
             list.Add(calendarTimeZone);
-
-            //supported-calendar-component-set
-            var supportedCalendarComp = new XmlTreeStructure("supported-calendar-component-set", CaldavNs);
-            list.Add(supportedCalendarComp);
-
-            //max-resource-size
-            var maxResourceSize = new XmlTreeStructure("max-resource-size", DavNs);
-            list.Add(maxResourceSize);
+            
 
             //min-date-time
             var minDateTime = new XmlTreeStructure("min-date-time", CaldavNs);

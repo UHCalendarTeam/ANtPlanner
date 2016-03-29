@@ -14,10 +14,10 @@ namespace CalDav_tests
 {
     public class PropfindTests
     {
-        private Dictionary<string, string> Namespaces = new Dictionary<string, string>() { { "D", @"xmlns:D=""DAV:""" } };
+        private Dictionary<string, string> Namespaces = new Dictionary<string, string>() { { "D", @"xmlns:D=""DAV:""" }, {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav""" } };
 
 
-        [Fact]
+        //[Fact]
         public void CreateRootWithNamespace()
         {
             ///Nachi cuando vayas a construir el primer nodo de XmlTreeStrucure
@@ -243,17 +243,17 @@ namespace CalDav_tests
       <D:status>HTTP/1.1 200 OK</D:status>
       <D:prop>
         <C:calendar-timezone />
-        <D:max-resource-size />
+        <C:max-resource-size />
         <C:min-date-time />
         <C:max-date-time />
         <C:max-instances />
         <D:getcontentlength />
+        <C:supported-calendar-component-set />
+        <C:supported-calendar-data />
         <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"" />
         <D:displayname />
         <D:resourcetype />
         <C:calendar-timezone />
-        <C:supported-calendar-component-set />
-        <D:max-resource-size />
         <C:min-date-time />
         <C:max-date-time />
         <C:max-intances />
@@ -304,6 +304,132 @@ namespace CalDav_tests
         </D:resourcetype>
         <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
         <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
+        <D:getcontenttype xmlns:D=""DAV:"">text/calendar; component=vevent</D:getcontenttype>
+      </D:prop>
+      <D:status>HTTP/1.1 200 OK</D:status>
+    </D:propstat>
+  </D:response>
+</D:multistatus>";
+            #endregion
+
+            Assert.Equal(xmFinal.ToString(), trueSolution);
+        }
+
+        [Fact]
+        public void ComparingFinalXmlAllPropWithInclude()
+        {
+            var db = MockDatabase();
+            FileSystemManagement fs = new FileSystemManagement();
+            CalDav calDav = new CalDav(fs, db);
+
+            var prop = new Dictionary<string, string>();
+            prop.Add("depth", "0");
+            prop.Add("userEmail", "foo@gmail.com");
+            prop.Add("collectionName", "Foocollection");
+
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+            strBuilder.AppendLine(@"<D:propfind xmlns:D=""DAV:"">");
+            strBuilder.AppendLine(@"<D:allprop/>");
+            strBuilder.AppendLine(@"<D:include>");
+            strBuilder.AppendLine(@"<D:getetag/>");
+            strBuilder.AppendLine(@"<D:getcontentlanguage/>");
+            strBuilder.AppendLine(@"</D:include>");
+            strBuilder.AppendLine("</D:propfind>");
+
+
+            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+
+            var strFinal = xmFinal.ToString();
+
+            #region String solution
+            var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:prop>
+        <D:displayname xmlns:D=""DAV:"">Mocking Collection</D:displayname>
+        <D:resourcetype xmlns:D=""DAV:"">
+          <D:collection />
+          <C:calendar xmlns:C=""urn:ietf:params:xml:ns:caldav"" />
+        </D:resourcetype>
+        <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
+        <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
+        <D:getcontenttype xmlns:D=""DAV:"">text/calendar; component=vevent</D:getcontenttype>
+        <D:getetag xmlns:D=""DAV:"">0</D:getetag>
+        <D:getcontentlanguage xmlns:D=""DAV:"">en</D:getcontentlanguage>
+      </D:prop>
+      <D:status>HTTP/1.1 200 OK</D:status>
+    </D:propstat>
+  </D:response>
+</D:multistatus>";
+            #endregion
+
+            Assert.Equal(xmFinal.ToString(), trueSolution);
+
+        }
+
+        [Fact]
+        public void ComparingFinalXmlProp()
+        {
+            var db = MockDatabase();
+            FileSystemManagement fs = new FileSystemManagement();
+            CalDav calDav = new CalDav(fs, db);
+
+            var prop = new Dictionary<string, string>();
+            prop.Add("depth", "0");
+            prop.Add("userEmail", "foo@gmail.com");
+            prop.Add("collectionName", "Foocollection");
+
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+            strBuilder.AppendLine(@"<D:propfind xmlns:D=""DAV:"">");
+            strBuilder.AppendLine($"<prop {Namespaces["C"]}>");
+            strBuilder.AppendLine(@"<C:calendar-timezone/>");
+            strBuilder.AppendLine(@"<getetag/>");
+            strBuilder.AppendLine(@"<getcontentlanguage/>");;
+            strBuilder.AppendLine(@"<C:min-date-time/>");
+            strBuilder.AppendLine(@"<C:max-date-time/>");
+            strBuilder.AppendLine(@"<C:max-instances/>");
+            strBuilder.AppendLine(@"<getcontentlength/>");
+            strBuilder.AppendLine(@"<C:calendar-description/>");
+            strBuilder.AppendLine(@"<displayname/>");
+            strBuilder.AppendLine(@"<resourcetype/>");
+            strBuilder.AppendLine(@"<C:supported-calendar-component-set/>");
+            strBuilder.AppendLine(@"<C:max-resource-size/>");
+            strBuilder.AppendLine(@"<D:creationdate/>");
+            strBuilder.AppendLine(@"<D:getcontenttype/>");
+            strBuilder.AppendLine(@"</prop>");
+            strBuilder.AppendLine("</D:propfind>");
+
+            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+
+            var strFinal = xmFinal.ToString();
+
+            #region String solution
+            var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:prop>
+        <C:calendar-timezone>LaHabana/Cuba</C:calendar-timezone>
+        <D:getetag xmlns:D=""DAV:"">0</D:getetag>
+        <D:getcontentlanguage xmlns:D=""DAV:"">en</D:getcontentlanguage>
+        <C:min-date-time>20160229T050000Z</C:min-date-time>
+        <C:max-date-time>20160429T040000Z</C:max-date-time>
+        <C:max-instances>10</C:max-instances>
+        <D:getcontentlength>0</D:getcontentlength>
+        <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
+        <D:displayname xmlns:D=""DAV:"">Mocking Collection</D:displayname>
+        <D:resourcetype xmlns:D=""DAV:"">
+          <D:collection />
+          <C:calendar xmlns:C=""urn:ietf:params:xml:ns:caldav"" />
+        </D:resourcetype>
+        <C:supported-calendar-component-set>&lt;C:comp name=""VEVENT""/&gt;&lt;C:comp name=""VTODO""/&gt;</C:supported-calendar-component-set>
+        <C:max-resource-size>102400</C:max-resource-size>
+        <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
         <D:getcontenttype xmlns:D=""DAV:"">text/calendar; component=vevent</D:getcontenttype>
       </D:prop>
       <D:status>HTTP/1.1 200 OK</D:status>
