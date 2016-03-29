@@ -158,7 +158,7 @@ namespace CalDav_tests
         [Fact]
         public void PropCollectionGetlastmodified()
         {
-           var db = MockDatabase();
+            var db = MockDatabase();
 
             XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
             response.Namespaces.Add("D", "DAV:");
@@ -227,13 +227,14 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<?xml version=""1.0"" encoding=""utf-8"" ?>");
             strBuilder.AppendLine(@"<propfind xmlns=""DAV:"">");
             strBuilder.AppendLine(@"<propname/>");
-            strBuilder.AppendLine("</propfind>"); 
+            strBuilder.AppendLine("</propfind>");
 
 
             var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
 
             var strFinal = xmFinal.ToString();
 
+            #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>
@@ -260,9 +261,58 @@ namespace CalDav_tests
     </D:propstat>
   </D:response>
 </D:multistatus>";
+            #endregion
 
-            Assert.Equal(xmFinal.ToString(),trueSolution);
+            Assert.Equal(xmFinal.ToString(), trueSolution);
 
+        }
+
+        [Fact]
+        public void ComparingFinalsXmlAllprop()
+        {
+            var db = MockDatabase();
+            FileSystemManagement fs = new FileSystemManagement();
+            CalDav calDav = new CalDav(fs, db);
+
+            var prop = new Dictionary<string, string>();
+            prop.Add("depth", "0");
+            prop.Add("userEmail", "foo@gmail.com");
+            prop.Add("collectionName", "Foocollection");
+
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+            strBuilder.AppendLine(@"<propfind xmlns=""DAV:"">");
+            strBuilder.AppendLine(@"<allprop/>");
+            strBuilder.AppendLine("</propfind>");
+
+
+            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+
+            var strFinal = xmFinal.ToString();
+
+            #region String solution
+            var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:prop>
+        <D:displayname xmlns:D=""DAV:"">Mocking Collection</D:displayname>
+        <D:resourcetype xmlns:D=""DAV:"">
+          <D:collection />
+          <C:calendar xmlns:C=""urn:ietf:params:xml:ns:caldav"" />
+        </D:resourcetype>
+        <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
+        <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
+        <D:getcontenttype xmlns:D=""DAV:"">text/calendar; component=vevent</D:getcontenttype>
+      </D:prop>
+      <D:status>HTTP/1.1 200 OK</D:status>
+    </D:propstat>
+  </D:response>
+</D:multistatus>";
+            #endregion
+
+            Assert.Equal(xmFinal.ToString(), trueSolution);
         }
 
         private CalDavContext MockDatabase()
@@ -294,7 +344,7 @@ namespace CalDav_tests
                     //Recurrence = "test",
                     User = user,
                     Getetag = "12345",
-                    Creationdate = DateTime.Now.ToString(),
+                    Creationdate = "29/03/16 01:30:44",
 
 
                 }
@@ -316,7 +366,7 @@ namespace CalDav_tests
                     Getcontenttype = $"<D:getcontenttype {Namespaces["D"]}>text/calendar; component=vevent</D:getcontenttype>",
                     Url = "url",
                     Resourcetype = $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>",
-                    Creationdate = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>",
+                    Creationdate = $"<D:creationdate {Namespaces["D"]}>{"29/03/16 01:30:44"}</D:creationdate>",
                     Getetag = $"<D:getetag {Namespaces["D"]}>0</D:getetag>",
                     Getlastmodified = $"<D:getlastmodified {Namespaces["D"]}>Mon, 12 Jan 1998 09:25:56 GMT</D:getlastmodified>",
                     Getcontentlanguage = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>"
