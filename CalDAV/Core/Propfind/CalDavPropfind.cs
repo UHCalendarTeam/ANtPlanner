@@ -5,6 +5,17 @@ using TreeForXml;
 
 namespace CalDAV.Core.Propfind
 {
+    /// <summary>
+    /// Propfind es el metodo de webdav encargado de lidiar con las propiedades de colecciones y recursos.
+    /// Este metodo puede tener un comportamiento recursivo si el depth especificado en el header del llamado es
+    /// depth=1 o depth=infinitum, el otro valor es 0.
+    /// depth=infinitum puede ocasionar problemas de eficiencia si las colecciones contienen muchos recursos ou otras colecciones(esto
+    /// no es permitido en CalDav ya que las colecciones de calendario no pueden tener anidadas otras colecciones de calendario). 
+    /// Propfind se componen de tres pedidos diferentes:
+    ///     *prop: Donde se especifican las propiedades a buscar y se devuelve el valor de la misma.
+    ///     *allprop: Devuelve todas las propiedades visibles (propiedades muertas y algunas vivas --ver rfc4918)
+    ///     *propname: Devuelve el nommbre de todas las propiedades implementadas.
+    /// </summary>
     public class CalDavPropfind : IPropfindMethods
     {
         CalDavContext db;
