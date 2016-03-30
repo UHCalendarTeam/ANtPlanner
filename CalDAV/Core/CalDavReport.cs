@@ -26,7 +26,7 @@ namespace CalDAV.Core
         {
             throw new NotImplementedException();
         }
-
+        //TODO: ver Adriano
         public string CalendarQuery(IXMLTreeStructure filters)
         {
             ///the the calendar-data node to know the data that
@@ -40,8 +40,8 @@ namespace CalDAV.Core
 
             var fMan = new FileSystemManagement();
 
-            fMan.
-
+            //fMan.
+            throw new NotImplementedException();
 
         }
     }
