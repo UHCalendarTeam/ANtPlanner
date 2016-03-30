@@ -32,13 +32,7 @@ namespace CalDAV.Models
 
         public string Creationdate { get; set; }
 
-        public string Getcontenttype { get; set; }
-
         public string Getetag { get; set; }
-
-        public string Getlastmodified { get; set; }
-
-        public string Getcontentlanguage { get; set; }
 
         public string Lockdiscovery { get; set; }
 

@@ -60,13 +60,11 @@ namespace CalDAV.Models
         
         public string Getcontentlength { get; set; }
 
-        public string Getcontenttype { get; set; }
-
         public string Getlastmodified { get; set; }
 
         public string Getcontentlanguage { get; set; }
 
-        public string Lockdiscovery { get; set; }
+        //public string Lockdiscovery { get; set; }
 
         public string Supportedlock { get; set; }
 

@@ -28,13 +28,14 @@ namespace CalDAV.CALDAV_Properties
              {"max-instances", new KeyValuePair<string,string>("10", CaldavNs)},
              {"getcontentlength", new KeyValuePair<string,string>("0", DavNs)},
              {"supported-calendar-component-set", new KeyValuePair<string, string>(@"<C:comp name=""VEVENT""/><C:comp name=""VTODO""/>",CaldavNs)},
-             {"supported-calendar-data", new KeyValuePair<string, string>(@"<C:calendar-data content-type=""text/calendar""version=""2.0""/>", CaldavNs) }
+             {"supported-calendar-data", new KeyValuePair<string, string>(@"<C:calendar-data content-type=""text/calendar""version=""2.0""/>", CaldavNs) },
+             {"getetag", new KeyValuePair<string, string>("0", DavNs) }
         };
 
 
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
-            "displayname", "resourcetype", "creationdate", "calendar-description", "getcontenttype"
+            "displayname", "resourcetype", "creationdate", "calendar-description"
         };
 
         private static string MinDateTime()
@@ -80,7 +81,7 @@ namespace CalDAV.CALDAV_Properties
             catch (Exception)
             {
                 value = null;
-                throw new Exception("The value could not be retrieved");
+                //throw new Exception("The value could not be retrieved");
             }
             XmlTreeStructure prop;
             try
@@ -88,7 +89,7 @@ namespace CalDAV.CALDAV_Properties
                 if (value != null)
                     prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
                 else
-                    return null;
+                    prop = new XmlTreeStructure(propertyName, mainNS);
             }
             catch (Exception e)
             {
@@ -134,34 +135,19 @@ namespace CalDAV.CALDAV_Properties
 
             //calendar desription
             var description = new XmlTreeStructure("calendar-description", CaldavNs);
-            description.AddNamespace("C", CaldavNs);
             list.Add(description);
             //a todos los que estan abajo le tienes q pasar el MainNs
             //Display Name
             var displayName = new XmlTreeStructure("displayname", DavNs);
             list.Add(displayName);
 
+            //CreationDate
+            var creationDate = new XmlTreeStructure("creationdate", DavNs);
+            list.Add(creationDate);
+
             //resource type
             var resourceType = new XmlTreeStructure("resourcetype", DavNs);
             list.Add(resourceType);
-
-            //calendar-timezone
-            var calendarTimeZone = new XmlTreeStructure("calendar-timezone", CaldavNs);
-            list.Add(calendarTimeZone);
-            
-
-            //min-date-time
-            var minDateTime = new XmlTreeStructure("min-date-time", CaldavNs);
-            list.Add(minDateTime);
-
-            //min-date-time
-            var maxDateTime = new XmlTreeStructure("max-date-time", CaldavNs);
-            list.Add(maxDateTime);
-
-            //max-intances
-            var maxIntances = new XmlTreeStructure("max-intances", CaldavNs);
-            list.Add(maxIntances);
-
 
             return list;
         }

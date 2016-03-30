@@ -34,7 +34,7 @@ namespace CalDAV.Core.Propfind
             //and if depth is greater than depth 0.
             #region Adding the responses for resources.
 
-            if (calendarResourceId != null && depth == 1 || depth == -1)
+            if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
 
@@ -54,13 +54,12 @@ namespace CalDAV.Core.Propfind
                         errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
                     }
                 }
-
-                if (errorOcurred)
-                {
-                    errorNode = new XmlTreeStructure("responsedescription", "DAV:");
-                    errorNode.AddValue("There has been an error");
-                    multistatusTree.AddChild(errorNode);
-                }
+            }
+            if (errorOcurred)
+            {
+                errorNode = new XmlTreeStructure("responsedescription", "DAV:");
+                errorNode.AddValue("There has been an error");
+                multistatusTree.AddChild(errorNode);
             }
 
             #endregion
@@ -87,7 +86,7 @@ namespace CalDAV.Core.Propfind
             //and if depth is greater than depth 0.
             #region Adding the responses for resources.
 
-            if (calendarResourceId != null && depth == 1 || depth == -1)
+            if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
                 //TODO: Trying to get db by dependency injection
@@ -106,14 +105,12 @@ namespace CalDAV.Core.Propfind
                         errorOcurred = resourceResponse.GetChildAtAnyLevel("responsedescription", out errorNode);
                     }
                 }
-
-                if (errorOcurred)
-                {
-                    errorNode = new XmlTreeStructure("responsedescription", "DAV:");
-                    errorNode.AddValue("There has been an error");
-                    multistatusTree.AddChild(errorNode);
-                }
-
+            }
+            if (errorOcurred)
+            {
+                errorNode = new XmlTreeStructure("responsedescription", "DAV:");
+                errorNode.AddValue("There has been an error");
+                multistatusTree.AddChild(errorNode);
             }
 
             #endregion
@@ -132,7 +129,7 @@ namespace CalDAV.Core.Propfind
             //and if depth is greater than depth 0.
             #region Adding the responses for resources.
 
-            if (calendarResourceId != null && depth == 1 || depth == -1)
+            if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
                 //TODO: Trying to get db by dependency injection

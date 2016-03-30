@@ -20,14 +20,14 @@ namespace CalDAV.CALDAV_Properties
         /// <param name="resource"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNS)
+        public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNS = "DAV:")
         {
             //First I look to see if is one of the static ones.
             if (XmlGeneralProperties.ContainsKey(propertyName))
             {
                 var svalue = XmlGeneralProperties[propertyName];
-                var sprop = new XmlTreeStructure(propertyName, mainNS);
-                sprop.AddValue(svalue);
+                var sprop = new XmlTreeStructure(propertyName, svalue.Value);
+                sprop.AddValue(svalue.Key);
                 return sprop;
             }
 
@@ -68,14 +68,15 @@ namespace CalDAV.CALDAV_Properties
         /// <summary>
         /// Contains all the properties that are common for all Calendar Collection Resources.
         /// </summary>
-        private static Dictionary<string, string> XmlGeneralProperties = new Dictionary<string, string>()
+        private static Dictionary<string, KeyValuePair<string, string>> XmlGeneralProperties = new Dictionary<string, KeyValuePair<string,string>>()
         {
-            {"getcontentlanguage","es"}, {"resourcetype", ""}
+            {"resourcetype", new KeyValuePair<string, string>("", DavNs)},
+            {"getcontenttype", new KeyValuePair<string, string>("text/icalendar", DavNs)}
         };
 
         private static List<string> VisibleGeneralProperties = new List<string>()
         {
-            "getetag", "displayname", "creationdate", "getcontentlenght", "getcontenttype", "getlastmodified", "resourcetype"
+            "getetag", "displayname", "creationdate", "getcontentlength", "getcontenttype", "getlastmodified", "resourcetype"
         };
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace CalDAV.CALDAV_Properties
             List<XmlTreeStructure> list = new List<XmlTreeStructure>();
             foreach (var property in VisibleGeneralProperties)
             {
-                list.Add(ResolveProperty(calendarResource, property, "DAV:"));
+                list.Add(ResolveProperty(calendarResource, property));
             }
             return list;
         }
@@ -105,17 +106,13 @@ namespace CalDAV.CALDAV_Properties
 
             foreach (var property in XmlGeneralProperties)
             {
-                list.Add(new XmlTreeStructure(property.Key, DavNs));
+                list.Add(new XmlTreeStructure(property.Key, property.Value.Value));
             }
 
             //TODO: annadir el ns a los de abajo
             //Display Name
             var displayName = new XmlTreeStructure("displayname", DavNs);
             list.Add(displayName);
-
-            //resource type
-            var resourceType = new XmlTreeStructure("resourcetype", DavNs);
-            list.Add(resourceType);
 
             //creation date
             var creationDate = new XmlTreeStructure("creationdate", DavNs);
@@ -125,10 +122,6 @@ namespace CalDAV.CALDAV_Properties
             var getcontentlegth = new XmlTreeStructure("getcontentlenght", DavNs);
             list.Add(getcontentlegth);
 
-            //getcontenttype
-            var getContentType = new XmlTreeStructure("getcontenttype", DavNs);
-            list.Add(getContentType);
-
             //getetag
             var getEtag = new XmlTreeStructure("getetag", DavNs);
             list.Add(getEtag);
@@ -136,6 +129,10 @@ namespace CalDAV.CALDAV_Properties
             //getLastModified
             var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
             list.Add(getLastModified);
+
+            //getContentLanguage
+            var getContentLanguage = new XmlTreeStructure("getcontentlanguage", DavNs);
+            list.Add(getContentLanguage);
 
             //supported lock
 

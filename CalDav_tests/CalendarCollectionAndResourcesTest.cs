@@ -27,7 +27,6 @@ namespace CalDav_tests
                 User = user,
                 Getetag = "0",
                 Displayname = "collection",
-                Getlastmodified = DateTime.Now.ToString(),
                 Calendardescription = "empty",
                 Creationdate = DateTime.Now.ToString(),
                 Name = "collection",
