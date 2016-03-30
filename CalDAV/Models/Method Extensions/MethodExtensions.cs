@@ -75,6 +75,7 @@ namespace CalDAV.Models
             }
             catch (Exception)
             {
+                throw;
             }
         }
 

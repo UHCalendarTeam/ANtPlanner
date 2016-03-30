@@ -120,23 +120,23 @@ namespace CalDav_tests
             Assert.Equal(prop.Children[0].Value, "empty description");
         }
 
-        [Fact]
-        public void PropCollectionGetcontenttype()
-        {
-            var db = MockDatabase();
+        //[Fact]
+        //public void PropCollectionGetcontenttype()
+        //{
+        //    var db = MockDatabase();
 
-            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+        //    XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
+        //    response.Namespaces.Add("D", "DAV:");
+        //    response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
-            var propMethods = new CalDavPropfind(db);
-            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getcontenttype", "D") }, response);
-            IXMLTreeStructure prop;
-            response.GetChildAtAnyLevel("prop", out prop);
-            Assert.NotNull(prop);
-            Assert.True(prop.Children.Count == 1);
-            Assert.Equal(prop.Children[0].Value, "text/calendar; component=vevent");
-        }
+        //    var propMethods = new CalDavPropfind(db);
+        //    propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getcontenttype", "D") }, response);
+        //    IXMLTreeStructure prop;
+        //    response.GetChildAtAnyLevel("prop", out prop);
+        //    Assert.NotNull(prop);
+        //    Assert.True(prop.Children.Count == 1);
+        //    Assert.Equal(prop.Children[0].Value, "text/calendar; component=vevent");
+        //}
 
         [Fact]
         public void PropCollectionGetetag()
