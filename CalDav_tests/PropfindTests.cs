@@ -155,40 +155,6 @@ namespace CalDav_tests
             Assert.True(prop.Children.Count == 1);
             Assert.Equal(prop.Children[0].Value, "0");
         }
-        [Fact]
-        public void PropCollectionGetlastmodified()
-        {
-            var db = MockDatabase();
-
-            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
-
-            var propMethods = new CalDavPropfind(db);
-            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getlastmodified", "DAV:") }, response);
-            IXMLTreeStructure prop;
-            response.GetChildAtAnyLevel("prop", out prop);
-            Assert.NotNull(prop);
-            Assert.True(prop.Children.Count == 1);
-            Assert.Equal(prop.Children[0].Value, "Mon, 12 Jan 1998 09:25:56 GMT");
-        }
-        [Fact]
-        public void PropCollectionContentLanguange()
-        {
-            var db = MockDatabase();
-
-            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
-
-            var propMethods = new CalDavPropfind(db);
-            propMethods.PropMethod("foo@gmail.com", "Foocollection", null, 0, new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("getcontentlanguage", "DAV:") }, response);
-            IXMLTreeStructure prop;
-            response.GetChildAtAnyLevel("prop", out prop);
-            Assert.NotNull(prop);
-            Assert.True(prop.Children.Count == 1);
-            Assert.Equal(prop.Children[0].Value, "en");
-        }
 
         [Fact]
         public void PropCollectionResourceType()
@@ -411,8 +377,8 @@ namespace CalDav_tests
       <D:prop>
         <C:calendar-timezone>LaHabana/Cuba</C:calendar-timezone>
         <D:getetag>0</D:getetag>
-        <C:min-date-time>20160229T050000Z</C:min-date-time>
-        <C:max-date-time>20160429T040000Z</C:max-date-time>
+        <C:min-date-time>20160228T050000Z</C:min-date-time>
+        <C:max-date-time>20160428T040000Z</C:max-date-time>
         <C:max-instances>10</C:max-instances>
         <D:getcontentlength>0</D:getcontentlength>
         <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
@@ -563,7 +529,7 @@ namespace CalDav_tests
         <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
         <D:getcontentlength xmlns:D=""DAV:"">10000</D:getcontentlength>
         <D:getcontenttype>text/icalendar</D:getcontenttype>
-        <D:getlastmodified xmlns:D=""DAV:"">Mon, 12 Jan 1998 09:25:56 GMT</D:getlastmodified>
+        <D:getlastmodified xmlns:D=""DAV:"">29/03/16 01:30:44</D:getlastmodified>
         <D:resourcetype />
       </D:prop>
       <D:status>HTTP/1.1 200 OK</D:status>
@@ -606,10 +572,8 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<C:max-resource-size/>");
             strBuilder.AppendLine(@"<D:creationdate/>");
             strBuilder.AppendLine(@"<D:getcontenttype/>");
-            strBuilder.AppendLine(@"<D:creationdate/>");
             strBuilder.AppendLine(@"<D:getcontentlenght/>");
             strBuilder.AppendLine(@"<D:getlastmodified/>");
-            strBuilder.AppendLine(@"<D:getcontentlanguage/>");
             strBuilder.AppendLine(@"</prop>");
             strBuilder.AppendLine("</D:propfind>");
 
@@ -626,8 +590,8 @@ namespace CalDav_tests
       <D:prop>
         <C:calendar-timezone>LaHabana/Cuba</C:calendar-timezone>
         <D:getetag>0</D:getetag>
-        <C:min-date-time>20160229T050000Z</C:min-date-time>
-        <C:max-date-time>20160429T040000Z</C:max-date-time>
+        <C:min-date-time>20160228T050000Z</C:min-date-time>
+        <C:max-date-time>20160428T040000Z</C:max-date-time>
         <C:max-instances>10</C:max-instances>
         <D:getcontentlength>0</D:getcontentlength>
         <C:calendar-description xmlns:C=""urn:ietf:params:xml:ns:caldav"">empty description</C:calendar-description>
@@ -646,6 +610,38 @@ namespace CalDav_tests
       <D:prop>
         <getcontentlanguage />
         <D:getcontenttype />
+        <D:getcontentlenght />
+        <D:getlastmodified />
+      </D:prop>
+      <D:status>HTTP/1.1 400 Not Found</D:status>
+      <D:responsedescription>The properties doesn't  exist</D:responsedescription>
+    </D:propstat>
+  </D:response>
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/test.ics</D:href>
+    <D:propstat>
+      <D:prop>
+        <D:getetag xmlns:D=""DAV:"">12345</D:getetag>
+        <D:getcontentlanguage xmlns:D=""DAV:"">en</D:getcontentlanguage>
+        <D:getcontentlength xmlns:D=""DAV:"">10000</D:getcontentlength>
+        <D:displayname xmlns:D=""DAV:"">Mocking resource</D:displayname>
+        <D:resourcetype />
+        <D:creationdate xmlns:D=""DAV:"">29/03/16 01:30:44</D:creationdate>
+        <D:getcontenttype>text/icalendar</D:getcontenttype>
+        <D:getlastmodified xmlns:D=""DAV:"">29/03/16 01:30:44</D:getlastmodified>
+      </D:prop>
+      <D:status>HTTP/1.1 200 OK</D:status>
+    </D:propstat>
+    <D:propstat>
+      <D:prop>
+        <D:calendar-timezone />
+        <D:min-date-time />
+        <D:max-date-time />
+        <D:max-instances />
+        <D:calendar-description />
+        <D:supported-calendar-component-set />
+        <D:max-resource-size />
+        <D:getcontentlenght />
       </D:prop>
       <D:status>HTTP/1.1 400 Not Found</D:status>
       <D:responsedescription>The properties doesn't  exist</D:responsedescription>
@@ -666,7 +662,7 @@ namespace CalDav_tests
         private CalDavContext MockDatabase()
         {
             #region FIlling Database
-            FileSystemManagement fs = new FileSystemManagement();
+            //FileSystemManagement fs = new FileSystemManagement();
             var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
@@ -696,7 +692,7 @@ namespace CalDav_tests
                     Creationdate =  $"<D:creationdate {Namespaces["D"]}>{"29/03/16 01:30:44"}</D:creationdate>",
                     Getcontentlanguage = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>",
                     Getcontentlength =  $"<D:getcontentlength {Namespaces["D"]}>10000</D:getcontentlength>",
-                    Getlastmodified = $"<D:getlastmodified {Namespaces["D"]}>Mon, 12 Jan 1998 09:25:56 GMT</D:getlastmodified>"
+                    Getlastmodified = $"<D:getlastmodified {Namespaces["D"]}>29/03/16 01:30:44</D:getlastmodified>"
                 }
             };
             var collection = new List<CalendarCollection>()

@@ -40,15 +40,19 @@ namespace CalDAV.CALDAV_Properties
 
         private static string MinDateTime()
         {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
             return
-                new DateTime(DateTime.Now.Year, (DateTime.Now.Month - 1) % 12, DateTime.Now.Day).ToUniversalTime()
+                new DateTime(DateTime.Now.Year, (thisMonth - 1)==0?12: thisMonth - 1, thisDay>28?28:thisDay).ToUniversalTime()
                     .ToString("yyyyMMddTHHmmssZ");
         }
 
         private static string MaxDateTime()
         {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
             return
-                   new DateTime(DateTime.Now.Year, (DateTime.Now.Month + 1) % 12, DateTime.Now.Day).ToUniversalTime()
+                   new DateTime(DateTime.Now.Year, (thisMonth + 1) == 13?1:thisMonth+1, thisDay > 28 ? 28 : thisDay).ToUniversalTime()
                        .ToString("yyyyMMddTHHmmssZ");
         }
 

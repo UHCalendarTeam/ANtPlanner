@@ -43,7 +43,6 @@ namespace CalDAV.CALDAV_Properties
             catch (Exception)
             {
                 value = null;
-                throw new Exception("The value could not be retrieved");
             }
 
             XmlTreeStructure prop;
@@ -52,8 +51,7 @@ namespace CalDAV.CALDAV_Properties
                 if (value != null)
                     prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
                 else
-                    return null;
-
+                    prop = new XmlTreeStructure(propertyName, mainNS);
             }
             catch (Exception)
             {
