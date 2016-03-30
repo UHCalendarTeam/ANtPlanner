@@ -4,26 +4,26 @@ using System.Linq;
 namespace CalDAV.Models
 {
     /// <summary>
-    /// This class contains method extension for the CaldavContext.
+    ///     This class contains method extension for the CaldavContext.
     /// </summary>
     public static class Queries
     {
         /// <summary>
-        /// Check if a User exist in the system
+        ///     Check if a User exist in the system
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail"></param>
         /// <returns></returns>
         public static bool UserExist(this CalDavContext source, string userEmail)
         {
-                return (
+            return (
                 from user in source.Users
                 where user.Email == userEmail
                 select user).Any();
         }
 
         /// <summary>
-        /// return a User for a given name
+        ///     return a User for a given name
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail"></param>
@@ -36,14 +36,12 @@ namespace CalDAV.Models
             }
             catch (Exception)
             {
-
                 return null;
             }
-            
         }
 
         /// <summary>
-        /// Check if a collection exist in the system.
+        ///     Check if a collection exist in the system.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail"></param>
@@ -51,8 +49,8 @@ namespace CalDAV.Models
         /// <returns></returns>
         public static bool CollectionExist(this CalDavContext source, string userEmail, string collectionName)
         {
-            if (!UserExist(source, userEmail)) 
-            return false;
+            if (!UserExist(source, userEmail))
+                return false;
 
             return (
                 from collection in GetUser(source, userEmail).CalendarCollections
@@ -62,13 +60,14 @@ namespace CalDAV.Models
         }
 
         /// <summary>
-        /// return a collection for a given user and collectionName
+        ///     return a collection for a given user and collectionName
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail"></param>
         /// <param name="collectionName"></param>
         /// <returns></returns>
-        public static CalendarCollection GetCollection(this CalDavContext source, string userEmail, string collectionName)
+        public static CalendarCollection GetCollection(this CalDavContext source, string userEmail,
+            string collectionName)
         {
             try
             {
@@ -76,12 +75,11 @@ namespace CalDAV.Models
             }
             catch (Exception)
             {
-                return null;
             }
-           
         }
+
         /// <summary>
-        /// Check if a CalendarResource Exist
+        ///     Check if a CalendarResource Exist
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail"></param>
@@ -100,8 +98,8 @@ namespace CalDAV.Models
                 select resource
                 ).Any();
         }
+
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail">The email of the calendarResource's user.</param>
@@ -116,13 +114,14 @@ namespace CalDAV.Models
                 .First(cr => cr.FileName == calResource);
         }
 
+        /// <param name="source"></param>
+        /// </summary>
+        /// by filter of the dates.
+        /// Filter the resources of the user in the given collection
+        /// <summary>
+
 
         //TODO: Adriano ver esto
-        /// <summary>
-        /// Filter the resources of the user in the given collection
-        /// by filter of the dates.
-        /// </summary>
-        /// <param name="source"></param>
         /// <param name="starTime">The startTime of the  </param>
         /// <param name="endTime"></param>
         /// <param name="ownerName"></param>

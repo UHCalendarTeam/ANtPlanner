@@ -1,40 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ICalendar;
 using ICalendar.Calendar;
-using ICalendar.GeneralInterfaces;
-using ICalendar.Utils;
 
 namespace CalDAV.Core
 {
     public class FileSystemManagement : IFileSystemManagement
     {
         /// <summary>
-        /// Contains the root where are the collections.
-        /// </summary>
-        public string Root { get; }
-
-        /// <summary>
-        /// Contains the userId where to apply the operations.
-        /// </summary>
-        public string UserId { get; set; }
-
-        /// <summary>
-        /// Contains the collection name where to apply the operations.
-        /// </summary>
-        public string CollectionId { get; set; }
-
-        /// <summary>
-        /// Use this construtor to set the root path of the files.
+        ///     Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
         public FileSystemManagement(string root = "/CalDav/Users")
         {
-
-            if (root != "/CalDav/Users" && !string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
+            if (root != "/CalDav/Users" && !string.IsNullOrEmpty(root) &&
+                Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
@@ -44,6 +24,56 @@ namespace CalDAV.Core
         {
             UserId = userId;
             CollectionId = collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+        }
+
+        /// <summary>
+        ///     Contains the userId where to apply the operations.
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        ///     Contains the collection name where to apply the operations.
+        /// </summary>
+        public string CollectionId { get; set; }
+
+        /// <summary>
+        ///     Contains the path to the collection where to apply the operations..
+        /// </summary>
+        public string CollectionPath { get; set; }
+
+        /// <summary>
+        ///     Contains the root where are the collections.
+        /// </summary>
+        public string Root { get; }
+
+        /// <summary>
+        ///     After created the class with the default constructor
+        ///     this method set the user and collection where to apply
+        ///     the operations.
+        /// </summary>
+        /// <param name="userId">The desired user.</param>
+        /// <param name="collectionId">The desired Collection name.</param>
+        /// <returns>True if the collection exist, false otherwise</returns>
+        public bool SetUserAndCollection(string userId, string collectionId)
+        {
+            UserId = userId;
+            CollectionId = collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+            return ExistCalendarCollection();
+        }
+
+        /// <summary>
+        ///     Create an instance of this class and check if the collection is valid..
+        /// </summary>
+        /// <param name="userId">The owner of the collection.</param>
+        /// <param name="collectionId">The desired collection.</param>
+        /// <param name="fileSystemManagement">The instance of the class.</param>
+        /// <returns>True if the collection exist, false otherwise</returns>
+        public bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement)
+        {
+            fileSystemManagement = new FileSystemManagement(userId, collectionId);
+            return fileSystemManagement.ExistCalendarCollection();
         }
 
         public bool AddUserFolder(string userEmail)
@@ -59,128 +89,118 @@ namespace CalDAV.Core
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
-       
-        /// <summary>
-        /// Get all the resources of a collection.
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="userCollectionId"></param>
-        /// <param name="calendarObjectResources"></param>
-        /// <returns></returns>
-        public bool GetAllCalendarObjectResource(out Dictionary<string,string> calendarObjectResources)
+
+
+        public bool DeleteCalendarCollection()
         {
-            calendarObjectResources = new Dictionary<string, string>();
-            var path = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + userCollectionId;
-            if (!Directory.Exists(Path))
-                return false;
-            var filesPath = Directory.EnumerateFiles(path);
-            foreach (var file in filesPath)
-            {
-                var temp = GetCalendarObjectResource(userId, userCollectionId, file);
-                if (temp != null)
-                    calendarObjectResources.Add(path+"/file", temp);
-            }
+            if (!Directory.Exists(CollectionPath)) return false;
+            Directory.Delete(CollectionPath, true);
             return true;
         }
 
-        public bool DeleteCalendarCollection(string userEmail, string calendarCollectionName)
+        public bool AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            if (!Directory.Exists(path)) return false;
-            Directory.Delete(path, true);
-            return true;
-        }
-
-        public bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string objectResourceName, string bodyIcalendar)
-        {
-
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
             objectResourceName = null;
 
             //Check Directory
-            if (!Directory.Exists(path)) return false;
-
+            if (!Directory.Exists(CollectionPath))
+                return false;
 
 
             //Parse the iCalendar Object
             //TODO: pa q estas construyendo esto??
             var iCalendar = new VCalendar(bodyIcalendar);
-            if (iCalendar == null) return false;
+            if (iCalendar == null)
+                return false;
 
             //Write to Disk
-            var stream = new FileStream(path + objectResourceName, FileMode.CreateNew);
-            using (stream)
+
+            using (var stream = new FileStream(CollectionPath + "/" + objectResourceName, FileMode.CreateNew))
             {
                 var writer = new StreamWriter(stream);
                 writer.Write(bodyIcalendar);
-
             }
             return true;
         }
 
-        public string GetCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public string GetCalendarObjectResource(string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = CollectionPath + "/" + objectResourceName;
             if (File.Exists(path))
             {
-                var stream = new FileStream(path, FileMode.Open);
-                using (stream)
+                using (var stream = new FileStream(path, FileMode.Open))
                 {
                     var reader = new StreamReader(stream);
                     return reader.ReadToEnd();
                 }
-
             }
             return null;
         }
 
-        public bool DeleteCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public bool DeleteCalendarObjectResource(string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = CollectionPath + "/" + objectResourceName;
             if (!File.Exists(path))
                 return false;
             File.Delete(path);
             return true;
-
         }
 
-        public bool ExistCalendarCollection(string userEmail, string calendarCollectionName)
+        public bool ExistCalendarCollection()
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            return Directory.Exists(path);
+            return Directory.Exists(CollectionPath);
         }
 
-        public bool ExistCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public bool ExistCalendarObjectResource(string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = CollectionPath + "/" + objectResourceName;
             return File.Exists(path);
         }
 
-        public IEnumerable<VCalendar> GetAllCalendarObjectResource(string userEmail, string calendarCollectionName)
+        public IEnumerable<VCalendar> GetAllCalendarObjectResource()
         {
             var calendarObjectResources = new List<VCalendar>();
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            
+
             string body;
             VCalendar iCalendar;
 
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(CollectionPath))
                 return null;
 
-            var filesPath = Directory.EnumerateFiles(path);
+            var filesPath = Directory.EnumerateFiles(CollectionPath);
 
             foreach (var file in filesPath)
             {
-                body = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
+                body = GetCalendarObjectResource(file);
                 if (body != null)
                 {
                     iCalendar = new VCalendar(body);
                     calendarObjectResources.Add(iCalendar);
                 }
-
             }
             return calendarObjectResources;
         }
-      
+
+        /// <summary>
+        ///     Get all the resources of a collection.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userCollectionId"></param>
+        /// <param name="calendarObjectResources"></param>
+        /// <returns></returns>
+        public bool GetAllCalendarObjectResource(out Dictionary<string, string> calendarObjectResources)
+        {
+            calendarObjectResources = new Dictionary<string, string>();
+            if (!Directory.Exists(CollectionPath))
+                return false;
+            var filesPath = Directory.EnumerateFiles(CollectionPath);
+            foreach (var file in filesPath)
+            {
+                var temp = GetCalendarObjectResource(file);
+                if (temp != null)
+                    calendarObjectResources.Add(CollectionPath + "/file", temp);
+            }
+            return true;
+        }
     }
 }
