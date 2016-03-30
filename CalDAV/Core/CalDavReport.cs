@@ -39,8 +39,8 @@ namespace CalDAV.Core
             filters.GetChildAtAnyLevel("filter", out componentFilter);
 
             var fMan = new FileSystemManagement();
+            return "";
 
-            fMan.
 
 
         }

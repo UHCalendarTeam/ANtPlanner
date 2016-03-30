@@ -39,7 +39,7 @@ namespace CalDAV.Core
             //get the time-filters if has one
             Dictionary<string, string> userResources;
             var fileM = new FileSystemManagement();
-            fileM.GetAllCalendarObjectResource(UserEmail, CollectionName, out userResources);
+            fileM.GetAllCalendarObjectResource( out userResources);
             Dictionary<string, VCalendar> userCalendars = userResources.ToDictionary(userResource => userResource.Key, userResource => new VCalendar(userResource.Value));
             return "";
 

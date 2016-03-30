@@ -178,6 +178,14 @@ namespace CalDAV.Core
             propertiesAndHeaders.TryGetValue("body", out body);
             #endregion
 
+            ///if the collection doesnt exist in the user folder
+            /// the can't do anything
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            {
+                retEtag = "";
+                return false;
+            }
+
             retEtag = null;
 
             //Note: calendar object resource = COR
@@ -207,7 +215,7 @@ namespace CalDAV.Core
                 //using (var db = new CalDavContext())
                // {
                     if (db.CalendarResourceExist(userEmail, collectionName, calendarResourceId) &&
-                        StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+                        StorageManagement.ExistCalendarObjectResource(calendarResourceId))
                     {
                         return UpdateCalendarObjectResource(propertiesAndHeaders,
                             out retEtag);
@@ -244,6 +252,13 @@ namespace CalDAV.Core
             propertiesAndHeaders.TryGetValue("body", out body);
             #endregion
 
+            ///if the collection doesnt exist in the user folder
+            /// the can't do anything
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            {
+                retEtag = "";
+                return false;
+            }
 
             TextReader reader = new StringReader(body);
             var iCal = new VCalendar(body);
@@ -263,7 +278,7 @@ namespace CalDAV.Core
                 db.CalendarResources.Add(resource);
 
                 //adding the file
-                StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, calendarResourceId, body);
+                StorageManagement.AddCalendarObjectResourceFile(calendarResourceId, body);
 
 
                 return true;
@@ -295,6 +310,14 @@ namespace CalDAV.Core
             propertiesAndHeaders.TryGetValue("body", out body);
             #endregion
 
+            ///if the collection doesn't exist in the user folder
+            /// then can't do anything
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            {
+                retEtag = "";
+                return false;
+            }
+
             TextReader reader = new StringReader(body);
             var iCal = new VCalendar(body);
 
@@ -316,6 +339,8 @@ namespace CalDAV.Core
                 int prevEtag;
                 int actualEtag;
                 string tempEtag = prevResource.Getetag;
+            
+                //TODO: esto siempre va a fallar pues los eTags no son int
                 if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
                 {
                     if (actualEtag > prevEtag)
@@ -326,9 +351,9 @@ namespace CalDAV.Core
                         db.CalendarResources.Update(resource);
 
                         //Removing old File 
-                        StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, calendarResourceId);
+                        StorageManagement.DeleteCalendarObjectResource( calendarResourceId);
                         //Adding New File
-                        StorageManagement.AddCalendarObjectResourceFile(userEmail, collectionName, calendarResourceId, body);
+                        StorageManagement.AddCalendarObjectResourceFile( calendarResourceId, body);
 
                     }
                     else
@@ -365,6 +390,14 @@ namespace CalDAV.Core
             string etag;
             propertiesAndHeaders.TryGetValue("etag", out etag);
             #endregion
+
+            ///if the collection doesnt exist in the user folder
+            /// the can't do anything
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            {
+                retEtag = "";
+                return null;
+            }
 
             //TODO: aki estabas cogiendo las propiedades del VCALENDAR
             //para coger las del CalComponent tienes que buscarlo
@@ -432,14 +465,19 @@ namespace CalDAV.Core
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceId"];
 
+            ///if the collection doesnt exist in the user folder
+            /// the can't do anything
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                return true;
+
             //TODO: Trying to get db by dependency injection
             //using (var db = new CalDavContext())
-           // {
-                var resource = db.GetCollection(userEmail, collectionName).Calendarresources.First(x => x.FileName == calendarResourceId);
+            // {
+            var resource = db.GetCollection(userEmail, collectionName).Calendarresources.First(x => x.FileName == calendarResourceId);
                 db.CalendarResources.Remove(resource);
                 db.SaveChanges();
           //  }
-            return StorageManagement.DeleteCalendarObjectResource(userEmail, collectionName, calendarResourceId);
+            return StorageManagement.DeleteCalendarObjectResource( calendarResourceId);
         }
 
         public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
@@ -448,6 +486,9 @@ namespace CalDAV.Core
             var collectionName = propertiesAndHeaders["collectionName"];
             var resourceId = propertiesAndHeaders["resourceId"];
 
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                return false;
+
             //TODO: Trying to get db by dependency injection
           //  using (var db = new CalDavContext())
             //{
@@ -455,7 +496,7 @@ namespace CalDAV.Core
                 if (collection == null)
                     return false;
                 db.CalendarCollections.Remove(collection);
-                return StorageManagement.DeleteCalendarCollection(userEmail, collectionName);
+                return StorageManagement.DeleteCalendarCollection();
 
 
           //  }
@@ -476,7 +517,7 @@ namespace CalDAV.Core
                 var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 etag = calendarRes.Getetag;
            // }
-            return StorageManagement.GetCalendarObjectResource(userEmail, collectionName, calendarResourceId);
+            return StorageManagement.GetCalendarObjectResource( calendarResourceId);
         }
 
         public string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders)

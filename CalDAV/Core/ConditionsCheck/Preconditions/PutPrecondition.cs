@@ -33,20 +33,20 @@ namespace CalDAV.Core.ConditionsCheck
             #endregion
 
             //check that resourceId don't exist but the collection does.
-            if (!StorageManagement.ExistCalendarCollection(userEmail, collectionName))
+            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 return false;
 
             if (propertiesAndHeaders.ContainsKey("If-Match"))
             {
                 //check that the value do exist
-                if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+                if (!StorageManagement.ExistCalendarObjectResource( calendarResourceId))
                     return false;
             }
 
             if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
             {
                 //check that the value do exist
-                if (StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+                if (StorageManagement.ExistCalendarObjectResource(calendarResourceId))
                     return false;
             }
 
@@ -82,7 +82,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             var uidCalendar = ((ComponentProperty<string>)iCalendar.Properties["UID"]).Value;
             //Check that if the operation is create there is not another element in the collection with the same UID
-            if (!StorageManagement.ExistCalendarObjectResource(userEmail, collectionName, calendarResourceId))
+            if (!StorageManagement.ExistCalendarObjectResource( calendarResourceId))
             {
                 using (var db = new CalDavContext())
                 {

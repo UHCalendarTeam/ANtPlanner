@@ -28,7 +28,12 @@ namespace CalDAV.Core
         public string CollectionId { get; set; }
 
         /// <summary>
-        /// Use this construtor to set the root path of the files.
+        /// Contains the path to the collection where to apply the operations..
+        /// </summary>
+        public string CollectionPath{ get; set; }
+
+        /// <summary>
+        /// Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
         public FileSystemManagement(string root = "/CalDav/Users")
@@ -44,6 +49,36 @@ namespace CalDAV.Core
         {
             UserId = userId;
             CollectionId = collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+        }
+
+        /// <summary>
+        /// After created the class with the default constructor
+        /// this method set the user and collection where to apply
+        /// the operations.
+        /// </summary>
+        /// <param name="userId">The desired user.</param>
+        /// <param name="collectionId">The desired Collection name.</param>
+        /// <returns>True if the collection exist, false otherwise</returns>
+        public bool SetUserAndCollection(string userId, string collectionId)
+        {
+            UserId = userId;
+            CollectionId = collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+            return ExistCalendarCollection();
+        }
+
+        /// <summary>
+        /// Create an instance of this class and check if the collection is valid.. 
+        /// </summary>
+        /// <param name="userId">The owner of the collection.</param>
+        /// <param name="collectionId">The desired collection.</param>
+        /// <param name="fileSystemManagement">The instance of the class.</param>
+        /// <returns>True if the collection exist, false otherwise</returns>
+        public bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement)
+        {
+            fileSystemManagement = new FileSystemManagement(userId, collectionId);
+            return fileSystemManagement.ExistCalendarCollection();
         }
 
         public bool AddUserFolder(string userEmail)
@@ -70,45 +105,43 @@ namespace CalDAV.Core
         public bool GetAllCalendarObjectResource(out Dictionary<string,string> calendarObjectResources)
         {
             calendarObjectResources = new Dictionary<string, string>();
-            var path = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + userCollectionId;
-            if (!Directory.Exists(Path))
+            if (!Directory.Exists(CollectionPath))
                 return false;
-            var filesPath = Directory.EnumerateFiles(path);
+            var filesPath = Directory.EnumerateFiles(CollectionPath);
             foreach (var file in filesPath)
             {
-                var temp = GetCalendarObjectResource(userId, userCollectionId, file);
+                var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(path+"/file", temp);
+                    calendarObjectResources.Add(CollectionPath + "/file", temp);
             }
             return true;
         }
 
-        public bool DeleteCalendarCollection(string userEmail, string calendarCollectionName)
+        public bool DeleteCalendarCollection()
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            if (!Directory.Exists(path)) return false;
-            Directory.Delete(path, true);
+            if (!Directory.Exists(CollectionPath)) return false;
+            Directory.Delete(CollectionPath, true);
             return true;
         }
 
-        public bool AddCalendarObjectResourceFile(string userEmail, string calendarCollectionName, string objectResourceName, string bodyIcalendar)
+        public bool AddCalendarObjectResourceFile( string objectResourceName, string bodyIcalendar)
         {
-
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
             objectResourceName = null;
 
             //Check Directory
-            if (!Directory.Exists(path)) return false;
+            if (!Directory.Exists(CollectionPath))
+                return false;
 
 
 
             //Parse the iCalendar Object
             //TODO: pa q estas construyendo esto??
             var iCalendar = new VCalendar(bodyIcalendar);
-            if (iCalendar == null) return false;
+            if (iCalendar == null)
+                return false;
 
             //Write to Disk
-            var stream = new FileStream(path + objectResourceName, FileMode.CreateNew);
+            var stream = new FileStream(CollectionPath + "/" + objectResourceName, FileMode.CreateNew);
             using (stream)
             {
                 var writer = new StreamWriter(stream);
@@ -118,9 +151,9 @@ namespace CalDAV.Core
             return true;
         }
 
-        public string GetCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public string GetCalendarObjectResource( string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = CollectionPath + "/" + objectResourceName;
             if (File.Exists(path))
             {
                 var stream = new FileStream(path, FileMode.Open);
@@ -134,9 +167,9 @@ namespace CalDAV.Core
             return null;
         }
 
-        public bool DeleteCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public bool DeleteCalendarObjectResource( string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path = CollectionPath+"/" + objectResourceName;
             if (!File.Exists(path))
                 return false;
             File.Delete(path);
@@ -144,34 +177,32 @@ namespace CalDAV.Core
 
         }
 
-        public bool ExistCalendarCollection(string userEmail, string calendarCollectionName)
+        public bool ExistCalendarCollection()
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            return Directory.Exists(path);
+            return Directory.Exists(CollectionPath);
         }
 
-        public bool ExistCalendarObjectResource(string userEmail, string calendarCollectionName, string objectResourceName)
+        public bool ExistCalendarObjectResource( string objectResourceName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName + "/" + objectResourceName;
+            var path =CollectionPath+ "/" + objectResourceName;
             return File.Exists(path);
         }
 
-        public IEnumerable<VCalendar> GetAllCalendarObjectResource(string userEmail, string calendarCollectionName)
+        public IEnumerable<VCalendar> GetAllCalendarObjectResource()
         {
             var calendarObjectResources = new List<VCalendar>();
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
             
             string body;
             VCalendar iCalendar;
 
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(CollectionPath))
                 return null;
 
-            var filesPath = Directory.EnumerateFiles(path);
+            var filesPath = Directory.EnumerateFiles(CollectionPath);
 
             foreach (var file in filesPath)
             {
-                body = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
+                body = GetCalendarObjectResource( file);
                 if (body != null)
                 {
                     iCalendar = new VCalendar(body);
