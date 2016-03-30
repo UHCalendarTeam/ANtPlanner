@@ -12,16 +12,40 @@ namespace CalDAV.Core
 {
     public class FileSystemManagement : IFileSystemManagement
     {
+        /// <summary>
+        /// Contains the root where are the collections.
+        /// </summary>
         public string Root { get; }
 
+        /// <summary>
+        /// Contains the userId where to apply the operations.
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Contains the collection name where to apply the operations.
+        /// </summary>
+        public string CollectionId { get; set; }
+
+        /// <summary>
+        /// Use this construtor to set the root path of the files.
+        /// </summary>
+        /// <param name="root"></param>
         public FileSystemManagement(string root = "/CalDav/Users")
         {
 
-            if (!string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root) && root != "/CalDav/Users")
+            if (root != "/CalDav/Users" && !string.IsNullOrEmpty(root) && Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
         }
+
+        public FileSystemManagement(string userId, string collectionId)
+        {
+            UserId = userId;
+            CollectionId = collectionId;
+        }
+
         public bool AddUserFolder(string userEmail)
         {
             var path = Path.GetFullPath(Root) + "\\" + userEmail;
@@ -35,18 +59,24 @@ namespace CalDAV.Core
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
-        //TODO: esto tiene que devolver un Dict<string, string> que tenga el path del resource y el contenido
-        //
-        public bool GetAllCalendarObjectResource(string userEmail, string calendarCollectionName, out Dictionary<string,string> calendarObjectResources)
+       
+        /// <summary>
+        /// Get all the resources of a collection.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userCollectionId"></param>
+        /// <param name="calendarObjectResources"></param>
+        /// <returns></returns>
+        public bool GetAllCalendarObjectResource(out Dictionary<string,string> calendarObjectResources)
         {
             calendarObjectResources = new Dictionary<string, string>();
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
-            if (!Directory.Exists(path))
+            var path = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + userCollectionId;
+            if (!Directory.Exists(Path))
                 return false;
             var filesPath = Directory.EnumerateFiles(path);
             foreach (var file in filesPath)
             {
-                var temp = GetCalendarObjectResource(userEmail, calendarCollectionName, file);
+                var temp = GetCalendarObjectResource(userId, userCollectionId, file);
                 if (temp != null)
                     calendarObjectResources.Add(path+"/file", temp);
             }

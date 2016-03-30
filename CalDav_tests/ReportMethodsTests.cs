@@ -47,7 +47,7 @@ end=""20060107T100000Z""/>
 			};
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = calendar.RecursiveSeeker(xmlTree, out tree, out comp);
+			var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
 			Assert.True(result);
 			Assert.Equal("VALARM", comp.Name);
 		}
@@ -102,7 +102,7 @@ END:VCALENDAR";
 			var xmlTree = XmlTreeStructure.Parse(xmlStr);
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = ExtensionsForFilters.RecursiveSeeker(calendar, xmlTree, out tree, out comp);
+			var result = ExtensionsForFilters.ComponentSeeker(calendar, xmlTree, out tree, out comp);
 			Assert.True(result);
 			Assert.Equal("VEVENT", comp.Name);
 			Assert.Equal("VEVENT", tree.Attributes["name"]);
@@ -157,7 +157,7 @@ END:VCALENDAR";
 			var xmlTree = XmlTreeStructure.Parse(xmlStr);
 			IXMLTreeStructure tree;
 			ICalendarComponent comp;
-			var result = ExtensionsForFilters.RecursiveSeeker(calendar, xmlTree, out tree, out comp);
+			var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
 			Assert.False(result);
 			/*Assert.Equal("VEVENT", comp.Name);
 			Assert.Equal("VEVENT", tree.Attributes["name"]);*/
@@ -360,15 +360,99 @@ END:VCALENDAR";
 			Assert.True(result);
 		}
 
+		/// <summary>
+		/// 7.8.1 Example: Partial Retrieval of Events by Time Range
+		/// </summary>
+		[Fact]
+		public void UnitTest1()
+		{
+			var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<C:calendar-query xmlns:D=""DAV:""
+xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+<D:prop>
+<D:getetag/>
+<C:calendar-data>
+<C:comp name=""VCALENDAR"">
+<C:prop name=""VERSION""/>
+<C:comp name=""VEVENT"">
+<C:prop name=""SUMMARY""/>
+<C:prop name=""UID""/>
+<C:prop name=""DTSTART""/>
+<C:prop name=""DTEND""/>
+<C:prop name=""DURATION""/>
+<C:prop name=""RRULE""/>
+<C:prop name=""RDATE""/>
+<C:prop name=""EXRULE""/>
+<C:prop name=""EXDATE""/>
+<C:prop name=""RECURRENCE-ID""/>
+</C:comp>
+<C:comp name=""VTIMEZONE""/>
+</C:comp>
+</C:calendar-data>
+</D:prop>
+<C:filter>
+<C:comp-filter name=""VCALENDAR"">
+<C:comp-filter name=""VEVENT"">
+<C:time-range start=""20060104T000000Z""
+end=""20060105T000000Z""/>
+</C:comp-filter>
+</C:comp-filter>
+</C:filter>
+</C:calendar-query>";
+			var calStr = @"BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VTIMEZONE
+LAST-MODIFIED:20040110T032845Z
+TZID:US/Eastern
+BEGIN:DAYLIGHT
+DTSTART:20000404T020000
+RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
+TZNAME:EDT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20001026T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZNAME:EST
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=US/Eastern:20060102T120000
+DURATION:PT1H
+RRULE:FREQ=DAILY;COUNT=5
+SUMMARY:Event #2
+UID:00959BC664CA650E933C892C@example.com
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=US/Eastern:20060104T140000
+DURATION:PT1H
+RECURRENCE-ID;TZID=US/Eastern:20060104T120000
+SUMMARY:Event #2 bis
+UID:00959BC664CA650E933C892C@example.com
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=US/Eastern:20060106T140000
+DURATION:PT1H
+RECURRENCE-ID;TZID=US/Eastern:20060106T120000
+SUMMARY:Event #2 bis bis
+UID:00959BC664CA650E933C892C@example.com
+END:VEVENT
+END:VCALENDAR";
+			var calendar = new VCalendar(calStr);
+			var xmlTree = XmlTreeStructure.Parse(xmlStr);
+			var result = calendar.FilterResource(xmlTree);
+			Assert.True(result);
+
+		}
+
 
 		[Fact]
 		public void TestingStuffs()
 		{
-			var timeSpan = TimeSpan.FromDays(34);
-			var d1 = new DateTime(2000);
-			var d2 = d1.AddDays(34);
-			var d3 = new DateTime(2000, 12, 31);
-			var d4 = d3.AddDays(-300);
+			var temp =TimeZoneInfo.GetSystemTimeZones();
 
 		}
 
