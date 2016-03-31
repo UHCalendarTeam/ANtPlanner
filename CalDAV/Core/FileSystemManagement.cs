@@ -11,20 +11,21 @@ namespace CalDAV.Core
         ///     Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
-        public FileSystemManagement(string root = "/CalDav/Users")
+        public FileSystemManagement(string root = "\\CalDav\\Users")
         {
-            if (root != "/CalDav/Users" && !string.IsNullOrEmpty(root) &&
+            if (root != "\\CalDav\\Users" && !string.IsNullOrEmpty(root) &&
                 Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
         }
 
-        public FileSystemManagement(string userId, string collectionId)
+        public FileSystemManagement(string userId, string collectionId, string root = "\\CalDav\\Users")
         {
+            Root = root;
             UserId = userId;
             CollectionId = collectionId;
-            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace CalDAV.Core
         {
             UserId = userId;
             CollectionId = collectionId;
-            CollectionPath = Path.GetFullPath(Root) + "/" + userId + "/Calendars/" + collectionId;
+            CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
             return ExistCalendarCollection();
         }
 
@@ -85,7 +86,7 @@ namespace CalDAV.Core
 
         public bool AddCalendarCollectionFolder(string userEmail, string calendarCollectionName)
         {
-            var path = Path.GetFullPath(Root) + "/" + userEmail + "/Calendars/" + calendarCollectionName;
+            var path = Path.GetFullPath(Root) + "\\" + userEmail + "\\Calendars\\" + calendarCollectionName;
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
@@ -100,7 +101,7 @@ namespace CalDAV.Core
 
         public bool AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar)
         {
-            objectResourceName = null;
+          
 
             //Check Directory
             if (!Directory.Exists(CollectionPath))
@@ -109,23 +110,28 @@ namespace CalDAV.Core
 
             //Parse the iCalendar Object
             //TODO: pa q estas construyendo esto??
-            var iCalendar = new VCalendar(bodyIcalendar);
+            var iCalendar = VCalendar.Parse(bodyIcalendar);
             if (iCalendar == null)
                 return false;
 
             //Write to Disk
 
-            using (var stream = new FileStream(CollectionPath + "/" + objectResourceName, FileMode.CreateNew))
+            using (var stream = new FileStream(CollectionPath + "\\" + objectResourceName + @".ics", FileMode.CreateNew))
             {
-                var writer = new StreamWriter(stream);
-                writer.Write(bodyIcalendar);
+                
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write(bodyIcalendar);
+                    
+                }
+                stream.Close();
             }
             return true;
         }
 
         public string GetCalendarObjectResource(string objectResourceName)
         {
-            var path = CollectionPath + "/" + objectResourceName;
+            var path = CollectionPath + "\\" + objectResourceName;
             if (File.Exists(path))
             {
                 using (var stream = new FileStream(path, FileMode.Open))
@@ -139,7 +145,7 @@ namespace CalDAV.Core
 
         public bool DeleteCalendarObjectResource(string objectResourceName)
         {
-            var path = CollectionPath + "/" + objectResourceName;
+            var path = CollectionPath + "\\" + objectResourceName;
             if (!File.Exists(path))
                 return false;
             File.Delete(path);
@@ -153,7 +159,7 @@ namespace CalDAV.Core
 
         public bool ExistCalendarObjectResource(string objectResourceName)
         {
-            var path = CollectionPath + "/" + objectResourceName;
+            var path = CollectionPath + "\\" + objectResourceName;
             return File.Exists(path);
         }
 
@@ -198,7 +204,7 @@ namespace CalDAV.Core
             {
                 var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(CollectionPath + "/file", temp);
+                    calendarObjectResources.Add(CollectionPath + "\\"+file, temp);
             }
             return true;
         }
