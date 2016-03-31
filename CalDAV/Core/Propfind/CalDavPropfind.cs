@@ -15,6 +15,11 @@ namespace CalDAV.Core.Propfind
     ///     *prop: Donde se especifican las propiedades a buscar y se devuelve el valor de la misma.
     ///     *allprop: Devuelve todas las propiedades visibles (propiedades muertas y algunas vivas --ver rfc4918)
     ///     *propname: Devuelve el nommbre de todas las propiedades implementadas.
+    /// 
+    /// Estas propiedades estan almacendas en los modelos de collection y resource
+    /// Las mutables o vivas directamente especificadas en los modelos
+    /// y las que se mantienen invariables o muertas en un diccionario statico de donde son
+    /// llamadas.
     /// </summary>
     public class CalDavPropfind : IPropfindMethods
     {
