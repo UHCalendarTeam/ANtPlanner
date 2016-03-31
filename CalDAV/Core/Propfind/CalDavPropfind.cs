@@ -269,10 +269,7 @@ namespace CalDAV.Core.Propfind
             var propertiesCol = new List<XmlTreeStructure>();
             List<XmlTreeStructure> propertiesOk;
             var propertiesWrong = new List<XmlTreeStructure>();
-
-            //TODO: Trying to get db by dependency injection
-            // using (var db = new CalDavContext())
-            // {
+            
             if (calendarResourceId == null)
             {
                 var collection = db.GetCollection(userEmail, collectionName);
@@ -293,8 +290,7 @@ namespace CalDAV.Core.Propfind
                         propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV:"));
                     }
             }
-            // }
-
+            
             //Here there are divided all properties between recovered and error recovering
             foreach (var propTree in propertiesCol)
             {
@@ -397,10 +393,7 @@ namespace CalDAV.Core.Propfind
             List<XmlTreeStructure> propertiesCol = new List<XmlTreeStructure>();
             List<XmlTreeStructure> propertiesOk = new List<XmlTreeStructure>();
             List<XmlTreeStructure> propertiesWrong = new List<XmlTreeStructure>();
-
-            //TODO: Trying to get db by dependency injection
-            //using (var db = new CalDavContext())
-            //{
+            
             if (calendarResourceId == null)
             {
                 collection = db.GetCollection(userEmail, collectionName);
@@ -419,7 +412,6 @@ namespace CalDAV.Core.Propfind
                         propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV:"));
                     }
             }
-            //}
 
             //Here there are divided all properties between recovered and error recovering
             foreach (var propTree in propertiesCol)
@@ -476,9 +468,7 @@ namespace CalDAV.Core.Propfind
             responseDescrpWrong.AddValue("The properties doesn't  exist");
             propstatWrong.AddChild(responseDescrpWrong);
             #endregion
-
             #endregion
-
 
             if (propertiesOk.Count > 0)
                 treeChild.AddChild(propstatOk);

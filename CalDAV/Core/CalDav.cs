@@ -77,7 +77,7 @@ namespace CalDAV.Core
             //trying to get the specified properties.
             //Inside every "propstatus" there are a xml element "prop" with all the properties that match with
             //the given "status" and a "status" xml containing the message of his "propstat".
-            
+
             //Todo respuesta de propfind esta compuesta de un elemento xml "multistatus",
             //El cual contiene un elemento xml "response" por cada colleccion o recurso analizado.
             //Dentro de cada "response" hay una lista de "propstat", uno por cada status distinto obtenido
@@ -105,7 +105,7 @@ namespace CalDAV.Core
             //Managing if the body was ok
             if (xmlTree.NodeName != "propfind")
                 return null;
-            
+
             //Finding the right method of propfind, it is found in the first child of the tree.
             //This methods take the response tree and they completed it with the necessary values and structure.
             var propType = xmlTree.Children[0];
@@ -139,6 +139,21 @@ namespace CalDAV.Core
         //TODO:Nacho
         public string PropPatch(Dictionary<string, string> propertiesAndHeaders, string body)
         {
+            //Proppatch is the method used by WebDAV for update, create and delete properties.
+
+            //The body structure of a Proppatch request is declare as a "proppertyupdate" xml.
+
+            //As a child of the "proppertyupdate" there are list of "set" and "remove" indicating the
+            //operations that have to be process. This element have to be process in order (top to bottom).
+
+            //There has to be at least one expected element inside "proppertyupdate".
+
+            //Each "set" element is composed by a "prop" element witch contains the property name and value
+            //of the properties that have to created or updated (if exists or not).
+
+            //The same happens for the "remove" elements but these don't include the value of the property inside
+            //the "prop" element. 
+
             #region Extracting Properties
 
             string userEmail;
@@ -152,6 +167,7 @@ namespace CalDAV.Core
             #endregion
 
             //Creating and filling the root of the xml tree response
+            //All response of a request is conformed by a "multistatus" element.
             var response = new XmlTreeStructure("multistatus", "DAV:");
             response.Namespaces.Add("D", "DAV:");
             response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
@@ -169,22 +185,49 @@ namespace CalDAV.Core
 
 
             //checking that the request has propertyupdate node
-
             IXMLTreeStructure propertyupdate;
             if (!xmlTree.GetChildAtAnyLevel("propertyupdate", out propertyupdate))
                 throw new ArgumentException(@"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
 
+            //aliasing the list with all "set" and "remove" structures inside "propertyupdate".
             List<IXMLTreeStructure> setsAndRemoves = propertyupdate.Children;
 
             //propertyupdate must have at least one element
-            if(setsAndRemoves.Count==0)
+            if (setsAndRemoves.Count == 0)
                 throw new ArgumentException("propertyupdate must have at least one element");
 
+            //The structure of a response for a proppatch has a "multistatus"
+            //as root inside it, there is only one response because depth is not allowed.
+            //For each response is necessary to add a "propstat" for each property.
+            //This "propstat" is built with a "prop" element containing just the property name 
+            //and a "status" with the exit status code.
 
+            //Proppatch is atomic, though when an error occurred in one property
+            //all failed an they received a "424 failed dependency" 
+            bool hasError = false;
+
+
+            foreach (var setOrRemove in setsAndRemoves)
+            {
+                if (setOrRemove.NodeName == "set")
+                    hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, response);
+                else
+                    hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, response);
+            }
+
+
+            return response.ToString();
+        }
+
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, XmlTreeStructure response)
+        {
             throw new NotImplementedException();
         }
 
-        
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, XmlTreeStructure response)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders)
         {
@@ -197,15 +240,12 @@ namespace CalDAV.Core
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 return true;
 
-            //TODO: Trying to get db by dependency injection
-            //using (var db = new CalDavContext())
-            // {
             var resource =
                 db.GetCollection(userEmail, collectionName)
                     .Calendarresources.First(x => x.FileName == calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
-            //  }
+
             return StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
         }
 
@@ -218,17 +258,12 @@ namespace CalDAV.Core
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 return false;
 
-            //TODO: Trying to get db by dependency injection
-            //  using (var db = new CalDavContext())
-            //{
+
             var collection = db.GetCollection(userEmail, collectionName);
             if (collection == null)
                 return false;
             db.CalendarCollections.Remove(collection);
             return StorageManagement.DeleteCalendarCollection();
-
-
-            //  }
         }
 
         public string ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string etag)
@@ -238,12 +273,10 @@ namespace CalDAV.Core
             var calendarResourceId = propertiesAndHeaders["calendarResourceId"];
 
             //Must return the Etag header of the COR
-            //TODO: Trying to get db by dependency injection
-            // using (var db = new CalDavContext())
-            //{
+
             var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             etag = calendarRes.Getetag;
-            // }
+
             return StorageManagement.GetCalendarObjectResource(calendarResourceId);
         }
 
