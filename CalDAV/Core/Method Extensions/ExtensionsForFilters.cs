@@ -22,7 +22,7 @@ namespace CalDAV.Core.Method_Extensions
         ///     Apply different filters to the given calendar.
         /// </summary>
         /// <param name="calendar">THe calendar to apply the filter.</param>
-        /// <param name="filterTree">The filter container.</param>
+        /// <param name="filterTree">The filter container. The node in the xml with name = "filter"</param>
         /// <returns>True if the calendar pass the filter, false otherwise</returns>
         public static bool FilterResource(this VCalendar calendar, IXMLTreeStructure filterTree)
         {
@@ -279,7 +279,7 @@ namespace CalDAV.Core.Method_Extensions
 
             ///if the component contains RRULES then expand the dts
             IEnumerable<DateTime> expandedDates = null;
-            if (component.MultipleValuesProperties["RRULE"].Any())
+            if (component.MultipleValuesProperties.ContainsKey("RRULE"))
                 expandedDates = compDTSTART.ExpandTime(component.GetMultipleCompProperties("RRULE").Select(
                     x => ((IValue<Recur>)x).Value).ToList());
             if (expandedDates == null)
@@ -524,13 +524,15 @@ namespace CalDAV.Core.Method_Extensions
 
         private static bool ApplyTimeFilterToVALARM(this ICalendarComponent component, DateTime start, DateTime end)
         {
-            ///TODO: the trigger should 
-            var trigger = ((IValue<Trigger>)component.Properties["TRIGGER"]).Value;
+            ///TODO: send the container of the VALARM because the trigger 
+            /// expands the DTSTART
+            var trigger = ((Trigger)component.Properties["TRIGGER"]).Value;
+            
             DateTime? triggerTime = null;
             //if the trigger define a trigger-time the use it to compare
-            if (trigger.PropertyParameters.Any(x => x.Name == "VALUE"))
+           /* if (trigger.PropertyParameters.Any(x => x.Name == "VALUE"))
                 trigger.PropertyParameters
-                    .FirstOrDefault(x => x.Name == "VALUE").Value.ToDateTime(out triggerTime);
+                    .FirstOrDefault(x => x.Name == "VALUE").Value.ToDateTime(out triggerTime);*/
             if (triggerTime == null)
                 return false;
             if (start <= triggerTime.Value && end > triggerTime.Value)
