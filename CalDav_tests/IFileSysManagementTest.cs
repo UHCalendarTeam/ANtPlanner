@@ -67,7 +67,7 @@ BEGIN:VEVENT
 DTSTART;TZID=US/Eastern:20060104T140000
 DURATION:PT1H
 RECURRENCE-ID;TZID=US/Eastern:20060104T120000
-SUMMARY:Event #2 bis
+SUMMARY:This event has more that 75 chars, so the line has to be splitted. Testing is split ok.
 UID:00959BC664CA650E933C892C@example.com
 END:VEVENT
 BEGIN:VEVENT
