@@ -118,13 +118,10 @@ namespace CalDAV.Core
 
             using (var stream = new FileStream(CollectionPath + "\\" + objectResourceName + @".ics", FileMode.CreateNew))
             {
-                
                 using (var writer = new StreamWriter(stream))
                 {
                     writer.Write(bodyIcalendar);
-                    
                 }
-                stream.Close();
             }
             return true;
         }
@@ -134,11 +131,14 @@ namespace CalDAV.Core
             var path = CollectionPath + "\\" + objectResourceName;
             if (File.Exists(path))
             {
+                string result;
                 using (var stream = new FileStream(path, FileMode.Open))
                 {
                     var reader = new StreamReader(stream);
-                    return reader.ReadToEnd();
+                    result= reader.ReadToEnd();
                 }
+
+                return result;
             }
             return null;
         }

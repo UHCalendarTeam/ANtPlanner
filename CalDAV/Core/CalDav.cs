@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CalDAV.CALDAV_Properties;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using CalDAV.Models;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
+using Microsoft.Data.Entity;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -136,9 +138,11 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
+        #region Proppatch
         //TODO:Nacho
         public string PropPatch(Dictionary<string, string> propertiesAndHeaders, string body)
         {
+            #region Docummentation
             //Proppatch is the method used by WebDAV for update, create and delete properties.
 
             //The body structure of a Proppatch request is declare as a "proppertyupdate" xml.
@@ -153,6 +157,7 @@ namespace CalDAV.Core
 
             //The same happens for the "remove" elements but these don't include the value of the property inside
             //the "prop" element. 
+            #endregion
 
             #region Extracting Properties
 
@@ -168,9 +173,9 @@ namespace CalDAV.Core
 
             //Creating and filling the root of the xml tree response
             //All response of a request is conformed by a "multistatus" element.
-            var response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            var multistatus = new XmlTreeStructure("multistatus", "DAV:");
+            multistatus.Namespaces.Add("D", "DAV:");
+            multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
             //getting the request body structure
             IXMLTreeStructure xmlTree;
@@ -198,36 +203,90 @@ namespace CalDAV.Core
 
             //The structure of a response for a proppatch has a "multistatus"
             //as root inside it, there is only one response because depth is not allowed.
-            //For each response is necessary to add a "propstat" for each property.
+            //Inside the "response" is necessary to add a "propstat" for each property.
             //This "propstat" is built with a "prop" element containing just the property name 
             //and a "status" with the exit status code.
+            var response = new XmlTreeStructure("response", "DAV:");
+            multistatus.AddChild(response);
 
-            //Proppatch is atomic, though when an error occurred in one property
-            //all failed an they received a "424 failed dependency" 
+            #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
+            var href = new XmlTreeStructure("href", "DAV:");
+
+            if (calendarResourceId == null)
+                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
+            else
+                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/" + calendarResourceId);
+
+            response.AddChild(href);
+            #endregion
+
+
+
+            //Proppatch is atomic, though when an error occurred in one property,
+            //all failed, an all other properties received a "424 failed dependency". 
             bool hasError = false;
 
-
-            foreach (var setOrRemove in setsAndRemoves)
+            //Here it is garanted that if an error occured during the processing of the operations
+            //The changes will not be stored in db thanks to a rollback.
+            using (db.Database.BeginTransaction())
             {
-                if (setOrRemove.NodeName == "set")
-                    hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, response);
-                else
-                    hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, response);
+                foreach (var setOrRemove in setsAndRemoves)
+                {
+                    if (setOrRemove.NodeName == "set")
+                        hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
+                    else
+                        hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
+                }
+
+                if (hasError)
+                    db.Database.RollbackTransaction();
             }
 
 
-            return response.ToString();
+
+            return multistatus.ToString();
         }
 
-        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, XmlTreeStructure response)
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
+        {
+            CalendarResource resource = null;
+            CalendarCollection collection = null;
+            if (calendarResourceId != null)
+                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+            else
+                collection = db.GetCollection(userEmail, collectionName);
+
+            var prop = remove.GetChild("prop");
+            foreach (var property in prop.Children)
+            {
+                XmlTreeStructure propstat = new XmlTreeStructure("propstat", "DAV:");
+                XmlTreeStructure stat = new XmlTreeStructure("stat", "DAV:");
+                XmlTreeStructure resProp = new XmlTreeStructure("prop", "DAV:");
+                propstat.AddChild(stat);
+                propstat.AddChild(resProp);
+
+                if (errorOccurred)
+                {
+                    stat.Value = "HTTP/1.1 424 Failed Dependency";
+                    resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
+                }else if (resource == null)
+                {
+                    //if ()
+                    //{
+                        
+                    //}
+                }
+                
+            }
+            throw new NotImplementedException();
+        }
+
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
         {
             throw new NotImplementedException();
         }
 
-        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, XmlTreeStructure response)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
         public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders)
         {
