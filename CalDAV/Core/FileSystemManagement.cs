@@ -128,11 +128,14 @@ namespace CalDAV.Core
             var path = CollectionPath + "\\" + objectResourceName;
             if (File.Exists(path))
             {
+                string result;
                 using (var stream = new FileStream(path, FileMode.Open))
                 {
                     var reader = new StreamReader(stream);
-                    return reader.ReadToEnd();
+                    result= reader.ReadToEnd();
                 }
+
+                return result;
             }
             return null;
         }
