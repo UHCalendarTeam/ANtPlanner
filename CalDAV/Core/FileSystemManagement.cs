@@ -197,11 +197,14 @@ namespace CalDAV.Core
             if (!Directory.Exists(CollectionPath))
                 return false;
             var filesPath = Directory.EnumerateFiles(CollectionPath);
+            var userCollectionPath = $"{UserId}\\{CollectionId}\\";
             foreach (var file in filesPath)
             {
+                var lstIndex = file.LastIndexOf("\\");
+                var fileName = file.Substring(lstIndex + 1);
                 var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(CollectionPath + "\\"+file, temp);
+                    calendarObjectResources.Add(userCollectionPath +fileName, temp);
             }
             return true;
         }

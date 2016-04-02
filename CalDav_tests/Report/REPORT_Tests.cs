@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+
 using CalDAV.Core;
 using TreeForXml;
 using Xunit;
@@ -56,6 +58,196 @@ end=""20060105T000000Z""/>
             var reportMet=new ReportMethods();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
+
+
+            var xmlResult = XDocument.Parse(result);
+
+            XNamespace nsDAV = "DAV:";
+
+
+
+
+            var responses = xmlResult.Root.Elements(nsDAV+"response");
+
+            Assert.Equal(2, responses.Count());
+
+            var hrefs = responses.SelectMany(x => x.Elements(nsDAV + "href"));
+
+            Assert.Equal(2, hrefs.Count());
+
+            Assert.True(hrefs.First().Value.Contains("abcd2.ics"));
+            Assert.True(hrefs.Last().Value.Contains("abcd3.ics"));
+
+        }
+
+
+        /// <summary>
+        /// 7.8.7 Example: Retrieval of Events by PARTSTAT
+        /// </summary>
+        [Fact]
+        public void UnitTest2()
+        {
+         
+
+            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+<D:prop xmlns:D=""DAV:"">
+<D:getetag/>
+<C:calendar-data/>
+</D:prop>
+<C:filter>
+<C:comp-filter name=""VCALENDAR"">
+<C:comp-filter name=""VEVENT"">
+<C:prop-filter name=""ATTENDEE"">
+<C:text-match collation=""i;ascii-casemap""
+>mailto:lisa@example.com</C:text-match>
+<C:param-filter name=""PARTSTAT"">
+<C:text-match collation=""i;ascii-casemap""
+>NEEDS-ACTION</C:text-match>
+</C:param-filter>
+</C:prop-filter>
+</C:comp-filter>
+</C:comp-filter>
+</C:filter>
+</C:calendar-query>";
+
+            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+
+            var reportMet = new ReportMethods();
+
+            var result = reportMet.ProcessRequest(xmlTree, fs);
+
+
+            var xmlResult = XDocument.Parse(result);
+
+            XNamespace nsDAV = "DAV:";
+
+
+
+
+            var responses = xmlResult.Root.Elements(nsDAV + "response");
+
+            Assert.Equal(1, responses.Count());
+
+            var hrefs = responses.SelectMany(x => x.Elements(nsDAV + "href"));
+
+            Assert.Equal(1, hrefs.Count());
+
+            Assert.True(hrefs.First().Value.Contains("abcd3.ics"));
+          
+
+        }
+
+        /// <summary>
+        /// 7.8.8 Example: Retrieval of Events Only
+        /// </summary>
+        [Fact]
+        public void UnitTest3()
+        {
+            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+<D:prop xmlns:D=""DAV:"">
+<D:getetag/>
+<C:calendar-data/>
+</D:prop>
+<C:filter>
+<C:comp-filter name=""VCALENDAR"">
+<C:comp-filter name=""VEVENT""/>
+</C:comp-filter>
+</C:filter>
+</C:calendar-query>";
+
+            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+
+            var reportMet = new ReportMethods();
+
+            var result = reportMet.ProcessRequest(xmlTree, fs);
+
+
+            var xmlResult = XDocument.Parse(result);
+
+            XNamespace nsDAV = "DAV:";
+
+
+
+
+            var responses = xmlResult.Root.Elements(nsDAV + "response");
+
+            Assert.Equal(3, responses.Count());
+
+            var hrefs = responses.SelectMany(x => x.Elements(nsDAV + "href"));
+
+            Assert.Equal(3, hrefs.Count());
+
+            var hrefValues = hrefs.Select(x => x.Value).ToList();
+
+            Assert.EndsWith("abcd1.ics", hrefValues[0]);
+            Assert.EndsWith("abcd2.ics", hrefValues[1]);
+            Assert.EndsWith("abcd3.ics", hrefValues[2]);
+
+
+
+        }
+
+
+        [Fact]
+        public void UnitTest4()
+        {
+            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+<D:prop xmlns:D=""DAV:"">
+<D:getetag/>
+<C:calendar-data/>
+</D:prop>
+<C:filter>
+<C:comp-filter name=""VCALENDAR"">
+<C:comp-filter name=""VTODO"">
+<C:prop-filter name=""COMPLETED"">
+<C:is-not-defined/>
+</C:prop-filter>
+<C:prop-filter name=""STATUS"">
+<C:text-match
+negate-condition=""yes"">CANCELLED</C:text-match>
+</C:prop-filter>
+</C:comp-filter>
+</C:comp-filter>
+</C:filter>
+</C:calendar-query>";
+
+
+            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+
+            var reportMet = new ReportMethods();
+
+            var result = reportMet.ProcessRequest(xmlTree, fs);
+
+
+            var xmlResult = XDocument.Parse(result);
+
+            XNamespace nsDAV = "DAV:";
+
+
+
+
+            var responses = xmlResult.Root.Elements(nsDAV + "response");
+
+            Assert.Equal(2, responses.Count());
+
+            var hrefs = responses.SelectMany(x => x.Elements(nsDAV + "href"));
+
+            Assert.Equal(2, hrefs.Count());
+
+            var hrefValues = hrefs.Select(x => x.Value).ToList();
+
+            Assert.EndsWith("abcd4.ics", hrefValues[0]);
+            Assert.EndsWith("abcd5.ics", hrefValues[1]);
+          
         }
     }
 }
