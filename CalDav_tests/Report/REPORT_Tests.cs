@@ -193,7 +193,9 @@ end=""20060105T000000Z""/>
 
         }
 
-
+        /// <summary>
+        /// 7.8.9 Example: Retrieval of All Pending To-Dos
+        /// </summary>
         [Fact]
         public void UnitTest4()
         {
@@ -231,8 +233,13 @@ negate-condition=""yes"">CANCELLED</C:text-match>
             var xmlResult = XDocument.Parse(result);
 
             XNamespace nsDAV = "DAV:";
+            XNamespace nsCalDAV = "urn:ietf:params:xml:ns:caldav";
 
 
+
+            var calDatas = xmlResult.Root.Descendants(nsCalDAV + "calendar-data");
+
+            Assert.Equal(2, calDatas.Count());
 
 
             var responses = xmlResult.Root.Elements(nsDAV + "response");
@@ -248,6 +255,49 @@ negate-condition=""yes"">CANCELLED</C:text-match>
             Assert.EndsWith("abcd4.ics", hrefValues[0]);
             Assert.EndsWith("abcd5.ics", hrefValues[1]);
           
+        }
+
+
+
+
+        [Fact]
+        public void UnitTest5()
+        {
+            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<C:calendar-multiget xmlns:D=""DAV:""
+xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+<D:prop>
+<D:getetag/>
+<C:calendar-data/>
+</D:prop>
+<D:href>/bernard/work/abcd1.ics</D:href>
+<D:href>/bernard/work/mtg1.ics</D:href>
+</C:calendar-multiget>";
+
+
+            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+
+            var reportMet = new ReportMethods();
+
+            var result = reportMet.ProcessRequest(xmlTree, fs);
+
+
+            var xmlResult = XDocument.Parse(result);
+
+            XNamespace nsDAV = "DAV:";
+            XNamespace nsCalDAV = "urn:ietf:params:xml:ns:caldav";
+
+            var status = xmlResult.Root.Descendants(nsDAV + "status");
+
+            Assert.Equal(2, status.Count());
+
+            Assert.Equal("HTTP/1.1 200 OK", status.First().Value);
+
+            Assert.Equal("HTTP/1.1 404 Not Found", status.Last().Value);
+
+
         }
     }
 }

@@ -37,7 +37,7 @@ namespace CalDAV.Core
         ///     response.If the CALDAV:calendar-data XML element doesn't contain any
         ///     CALDAV:comp element, calendar object resources will be returned in their entirety./param>
         ///     <returns>The string representation of the multi-status Xml with the results.</returns>
-        string ToXmlString(IEnumerable<KeyValuePair<string, VCalendar>> resources,
+        string ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
             IXMLTreeStructure calendarData);
     }
 }
