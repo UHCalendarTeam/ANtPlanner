@@ -11,16 +11,16 @@ namespace CalDAV.Core
         ///     Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
-        public FileSystemManagement(string root = "\\CalDav\\Users")
+        public FileSystemManagement(string root = "CalDav\\Users")
         {
-            if (root != "\\CalDav\\Users" && !string.IsNullOrEmpty(root) &&
+            if (root != "CalDav\\Users" && !string.IsNullOrEmpty(root) &&
                 Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
         }
 
-        public FileSystemManagement(string userId, string collectionId, string root = "\\CalDav\\Users")
+        public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")
         {
             Root = root;
             UserId = userId;
