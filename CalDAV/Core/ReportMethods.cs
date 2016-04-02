@@ -19,6 +19,10 @@ namespace CalDAV.Core
             CollectionName = collectionName;
         }
 
+        public ReportMethods()
+        {
+            
+        }
         private string UserEmail { get; set; }
         private string CollectionName { get; set; }
 
@@ -32,27 +36,25 @@ namespace CalDAV.Core
         {
             //take the first node of the xml and 
             //process the request by it
-            var node = xmlBody.Children.First();
+           // var node = xmlBody.Children.First();
 
-            switch (node.NodeName)
+            switch (xmlBody.NodeName)
             {
                 case "calendar-query":
-                    return CalendarQuery(node, storageManagement);
-                    break;
+                    return CalendarQuery(xmlBody, storageManagement);
                 default:
-                    throw new NotImplementedException($"The REPORT request {node.NodeName} with ns equal to {node.MainNamespace} is not" +
-                                                      $"implemented yet :(.");
+                    throw new NotImplementedException($"The REPORT request {xmlBody.NodeName} with ns equal to {xmlBody.MainNamespace} is not implemented yet .");
 
 
             }
         }
 
-        public string CalendarQuery(IXMLTreeStructure xmlDoc, IFileSystemManagement storageManagement)
+        public string CalendarQuery(IXMLTreeStructure xmlDoc, IFileSystemManagement fs)
         {
-            ///the the calendar-data node to know the data that
+            /// take the first prop node to know the data that
             /// should ne returned
-            IXMLTreeStructure calendarData;
-            xmlDoc.GetChildAtAnyLevel("calendar-data", out calendarData);
+            IXMLTreeStructure propNode;
+            xmlDoc.GetChildAtAnyLevel("prop", out propNode);
 
             ///get the filters to be applied
             IXMLTreeStructure componentFilter;
@@ -61,13 +63,13 @@ namespace CalDAV.Core
 
             Dictionary<string, string> userResources;
             var fileM = new FileSystemManagement();
-            fileM.GetAllCalendarObjectResource(out userResources);
+            fs.GetAllCalendarObjectResource(out userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
 
             ///apply the filters to the calendars
-            var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(xmlDoc));
-            return ToXmlString(filteredCalendars, calendarData);
+            var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(componentFilter));
+            return ToXmlString(filteredCalendars, propNode);
             
         }
 
@@ -76,7 +78,7 @@ namespace CalDAV.Core
         ///     create the multi-status xml.
         /// </summary>
         /// <param name="resources">The resources to be returned</param>
-        /// <param name="xmlTree">
+        /// <param name="calDataNode">
         ///     THis is the node with name ="prop"
         ///     When used in a calendaring REPORT request, the CALDAV:calendar-data XML
         ///     element specifies which parts of calendar object resources need to be returned in the
@@ -84,7 +86,7 @@ namespace CalDAV.Core
         ///     CALDAV:comp element, calendar object resources will be returned in their entirety.
         /// </param>
         /// <returns>The string representation of the multi-status Xml with the results.</returns>
-        public string ToXmlString(IEnumerable<KeyValuePair<string, VCalendar>> resources, IXMLTreeStructure xmlTree)
+        public string ToXmlString(IEnumerable<KeyValuePair<string, VCalendar>> resources, IXMLTreeStructure calDataNode)
         {
             var mutistatusNode = new XmlTreeStructure("multi-status", "DAV:")
             {
@@ -97,8 +99,7 @@ namespace CalDAV.Core
 
             //take the node that specified the comp and properties
             //to return
-            IXMLTreeStructure incommingPropNode;
-            xmlTree.GetChildAtAnyLevel("prop", out incommingPropNode);
+            
 
             foreach (var resource in resources)
             {
@@ -113,7 +114,7 @@ namespace CalDAV.Core
                 var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                 //that the requested data
-                var propNode = ProccessPropNode(incommingPropNode,resource.Value);
+                var propNode = ProccessPropNode(calDataNode, resource.Value);
 
                 propstatNode.AddChild(propNode);
 
@@ -160,9 +161,9 @@ namespace CalDAV.Core
                         break;
 
                     case "calendar-data":
-                        //add the string representantion of the resource
-                        //taking just the requested data.
-                        currentProp.AddValue(resource.ToString(prop));
+                        ///see if the calendar-data describes pros to take
+                        /// if does then take them if not take it all
+                        currentProp.AddValue(prop.Children.Any() ? resource.ToString(prop) : resource.ToString());
                         break;
                 }
                 outputRoot.AddChild(currentProp);

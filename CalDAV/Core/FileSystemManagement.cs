@@ -125,11 +125,11 @@ namespace CalDAV.Core
 
         public string GetCalendarObjectResource(string objectResourceName)
         {
-            var path = CollectionPath + "\\" + objectResourceName;
-            if (File.Exists(path))
+           
+            if (File.Exists(objectResourceName))
             {
                 string result;
-                using (var stream = new FileStream(path, FileMode.Open))
+                using (var stream = File.OpenRead(objectResourceName))
                 {
                     var reader = new StreamReader(stream);
                     result= reader.ReadToEnd();
