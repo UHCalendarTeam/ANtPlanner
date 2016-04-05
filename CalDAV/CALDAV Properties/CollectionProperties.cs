@@ -65,6 +65,7 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNS = "DAV:")
         {
+            
             //First I look to see if is one of the static ones.
             if (XmlGeneralProperties.ContainsKey(propertyName))
             {
