@@ -10,7 +10,7 @@ using Xunit;
 
 namespace CalDav_tests
 {
-	public class ReportMethodsTests
+	public class FiltersTests
 	{
         /// <summary>
         /// 7.8.5 Example: Retrieval of To-Dos by Alarm Time Range

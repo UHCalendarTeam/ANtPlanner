@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalDAV.Core.Method_Extensions;
 using ICalendar.Calendar;
+using Microsoft.Data.Entity.Metadata.Internal;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -19,6 +20,10 @@ namespace CalDAV.Core
             CollectionName = collectionName;
         }
 
+        public ReportMethods()
+        {
+        }
+
         private string UserEmail { get; set; }
         private string CollectionName { get; set; }
 
@@ -30,29 +35,39 @@ namespace CalDAV.Core
 
         public string ProcessRequest(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement)
         {
-            //take the first node of the xml and 
-            //process the request by it
-            var node = xmlBody.Children.First();
+            //take the first node of the xml and process the request
+            //by the name of the first node
+            // var node = xmlBody.Children.First();
 
-            switch (node.NodeName)
+            switch (xmlBody.NodeName)
             {
                 case "calendar-query":
-                    return CalendarQuery(node, storageManagement);
-                    break;
+                    return CalendarQuery(xmlBody, storageManagement);
+                case "calendar-multiget":
+                    return CalendarMultiget(xmlBody, storageManagement);
                 default:
-                    throw new NotImplementedException($"The REPORT request {node.NodeName} with ns equal to {node.MainNamespace} is not" +
-                                                      $"implemented yet :(.");
-
-
+                    throw new NotImplementedException(
+                        $"The REPORT request {xmlBody.NodeName} with ns equal to {xmlBody.MainNamespace} is not implemented yet .");
             }
         }
 
-        public string CalendarQuery(IXMLTreeStructure xmlDoc, IFileSystemManagement storageManagement)
+
+        /// <summary>
+        /// The CALDAV:calendar-query REPORT performs a search for all calendar object resources that match a
+        /// specified filter. The response of this report will contain all the WebDAV properties and calendar object
+        /// resource data specified in the request. In the case of the CALDAV:calendar-data XML element, one can
+        /// explicitly specify the calendar components and properties that should be returned in the calendar object
+        /// resource data that matches the filter.
+        /// </summary>
+        /// <param name="xmlDoc">The body of the request.</param>
+        /// <param name="fs">The FileManagementSystem instance that points to the requested collection.</param>
+        /// <returns></returns>
+        public string CalendarQuery(IXMLTreeStructure xmlDoc, IFileSystemManagement fs)
         {
-            ///the the calendar-data node to know the data that
+            /// take the first prop node to know the data that
             /// should ne returned
-            IXMLTreeStructure calendarData;
-            xmlDoc.GetChildAtAnyLevel("calendar-data", out calendarData);
+            IXMLTreeStructure propNode;
+            xmlDoc.GetChildAtAnyLevel("prop", out propNode);
 
             ///get the filters to be applied
             IXMLTreeStructure componentFilter;
@@ -61,14 +76,13 @@ namespace CalDAV.Core
 
             Dictionary<string, string> userResources;
             var fileM = new FileSystemManagement();
-            fileM.GetAllCalendarObjectResource(out userResources);
+            fs.GetAllCalendarObjectResource(out userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
 
             ///apply the filters to the calendars
-            var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(xmlDoc));
-            return ToXmlString(filteredCalendars, calendarData);
-            
+            var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(componentFilter));
+            return ReportResponseBuilder(filteredCalendars, propNode);
         }
 
         /// <summary>
@@ -76,7 +90,7 @@ namespace CalDAV.Core
         ///     create the multi-status xml.
         /// </summary>
         /// <param name="resources">The resources to be returned</param>
-        /// <param name="xmlTree">
+        /// <param name="calDataNode">
         ///     THis is the node with name ="prop"
         ///     When used in a calendaring REPORT request, the CALDAV:calendar-data XML
         ///     element specifies which parts of calendar object resources need to be returned in the
@@ -84,7 +98,8 @@ namespace CalDAV.Core
         ///     CALDAV:comp element, calendar object resources will be returned in their entirety.
         /// </param>
         /// <returns>The string representation of the multi-status Xml with the results.</returns>
-        public string ToXmlString(IEnumerable<KeyValuePair<string, VCalendar>> resources, IXMLTreeStructure xmlTree)
+        public string ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
+            IXMLTreeStructure calDataNode)
         {
             var mutistatusNode = new XmlTreeStructure("multi-status", "DAV:")
             {
@@ -97,11 +112,13 @@ namespace CalDAV.Core
 
             //take the node that specified the comp and properties
             //to return
-            IXMLTreeStructure incommingPropNode;
-            xmlTree.GetChildAtAnyLevel("prop", out incommingPropNode);
+
 
             foreach (var resource in resources)
             {
+
+                IXMLTreeStructure statusNode;
+
                 ///each returned resource has is own response and href nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
@@ -110,25 +127,83 @@ namespace CalDAV.Core
                 ///href is a child pf response
                 responseNode.AddChild(hrefNode);
 
-                var propstatNode = new XmlTreeStructure("propstat", "DAV:");
+                ///if the resource is null it was not foound so
+                /// add an error status
+                if (resource.Value == null)
+                {
+                    statusNode = new XmlTreeStructure("status", "DAV:");
+                    statusNode.AddValue("HTTP/1.1 404 Not Found");
+                    responseNode.AddChild(statusNode);
 
-                //that the requested data
-                var propNode = ProccessPropNode(incommingPropNode,resource.Value);
+                }
+                else
+                {
 
-                propstatNode.AddChild(propNode);
+                    
 
-                ///adding the status node
-                /// TODO: check the status!!
-                var statusNode = new XmlTreeStructure("status", "DAV:");
-                statusNode.AddValue("HTTP/1.1 200 OK");
+                    var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
-                propstatNode.AddChild(statusNode);
+                    //that the requested data
+                    var propNode = ProccessPropNode(calDataNode, resource.Value);
 
-                responseNode.AddChild(propstatNode);
+                    propstatNode.AddChild(propNode);
+
+                    ///adding the status node
+                    /// TODO: check the status!!
+                    statusNode = new XmlTreeStructure("status", "DAV:");
+                    statusNode.AddValue("HTTP/1.1 200 OK");
+
+                    propstatNode.AddChild(statusNode);
+
+                    responseNode.AddChild(propstatNode);
+                }
 
                 mutistatusNode.AddChild(responseNode);
             }
             return mutistatusNode.ToString();
+        }
+
+
+        /// <summary>
+        ///     The CALDAV:calendar-multiget REPORT is used to retrieve specific calendar object resources from within a
+        ///     collection, if the Request-URI is a collection, or to retrieve a specific calendar object resource, if the
+        ///     Request-URI is a calendar object resource. This report is similar to the CALDAV:calendar-query REPORT
+        ///     (see Section 7.8), except that it takes a list of DAV:href elements, instead of a CALDAV:filter element, to
+        ///     determine which calendar object resources to return
+        /// </summary>
+        /// <param name="xmlDoc">The body of the request.</param>
+        /// <param name="storageManagement">The FileManagementSystem instance that points to the requested collection.</param>
+        /// <returns></returns>
+        private string CalendarMultiget(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement)
+        {
+            /// take the first prop node to know the data that
+            /// should ne returned
+            IXMLTreeStructure propNode;
+            xmlBody.GetChildAtAnyLevel("prop", out propNode);
+
+            //take the href nodes. Contain the direction of the resources files that
+            //are requested
+            var hrefs = xmlBody.Children.Where(node => node.NodeName == "href").Select(href => href.Value);
+
+            var result = new Dictionary<string, string>();
+
+            /// process the requested resources
+            foreach (var href in hrefs)
+            {
+                var hrefComp = href.Split('/');
+                var userName = hrefComp[1];
+                var collectionName = hrefComp[2];
+                var resourceName = hrefComp[3];
+
+                var fs = new FileSystemManagement(userName, collectionName);
+
+                var resourceContent = fs.GetCalendarObjectResource($"{fs.CollectionPath}\\{resourceName}");
+
+                result.Add(href, resourceContent);
+            }
+            return ReportResponseBuilder(result
+                .Select( x=> new KeyValuePair<string, VCalendar>(x.Key,string.IsNullOrEmpty(x.Value)?null: VCalendar.Parse(x.Value))), propNode);
+
         }
 
         /// <summary>
@@ -160,10 +235,13 @@ namespace CalDAV.Core
                         break;
 
                     case "calendar-data":
-                        //add the string representantion of the resource
-                        //taking just the requested data.
-                        currentProp.AddValue(resource.ToString(prop));
+                        ///see if the calendar-data describes pros to take
+                        /// if does then take them if not take it all
+                        currentProp.AddValue(prop.Children.Any() ? resource.ToString(prop) : resource.ToString());
                         break;
+                    default:
+                        throw new NotImplementedException(
+                            $"The requested property with name {prop.NodeName} is not implented.");
                 }
                 outputRoot.AddChild(currentProp);
             }

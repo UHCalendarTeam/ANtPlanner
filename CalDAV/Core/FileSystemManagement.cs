@@ -11,16 +11,16 @@ namespace CalDAV.Core
         ///     Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
-        public FileSystemManagement(string root = "\\CalDav\\Users")
+        public FileSystemManagement(string root = "CalDav\\Users")
         {
-            if (root != "\\CalDav\\Users" && !string.IsNullOrEmpty(root) &&
+            if (root != "CalDav\\Users" && !string.IsNullOrEmpty(root) &&
                 Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
                 Root = Directory.GetCurrentDirectory() + root;
         }
 
-        public FileSystemManagement(string userId, string collectionId, string root = "\\CalDav\\Users")
+        public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")
         {
             Root = root;
             UserId = userId;
@@ -125,11 +125,11 @@ namespace CalDAV.Core
 
         public string GetCalendarObjectResource(string objectResourceName)
         {
-            var path = CollectionPath + "\\" + objectResourceName;
-            if (File.Exists(path))
+           
+            if (File.Exists(objectResourceName))
             {
                 string result;
-                using (var stream = new FileStream(path, FileMode.Open))
+                using (var stream = File.OpenRead(objectResourceName))
                 {
                     var reader = new StreamReader(stream);
                     result= reader.ReadToEnd();
@@ -197,11 +197,14 @@ namespace CalDAV.Core
             if (!Directory.Exists(CollectionPath))
                 return false;
             var filesPath = Directory.EnumerateFiles(CollectionPath);
+            var userCollectionPath = $"{UserId}\\{CollectionId}\\";
             foreach (var file in filesPath)
             {
+                var lstIndex = file.LastIndexOf("\\");
+                var fileName = file.Substring(lstIndex + 1);
                 var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(CollectionPath + "\\"+file, temp);
+                    calendarObjectResources.Add(userCollectionPath +fileName, temp);
             }
             return true;
         }
