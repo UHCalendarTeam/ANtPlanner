@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CalDAV.Models;
 using TreeForXml;
 
 namespace CalDAV.CALDAV_Properties
 {
-    public static class CollectionResourceProperties
+    public static class ResourcePropertyMethods
     {
         public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
         public static string DavNs => "DAV:";
@@ -135,5 +136,34 @@ namespace CalDAV.CALDAV_Properties
             //supported lock
             return calendarResource.Properties.Select(property => (XmlTreeStructure)XmlTreeStructure.Parse(property.Value)).ToList();
         }
+
+        /// <summary>
+        /// Try to remove the specified property in the resource.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyNamespace"></param>
+        /// <param name="errorStack"></param>
+        /// <returns></returns>
+        public static bool RemoveProperty(this CalendarResource resource, string propertyName, string propertyNamespace, Stack<string> errorStack)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Try to modify the specified property if it exist in the resource.
+        /// If the property does not exist it is try to create the property in the resource.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="nameSpace"></param>
+        /// <param name="propertyValue"></param>
+        /// <param name="errorStack"></param>
+        /// <returns></returns>
+        public static bool CreateOrModifyProperty(this CalendarResource resource, string propertyName, string nameSpace, string propertyValue, Stack<string> errorStack)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

@@ -272,37 +272,74 @@ namespace CalDAV.Core
             var errorStack = new Stack<string>();
             foreach (var property in prop.Children)
             {
+                //The structure for the response does not change.
+                //It is constructed with a propstat and the value is never showed in the prop element.
                 var propstat = new XmlTreeStructure("propstat", "DAV:");
                 var stat = new XmlTreeStructure("stat", "DAV:");
                 var resProp = new XmlTreeStructure("prop", "DAV:");
-                XmlTreeStructure tempResProp;
+
                 propstat.AddChild(stat);
                 propstat.AddChild(resProp);
+                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
 
+                //If an error occurred previously the stat if 424 Failed Dependency.
                 if (errorOccurred)
-                {
                     stat.Value = "HTTP/1.1 424 Failed Dependency";
-                    resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
-                }
+                    
+                
                 else
                 {
-                    //I try to get that 
-                    tempResProp = resource != null ? resource.ResolveProperty(property.NodeName, property.MainNamespace, errorStack) : collection.ResolveProperty(property.NodeName, property.MainNamespace, errorStack);
-                    if (errorStack.Count > 0)
-                    {
-                        errorOccurred = true;
+                    //Try to remove the specified property, gets an error message from the stack in case of problems.
+                    errorOccurred = resource?.RemoveProperty(property.NodeName, property.MainNamespace, errorStack) ?? collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack);
+                    if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
-                    }
-                    propstat.AddChild(tempResProp);
+                    else
+                        stat.Value = "HTTP/1.1 200 OK";
                 }
 
             }
             return errorOccurred;
         }
 
-        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
         {
-            throw new NotImplementedException();
+            CalendarResource resource = null;
+            CalendarCollection collection = null;
+            if (calendarResourceId != null)
+                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+            else
+                collection = db.GetCollection(userEmail, collectionName);
+
+            //For each property it is tried to remove, if not possible change the error occured to true and
+            //continue setting dependency error to the rest. 
+            var prop = setTree.GetChild("prop");
+            var errorStack = new Stack<string>();
+            foreach (var property in prop.Children)
+            {
+                var propstat = new XmlTreeStructure("propstat", "DAV:");
+                var stat = new XmlTreeStructure("stat", "DAV:");
+                var resProp = new XmlTreeStructure("prop", "DAV:");
+
+                propstat.AddChild(stat);
+                propstat.AddChild(resProp);
+                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
+
+                if (errorOccurred)
+                    stat.Value = "HTTP/1.1 424 Failed Dependency";
+
+                else
+                {
+                    //Try to modify the specified property if it exist, if not try to create it
+                    //gets an error message from the stack in case of problems.
+                    errorOccurred = resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.Value,errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.Value,errorStack);
+                    if (errorOccurred && errorStack.Count > 0)
+                        stat.Value = errorStack.Pop();
+                    else
+                        stat.Value = "HTTP/1.1 200 OK";
+                }
+
+            }
+            return errorOccurred;
         }
 
         #endregion
