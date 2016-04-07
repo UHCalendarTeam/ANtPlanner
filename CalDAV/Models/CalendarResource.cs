@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CalDAV.CALDAV_Properties.Interfaces;
 using CalDAV.Core;
@@ -16,19 +17,9 @@ namespace CalDAV.Models
         public int CalendarResourceId { get; set; }
 
         [Required]
-        public string FileName { get; set; }
+        public string Href { get; set; }
 
-        public string Getetag { get; set; }
-
-        //public string DtStart { get; set; }
-
-        /// <summary>
-        /// The endDateTime of the resource if defined.
-        /// Default value = DateTime.Max
-        /// </summary>
-        //public string DtEnd { get; set; }
-
-        //public string Recurrence { get; set; }
+        //public string Getetag { get; set; }
 
         public string Uid { get; set; }
 
@@ -44,6 +35,22 @@ namespace CalDAV.Models
         /// </summary>
         public CalendarCollection Collection { get; set; }
 
+        //public int CollectionId { get; set; }
+
+        public ICollection<ResourceProperty> Properties { get; set; }
+
+        //public string DtStart { get; set; }
+
+        /// <summary>
+        /// The endDateTime of the resource if defined.
+        /// Default value = DateTime.Max
+        /// </summary>
+        //public string DtEnd { get; set; }
+
+        //public string Recurrence { get; set; }
+
+
+
         /// <summary>
         /// The duration of the resource if defined
         /// Default value ="".
@@ -54,19 +61,19 @@ namespace CalDAV.Models
         /// Returns the datetime value of when was created the resource.
         /// </summary>
         //public string CreationDate { get; set; }
-        public string Creationdate { get; set; }
+        //public string Creationdate { get; set; }
 
-        public string Displayname { get; set; }
-        
-        public string Getcontentlength { get; set; }
+        //public string Displayname { get; set; }
 
-        public string Getlastmodified { get; set; }
+        //public string Getcontentlength { get; set; }
 
-        public string Getcontentlanguage { get; set; }
+        //public string Getlastmodified { get; set; }
 
-        //public string Lockdiscovery { get; set; }
+        //public string Getcontentlanguage { get; set; }
 
-        public string Supportedlock { get; set; }
+        ////public string Lockdiscovery { get; set; }
+
+        //public string Supportedlock { get; set; }
 
     }
 }

@@ -95,7 +95,7 @@ namespace CalDAV.Models
 
             return (
                 from resource in GetCollection(source, userEmail, collectionName).Calendarresources
-                where resource.FileName == calResource
+                where resource.Href == calResource
                 select resource
                 ).Any();
         }
@@ -112,7 +112,7 @@ namespace CalDAV.Models
         {
             return source.GetCollection(userEmail, collectionName)
                 .Calendarresources
-                .First(cr => cr.FileName == calResource);
+                .First(cr => cr.Href == calResource);
         }
 
         /// <param name="source"></param>

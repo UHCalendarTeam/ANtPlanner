@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
-using CalDAV.CALDAV_Properties.Interfaces;
-using CalDAV.Utils.XML_Processors;
-using TreeForXml;
 
 namespace CalDAV.Models
 {
@@ -13,6 +8,7 @@ namespace CalDAV.Models
     /// </summary>
     public class CalendarCollection
     {
+        [ScaffoldColumn(false)]
         public int CalendarCollectionId { get; set; }
 
         public string Name { get; set; }
@@ -24,21 +20,25 @@ namespace CalDAV.Models
 
         public User User { get; set; }
 
-        public string Displayname { get; set; }
-
-        public string Calendardescription { get; set; }
-
         public ICollection<CalendarResource> Calendarresources { get; set; }
 
-        public string Creationdate { get; set; }
+        public ICollection<CollectionProperty> Properties { get; set;} 
 
-        public string Getetag { get; set; }
+        //public string Displayname { get; set; }
 
-        public string Lockdiscovery { get; set; }
+        //public string Calendardescription { get; set; }
 
-        public string Resourcetype { get; set; }
 
-        public string Supportedlock { get; set; }
+
+        //public string Creationdate { get; set; }
+
+        //public string Getetag { get; set; }
+
+        //public string Lockdiscovery { get; set; }
+
+        //public string Resourcetype { get; set; }
+
+        //public string Supportedlock { get; set; }
 
 
     }
