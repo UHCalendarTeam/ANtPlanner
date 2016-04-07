@@ -109,19 +109,16 @@ namespace CalDAV.Core
 
 
             //Parse the iCalendar Object
-            //TODO: pa q estas construyendo esto??
+            //Construimos el objeto pa verificar que esta bien
             var iCalendar = VCalendar.Parse(bodyIcalendar);
             if (iCalendar == null)
                 return false;
 
-            //Write to Disk
-
-            using (var stream = new FileStream(CollectionPath + "\\" + objectResourceName + @".ics", FileMode.CreateNew))
+            //Write to Disk the toString of the object, so it splits the lines
+            //
+            using (StreamWriter writer = File.CreateText(CollectionPath + "\\" + objectResourceName + @".ics"))
             {
-                using (var writer = new StreamWriter(stream))
-                {
-                    writer.Write(bodyIcalendar);
-                }
+                writer.Write(iCalendar.ToString());
             }
             return true;
         }
