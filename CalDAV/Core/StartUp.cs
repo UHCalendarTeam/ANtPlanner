@@ -57,8 +57,20 @@ namespace CalDAV.Core
                 {
                     User = user,
                     Name = collectionName,
-                    Calendardescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
-                    Displayname = calDisplayName
+                    Properties = new List<CollectionProperty>()
+                    {
+                        new CollectionProperty()
+                        {
+                            Name = "calendar-description",
+                            Namespace = "C:",
+                            Value = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
+                            IsVisible = true,
+                            IsMutable = true,
+                            IsDestroyable = false
+                        }
+                    }
+                    //Calendardescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
+                    //Displayname = calDisplayName
                     
                     //TODO: take the other properties from the class that is gonna contain the 
                     //custom properties of the collections

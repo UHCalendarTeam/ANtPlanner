@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CalDAV.Models;
-using CalDAV.Utils.XML_Processors;
 using TreeForXml;
-using System.Reflection;
 
 namespace CalDAV.CALDAV_Properties
 {
@@ -16,79 +12,85 @@ namespace CalDAV.CALDAV_Properties
 
         /// <summary>
         /// Returns the value of a resource property given its name.
+        /// If error returns the property without value and puts the error in the
+        /// error stack.
         /// </summary>
         /// <param name="resource"></param>
         /// <param name="propertyName"></param>
+        /// <param name="mainNs"></param>
+        /// <param name="errorStack"></param>
         /// <returns></returns>
-        public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNS = "DAV:")
+        public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNs, Stack<string> errorStack)
         {
             //First I look to see if is one of the static ones.
-            if (XmlGeneralProperties.ContainsKey(propertyName))
-            {
-                var svalue = XmlGeneralProperties[propertyName];
-                var sprop = new XmlTreeStructure(propertyName, svalue.Value);
-                sprop.AddValue(svalue.Key);
-                return sprop;
-            }
+            //if (XmlGeneralProperties.ContainsKey(propertyName))
+            //{
+            //    var svalue = XmlGeneralProperties[propertyName];
+            //    var sprop = new XmlTreeStructure(propertyName, svalue.Value);
+            //    sprop.AddValue(svalue.Key);
+            //    return sprop;
+            //}
 
             ////this must be fixed later because not all properties are of type string.
-            var realPropName = propertyName.ToLower();
-            realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
-            realPropName = realPropName.Replace("-", "");
-            string value;
-            try
-            {
-                value = (string)resource.GetType().GetProperty(realPropName).GetValue(resource);
-            }
-            catch (Exception)
-            {
-                value = null;
-            }
+            //var realPropName = propertyName.ToLower();
+            //realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
+            //realPropName = realPropName.Replace("-", "");
+            //string value;
+            //try
+            //{
+            //    value = (string)resource.GetType().GetProperty(realPropName).GetValue(resource);
+            //}
+            //catch (Exception)
+            //{
+            //    value = null;
+            //}
 
-            XmlTreeStructure prop;
-            try
+            //XmlTreeStructure prop;
+            //try
+            //{
+            //    if (value != null)
+            //        prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
+            //    else
+            //        prop = new XmlTreeStructure(propertyName, mainNS);
+            //}
+            //catch (Exception)
+            //{
+            //    prop = null;
+            //    throw new Exception("The Property Value Could Not Be Parsed");
+            //}
+            var property = resource.Properties.SingleOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
+            IXMLTreeStructure prop;
+            if (property != null)
+                prop = property.Value == null
+                    ? new XmlTreeStructure(propertyName, mainNs)
+                    : XmlTreeStructure.Parse(property.Value);
+            else
             {
-                if (value != null)
-                    prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
-                else
-                    prop = new XmlTreeStructure(propertyName, mainNS);
+                prop = new XmlTreeStructure(propertyName, mainNs);
             }
-            catch (Exception)
-            {
-                prop = null;
-                throw new Exception("The Property Value Could Not Be Parsed");
-            }
-
-
-            return prop;
+            //var prop = new XmlTreeStructure(propertyName, mainNS);
+            //prop.Value = property?.Value;
+            return (XmlTreeStructure)prop;
         }
 
         /// <summary>
         /// Contains all the properties that are common for all Calendar Collection Resources.
         /// </summary>
-        private static Dictionary<string, KeyValuePair<string, string>> XmlGeneralProperties = new Dictionary<string, KeyValuePair<string,string>>()
-        {
-            {"resourcetype", new KeyValuePair<string, string>("", DavNs)},
-            {"getcontenttype", new KeyValuePair<string, string>("text/icalendar", DavNs)}
-        };
-
-        private static List<string> VisibleGeneralProperties = new List<string>()
-        {
-            "getetag", "displayname", "creationdate", "getcontentlength", "getcontenttype", "getlastmodified", "resourcetype"
-        };
-
         /// <summary>
         /// Returns all the properties of a resource that must be returned for
         /// an "allprop" property method of Propfind. 
         /// </summary>
-        /// <param name="collection"></param>
+        /// <param name="calendarResource"></param>
+        /// <param name="errorStack"></param>
         /// <returns></returns>
-        public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarResource calendarResource)
+        public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarResource calendarResource, Stack<string> errorStack )
         {
             List<XmlTreeStructure> list = new List<XmlTreeStructure>();
-            foreach (var property in VisibleGeneralProperties)
+            foreach (var property in calendarResource.Properties.Where(prop => prop.IsVisible))
             {
-                list.Add(ResolveProperty(calendarResource, property));
+                var tempTree = property.Value == null ? new XmlTreeStructure(property.Name, property.Namespace) : XmlTreeStructure.Parse(property.Value);
+
+                list.Add((XmlTreeStructure)tempTree);
             }
             return list;
         }
@@ -100,41 +102,38 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
-            var list = new List<XmlTreeStructure>();
-
-            foreach (var property in XmlGeneralProperties)
-            {
-                list.Add(new XmlTreeStructure(property.Key, property.Value.Value));
-            }
+            //foreach (var property in XmlGeneralProperties)
+            //{
+            //    list.Add(new XmlTreeStructure(property.Key, property.Value.Value));
+            //}
 
             //TODO: annadir el ns a los de abajo
             //Display Name
-            var displayName = new XmlTreeStructure("displayname", DavNs);
-            list.Add(displayName);
+            //var displayName = new XmlTreeStructure("displayname", DavNs);
+            //list.Add(displayName);
 
-            //creation date
-            var creationDate = new XmlTreeStructure("creationdate", DavNs);
-            list.Add(creationDate);
+            ////creation date
+            //var creationDate = new XmlTreeStructure("creationdate", DavNs);
+            //list.Add(creationDate);
 
-            //getcontent length
-            var getcontentlegth = new XmlTreeStructure("getcontentlenght", DavNs);
-            list.Add(getcontentlegth);
+            ////getcontent length
+            //var getcontentlegth = new XmlTreeStructure("getcontentlenght", DavNs);
+            //list.Add(getcontentlegth);
 
-            //getetag
-            var getEtag = new XmlTreeStructure("getetag", DavNs);
-            list.Add(getEtag);
+            ////getetag
+            //var getEtag = new XmlTreeStructure("getetag", DavNs);
+            //list.Add(getEtag);
 
-            //getLastModified
-            var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
-            list.Add(getLastModified);
+            ////getLastModified
+            //var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
+            //list.Add(getLastModified);
 
-            //getContentLanguage
-            var getContentLanguage = new XmlTreeStructure("getcontentlanguage", DavNs);
-            list.Add(getContentLanguage);
+            ////getContentLanguage
+            //var getContentLanguage = new XmlTreeStructure("getcontentlanguage", DavNs);
+            //list.Add(getContentLanguage);
 
             //supported lock
-
-            return list;
+            return calendarResource.Properties.Select(property => (XmlTreeStructure)XmlTreeStructure.Parse(property.Value)).ToList();
         }
     }
 }

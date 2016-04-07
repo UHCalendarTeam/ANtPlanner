@@ -230,6 +230,9 @@ namespace CalDAV.Core
             //The changes will not be stored in db thanks to a rollback.
             using (db.Database.BeginTransaction())
             {
+                //For each set and remove try to execute the operation if something fails 
+                //put the Failed Dependency Error to every property before and after the error
+                //even if the operation for the property was succesfully changed.
                 foreach (var setOrRemove in setsAndRemoves)
                 {
                     if (setOrRemove.NodeName == "set")
@@ -239,15 +242,22 @@ namespace CalDAV.Core
                 }
 
                 if (hasError)
+                {
+                    ChangeToDependencyError(response);
                     db.Database.RollbackTransaction();
+                }
+
             }
-
-
 
             return multistatus.ToString();
         }
 
-        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
+        private void ChangeToDependencyError(XmlTreeStructure response)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
@@ -256,12 +266,16 @@ namespace CalDAV.Core
             else
                 collection = db.GetCollection(userEmail, collectionName);
 
-            var prop = remove.GetChild("prop");
+            //For each property it is tried to remove, if not possible change the error occured to true and
+            //continue setting dependency error to the rest. 
+            var prop = removeTree.GetChild("prop");
+            var errorStack = new Stack<string>();
             foreach (var property in prop.Children)
             {
-                XmlTreeStructure propstat = new XmlTreeStructure("propstat", "DAV:");
-                XmlTreeStructure stat = new XmlTreeStructure("stat", "DAV:");
-                XmlTreeStructure resProp = new XmlTreeStructure("prop", "DAV:");
+                var propstat = new XmlTreeStructure("propstat", "DAV:");
+                var stat = new XmlTreeStructure("stat", "DAV:");
+                var resProp = new XmlTreeStructure("prop", "DAV:");
+                XmlTreeStructure tempResProp;
                 propstat.AddChild(stat);
                 propstat.AddChild(resProp);
 
@@ -269,16 +283,21 @@ namespace CalDAV.Core
                 {
                     stat.Value = "HTTP/1.1 424 Failed Dependency";
                     resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
-                }else if (resource == null)
-                {
-                    //if ()
-                    //{
-                        
-                    //}
                 }
-                
+                else
+                {
+                    //I try to get that 
+                    tempResProp = resource != null ? resource.ResolveProperty(property.NodeName, property.MainNamespace, errorStack) : collection.ResolveProperty(property.NodeName, property.MainNamespace, errorStack);
+                    if (errorStack.Count > 0)
+                    {
+                        errorOccurred = true;
+                        stat.Value = errorStack.Pop();
+                    }
+                    propstat.AddChild(tempResProp);
+                }
+
             }
-            throw new NotImplementedException();
+            return errorOccurred;
         }
 
         private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
@@ -301,7 +320,7 @@ namespace CalDAV.Core
 
             var resource =
                 db.GetCollection(userEmail, collectionName)
-                    .Calendarresources.First(x => x.FileName == calendarResourceId);
+                    .Calendarresources.First(x => x.Href == calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
 
@@ -334,7 +353,7 @@ namespace CalDAV.Core
             //Must return the Etag header of the COR
 
             var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-            etag = calendarRes.Getetag;
+            etag = calendarRes.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
             return StorageManagement.GetCalendarObjectResource(calendarResourceId);
         }
@@ -563,8 +582,10 @@ namespace CalDAV.Core
             var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
             var prevResource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             int prevEtag;
-            int actualEtag;
-            var tempEtag = prevResource.Getetag;
+            int actualEtag = 0;
+            string tempEtag = "0";
+            //TODO: Este metodo tiene que ser revisado por completo
+            //var tempEtag = prevResource.Getetag;
 
             //TODO: esto siempre va a fallar pues los eTags no son int
             if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
@@ -635,8 +656,8 @@ namespace CalDAV.Core
 
             //TODO: Take the resource Etag if the client send it if not assign one
             if (etag != null)
-                resource.Getetag = etag;
-            retEtag = resource.Getetag;
+                resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value = etag;
+            retEtag = resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
             resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
@@ -665,7 +686,7 @@ namespace CalDAV.Core
                 resource.Uid = ((IValue<string>)property).Value;
             }
 
-            resource.FileName = calendarResourceId;
+            resource.Href = calendarResourceId;
 
             resource.UserId = resource.User.UserId;
 
