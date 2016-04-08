@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace CalDAV.Models
+namespace DataEntityModels
 {
     /// <summary>
     /// To store the data related to the calendar collections of the user.

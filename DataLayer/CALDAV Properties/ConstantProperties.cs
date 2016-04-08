@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CalDAV.CALDAV_Properties
+namespace DataLayer
 {
     /// <summary>
     /// Class to declate the different constant values of the CAlDav server.

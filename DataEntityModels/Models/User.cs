@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace CalDAV.Models
+namespace DataEntityModels
 {
     public class User
     {

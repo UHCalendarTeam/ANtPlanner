@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CalDAV.Core
+namespace DataLayer
 {
     /// <summary>
     /// Define the methods that should be use for the initial configuration of new users and collection.

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using CalDAV.Models;
 using TreeForXml;
 
-namespace CalDAV.CALDAV_Properties
+namespace DataLayer
 {
     public static class ResourcePropertyMethods
     {

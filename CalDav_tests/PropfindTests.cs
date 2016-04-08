@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CalDAV.CALDAV_Properties;
 using CalDAV.Core;
 using CalDAV.Core.Propfind;
-using CalDAV.Models;
+using DataLayer;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;

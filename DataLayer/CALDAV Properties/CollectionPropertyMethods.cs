@@ -4,13 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using CalDAV.XML_Processors;
-using CalDAV.Models;
-using CalDAV.Utils.XML_Processors;
 using TreeForXml;
 using System.Reflection;
 
-namespace CalDAV.CALDAV_Properties
+namespace DataLayer
 {
     public static class CollectionPropertyMethods
     {

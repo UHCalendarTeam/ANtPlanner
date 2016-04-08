@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalDAV.Core.Method_Extensions;
 using ICalendar.Calendar;
-using Microsoft.Data.Entity.Metadata.Internal;
+using DataLayer;
 using TreeForXml;
 
 namespace CalDAV.Core

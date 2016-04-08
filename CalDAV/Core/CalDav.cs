@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CalDAV.CALDAV_Properties;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
-using CalDAV.Models;
+using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;

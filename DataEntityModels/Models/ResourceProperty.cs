@@ -4,16 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CalDAV.Models
+namespace DataEntityModels
 {
-    public class CollectionProperty
+    public class ResourceProperty
     {
         [ScaffoldColumn(false)]
-        public int CollectionPropertyId { get; set; }
+        public int ResourcePropertyId { get; set; }
+        public CalendarResource Resource { get; set; }
 
-        public CalendarCollection Collection { get; set; }
-
-        public int CollectionId { get; set; }
+        public int ResourceId { get; set; }
 
         [Required]
         public string Name { get; set; }

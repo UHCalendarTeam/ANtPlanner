@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Utils.XML_Processors;
 using TreeForXml;
 
-namespace CalDAV.CALDAV_Properties.Interfaces
+namespace DataLayer
 {
     public interface IDavProperties
     {

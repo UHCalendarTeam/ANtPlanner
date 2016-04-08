@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace CalDAV.Models
+namespace DataLayer
 {
     /// <summary>
     ///     This class contains method extension for the CaldavContext.

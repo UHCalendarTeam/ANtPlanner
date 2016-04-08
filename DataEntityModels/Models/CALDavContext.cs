@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 
-namespace CalDAV.Models
+namespace DataEntityModels
 {
     public class CalDavContext : DbContext
     {

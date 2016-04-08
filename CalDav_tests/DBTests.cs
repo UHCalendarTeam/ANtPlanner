@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Models;
+using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using Microsoft.Data.Entity;
 using TreeForXml;

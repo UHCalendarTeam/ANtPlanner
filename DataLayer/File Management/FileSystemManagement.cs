@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using ICalendar.Calendar;
 
-namespace CalDAV.Core
+namespace DataLayer
 {
     public class FileSystemManagement : IFileSystemManagement
     {

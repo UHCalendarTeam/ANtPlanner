@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using CalDAV.CALDAV_Properties.Interfaces;
-using CalDAV.Core;
-using CalDAV.Utils.XML_Processors;
+using DataLayer;
 using TreeForXml;
 
-namespace CalDAV.Models
+namespace DataLayer
 {
     /// <summary>
     /// to store the main properties of a cal resource.

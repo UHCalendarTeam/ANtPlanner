@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Models;
 
 
-namespace CalDAV.Core
+namespace DataLayer
 {
     /// <summary>
     /// Contains the logic for the creation of new clients of the system.
