@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using CalDAV.Models;
 using TreeForXml;
 
@@ -23,42 +24,6 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName, string mainNs, Stack<string> errorStack)
         {
-            //First I look to see if is one of the static ones.
-            //if (XmlGeneralProperties.ContainsKey(propertyName))
-            //{
-            //    var svalue = XmlGeneralProperties[propertyName];
-            //    var sprop = new XmlTreeStructure(propertyName, svalue.Value);
-            //    sprop.AddValue(svalue.Key);
-            //    return sprop;
-            //}
-
-            ////this must be fixed later because not all properties are of type string.
-            //var realPropName = propertyName.ToLower();
-            //realPropName = realPropName[0].ToString().ToUpper() + realPropName.Substring(1);
-            //realPropName = realPropName.Replace("-", "");
-            //string value;
-            //try
-            //{
-            //    value = (string)resource.GetType().GetProperty(realPropName).GetValue(resource);
-            //}
-            //catch (Exception)
-            //{
-            //    value = null;
-            //}
-
-            //XmlTreeStructure prop;
-            //try
-            //{
-            //    if (value != null)
-            //        prop = (XmlTreeStructure)XmlTreeStructure.Parse(value);
-            //    else
-            //        prop = new XmlTreeStructure(propertyName, mainNS);
-            //}
-            //catch (Exception)
-            //{
-            //    prop = null;
-            //    throw new Exception("The Property Value Could Not Be Parsed");
-            //}
             var property = resource.Properties.SingleOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
             IXMLTreeStructure prop;
             if (property != null)
@@ -69,8 +34,7 @@ namespace CalDAV.CALDAV_Properties
             {
                 prop = new XmlTreeStructure(propertyName, mainNs);
             }
-            //var prop = new XmlTreeStructure(propertyName, mainNS);
-            //prop.Value = property?.Value;
+          
             return (XmlTreeStructure)prop;
         }
 
@@ -103,37 +67,6 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
-            //foreach (var property in XmlGeneralProperties)
-            //{
-            //    list.Add(new XmlTreeStructure(property.Key, property.Value.Value));
-            //}
-
-            //TODO: annadir el ns a los de abajo
-            //Display Name
-            //var displayName = new XmlTreeStructure("displayname", DavNs);
-            //list.Add(displayName);
-
-            ////creation date
-            //var creationDate = new XmlTreeStructure("creationdate", DavNs);
-            //list.Add(creationDate);
-
-            ////getcontent length
-            //var getcontentlegth = new XmlTreeStructure("getcontentlenght", DavNs);
-            //list.Add(getcontentlegth);
-
-            ////getetag
-            //var getEtag = new XmlTreeStructure("getetag", DavNs);
-            //list.Add(getEtag);
-
-            ////getLastModified
-            //var getLastModified = new XmlTreeStructure("getlastmodified", DavNs);
-            //list.Add(getLastModified);
-
-            ////getContentLanguage
-            //var getContentLanguage = new XmlTreeStructure("getcontentlanguage", DavNs);
-            //list.Add(getContentLanguage);
-
-            //supported lock
             return calendarResource.Properties.Select(property => (XmlTreeStructure)XmlTreeStructure.Parse(property.Value)).ToList();
         }
 
@@ -147,7 +80,22 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static bool RemoveProperty(this CalendarResource resource, string propertyName, string propertyNamespace, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            //try to gets the property for check if exists
+            var property = resource.Properties.SingleOrDefault(x => x.Name == propertyName && x.Namespace == propertyNamespace);
+            //if it does not exist then the method success!!
+            if (property == null)
+            {
+                return true;
+            }
+            //If the property is not allowed to be destroyed it should return and error.
+            if (!property.IsDestroyable)
+            {
+                errorStack.Push(HttpStatusCode.Forbidden.ToString());
+                return false;
+            }
+            //If there are not problems and the property exists it should be deleted.
+            resource.Properties.Remove(property);
+            return true;
         }
 
         /// <summary>
@@ -162,7 +110,31 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static bool CreateOrModifyProperty(this CalendarResource resource, string propertyName, string nameSpace, string propertyValue, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            //get the property
+            var property =
+                resource.Properties
+                    .SingleOrDefault(prop => prop.Name == propertyName && prop.Namespace == nameSpace);
+            //if the property did not exist it is created.
+            if (property == null)
+            {
+                resource.Properties.Add(new ResourceProperty
+                {
+                    Name = propertyName,
+                    Namespace = nameSpace,
+                    IsDestroyable = true,
+                    IsVisible = false,
+                    IsMutable = true,
+                    Value = XmlTreeStructure.Parse(propertyValue).ToString()
+                });
+                return true;
+            }
+            //if this property belongs to the fix system properties, it can not be changed.
+            if (!property.IsMutable)
+                return false;
+
+            //if all previous conditions don't pass then the value of the property is changed.
+            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            return true;
         }
 
     }

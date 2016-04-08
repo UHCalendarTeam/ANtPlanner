@@ -254,7 +254,21 @@ namespace CalDAV.Core
 
         private void ChangeToDependencyError(XmlTreeStructure response)
         {
-            throw new NotImplementedException();
+            //this method is the one in charge of fix the status messages 
+            //of all the properties that were fine before the error.
+            foreach (var child in response.Children)
+            {
+                if (child.NodeName != "propstat")
+                    continue;
+
+                var status = child.GetChild("status");
+                var statMessage = status.Value;
+                //if the message is not OK means that we reach
+                //the error and no more further message changing is needed.
+                if (statMessage != "HTTP/1.1 200 OK")
+                    return;
+                ((XmlTreeStructure) status).Value = "HTTP/1.1 424 Failed Dependency";
+            }
         }
 
         private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
@@ -285,8 +299,8 @@ namespace CalDAV.Core
                 //If an error occurred previously the stat if 424 Failed Dependency.
                 if (errorOccurred)
                     stat.Value = "HTTP/1.1 424 Failed Dependency";
-                    
-                
+
+
                 else
                 {
                     //Try to remove the specified property, gets an error message from the stack in case of problems.
@@ -294,7 +308,12 @@ namespace CalDAV.Core
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
+                    {
                         stat.Value = "HTTP/1.1 200 OK";
+                        db.SaveChanges();
+                    }
+
+
                 }
 
             }
@@ -331,11 +350,15 @@ namespace CalDAV.Core
                 {
                     //Try to modify the specified property if it exist, if not try to create it
                     //gets an error message from the stack in case of problems.
-                    errorOccurred = resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.Value,errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.Value,errorStack);
+                    errorOccurred = resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack);
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
+                    {
                         stat.Value = "HTTP/1.1 200 OK";
+                        db.SaveChanges();
+                    }
+
                 }
 
             }

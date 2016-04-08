@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using CalDAV.XML_Processors;
 using CalDAV.Models;
@@ -85,7 +86,18 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static bool RemoveProperty(this CalendarCollection collection, string propertyName, string nameSpace, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            var property = collection.Properties.SingleOrDefault(x => x.Name == propertyName && x.Namespace == nameSpace);
+            if (property==null)
+            {
+                return true;
+            }
+            if(!property.IsDestroyable)
+            {
+                errorStack.Push(HttpStatusCode.Forbidden.ToString());
+                return false;
+            }
+            collection.Properties.Remove(property);
+            return true;
         }
        
 
@@ -101,7 +113,24 @@ namespace CalDAV.CALDAV_Properties
         /// <returns></returns>
         public static bool CreateOrModifyProperty(this CalendarCollection collection, string propertyName, string nameSpace, string propertyValue, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            //get the property
+            var property =
+                collection.Properties
+                    .SingleOrDefault(prop => prop.Name == propertyName && prop.Namespace == nameSpace);
+            //if the property did not exist it is created.
+            if (property == null)
+            {
+                collection.Properties.Add(new CollectionProperty() {Name = propertyName, Namespace = nameSpace,
+                    IsDestroyable = true, IsVisible = false, IsMutable = true, Value = XmlTreeStructure.Parse(propertyValue).ToString()});
+                return true;
+            }
+            //if this property belongs to the fix system properties, it can not be changed.
+            if (!property.IsMutable)
+                return false;
+
+            //if all previous conditions don't pass then the value of the property is changed.
+            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            return true;
         }
     }
 }
