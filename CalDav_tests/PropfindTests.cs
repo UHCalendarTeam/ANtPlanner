@@ -13,7 +13,7 @@ namespace CalDav_tests
     public class PropfindTests
     {
         //xmlns:C=\"urn:ietf:params:xml:ns:caldav\"
-        private Dictionary<string, string> Namespaces = new Dictionary<string, string> { { "D", @"xmlns:D=""DAV:""" }, { "C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav\""" } };
+        private Dictionary<string, string> Namespaces = new Dictionary<string, string> { { "D", @"xmlns:D=""DAV:""" }, { "C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav""" } };
         private Dictionary<string,string> NamespacesSimple = new Dictionary<string, string> { { "D", "DAV:"}, { "C", "urn:ietf:params:xml:ns:caldav" } }; 
 
 

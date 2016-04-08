@@ -42,7 +42,7 @@ namespace CalDav_Services
             services.AddEntityFramework()
                .AddSqlServer()
                .AddDbContext<CalDavContext>(options =>
-                   options.UseSqlServer(connection).MigrationsAssembly("CalDAV"));
+                   options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
 
             services.AddMvc();
 

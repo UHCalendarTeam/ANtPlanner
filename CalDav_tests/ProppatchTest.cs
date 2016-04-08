@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using CalDAV.Core;
 using Microsoft.Data.Entity;
 using TreeForXml;
@@ -12,7 +13,7 @@ namespace CalDav_tests
 {
     public class ProppatchTest
     {
-        private Dictionary<string, string> Namespaces = new Dictionary<string, string> { { "D", @"xmlns:D=""DAV:""" }, { "C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav\""" } };
+        private Dictionary<string, string> Namespaces = new Dictionary<string, string> { { "D", @"xmlns:D=""DAV:""" }, { "C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav""" } };
         private Dictionary<string, string> NamespacesSimple = new Dictionary<string, string> { { "D", "DAV:" }, { "C", "urn:ietf:params:xml:ns:caldav" } };
 
         private CalDavContext MockDatabase()
@@ -281,20 +282,21 @@ namespace CalDav_tests
             var db = MockDatabase();
             var fs = new FileSystemManagement();
 
-            XmlTreeStructure response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
-
             var caldav = new CalDav(fs, db);
-
-            var request = XmlTreeStructure.Parse(
-                $@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
-    <set>
-        <prop><C:calendar-description>void description</C:calendar-description></prop>
-    </set>
+            var propertiesAndHeaders = new Dictionary<string,string> { {"userEmail", "foo@gmail.com" } , {"collectionName" ,"Foocollection" }  };
+            var body = XDocument.Parse($@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
+  <set>
+    <prop>
+      <C:calendar-description>void description</C:calendar-description>
+    </prop>
+  </set>
 </propertyupdate>");
 
-            //caldav.PropPatch()
+            var request = XmlTreeStructure.Parse(body.ToString());
+
+            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+
+            Assert.Equal(response, "");
         }
 
         [Fact]
