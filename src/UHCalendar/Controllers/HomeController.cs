@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using CalDAV.Models;
+using DataLayer;
 
 namespace UHCalendar.Controllers
 {

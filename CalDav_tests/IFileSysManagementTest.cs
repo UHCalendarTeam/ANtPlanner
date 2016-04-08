@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Core;
 using Xunit;
+using DataLayer;
 
 namespace CalDav_tests
 {

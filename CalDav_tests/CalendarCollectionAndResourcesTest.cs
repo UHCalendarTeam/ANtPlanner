@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.CALDAV_Properties;
-using CalDAV.Models;
+using DataLayer;
+
 using Xunit;
 
 namespace CalDav_tests
@@ -22,14 +22,15 @@ namespace CalDav_tests
             };
             CalendarCollection colecction = new CalendarCollection()
             {
-                Calendarresources = new List<CalendarResource>(),
-                Resourcetype = "",
-                User = user,
-                Getetag = "0",
-                Displayname = "collection",
-                Calendardescription = "empty",
-                Creationdate = DateTime.Now.ToString(),
-                Name = "collection",
+                //TODO: Ver estos tests
+                //Calendarresources = new List<CalendarResource>(),
+                //Resourcetype = "",
+                //User = user,
+                //Getetag = "0",
+                //Displayname = "collection",
+                //Calendardescription = "empty",
+                //Creationdate = DateTime.Now.ToString(),
+                //Name = "collection",
 
             };
 

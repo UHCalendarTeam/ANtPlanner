@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDAV.Models;
+using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using Microsoft.Data.Entity;
 using TreeForXml;
@@ -39,11 +39,32 @@ namespace CalDav_tests
                     //TODO: Adriano ver esto
                     //DtStart = DateTime.Now,
                     //DtEnd = DateTime.Now,
-                    FileName = "test.ics",
+                    Href = "test.ics",
                     //Recurrence = "test",
                     User = user,
-                    Getetag = "12345",
-                    Creationdate = DateTime.Now.ToString(),
+                    Properties = new List<ResourceProperty>()
+                    {
+                        new ResourceProperty()
+                        {
+                            Name = "getetag",
+                            Namespace = "DAV:",
+                            Value = "12345",
+                            IsVisible = true,
+                            IsMutable = true,
+                            IsDestroyable = false
+                        },
+                        new ResourceProperty()
+                        {
+                            Namespace = "DAV:",
+                            Name = "creationdate",
+                            Value = DateTime.Now.ToString(),
+                            IsVisible = true,
+                            IsMutable = true,
+                            IsDestroyable = false
+                        }
+                    }
+                
+                    //Creationdate = DateTime.Now.ToString(),
 
 
                 }
@@ -52,7 +73,7 @@ namespace CalDav_tests
             {
                 new CalendarCollection()
                 {
-                    Calendardescription = "Foo description",
+                    //Calendardescription = "Foo description",
                     Name = "Foo collection",
                     User = user,
                     Calendarresources = resources/*,
@@ -61,8 +82,29 @@ namespace CalDav_tests
 
                     //TODO: Adriano ver esto ahora es xml hecho string
                     //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
-                    Displayname = "Display name",
-                    Url = "url"
+                    //Displayname = "Display name",
+                    Url = "url",
+                    Properties = new List<CollectionProperty>()
+                    {
+                        new CollectionProperty()
+                        {
+                            Name = "calendar-description",
+                            Namespace = @"xmlns:C=""urn:ietf:params:xml:ns:caldav""",
+                            Value = "Foo description",
+                            IsVisible = true,
+                            IsMutable = true,
+                            IsDestroyable = false
+                        },
+                        new CollectionProperty()
+                        {
+                           Name = "displayname",
+                            Namespace ="DAV:",
+                            Value = "Foo",
+                            IsVisible = true,
+                            IsMutable = true,
+                            IsDestroyable = false
+                        }
+                    }
                     
                 }
             };

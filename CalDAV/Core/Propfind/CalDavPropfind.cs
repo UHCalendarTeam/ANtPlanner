@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using CalDAV.CALDAV_Properties;
-using CalDAV.Models;
+using DataLayer;
 using TreeForXml;
 
 namespace CalDAV.Core.Propfind
@@ -30,7 +29,7 @@ namespace CalDAV.Core.Propfind
             db = context;
         }
 
-        
+
         public void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree)
         {
             //error flag
@@ -54,13 +53,13 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-                  
+
                 collection = db.GetCollection(userEmail, collectionName);
-               
+
                 foreach (var calendarResource in collection.Calendarresources)
                 {
                     //For every resource in the collection it is added a new xml "response"
-                    var resourceResponse = AllPropFillTree(userEmail, collectionName, calendarResource.FileName, aditionalProperties);
+                    var resourceResponse = AllPropFillTree(userEmail, collectionName, calendarResource.Href, aditionalProperties);
                     multistatusTree.AddChild(resourceResponse);
 
                     //error check
@@ -106,12 +105,12 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-               
+
                 collection = db.GetCollection(userEmail, collectionName);
-            
+
                 foreach (var calendarResource in collection.Calendarresources)
                 {
-                    var resourceResponse = PropFillTree(userEmail, collectionName, calendarResource.FileName, propertiesReq);
+                    var resourceResponse = PropFillTree(userEmail, collectionName, calendarResource.Href, propertiesReq);
                     multistatusTree.AddChild(resourceResponse);
 
                     //error check
@@ -147,12 +146,12 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
                 CalendarCollection collection;
-                
+
                 collection = db.GetCollection(userEmail, collectionName);
-              
+
                 foreach (var calendarResource in collection.Calendarresources)
                 {
-                    var resourceResponse = PropNameFillTree(userEmail, collectionName, calendarResource.FileName);
+                    var resourceResponse = PropNameFillTree(userEmail, collectionName, calendarResource.Href);
                     multistatusTree.AddChild(resourceResponse);
                 }
             }
@@ -206,7 +205,7 @@ namespace CalDAV.Core.Propfind
             CalendarCollection collection;
             CalendarResource resource;
             List<XmlTreeStructure> properties;
-           
+
             //Depending if the target is a collection or a resource this section
             //will find the object in the database and get from there all names of properties.
             if (calendarResourceId == null)
@@ -267,30 +266,30 @@ namespace CalDAV.Core.Propfind
             #region Selecting properties
 
             var propertiesCol = new List<XmlTreeStructure>();
-            List<XmlTreeStructure> propertiesOk;
+            var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
-            
+            var errorStack = new Stack<string>();
             if (calendarResourceId == null)
             {
                 var collection = db.GetCollection(userEmail, collectionName);
-                propertiesOk = collection.GetAllVisibleProperties();
+                propertiesCol = collection.GetAllVisibleProperties(errorStack);
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
                     {
-                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value));
+                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value, errorStack));
                     }
             }
             else
             {
                 var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                propertiesOk = resource.GetAllVisibleProperties();
+                propertiesCol = resource.GetAllVisibleProperties(errorStack);
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
                     {
-                        propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV:"));
+                        propertiesCol.Add(resource.ResolveProperty(property.Key, property.Value, errorStack));
                     }
             }
-            
+
             //Here there are divided all properties between recovered and error recovering
             foreach (var propTree in propertiesCol)
             {
@@ -390,17 +389,17 @@ namespace CalDAV.Core.Propfind
             #region Selecting properties
             CalendarCollection collection;
             CalendarResource resource;
-            List<XmlTreeStructure> propertiesCol = new List<XmlTreeStructure>();
-            List<XmlTreeStructure> propertiesOk = new List<XmlTreeStructure>();
-            List<XmlTreeStructure> propertiesWrong = new List<XmlTreeStructure>();
-            
+            var propertiesCol = new List<XmlTreeStructure>();
+            var propertiesOk = new List<XmlTreeStructure>();
+            var propertiesWrong = new List<XmlTreeStructure>();
+            var errorStack = new Stack<string>();
             if (calendarResourceId == null)
             {
                 collection = db.GetCollection(userEmail, collectionName);
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {
-                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value));
+                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value, errorStack));
                     }
             }
             else
@@ -409,7 +408,7 @@ namespace CalDAV.Core.Propfind
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {
-                        propertiesCol.Add(resource.ResolveProperty(property.Key, "DAV:"));
+                        propertiesCol.Add(resource.ResolveProperty(property.Key, property.Value, errorStack));
                     }
             }
 

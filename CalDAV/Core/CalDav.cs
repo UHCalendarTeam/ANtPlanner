@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CalDAV.CALDAV_Properties;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
-using CalDAV.Models;
+using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
@@ -230,6 +229,9 @@ namespace CalDAV.Core
             //The changes will not be stored in db thanks to a rollback.
             using (db.Database.BeginTransaction())
             {
+                //For each set and remove try to execute the operation if something fails 
+                //put the Failed Dependency Error to every property before and after the error
+                //even if the operation for the property was succesfully changed.
                 foreach (var setOrRemove in setsAndRemoves)
                 {
                     if (setOrRemove.NodeName == "set")
@@ -239,15 +241,36 @@ namespace CalDAV.Core
                 }
 
                 if (hasError)
+                {
+                    ChangeToDependencyError(response);
                     db.Database.RollbackTransaction();
+                }
+
             }
-
-
 
             return multistatus.ToString();
         }
 
-        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
+        private void ChangeToDependencyError(XmlTreeStructure response)
+        {
+            //this method is the one in charge of fix the status messages 
+            //of all the properties that were fine before the error.
+            foreach (var child in response.Children)
+            {
+                if (child.NodeName != "propstat")
+                    continue;
+
+                var status = child.GetChild("status");
+                var statMessage = status.Value;
+                //if the message is not OK means that we reach
+                //the error and no more further message changing is needed.
+                if (statMessage != "HTTP/1.1 200 OK")
+                    return;
+                ((XmlTreeStructure) status).Value = "HTTP/1.1 424 Failed Dependency";
+            }
+        }
+
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
@@ -256,34 +279,89 @@ namespace CalDAV.Core
             else
                 collection = db.GetCollection(userEmail, collectionName);
 
-            var prop = remove.GetChild("prop");
+            //For each property it is tried to remove, if not possible change the error occured to true and
+            //continue setting dependency error to the rest. 
+            var prop = removeTree.GetChild("prop");
+            var errorStack = new Stack<string>();
             foreach (var property in prop.Children)
             {
-                XmlTreeStructure propstat = new XmlTreeStructure("propstat", "DAV:");
-                XmlTreeStructure stat = new XmlTreeStructure("stat", "DAV:");
-                XmlTreeStructure resProp = new XmlTreeStructure("prop", "DAV:");
+                //The structure for the response does not change.
+                //It is constructed with a propstat and the value is never showed in the prop element.
+                var propstat = new XmlTreeStructure("propstat", "DAV:");
+                var stat = new XmlTreeStructure("stat", "DAV:");
+                var resProp = new XmlTreeStructure("prop", "DAV:");
+
                 propstat.AddChild(stat);
                 propstat.AddChild(resProp);
+                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
 
+                //If an error occurred previously the stat if 424 Failed Dependency.
                 if (errorOccurred)
-                {
                     stat.Value = "HTTP/1.1 424 Failed Dependency";
-                    resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
-                }else if (resource == null)
+
+
+                else
                 {
-                    //if ()
-                    //{
-                        
-                    //}
+                    //Try to remove the specified property, gets an error message from the stack in case of problems.
+                    errorOccurred = resource?.RemoveProperty(property.NodeName, property.MainNamespace, errorStack) ?? collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack);
+                    if (errorOccurred && errorStack.Count > 0)
+                        stat.Value = errorStack.Pop();
+                    else
+                    {
+                        stat.Value = "HTTP/1.1 200 OK";
+                        db.SaveChanges();
+                    }
+
+
                 }
-                
+
             }
-            throw new NotImplementedException();
+            return errorOccurred;
         }
 
-        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure remove, IXMLTreeStructure response)
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
         {
-            throw new NotImplementedException();
+            CalendarResource resource = null;
+            CalendarCollection collection = null;
+            if (calendarResourceId != null)
+                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+            else
+                collection = db.GetCollection(userEmail, collectionName);
+
+            //For each property it is tried to remove, if not possible change the error occured to true and
+            //continue setting dependency error to the rest. 
+            var prop = setTree.GetChild("prop");
+            var errorStack = new Stack<string>();
+            foreach (var property in prop.Children)
+            {
+                var propstat = new XmlTreeStructure("propstat", "DAV:");
+                var stat = new XmlTreeStructure("stat", "DAV:");
+                var resProp = new XmlTreeStructure("prop", "DAV:");
+
+                propstat.AddChild(stat);
+                propstat.AddChild(resProp);
+                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
+
+                if (errorOccurred)
+                    stat.Value = "HTTP/1.1 424 Failed Dependency";
+
+                else
+                {
+                    //Try to modify the specified property if it exist, if not try to create it
+                    //gets an error message from the stack in case of problems.
+                    errorOccurred = resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack);
+                    if (errorOccurred && errorStack.Count > 0)
+                        stat.Value = errorStack.Pop();
+                    else
+                    {
+                        stat.Value = "HTTP/1.1 200 OK";
+                        db.SaveChanges();
+                    }
+
+                }
+
+            }
+            return errorOccurred;
         }
 
         #endregion
@@ -301,7 +379,7 @@ namespace CalDAV.Core
 
             var resource =
                 db.GetCollection(userEmail, collectionName)
-                    .Calendarresources.First(x => x.FileName == calendarResourceId);
+                    .Calendarresources.First(x => x.Href == calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
 
@@ -334,7 +412,7 @@ namespace CalDAV.Core
             //Must return the Etag header of the COR
 
             var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-            etag = calendarRes.Getetag;
+            etag = calendarRes.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
             return StorageManagement.GetCalendarObjectResource(calendarResourceId);
         }
@@ -563,8 +641,10 @@ namespace CalDAV.Core
             var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
             var prevResource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             int prevEtag;
-            int actualEtag;
-            var tempEtag = prevResource.Getetag;
+            int actualEtag = 0;
+            string tempEtag = "0";
+            //TODO: Este metodo tiene que ser revisado por completo
+            //var tempEtag = prevResource.Getetag;
 
             //TODO: esto siempre va a fallar pues los eTags no son int
             if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
@@ -635,8 +715,8 @@ namespace CalDAV.Core
 
             //TODO: Take the resource Etag if the client send it if not assign one
             if (etag != null)
-                resource.Getetag = etag;
-            retEtag = resource.Getetag;
+                resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value = etag;
+            retEtag = resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
             resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
@@ -665,7 +745,7 @@ namespace CalDAV.Core
                 resource.Uid = ((IValue<string>)property).Value;
             }
 
-            resource.FileName = calendarResourceId;
+            resource.Href = calendarResourceId;
 
             resource.UserId = resource.User.UserId;
 

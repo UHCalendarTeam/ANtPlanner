@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CalDAV.Core;
-using CalDAV.Models;
+using DataLayer;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.Extensions.Primitives;
+using DataLayer;
 
 namespace CalDav_Services.Controllers
 {
