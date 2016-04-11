@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CalDAV.Core;
@@ -23,9 +24,11 @@ namespace CalDav_tests
             var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
-            optionsBuilder.UseInMemoryDatabase();
+            // optionsBuilder.UseInMemoryDatabase();
 
-            var db = new CalDavContext(optionsBuilder.Options);
+            var db = new CalDavContext();//optionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
 
             var user = new User
             {
@@ -38,9 +41,6 @@ namespace CalDav_tests
             {
                 new CalendarResource
                 {
-                    //TODO: Adriano ver esto
-                    //DtStart = DateTime.Now,
-                    //DtEnd = DateTime.Now,
                     Href = "test.ics",
                     Properties = new List<ResourceProperty>
                     {
@@ -117,34 +117,20 @@ namespace CalDav_tests
                             IsMutable = true
                         }
                     }
-                    //Displayname = $"<D:displayname {Namespaces["D"]}>Mocking resource</D:displayname>",
-                    ////Recurrence = "test",
-                    //User = user,
-                    //Getetag = $"<D:getetag {Namespaces["D"]}>12345</D:getetag>",
-                    //Creationdate =  $"<D:creationdate {Namespaces["D"]}>{"29/03/16 01:30:44"}</D:creationdate>",
-                    //Getcontentlanguage = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>",
-                    //Getcontentlength =  $"<D:getcontentlength {Namespaces["D"]}>10000</D:getcontentlength>",
-                    //Getlastmodified = $"<D:getlastmodified {Namespaces["D"]}>29/03/16 01:30:44</D:getlastmodified>"
+
                 }
             };
             var collection = new List<CalendarCollection>
             {
                 new CalendarCollection
                 {
-                    //Calendardescription = "<C:calendar-description xmlns:C=\"urn:ietf:params:xml:ns:caldav\">empty description</C:calendar-description>",
+
                     Name = "Foocollection",
                     User = user,
-                    Calendarresources = resources,/*,
-                    SupportedCalendarComponentSet = new List<string>()*/
-                    //ResourceType = new List<string>(),
+                    Calendarresources = resources,
 
-                    //TODO: Adriano ver esto ahora es xml hecho string
-                    //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
-                    //Displayname = $"<D:displayname {Namespaces["D"]}>Mocking Collection</D:displayname>",
                     Url = "url",
-                    //Resourcetype = $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>",
-                    //Creationdate = $"<D:creationdate {Namespaces["D"]}>{"29/03/16 01:30:44"}</D:creationdate>",
-                    //Getetag = $"<D:getetag {Namespaces["D"]}>0</D:getetag>"
+
                     Properties = new List<CollectionProperty>
                     {
                          new CollectionProperty
@@ -283,44 +269,206 @@ namespace CalDav_tests
             var fs = new FileSystemManagement();
 
             var caldav = new CalDav(fs, db);
-            var propertiesAndHeaders = new Dictionary<string,string> { {"userEmail", "foo@gmail.com" } , {"collectionName" ,"Foocollection" }  };
-            var body = XDocument.Parse($@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
+            var propertiesAndHeaders = new Dictionary<string, string> { { "userEmail", "foo@gmail.com" }, { "collectionName", "Foocollection" } };
+            var body = $@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
   <set>
     <prop>
       <C:calendar-description>void description</C:calendar-description>
     </prop>
   </set>
-</propertyupdate>");
+</propertyupdate>";
 
-            var request = XmlTreeStructure.Parse(body.ToString());
+            var request = XmlTreeStructure.Parse(body);
 
             var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
 
-            Assert.Equal(response, "");
+            Assert.Equal(response,
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:status>HTTP/1.1 200 OK</D:status>
+      <D:prop>
+        <C:calendar-description />
+      </D:prop>
+    </D:propstat>
+  </D:response>
+</D:multistatus>");
+
+            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+            var testPropperty = testCollection.Properties
+                .SingleOrDefault(x => x.Name == "calendar-description" && x.Namespace == NamespacesSimple["C"]);
+
+            Assert.Equal(testPropperty.Value, $@"<calendar-description xmlns=""{NamespacesSimple["C"]}"">void description</calendar-description>");
+
+            var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
+            Assert.NotNull(varCorrectParsing);
         }
 
         [Fact]
         public void CreateSuccesful()
         {
-            
+            var db = MockDatabase();
+            var fs = new FileSystemManagement();
+
+            var caldav = new CalDav(fs, db);
+            var propertiesAndHeaders = new Dictionary<string, string> { { "userEmail", "foo@gmail.com" }, { "collectionName", "Foocollection" } };
+            var body = $@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
+  <set>
+    <prop>
+      <C:calendar-test>test 2</C:calendar-test>
+    </prop>
+  </set>
+</propertyupdate>";
+
+            var request = XmlTreeStructure.Parse(body);
+
+            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+
+            Assert.Equal(response,
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:status>HTTP/1.1 200 OK</D:status>
+      <D:prop>
+        <C:calendar-test />
+      </D:prop>
+    </D:propstat>
+  </D:response>
+</D:multistatus>");
+
+            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+            var testPropperty = testCollection.Properties
+                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
+
+            Assert.Equal(testPropperty.Value, $@"<calendar-test xmlns=""{NamespacesSimple["C"]}"">test 2</calendar-test>");
+
+            var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
+            Assert.NotNull(varCorrectParsing);
         }
 
         [Fact]
         public void CreateAndThenRemoveSuccesful()
         {
-            
+            var db = MockDatabase();
+            var fs = new FileSystemManagement();
+
+            var caldav = new CalDav(fs, db);
+            var propertiesAndHeaders = new Dictionary<string, string> { { "userEmail", "foo@gmail.com" }, { "collectionName", "Foocollection" } };
+            var body = $@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
+  <set>
+    <prop>
+      <C:calendar-test>test 2</C:calendar-test>
+    </prop>
+  </set>
+  <remove>
+    <prop>
+      <C:calendar-test/>
+    </prop>
+  </remove>
+</propertyupdate>";
+
+            var request = XmlTreeStructure.Parse(body);
+
+            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+
+            Assert.Equal(response,
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:status>HTTP/1.1 200 OK</D:status>
+      <D:prop>
+        <C:calendar-test />
+      </D:prop>
+    </D:propstat>
+    <D:propstat>
+      <D:status>HTTP/1.1 200 OK</D:status>
+      <D:prop>
+        <C:calendar-test />
+      </D:prop>
+    </D:propstat>
+  </D:response>
+</D:multistatus>");
+
+            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+            var testPropperty = testCollection.Properties
+                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
+
+            Assert.Null(testPropperty);
         }
 
         [Fact]
         public void SeveralSetAndRemoveSuccesful()
         {
-            
+
         }
 
         [Fact]
         public void ErrorCoctel()
         {
+            var db = MockDatabase();
+            var fs = new FileSystemManagement();
+
+            var caldav = new CalDav(fs, db);
+            var propertiesAndHeaders = new Dictionary<string, string> { { "userEmail", "foo@gmail.com" }, { "collectionName", "Foocollection" } };
+            var body = $@"<propertyupdate {Namespaces["D"]} {Namespaces["C"]}>
+  <set>
+    <prop>
+      <C:calendar-test>test 2</C:calendar-test>
+    </prop>
+  </set>
+  <remove>
+    <prop>
+      <C:calendar-description/>
+    </prop>
+  </remove>
+  <set>
+    <prop>
+      <C:calendar-test>test failed</C:calendar-test>
+    </prop>
+  </set>
+</propertyupdate>";
+
+            var request = XmlTreeStructure.Parse(body);
+
+            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+
+            Assert.Equal(response,
+                $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+  <D:response>
+    <D:href>/api/v1/caldav/foo@gmail.com/calendars/Foocollection/</D:href>
+    <D:propstat>
+      <D:status>HTTP/1.1 424 Failed Dependency</D:status>
+      <D:prop>
+        <C:calendar-test />
+      </D:prop>
+    </D:propstat>
+    <D:propstat>
+      <D:status>HTTP/1.1 403 Forbidden</D:status>
+      <D:prop>
+        <C:calendar-description />
+      </D:prop>
+    </D:propstat>
+    <D:propstat>
+      <D:status>HTTP/1.1 424 Failed Dependency</D:status>
+      <D:prop>
+        <C:calendar-test />
+      </D:prop>
+    </D:propstat>
+  </D:response>
+</D:multistatus>");
+
+            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+            var testPropperty = testCollection.Properties
+                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
             
+            Assert.Null(testPropperty);
         }
     }
 }

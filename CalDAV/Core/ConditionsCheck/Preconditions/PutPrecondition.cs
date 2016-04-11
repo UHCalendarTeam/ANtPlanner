@@ -16,8 +16,11 @@ namespace CalDAV.Core.ConditionsCheck
     {
         IFileSystemManagement StorageManagement { get; }
 
-        public PutPrecondition(IFileSystemManagement manager)
+        private CalDavContext db { get; }
+
+        public PutPrecondition(IFileSystemManagement manager, CalDavContext context)
         {
+            db = context;
             StorageManagement = manager;
         }
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders)
@@ -28,7 +31,7 @@ namespace CalDAV.Core.ConditionsCheck
             var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
             var etag = propertiesAndHeaders["etag"];
             var body = propertiesAndHeaders["body"];
-            var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
+            //var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
             var iCalendar = new VCalendar(body);//lo que no estoy seguro que en el body solo haya el iCal string
             #endregion
 
@@ -84,7 +87,7 @@ namespace CalDAV.Core.ConditionsCheck
             //Check that if the operation is create there is not another element in the collection with the same UID
             if (!StorageManagement.ExistCalendarObjectResource( calendarResourceId))
             {
-                using (var db = new CalDavContext())
+                using (db)
                 {
                     if ((from calendarResource in db.CalendarResources
                         where calendarResource.Uid == uidCalendar
@@ -96,7 +99,7 @@ namespace CalDAV.Core.ConditionsCheck
             //Check if the operation is update the element to be updated must have the same UID.
             else
             {
-                using (var db = new CalDavContext())
+                using (db)
                 {
                     if ((from calendarResource in db.CalendarResources
                          where calendarResource.Uid == uidCalendar

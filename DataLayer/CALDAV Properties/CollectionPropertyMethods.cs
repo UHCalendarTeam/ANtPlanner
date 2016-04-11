@@ -90,7 +90,7 @@ namespace DataLayer
             }
             if(!property.IsDestroyable)
             {
-                errorStack.Push(HttpStatusCode.Forbidden.ToString());
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
             }
             collection.Properties.Remove(property);
@@ -118,7 +118,7 @@ namespace DataLayer
             if (property == null)
             {
                 collection.Properties.Add(new CollectionProperty() {Name = propertyName, Namespace = nameSpace,
-                    IsDestroyable = true, IsVisible = false, IsMutable = true, Value = XmlTreeStructure.Parse(propertyValue).ToString()});
+                    IsDestroyable = true, IsVisible = false, IsMutable = true, Value = propertyValue});
                 return true;
             }
             //if this property belongs to the fix system properties, it can not be changed.
@@ -126,7 +126,7 @@ namespace DataLayer
                 return false;
 
             //if all previous conditions don't pass then the value of the property is changed.
-            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            property.Value = propertyValue;
             return true;
         }
     }
