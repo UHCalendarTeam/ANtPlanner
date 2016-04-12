@@ -40,5 +40,22 @@ namespace DataLayer.Models.ACL
         /// privileges for this resource.
         /// </summary>
         public string Acl { get; set; }
+
+        /// <summary>
+        /// This protected property defines the types of ACLs supported by this 
+        /// server, to avoid clients needlessly getting errors.When a client 
+        /// tries to set an ACL via the ACL method, the server may reject the 
+        /// attempt to set the ACL as specified
+        /// </summary>
+        public string AclRestrictions { get; set; }
+
+        /// <summary>
+        /// This protected property of a resource contains a set of URLs that 
+        /// identify the root collections that contain the principals that are 
+        /// available on the server that implements this resource.
+        /// A server MAY elect to report none of the principal collections 
+        /// it knows about, in which case the property value would be empty.
+        /// </summary>
+        public string PrincipalCollectionSet { get; set; }
     }
 }
