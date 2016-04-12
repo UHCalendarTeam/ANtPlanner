@@ -295,15 +295,18 @@ namespace CalDav_tests
     </D:propstat>
   </D:response>
 </D:multistatus>");
+            using (db = new CalDavContext())
+            {
+                var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+                var testPropperty = testCollection.Properties
+                    .SingleOrDefault(x => x.Name == "calendar-description" && x.Namespace == NamespacesSimple["C"]);
 
-            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
-            var testPropperty = testCollection.Properties
-                .SingleOrDefault(x => x.Name == "calendar-description" && x.Namespace == NamespacesSimple["C"]);
+                Assert.Equal(testPropperty.Value, $@"<calendar-description xmlns=""{NamespacesSimple["C"]}"">void description</calendar-description>");
 
-            Assert.Equal(testPropperty.Value, $@"<calendar-description xmlns=""{NamespacesSimple["C"]}"">void description</calendar-description>");
+                var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
+                Assert.NotNull(varCorrectParsing);
+            }
 
-            var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
-            Assert.NotNull(varCorrectParsing);
         }
 
         [Fact]
@@ -340,14 +343,18 @@ namespace CalDav_tests
   </D:response>
 </D:multistatus>");
 
-            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
-            var testPropperty = testCollection.Properties
-                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
+            using (db = new CalDavContext())
+            {
+                var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+                var testPropperty = testCollection.Properties
+                    .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
 
-            Assert.Equal(testPropperty.Value, $@"<calendar-test xmlns=""{NamespacesSimple["C"]}"">test 2</calendar-test>");
+                Assert.Equal(testPropperty.Value, $@"<calendar-test xmlns=""{NamespacesSimple["C"]}"">test 2</calendar-test>");
 
-            var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
-            Assert.NotNull(varCorrectParsing);
+                var varCorrectParsing = XmlTreeStructure.Parse(testPropperty.Value);
+                Assert.NotNull(varCorrectParsing);
+            }
+
         }
 
         [Fact]
@@ -395,11 +402,15 @@ namespace CalDav_tests
   </D:response>
 </D:multistatus>");
 
-            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
-            var testPropperty = testCollection.Properties
-                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
+            using (db = new CalDavContext())
+            {
+                var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+                var testPropperty = testCollection.Properties
+                    .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
 
-            Assert.Null(testPropperty);
+                Assert.Null(testPropperty);
+            }
+
         }
 
         [Fact]
@@ -463,12 +474,15 @@ namespace CalDav_tests
     </D:propstat>
   </D:response>
 </D:multistatus>");
+            using (db = new CalDavContext())
+            {
+                var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
+                var testPropperty = testCollection.Properties
+                    .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
 
-            var testCollection = db.GetCollection("foo@gmail.com", "Foocollection");
-            var testPropperty = testCollection.Properties
-                .SingleOrDefault(x => x.Name == "calendar-test" && x.Namespace == NamespacesSimple["C"]);
-            
-            Assert.Null(testPropperty);
+                Assert.Null(testPropperty);
+            }
+
         }
     }
 }

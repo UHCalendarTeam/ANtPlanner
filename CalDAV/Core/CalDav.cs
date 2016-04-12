@@ -8,6 +8,8 @@ using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -235,7 +237,7 @@ namespace CalDAV.Core
             //Here it is garanted that if an error occured during the processing of the operations
             //The changes will not be stored in db thanks to a rollback.
 
-            using (var db2 = new CalDavContext())
+            using (db)
             {
                 //For each set and remove try to execute the operation if something fails 
                 //put the Failed Dependency Error to every property before and after the error
@@ -243,19 +245,18 @@ namespace CalDAV.Core
                 foreach (var setOrRemove in setsAndRemoves)
                 {
                     if (setOrRemove.NodeName == "set")
-                        hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response, db2);
+                        hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
                     else
-                        hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response, db2);
+                        hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
                 }
 
                 if (hasError)
                 {
                     ChangeToDependencyError(response);
-                    
                 }
                 else
                 {
-                    db2.SaveChanges();
+                    db.SaveChanges();
                 }
 
 
@@ -283,14 +284,14 @@ namespace CalDAV.Core
             }
         }
 
-        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response, CalDavContext db2)
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db2.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             else
-                collection = db2.GetCollection(userEmail, collectionName);
+                collection = db.GetCollection(userEmail, collectionName);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
@@ -333,14 +334,14 @@ namespace CalDAV.Core
             return errorOccurred;
         }
 
-        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response, CalDavContext db2)
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db2.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             else
-                collection = db2.GetCollection(userEmail, collectionName);
+                collection = db.GetCollection(userEmail, collectionName);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 

@@ -679,9 +679,9 @@ namespace CalDav_tests
             var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
-            optionsBuilder.UseInMemoryDatabase();
+          //  optionsBuilder.UseInMemoryDatabase();
 
-            var db = new CalDavContext(optionsBuilder.Options);
+            var db = new CalDavContext();
 
             var user = new User
             {
