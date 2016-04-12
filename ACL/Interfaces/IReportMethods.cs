@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using DataLayer;
 using Microsoft.AspNet.Http;
 using TreeForXml;
 
@@ -18,7 +19,7 @@ namespace ACL.Interfaces
         /// for any of the ACL's defined methods.
         /// </summary>
         /// <returns></returns>
-        string ProcessRequest(IXMLTreeStructure body, HttpRequest request);
+        string ProcessRequest(HttpRequest request, CalDavContext context);
 
         /// <summary>
         /// The DAV:acl-principal-prop-set report returns, for all principals in 
@@ -27,7 +28,7 @@ namespace ACL.Interfaces
         /// properties specified in the REPORT request body.
         /// </summary>
         /// <returns></returns>
-        string AclPrincipalPropSet();
+        string AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context);
 
         /// <summary>
         /// The DAV:principal-match REPORT is used to identify all members (at 
@@ -35,9 +36,22 @@ namespace ACL.Interfaces
         /// principals and that match the current user.
         /// </summary>
         /// <returns></returns>
-        string PrincipalMatch();
+        string PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context);
 
+        /// <summary>
+        /// The DAV:principal-property-search REPORT performs a search for all 
+        /// principals whose properties contain character data that matches the 
+        /// search criteria specified in the request.
+        /// </summary>
+        /// <returns></returns>
+        string PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context);
 
-        string PrincipalProperty();
+        /// <summary>
+        /// The DAV:principal-search-property-set REPORT identifies those 
+        /// properties that may be searched using the DAV:principal-property 
+        /// search REPORT(defined in Section 9.4).
+        /// </summary>
+        /// <returns></returns>
+        string PrincipalSearchPropertySet();
     }
 }

@@ -12,15 +12,15 @@ namespace CalDAV.Core
     ///     THis class contain the logic for processing a
     ///     REPORT Request.
     /// </summary>
-    public class ReportMethods : IReportMethods
+    public class CalDavReport : IReportMethods
     {
-        public ReportMethods(string userEmail, string collectionName)
+        public CalDavReport(string userEmail, string collectionName)
         {
             UserEmail = userEmail;
             CollectionName = collectionName;
         }
 
-        public ReportMethods()
+        public CalDavReport()
         {
         }
 

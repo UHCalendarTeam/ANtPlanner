@@ -55,7 +55,7 @@ end=""20060105T000000Z""/>
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet=new ReportMethods();
+            var reportMet=new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -115,7 +115,7 @@ end=""20060105T000000Z""/>
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet = new ReportMethods();
+            var reportMet = new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -163,7 +163,7 @@ end=""20060105T000000Z""/>
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet = new ReportMethods();
+            var reportMet = new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -225,7 +225,7 @@ negate-condition=""yes"">CANCELLED</C:text-match>
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet = new ReportMethods();
+            var reportMet = new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -279,7 +279,7 @@ xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet = new ReportMethods();
+            var reportMet = new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
