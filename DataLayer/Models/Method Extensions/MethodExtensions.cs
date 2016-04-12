@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Data.Entity;
 
 namespace DataLayer
 {
@@ -32,7 +33,9 @@ namespace DataLayer
         {
             try
             {
-                return source.Users.First(u => u.Email == userEmail);
+                return source.Users.Include(x => x.CalendarCollections).ThenInclude(c => c.Properties)
+                    .Include(k => k.CalendarCollections).ThenInclude(y => y.Calendarresources).ThenInclude(p => p.Properties)
+                    .First(u => u.Email == userEmail);
             }
             catch (Exception)
             {

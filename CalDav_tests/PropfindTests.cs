@@ -924,7 +924,7 @@ namespace CalDav_tests
                 }
             };
             user.CalendarCollections = collection;
-            user.Resources = resources;
+            //user.Resources = resources;
             db.Users.Add(user);
             db.SaveChanges();
             return db;

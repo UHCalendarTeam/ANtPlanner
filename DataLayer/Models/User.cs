@@ -19,7 +19,7 @@ namespace DataLayer
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        public ICollection<CalendarResource> Resources { get; set; }
+        //public ICollection<CalendarResource> Resources { get; set; }
 
         public ICollection<CalendarCollection> CalendarCollections { get; set; }
     }

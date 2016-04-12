@@ -8,7 +8,6 @@ using DataLayer;
 using CalDAV.Utils.XML_Processors;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
-using Microsoft.Data.Entity;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -31,7 +30,7 @@ namespace CalDAV.Core
 
         private IStartUp StartUp { get; set; }
 
-        private CalDavContext db { get; }
+        private CalDavContext db { get;}
 
         public string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
         {
@@ -235,7 +234,8 @@ namespace CalDAV.Core
 
             //Here it is garanted that if an error occured during the processing of the operations
             //The changes will not be stored in db thanks to a rollback.
-            using (db)
+
+            using (var db2 = new CalDavContext())
             {
                 //For each set and remove try to execute the operation if something fails 
                 //put the Failed Dependency Error to every property before and after the error
@@ -243,18 +243,19 @@ namespace CalDAV.Core
                 foreach (var setOrRemove in setsAndRemoves)
                 {
                     if (setOrRemove.NodeName == "set")
-                        hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
+                        hasError = BuiltResponseForSet(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response, db2);
                     else
-                        hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response);
+                        hasError = BuiltResponseForRemove(userEmail, collectionName, calendarResourceId, hasError, setOrRemove, response, db2);
                 }
 
                 if (hasError)
                 {
                     ChangeToDependencyError(response);
+                    
                 }
                 else
                 {
-                    db.SaveChanges();
+                    db2.SaveChanges();
                 }
 
 
@@ -282,14 +283,14 @@ namespace CalDAV.Core
             }
         }
 
-        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
+        private bool BuiltResponseForRemove(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response, CalDavContext db2)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db2.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             else
-                collection = db.GetCollection(userEmail, collectionName);
+                collection = db2.GetCollection(userEmail, collectionName);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
@@ -322,7 +323,7 @@ namespace CalDAV.Core
                     else
                     {
                         stat.Value = "HTTP/1.1 200 OK";
-                       // db.SaveChanges();
+                        // db.SaveChanges();
                     }
 
 
@@ -332,14 +333,14 @@ namespace CalDAV.Core
             return errorOccurred;
         }
 
-        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
+        private bool BuiltResponseForSet(string userEmail, string collectionName, string calendarResourceId, bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response, CalDavContext db2)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db2.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             else
-                collection = db.GetCollection(userEmail, collectionName);
+                collection = db2.GetCollection(userEmail, collectionName);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
@@ -378,7 +379,7 @@ namespace CalDAV.Core
             }
             return errorOccurred;
         }
-
+        
         /// <summary>
         /// This method only functionality is to take the string representation of a property without
         /// the first line, witch is the template for xml.
@@ -745,7 +746,7 @@ namespace CalDAV.Core
                 resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value = etag;
             retEtag = resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
-            resource.User = db.GetUser(userEmail);
+            // resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
             IComponentProperty property;
             var calendarComp =
@@ -774,7 +775,7 @@ namespace CalDAV.Core
 
             resource.Href = calendarResourceId;
 
-            resource.UserId = resource.User.UserId;
+            //resource.UserId = resource.User.UserId;
 
             //resource.ResourceType = calendarComp.Name;
 

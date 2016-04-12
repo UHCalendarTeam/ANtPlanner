@@ -20,37 +20,44 @@ namespace DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-            optionBuilder.UseSqlServer(connection).MigrationsAssembly("DataLayer");
-
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
+            //optionBuilder.UseSqlServer(connection);
+            optionBuilder.UseInMemoryDatabase();
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(u => u.User)
-                .WithMany(cr => cr.CalendarCollections);
+                .WithMany(cr => cr.CalendarCollections)
+                .HasForeignKey(k => k.UserId);
 
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.Collection)
-                .WithMany(u => u.Calendarresources);
+                .WithMany(u => u.Calendarresources)
+                .HasForeignKey(k => k.CollectionId);
 
             modelBuilder.Entity<CollectionProperty>()
                 .HasOne(c => c.Collection)
-                .WithMany(p => p.Properties);
+                .WithMany(p => p.Properties)
+                .HasForeignKey(k => k.CollectionId);
 
             modelBuilder.Entity<ResourceProperty>()
                 .HasOne(r => r.Resource)
-                .WithMany(p => p.Properties);
+                .WithMany(p => p.Properties)
+                .HasForeignKey(k => k.ResourceId);
         }
 
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
+            
         }
 
         public CalDavContext()
         {
+
         }
     }
 

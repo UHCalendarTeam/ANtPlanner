@@ -21,12 +21,7 @@ namespace DataLayer
 
         public string Uid { get; set; }
 
-        public int UserId { get; set; }
-
-        /// <summary>
-        /// The owner of the resource
-        /// </summary>
-        public User User { get; set; }
+        public int CollectionId { get; set; }
 
         /// <summary>
         /// The collection where the resource is defined.

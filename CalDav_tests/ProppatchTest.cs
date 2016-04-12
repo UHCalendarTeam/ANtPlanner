@@ -27,8 +27,8 @@ namespace CalDav_tests
             // optionsBuilder.UseInMemoryDatabase();
 
             var db = new CalDavContext();//optionsBuilder.Options);
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
+            //db.Database.EnsureDeleted();
+            //db.Database.EnsureCreated();
 
             var user = new User
             {
@@ -254,7 +254,7 @@ namespace CalDav_tests
                 }
             };
             user.CalendarCollections = collection;
-            user.Resources = resources;
+            //user.Resources = resources;
             db.Users.Add(user);
             db.SaveChanges();
             return db;

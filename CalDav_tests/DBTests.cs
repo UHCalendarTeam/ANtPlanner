@@ -41,7 +41,7 @@ namespace CalDav_tests
                     //DtEnd = DateTime.Now,
                     Href = "test.ics",
                     //Recurrence = "test",
-                    User = user,
+                   // User = user,
                     Properties = new List<ResourceProperty>()
                     {
                         new ResourceProperty()
@@ -109,7 +109,7 @@ namespace CalDav_tests
                 }
             };
             user.CalendarCollections = collection;
-            user.Resources = resources;
+           // user.Resources = resources;
             db.Users.Add(user);
             db.SaveChanges();
 
