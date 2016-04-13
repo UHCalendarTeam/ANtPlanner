@@ -39,8 +39,9 @@ namespace CalDav_Services.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            
-            return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body));
+            //TODO: I have to fix this the status is in the first element.
+            //Response.StatusCode=GetHashCode() 
+            return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body)).Value;
         }
 
         //PROPFIND COLLECTIONS

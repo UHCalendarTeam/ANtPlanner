@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using DataLayer;
 using ICalendar.Calendar;
@@ -23,7 +24,7 @@ namespace CalDAV.Core.ConditionsCheck
             db = context;
             StorageManagement = manager;
         }
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders)
+        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, out KeyValuePair<HttpStatusCode, string> errorMessage)
         {
             #region Extracting Properties
             var userEmail = propertiesAndHeaders["userEmail"];
@@ -34,6 +35,8 @@ namespace CalDAV.Core.ConditionsCheck
             //var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
             var iCalendar = new VCalendar(body);//lo que no estoy seguro que en el body solo haya el iCal string
             #endregion
+
+            errorMessage = new KeyValuePair<HttpStatusCode, string>();
 
             //check that resourceId don't exist but the collection does.
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))

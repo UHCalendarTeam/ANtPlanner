@@ -6,7 +6,7 @@ Caldav:
   ☐ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.)
         ☐ Do the precodintions methods.
         ☐ Do the postconditions.
-  ☐  Do a class for the common properties of the collections.
+  ✔  Do a model for the  properties of the collections and resources. @done (16-04-13 00:51)
   ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
 
   Report Method:
@@ -34,9 +34,20 @@ Preconditions:
   Nacho:
     ✔ FileSystemMangement implemntar metodo para devolver todos los recursos de una coleccion. @done (16-03-14 15:54)
     ✔ base de datos @done (16-03-24 23:03)
-    ☐ recur
-    ☐ test propfind
+    ✔ recur @done (16-03-30 23:31)
+    ✔ test propfind @done (16-03-30 23:31)
     ✔ fix database @done (16-03-25 14:51)
     ✔ cambiar las propiedades @done (16-03-24 23:03)
     ✔ mandar lo de katrib @done (16-03-24 23:03)
-    ☐ proppatch
+    ✔ proppatch @done (16-04-13 00:52)
+    ☐ etag
+    ✔ makecalendar @done (16-04-13 02:50)
+    ☐ documentar
+    ✔ Pasar modelos a capa de datos. @done (16-04-13 00:52)
+    ✔ Implementar test de proppatch. @done (16-04-13 00:52)
+    ☐ Arreglar PUT, GET, DELETE, etc.
+      ☐ Hacer que todos estos metodos devuelvan KVP<HttpStatusCode, string>
+    ☐ Hacer Contructor en POCO's de forma tal que:
+      ☐ Se inicializen las listas relacionales.
+      ☐ Se anadan las propiedades de WEBDAB y CALDAV.
+        ☐ displayname toma por defecto el nombre de la coleccion o recurso.

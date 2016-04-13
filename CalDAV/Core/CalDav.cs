@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using DataLayer;
@@ -28,13 +29,13 @@ namespace CalDAV.Core
 
         private IPropfindMethods PropFindMethods { get; set; }
         private IPrecondition PreconditionCheck { get; set; }
-        private IPostcondition postconditionCheck { get; }
+        private IPoscondition PosconditionCheck { get; set; }
 
         private IStartUp StartUp { get; set; }
 
-        private CalDavContext db { get;}
+        private CalDavContext db { get; }
 
-        public string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
+        public KeyValuePair<HttpStatusCode, string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             #region Extracting Properties
             string userEmail;
@@ -42,11 +43,99 @@ namespace CalDAV.Core
 
             string collectionName;
             propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
             #endregion
 
-            var properties = XMLParsers.XMLMKCalendarParser(body);
-            StartUp.CreateCollectionForUser(propertiesAndHeaders["userEmail"], propertiesAndHeaders["collectionName"]);
-            return "";
+            propertiesAndHeaders.Add("body", body);
+
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, db);
+            PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
+
+            //Checking that all precondition pass
+            //If not the corresponding statusCode and error message are returned inside
+            //the errorMessage property
+            var errorMessage = new KeyValuePair<HttpStatusCode, string>();
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
+                return errorMessage;
+
+            //If it has not body, it is created with default values.
+            if (string.IsNullOrEmpty(body))
+            {
+                return CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+            }
+
+            //If a body exist the it is parsed like an XmlTree
+            var mkCalendarTree = XmlTreeStructure.Parse(body);
+
+            //if it does not have set property it is treated as a empty body.
+            if (mkCalendarTree.Children.Count == 0)
+            {
+                return CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+            }
+
+            //now it is assumed that the body contains a set
+            var setTree = mkCalendarTree.GetChild("set");
+
+            #region Response Construction in case of error
+            //this only if error during processing.
+            //Creating and filling the root of the xml tree response
+            //All response of a request is conformed by a "multistatus" element.
+            var multistatus = new XmlTreeStructure("multistatus", "DAV:");
+            multistatus.Namespaces.Add("D", "DAV:");
+            multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var response = new XmlTreeStructure("response", "DAV:");
+            multistatus.AddChild(response);
+
+            var href = new XmlTreeStructure("href", "DAV:");
+            href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
+            #endregion
+            //Check if any error occurred during body processing.
+            var hasError = BuiltResponseForSet(userEmail, collectionName, null, false, setTree, response);
+
+            if (hasError)
+            {
+                ChangeToDependencyError(response);
+                //TODO: aki debe ser en realidad 207 multistatus pero no lo encuentro.
+                return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, multistatus.ToString());
+            }
+
+            db.SaveChanges();
+            //StartUp.CreateCollectionForUser(propertiesAndHeaders["userEmail"], propertiesAndHeaders["collectionName"]);
+            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+        }
+
+        private KeyValuePair<HttpStatusCode, string> CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders, ref KeyValuePair<HttpStatusCode, string> errorMessage)
+        {
+            #region Extracting Properties
+            string userEmail;
+            propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
+
+            string collectionName;
+            propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
+            #endregion
+            //Adding the collection to the database
+            var user = db.GetUser(userEmail);
+            var collection = new CalendarCollection { Name = collectionName, Url = url };
+            user.CalendarCollections.Add(collection);
+
+            //Adding the collection folder.
+            StorageManagement.AddCalendarCollectionFolder(userEmail, collectionName);
+
+            //Checking Preconditions   
+            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+            {
+                db.SaveChanges();
+                return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+            }
+
+
+            return errorMessage;
         }
 
         //TODO: Nacho
@@ -380,7 +469,7 @@ namespace CalDAV.Core
             }
             return errorOccurred;
         }
-        
+
         /// <summary>
         /// This method only functionality is to take the string representation of a property without
         /// the first line, witch is the template for xml.
@@ -524,8 +613,9 @@ namespace CalDAV.Core
             //Note: calendar object resource = COR
 
             //CheckAllPreconditions
+            var errorMessage = new KeyValuePair<HttpStatusCode, string>();
             PreconditionCheck = new PutPrecondition(StorageManagement, db);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders))
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
                 return false;
 
             //etag value of "If-Match"
