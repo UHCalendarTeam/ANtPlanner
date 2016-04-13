@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Entities;
+using DataLayer.Models.ACL;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 
@@ -14,6 +15,8 @@ namespace DataLayer
         public DbSet<CalendarCollection> CalendarCollections { get; set; }
 
         public DbSet<CalendarResource> CalendarResources { get; set; }
+
+        public DbSet<Principal> Principals { get; set; }
 
       /*  protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
@@ -29,6 +32,8 @@ namespace DataLayer
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.User)
                 .WithMany(u => u.Resources);
+            modelBuilder.Entity<CalendarResource>()
+                .HasOne(cl => cl.AccessControlProperties);
         }
 
         public CalDavContext(DbContextOptions options)
