@@ -5,10 +5,22 @@ namespace DataLayer
 {
     public class User
     {
+        public User()
+        {
+            CalendarCollections = new List<CalendarCollection>();
+        }
+
+        public User(string ftname, string email)
+        {
+            Email = email;
+            FirstName = ftname;
+            CalendarCollections = new List<CalendarCollection>();
+        }
+
         [ScaffoldColumn(false)]
         public int UserId { get; set; }
 
-        
+        [Required]
         public string Email { get; set; }
 
 

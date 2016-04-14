@@ -8,6 +8,15 @@ namespace DataLayer
 {
     public class CollectionProperty
     {
+        public CollectionProperty()
+        {
+            
+        }
+        public CollectionProperty(string name, string nameSpace)
+        {
+            Name = name;
+            Namespace = nameSpace;
+        }
         [ScaffoldColumn(false)]
         public int CollectionPropertyId { get; set; }
 
