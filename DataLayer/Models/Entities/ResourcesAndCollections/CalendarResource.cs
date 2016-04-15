@@ -69,15 +69,10 @@ namespace DataLayer.Entities
         ///     The collection where the resource is defined.
         /// </summary>
         public CalendarCollection Collection { get; set; }
-
-        //public int CollectionId { get; set; }
+       
 
         public ICollection<ResourceProperty> Properties { get; set; }
-
-        /// </summary>
-        /// Default value = DateTime.Max
-        /// The endDateTime of the resource if defined.
-        //public string DtStart { get; set; }
+        
 
     }
 }
