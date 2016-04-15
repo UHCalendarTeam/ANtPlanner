@@ -9,13 +9,29 @@ using Microsoft.AspNet.Http;
 using TreeForXml;
 using DataLayer.Entities;
 using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
 
 namespace ACL.Core
 {
     public class ACLReport:IReportMethods
     {
-        public bool ProcessRequest(HttpRequest request, CalDavContext context, out HttpResponse response)
+        public void ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
         {
+
+            ///check the depth of the header
+            /// This report is only defined when the Depth header has value "0";
+            /// other values result in a 400 (Bad Request) error response.
+            if (request.Headers.ContainsKey("Depth"))
+            {
+                var depth = request.Headers["Depth"];
+                if (depth != "\"0\"")
+                {
+                    response.StatusCode = 400;
+                    return;
+                }
+            }
+            
+
             response = null;
             //take the string representation of the body
             string bodyStr = request.Body.ToString();
@@ -24,19 +40,23 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                    return AclPrincipalPropSet(xmlbody, request, context, out response);
+                     AclPrincipalPropSet(xmlbody, request, context, response );
+                    break;
                 case "principal-match":
-                    return PrincipalMatch(xmlbody, request, context, out response);
+                     PrincipalMatch(xmlbody, request, context, response);
+                    break;
                 case "principal-property-search":
-                    return PrincipalPropertySearch(xmlbody, request, context, out response);
+                     PrincipalPropertySearch(xmlbody, request, context, response);
+                    break;
                 case "principal-search-property-set":
-                    return PrincipalSearchPropertySet(out response);
+                     PrincipalSearchPropertySet( response);
+                    break;
             }
-            return false;
+            
 
         }
 
-        public bool AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
+        public void AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
             response = null;
 
@@ -45,10 +65,11 @@ namespace ACL.Core
             IXMLTreeStructure propNode;
 
             ///first take the node container of the property names
-            body.GetChildAtAnyLevel("prop", out propNode);
+            body.GetChildAtAnyLevel("prop",out propNode);
 
-            //take the children of the node, these are the proeprties
-            var requestedProperties = propNode.Children.Select(x => x.NodeName);
+            ///take the children of the node, these are the proeprties
+            var requestedProperties = propNode.Children.Select(x => 
+            new KeyValuePair<string, string>( x.NodeName, x.MainNamespace));
 
             string colUrl = "";
 
@@ -67,39 +88,44 @@ namespace ACL.Core
             ///take the href of the principals of the property
             var principalsURLs = xml.Elements("principal").Select(x => x.Descendants("href").FirstOrDefault());
 
-            List<Principal> principals = new List<Principal>();
+            Dictionary<Principal,IEnumerable<Property>> principals = new Dictionary<Principal,IEnumerable<Property>>();
 
             ///take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
                 var principal = context.Principals.FirstOrDefault(principal1 => principal1.PrincipalURL == pUrl.Value);
                 if(principal!=null)
-                    principals.Add(principal);
+                    principals.Add(principal, null);
             }
 
             ///take the requested properties from the principals
-            
+            foreach (var principal in principals)
+            {
+               principals[principal.Key] = principal.Key.TakeProperties(requestedProperties);
+            }
 
 
-            return true;
+           
 
 
         }
 
-        public bool PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
+        public void PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public bool PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
+        public void PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public bool PrincipalSearchPropertySet(out HttpResponse response)
+        public void PrincipalSearchPropertySet(HttpResponse response)
         {
             throw new NotImplementedException();
         }
+
+       
 
      
     }

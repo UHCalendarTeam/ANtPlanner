@@ -19,7 +19,7 @@ namespace ACL.Interfaces
         /// for any of the ACL's defined methods.
         /// </summary>
         /// <returns></returns>
-        bool ProcessRequest(HttpRequest request, CalDavContext context, out HttpResponse response);
+        void ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response);
 
         /// <summary>
         /// The DAV:acl-principal-prop-set report returns, for all principals in 
@@ -28,7 +28,7 @@ namespace ACL.Interfaces
         /// properties specified in the REPORT request body.
         /// </summary>
         /// <returns></returns>
-        bool AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response);
+        void AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response);
 
         /// <summary>
         /// The DAV:principal-match REPORT is used to identify all members (at 
@@ -36,7 +36,7 @@ namespace ACL.Interfaces
         /// principals and that match the current user.
         /// </summary>
         /// <returns></returns>
-        bool PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response);
+        void PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response);
 
         /// <summary>
         /// The DAV:principal-property-search REPORT performs a search for all 
@@ -44,7 +44,7 @@ namespace ACL.Interfaces
         /// search criteria specified in the request.
         /// </summary>
         /// <returns></returns>
-        bool PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response);
+        void PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response);
 
         /// <summary>
         /// The DAV:principal-search-property-set REPORT identifies those 
@@ -52,6 +52,6 @@ namespace ACL.Interfaces
         /// search REPORT(defined in Section 9.4).
         /// </summary>
         /// <returns></returns>
-        bool PrincipalSearchPropertySet( out HttpResponse response);
+        void PrincipalSearchPropertySet( HttpResponse response);
     }
 }
