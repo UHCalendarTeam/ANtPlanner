@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.ACL;
 
 namespace DataLayer.Entities
 {
@@ -55,6 +56,9 @@ namespace DataLayer.Entities
         [ScaffoldColumn(false)]
         public int CalendarResourceId { get; set; }
 
+        /// <summary>
+        /// The url where is the resource.
+        /// </summary>
         [Required]
         public string Href { get; set; }
 
@@ -65,7 +69,6 @@ namespace DataLayer.Entities
         public int CollectionId { get; set; }
 
         /// <summary>
-        ///     The owner of the resource
         ///     The collection where the resource is defined.
         /// </summary>
         public CalendarCollection Collection { get; set; }
@@ -73,6 +76,10 @@ namespace DataLayer.Entities
 
         public ICollection<ResourceProperty> Properties { get; set; }
         
+        /// <summary>
+        /// The ACL properties of the resource.
+        public AccessControlProperties AccessControlProperties { get; set; }
+
 
     }
 }
