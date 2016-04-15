@@ -8,6 +8,14 @@ namespace DataLayer.Entities
     /// </summary>
     public class ResourceProperty
     {
+        public ResourceProperty(string name, string nameSpace)
+        {
+            Name = name;
+            Namespace = nameSpace;
+        }
+        public ResourceProperty()
+        { }
+
         [ScaffoldColumn(false)]
         public int ResourcePropertyId { get; set; }
 

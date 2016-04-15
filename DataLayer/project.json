@@ -1,4 +1,4 @@
-﻿{
+{
     "version": "1.0.0-*",
     "authors": [ "UHCalendarTeam" ],
     "commands": {
@@ -15,7 +15,8 @@
         "EntityFramework.InMemory": "7.0.0-rc1-final",
         "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
         "TreeForXml": "1.0.2",
-        "System.Data.Common": "4.0.1-beta-23516"
+        "System.Data.Common": "4.0.1-beta-23516",
+        "EntityFramework.Core": "7.0.0-rc1-final"
     },
 
     "frameworks": {

@@ -17,32 +17,50 @@ namespace DataLayer
         public DbSet<CalendarResource> CalendarResources { get; set; }
 
         public DbSet<Principal> Principals { get; set; }
+        public DbSet<CollectionProperty> CollectionProperties { get; set; }
 
-      /*  protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
+        public DbSet<ResourceProperty> ResourceProperties { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            optionBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=Caldav;Trusted_Connection=True;");
-
-        }*/
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
+            //optionBuilder.UseSqlServer(connection);
+            optionBuilder.UseInMemoryDatabase();
+            
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(u => u.User)
-                .WithMany(cr => cr.CalendarCollections);
+                .WithMany(cr => cr.CalendarCollections)
+                .HasForeignKey(k => k.UserId);
+
             modelBuilder.Entity<CalendarResource>()
-                .HasOne(cl => cl.User)
-                .WithMany(u => u.Resources);
-            modelBuilder.Entity<CalendarResource>()
-                .HasOne(cl => cl.AccessControlProperties);
+                .HasOne(cl => cl.Collection)
+                .WithMany(u => u.Calendarresources)
+                .HasForeignKey(k => k.CollectionId);
+
+            modelBuilder.Entity<CollectionProperty>()
+                .HasOne(c => c.Collection)
+                .WithMany(p => p.Properties)
+                .HasForeignKey(k => k.CollectionId);
+
+            modelBuilder.Entity<ResourceProperty>()
+                .HasOne(r => r.Resource)
+                .WithMany(p => p.Properties)
+                .HasForeignKey(k => k.ResourceId);
         }
 
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
+            
         }
 
         public CalDavContext()
         {
+
         }
     }
 

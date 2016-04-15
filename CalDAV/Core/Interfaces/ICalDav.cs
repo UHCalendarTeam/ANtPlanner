@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TreeForXml;
 
@@ -15,8 +16,9 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
-        /// <returns></returns>
-        string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body);
+        /// <returns>Returns a KeyValuePair where the key is the status code
+        ///  and the value is the body of the response</returns>
+        KeyValuePair<HttpStatusCode,string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body);
 
         /// <summary>
         /// WebDAV HTTP Method

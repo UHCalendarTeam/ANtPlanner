@@ -680,9 +680,9 @@ namespace CalDav_tests
             var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
-            optionsBuilder.UseInMemoryDatabase();
+          //  optionsBuilder.UseInMemoryDatabase();
 
-            var db = new CalDavContext(optionsBuilder.Options);
+            var db = new CalDavContext();
 
             var user = new User
             {
@@ -925,7 +925,7 @@ namespace CalDav_tests
                 }
             };
             user.CalendarCollections = collection;
-            user.Resources = resources;
+            //user.Resources = resources;
             db.Users.Add(user);
             db.SaveChanges();
             return db;

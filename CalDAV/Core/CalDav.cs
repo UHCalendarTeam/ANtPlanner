@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using DataLayer;
@@ -10,6 +11,7 @@ using DataLayer.Entities;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -28,17 +30,141 @@ namespace CalDAV.Core
 
         private IPropfindMethods PropFindMethods { get; set; }
         private IPrecondition PreconditionCheck { get; set; }
-        private IPostcondition postconditionCheck { get; }
+        private IPoscondition PosconditionCheck { get; set; }
 
         private IStartUp StartUp { get; set; }
 
         private CalDavContext db { get; }
 
-        public string MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
+        public KeyValuePair<HttpStatusCode, string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
         {
-            var properties = XMLParsers.XMLMKCalendarParser(body);
-            StartUp.CreateCollectionForUser(propertiesAndHeaders["userEmail"], propertiesAndHeaders["collectionName"]);
-            return "";
+            #region Extracting Properties
+            string userEmail;
+            propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
+
+            string collectionName;
+            propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
+            #endregion
+
+            propertiesAndHeaders.Add("body", body);
+
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, db);
+            PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
+
+            //Checking that all precondition pass
+            //If not the corresponding statusCode and error message are returned inside
+            //the errorMessage property
+            var errorMessage = new KeyValuePair<HttpStatusCode, string>();
+            var createdMessage = new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+
+            //Cheking Preconditions
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
+                return errorMessage;
+
+            //I create here the collection already but i wait for other comprobations before save the database.
+            CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+
+            //If it has not body and  Posconditions are OK, it is created with default values.
+            if (string.IsNullOrEmpty(body))
+            {
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                {
+                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                        StorageManagement.DeleteCalendarCollection();
+                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                   
+                }
+                    
+
+                db.SaveChanges();
+                return createdMessage;
+            }
+
+            //If a body exist the it is parsed like an XmlTree
+            var mkCalendarTree = XmlTreeStructure.Parse(body);
+
+            //if it does not have set property it is treated as a empty body.
+            if (mkCalendarTree.Children.Count == 0)
+            {
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                {
+                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                        StorageManagement.DeleteCalendarCollection();
+                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                }
+                    
+
+                db.SaveChanges();
+                return createdMessage;
+            }
+
+            //now it is assumed that the body contains a set
+            var setTree = mkCalendarTree.GetChild("set");
+
+            #region Response Construction in case of error
+            //this only if error during processing.
+            //Creating and filling the root of the xml tree response
+            //All response of a request is conformed by a "multistatus" element.
+            var multistatus = new XmlTreeStructure("multistatus", "DAV:");
+            multistatus.Namespaces.Add("D", "DAV:");
+            multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+
+            var response = new XmlTreeStructure("response", "DAV:");
+            multistatus.AddChild(response);
+
+            var href = new XmlTreeStructure("href", "DAV:");
+            href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
+            #endregion
+            //Check if any error occurred during body processing.
+            var hasError = BuiltResponseForSet(userEmail, collectionName, null, false, setTree, response);
+
+            if (hasError)
+            {
+                if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                    StorageManagement.DeleteCalendarCollection();
+                ChangeToDependencyError(response);
+                //TODO: aki debe ser en realidad 207 multistatus pero no lo encuentro.
+                return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, multistatus.ToString());
+            }
+
+            //Checking Preconditions   
+            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+            {
+                db.SaveChanges();
+                return createdMessage;
+            }
+
+            if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                StorageManagement.DeleteCalendarCollection();
+            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+
+
+        }
+
+        private KeyValuePair<HttpStatusCode, string> CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders, ref KeyValuePair<HttpStatusCode, string> errorMessage)
+        {
+            #region Extracting Properties
+            string userEmail;
+            propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
+
+            string collectionName;
+            propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
+            #endregion
+            //Adding the collection to the database
+            var user = db.GetUser(userEmail);
+            var collection = new CalendarCollection { Name = collectionName, Url = url };
+            user.CalendarCollections.Add(collection);
+
+            //Adding the collection folder.
+            StorageManagement.AddCalendarCollectionFolder(userEmail, collectionName);
+
+            return errorMessage;
         }
 
         //TODO: Nacho
@@ -190,10 +316,10 @@ namespace CalDAV.Core
 
 
             //checking that the request has propertyupdate node
-            IXMLTreeStructure propertyupdate;
-            if (!xmlTree.GetChildAtAnyLevel("propertyupdate", out propertyupdate))
-                throw new ArgumentException(@"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
 
+            if (xmlTree.NodeName != "propertyupdate")
+                throw new ArgumentException(@"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
+            IXMLTreeStructure propertyupdate = xmlTree;
             //aliasing the list with all "set" and "remove" structures inside "propertyupdate".
             List<IXMLTreeStructure> setsAndRemoves = propertyupdate.Children;
 
@@ -228,7 +354,8 @@ namespace CalDAV.Core
 
             //Here it is garanted that if an error occured during the processing of the operations
             //The changes will not be stored in db thanks to a rollback.
-            using (db.Database.BeginTransaction())
+
+            using (db)
             {
                 //For each set and remove try to execute the operation if something fails 
                 //put the Failed Dependency Error to every property before and after the error
@@ -244,8 +371,12 @@ namespace CalDAV.Core
                 if (hasError)
                 {
                     ChangeToDependencyError(response);
-                    db.Database.RollbackTransaction();
                 }
+                else
+                {
+                    db.SaveChanges();
+                }
+
 
             }
 
@@ -267,7 +398,7 @@ namespace CalDAV.Core
                 //the error and no more further message changing is needed.
                 if (statMessage != "HTTP/1.1 200 OK")
                     return;
-                ((XmlTreeStructure) status).Value = "HTTP/1.1 424 Failed Dependency";
+                ((XmlTreeStructure)status).Value = "HTTP/1.1 424 Failed Dependency";
             }
         }
 
@@ -289,12 +420,13 @@ namespace CalDAV.Core
                 //The structure for the response does not change.
                 //It is constructed with a propstat and the value is never showed in the prop element.
                 var propstat = new XmlTreeStructure("propstat", "DAV:");
-                var stat = new XmlTreeStructure("stat", "DAV:");
+                var stat = new XmlTreeStructure("status", "DAV:");
                 var resProp = new XmlTreeStructure("prop", "DAV:");
 
                 propstat.AddChild(stat);
                 propstat.AddChild(resProp);
                 resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
+                response.AddChild(propstat);
 
                 //If an error occurred previously the stat if 424 Failed Dependency.
                 if (errorOccurred)
@@ -304,13 +436,13 @@ namespace CalDAV.Core
                 else
                 {
                     //Try to remove the specified property, gets an error message from the stack in case of problems.
-                    errorOccurred = resource?.RemoveProperty(property.NodeName, property.MainNamespace, errorStack) ?? collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack);
+                    errorOccurred = !(resource?.RemoveProperty(property.NodeName, property.MainNamespace, errorStack) ?? collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack));
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
                     {
                         stat.Value = "HTTP/1.1 200 OK";
-                        db.SaveChanges();
+                        // db.SaveChanges();
                     }
 
 
@@ -336,12 +468,14 @@ namespace CalDAV.Core
             foreach (var property in prop.Children)
             {
                 var propstat = new XmlTreeStructure("propstat", "DAV:");
-                var stat = new XmlTreeStructure("stat", "DAV:");
+                var stat = new XmlTreeStructure("status", "DAV:");
                 var resProp = new XmlTreeStructure("prop", "DAV:");
 
+                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
                 propstat.AddChild(stat);
                 propstat.AddChild(resProp);
-                resProp.AddChild(new XmlTreeStructure(property.NodeName, property.MainNamespace));
+
+                response.AddChild(propstat);
 
                 if (errorOccurred)
                     stat.Value = "HTTP/1.1 424 Failed Dependency";
@@ -350,19 +484,31 @@ namespace CalDAV.Core
                 {
                     //Try to modify the specified property if it exist, if not try to create it
                     //gets an error message from the stack in case of problems.
-                    errorOccurred = resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, property.ToString(), errorStack);
+                    errorOccurred = !(resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace, GetValueFromRealProperty(property), errorStack) ?? collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace, GetValueFromRealProperty(property), errorStack));
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
                     {
                         stat.Value = "HTTP/1.1 200 OK";
-                        db.SaveChanges();
+                        //db.SaveChanges();
                     }
 
                 }
 
             }
             return errorOccurred;
+        }
+
+        /// <summary>
+        /// This method only functionality is to take the string representation of a property without
+        /// the first line, witch is the template for xml.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private string GetValueFromRealProperty(IXMLTreeStructure property)
+        {
+            var temp = property.ToString();
+            return temp.Replace(@"<?xml version=""1.0"" encoding=""utf-8""?>", "").TrimStart();
         }
 
         #endregion
@@ -496,8 +642,9 @@ namespace CalDAV.Core
             //Note: calendar object resource = COR
 
             //CheckAllPreconditions
-            PreconditionCheck = new PutPrecondition(StorageManagement);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders))
+            var errorMessage = new KeyValuePair<HttpStatusCode, string>();
+            PreconditionCheck = new PutPrecondition(StorageManagement, db);
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
                 return false;
 
             //etag value of "If-Match"
@@ -719,7 +866,7 @@ namespace CalDAV.Core
                 resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value = etag;
             retEtag = resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
 
-            resource.User = db.GetUser(userEmail);
+            // resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);
             IComponentProperty property;
             var calendarComp =
@@ -748,7 +895,7 @@ namespace CalDAV.Core
 
             resource.Href = calendarResourceId;
 
-            resource.UserId = resource.User.UserId;
+            //resource.UserId = resource.User.UserId;
 
             //resource.ResourceType = calendarComp.Name;
 

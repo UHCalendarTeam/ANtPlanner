@@ -90,7 +90,7 @@ namespace DataLayer
             //If the property is not allowed to be destroyed it should return and error.
             if (!property.IsDestroyable)
             {
-                errorStack.Push(HttpStatusCode.Forbidden.ToString());
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
             }
             //If there are not problems and the property exists it should be deleted.
@@ -124,16 +124,20 @@ namespace DataLayer
                     IsDestroyable = true,
                     IsVisible = false,
                     IsMutable = true,
-                    Value = XmlTreeStructure.Parse(propertyValue).ToString()
+                    Value = propertyValue
                 });
                 return true;
             }
             //if this property belongs to the fix system properties, it can not be changed.
             if (!property.IsMutable)
+            {
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
+            }
+                
 
             //if all previous conditions don't pass then the value of the property is changed.
-            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            property.Value = propertyValue;
             return true;
         }
 

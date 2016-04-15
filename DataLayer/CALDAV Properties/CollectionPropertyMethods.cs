@@ -15,6 +15,24 @@ namespace DataLayer
         public static string CaldavNs => "urn:ietf:params:xml:ns:caldav";
         public static string DavNs => "DAV:";
 
+        //This two methods will give me a month up and down from NOW
+        public static string MinDateTime(this CalendarCollection collection)
+        {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
+            return
+                new DateTime(DateTime.Now.Year, (thisMonth - 1) == 0 ? 12 : thisMonth - 1, thisDay > 28 ? 28 : thisDay).ToUniversalTime()
+                    .ToString("yyyyMMddTHHmmssZ");
+        }
+
+        public static string MaxDateTime(this CalendarCollection collection)
+        {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
+            return
+                   new DateTime(DateTime.Now.Year, (thisMonth + 1) == 13 ? 1 : thisMonth + 1, thisDay > 28 ? 28 : thisDay).ToUniversalTime()
+                       .ToString("yyyyMMddTHHmmssZ");
+        }
 
         /// <summary>
         /// Returns the value of a collection property given its name.
@@ -22,8 +40,8 @@ namespace DataLayer
         /// error stack.
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="propertyName"></param>
-        /// <param name="mainNs"></param>
+        /// <param name="propertyName">Name of the property</param>
+        /// <param name="mainNs">Main Namespace</param>
         /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
         public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNs, Stack<string> errorStack)
@@ -47,7 +65,7 @@ namespace DataLayer
         /// an "allprop" property method of Propfind.
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="errorStack"></param>
+        /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
         public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection, Stack<string> errorStack)
         {
@@ -91,7 +109,7 @@ namespace DataLayer
             }
             if(!property.IsDestroyable)
             {
-                errorStack.Push(HttpStatusCode.Forbidden.ToString());
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
             }
             collection.Properties.Remove(property);
@@ -119,15 +137,19 @@ namespace DataLayer
             if (property == null)
             {
                 collection.Properties.Add(new CollectionProperty() {Name = propertyName, Namespace = nameSpace,
-                    IsDestroyable = true, IsVisible = false, IsMutable = true, Value = XmlTreeStructure.Parse(propertyValue).ToString()});
+                    IsDestroyable = true, IsVisible = false, IsMutable = true, Value = propertyValue});
                 return true;
             }
             //if this property belongs to the fix system properties, it can not be changed.
             if (!property.IsMutable)
+            {
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
+            }
+                
 
             //if all previous conditions don't pass then the value of the property is changed.
-            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            property.Value = propertyValue;
             return true;
         }
     }
