@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,5 +58,8 @@ namespace DataLayer.Models.ACL
         /// it knows about, in which case the property value would be empty.
         /// </summary>
         public string PrincipalCollectionSet { get; set; }
+
+        [ScaffoldColumn(false)]
+        public int AccessControlPropertiesId { get; set; }
     }
 }

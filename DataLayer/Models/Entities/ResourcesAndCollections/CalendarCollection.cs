@@ -19,22 +19,22 @@ namespace DataLayer.Entities
 
             Properties.Add(new CollectionProperty("max-resource-size", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<C:max-resource-size {Namespaces["C"]}>102400</C:max-resource-size>" });
-        /// </summary>
+       
 
             Properties.Add(new CollectionProperty("min-date-time", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<C:min-date-time {Namespaces["C"]}>{this.MinDateTime()}</C:min-date-time>" });
 
             Properties.Add(new CollectionProperty("max-date-time", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<C:max-date-time {Namespaces["C"]}>{this.MaxDateTime()}</C:max-date-time>" });
-        /// </summary>
+        
 
             Properties.Add(new CollectionProperty("max-instances", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<C:max-instances {Namespaces["C"]}>10</C:max-instances>" });
-        /// </summary>
+       
 
             Properties.Add(new CollectionProperty("getcontentlength", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:getcontentlength {Namespaces["D"]}>0</D:getcontentlength>"});
-        /// </summary>
+     
 
             Properties.Add(new CollectionProperty("supported-calendar-component-set", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = true, Value = $@"<C:supported-calendar-component-set {Namespaces["C"]}>&lt;C:comp name=""VEVENT""/&gt;&lt;C:comp name=""VTODO""/&gt;</C:supported-calendar-component-set>" });

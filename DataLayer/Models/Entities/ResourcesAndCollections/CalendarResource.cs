@@ -80,6 +80,7 @@ namespace DataLayer.Entities
         /// The ACL properties of the resource.
         public AccessControlProperties AccessControlProperties { get; set; }
 
+        public int AccessControlPropertiesId { get; set; }
 
     }
 }

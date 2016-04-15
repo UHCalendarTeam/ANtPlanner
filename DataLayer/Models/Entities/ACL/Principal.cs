@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,5 +37,8 @@ namespace DataLayer.Models.ACL
         /// The readable name of the principal.
         /// </summary>
         public string Displayname { get; set; }
+
+        [ScaffoldColumn(false)]
+        public int PrincipalId { get; set; }
     }
 }
