@@ -14,7 +14,7 @@ namespace ACL.Core
 {
     public class ACLReport:IReportMethods
     {
-        public string ProcessRequest(HttpRequest request, CalDavContext context)
+        public bool ProcessRequest(HttpRequest request, CalDavContext context)
         {
             //take the string representation of the body
             string bodyStr = request.Body.ToString();
@@ -31,12 +31,24 @@ namespace ACL.Core
                 case "principal-search-property-set":
                     return PrincipalSearchPropertySet();
             }
-            return "";
+            return false;
 
         }
 
-        public string AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
         {
+
+
+            ///take the requested properties from the body
+            /// of the request
+            IXMLTreeStructure propNode;
+
+            ///first take the node container of the property names
+            body.GetChildAtAnyLevel("prop", out propNode);
+
+            //take the children of the node, these are the proeprties
+            var requestedProperties = propNode.Children.Select(x => x.NodeName);
+
             string colUrl = "";
 
             //Take the resource with the href == to the given url
@@ -66,21 +78,22 @@ namespace ACL.Core
 
 
 
+            return true;
 
 
         }
 
-        public string PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
         {
             throw new NotImplementedException();
         }
 
-        public string PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
         {
             throw new NotImplementedException();
         }
 
-        public string PrincipalSearchPropertySet()
+        public bool PrincipalSearchPropertySet()
         {
             throw new NotImplementedException();
         }
