@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataLayer;
 using CalDAV.Utils.XML_Processors;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;
@@ -43,9 +43,9 @@ namespace CalDav_tests
                     Href = "test.ics",
                     //Recurrence = "test",
                    // User = user,
-                    Properties = new List<ResourceProperty>()
+                    Properties = new List<Property>()
                     {
-                        new ResourceProperty()
+                        new Property()
                         {
                             Name = "getetag",
                             Namespace = "DAV:",
@@ -54,7 +54,7 @@ namespace CalDav_tests
                             IsMutable = true,
                             IsDestroyable = false
                         },
-                        new ResourceProperty()
+                        new Property()
                         {
                             Namespace = "DAV:",
                             Name = "creationdate",
@@ -85,9 +85,9 @@ namespace CalDav_tests
                     //ResourceType = new XmlTreeStructure("resourcetype", "DAV"),
                     //Displayname = "Display name",
                     Url = "url",
-                    Properties = new List<CollectionProperty>()
+                    Properties = new List<Property>()
                     {
-                        new CollectionProperty()
+                        new Property()
                         {
                             Name = "calendar-description",
                             Namespace = @"xmlns:C=""urn:ietf:params:xml:ns:caldav""",
@@ -96,7 +96,7 @@ namespace CalDav_tests
                             IsMutable = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty()
+                        new Property()
                         {
                            Name = "displayname",
                             Namespace ="DAV:",

@@ -8,7 +8,7 @@ using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using DataLayer;
 using CalDAV.Utils.XML_Processors;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;

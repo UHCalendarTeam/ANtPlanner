@@ -6,7 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using TreeForXml;
 using System.Reflection;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 
 namespace DataLayer
 {
@@ -136,7 +136,7 @@ namespace DataLayer
             //if the property did not exist it is created.
             if (property == null)
             {
-                collection.Properties.Add(new CollectionProperty() {Name = propertyName, Namespace = nameSpace,
+                collection.Properties.Add(new Property() {Name = propertyName, Namespace = nameSpace,
                     IsDestroyable = true, IsVisible = false, IsMutable = true, Value = propertyValue});
                 return true;
             }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using DataLayer.Models.ACL;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
@@ -17,9 +17,9 @@ namespace DataLayer
         public DbSet<CalendarResource> CalendarResources { get; set; }
 
         public DbSet<Principal> Principals { get; set; }
-        public DbSet<CollectionProperty> CollectionProperties { get; set; }
+        public DbSet<Property> CollectionProperties { get; set; }
 
-        public DbSet<ResourceProperty> ResourceProperties { get; set; }
+        public DbSet<Property> ResourceProperties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
@@ -41,12 +41,12 @@ namespace DataLayer
                 .WithMany(u => u.Calendarresources)
                 .HasForeignKey(k => k.CollectionId);
 
-            modelBuilder.Entity<CollectionProperty>()
+            modelBuilder.Entity<Property>()
                 .HasOne(c => c.Collection)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.CollectionId);
 
-            modelBuilder.Entity<ResourceProperty>()
+            modelBuilder.Entity<Property>()
                 .HasOne(r => r.Resource)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.ResourceId);

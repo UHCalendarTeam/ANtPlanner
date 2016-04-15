@@ -6,7 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CalDAV.Core;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;
@@ -43,9 +43,9 @@ namespace CalDav_tests
                 new CalendarResource
                 {
                     Href = "test.ics",
-                    Properties = new List<ResourceProperty>
+                    Properties = new List<Property>
                     {
-                         new ResourceProperty
+                         new Property
                         {
                             Name = "getcontenttype",
                             Namespace = NamespacesSimple["D"],
@@ -54,7 +54,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "resourcetype",
                             Namespace = NamespacesSimple["D"],
@@ -63,7 +63,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "displayname",
                             Namespace = NamespacesSimple["D"],
@@ -72,7 +72,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "getetag",
                             Namespace = NamespacesSimple["D"],
@@ -81,7 +81,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "creationdate",
                             Namespace = NamespacesSimple["D"],
@@ -90,7 +90,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "getcontentlanguage",
                             Namespace = NamespacesSimple["D"],
@@ -99,7 +99,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "getcontentlength",
                             Namespace = NamespacesSimple["D"],
@@ -108,7 +108,7 @@ namespace CalDav_tests
                             IsDestroyable = false,
                             IsMutable = true
                         },
-                        new ResourceProperty
+                        new Property
                         {
                             Name = "getlastmodified",
                             Namespace = NamespacesSimple["D"],
@@ -132,9 +132,9 @@ namespace CalDav_tests
 
                     Url = "url",
 
-                    Properties = new List<CollectionProperty>
+                    Properties = new List<Property>
                     {
-                         new CollectionProperty
+                         new Property
                          {
                             Name= "calendar-timezone",
                             Namespace = NamespacesSimple["C"],
@@ -143,7 +143,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "max-resource-size",
                             Namespace = NamespacesSimple["C"],
@@ -152,7 +152,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                         new CollectionProperty
+                         new Property
                          {
                             Name= "min-date-time",
                             Namespace = NamespacesSimple["C"],
@@ -161,7 +161,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                          new CollectionProperty
+                          new Property
                           {
                             Name= "max-date-time",
                             Namespace = NamespacesSimple["C"],
@@ -170,7 +170,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                           new CollectionProperty
+                           new Property
                            {
                             Name= "max-instances",
                             Namespace = NamespacesSimple["C"],
@@ -179,7 +179,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "getcontentlength",
                             Namespace = NamespacesSimple["D"],
@@ -188,7 +188,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                         new CollectionProperty
+                         new Property
                         {
                             Name= "supported-calendar-component-set",
                             Namespace = NamespacesSimple["C"],
@@ -197,7 +197,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                          new CollectionProperty
+                          new Property
                         {
                             Name= "supported-calendar-data",
                             Namespace = NamespacesSimple["C"],
@@ -206,7 +206,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                           new CollectionProperty
+                           new Property
                         {
                             Name= "getetag",
                             Namespace = NamespacesSimple["D"],
@@ -215,7 +215,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "calendar-description",
                             Namespace = NamespacesSimple["C"],
@@ -224,7 +224,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "resourcetype",
                             Namespace = NamespacesSimple["D"],
@@ -233,7 +233,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "displayname",
                             Namespace = NamespacesSimple["D"],
@@ -242,7 +242,7 @@ namespace CalDav_tests
                             IsVisible = true,
                             IsDestroyable = false
                         },
-                        new CollectionProperty
+                        new Property
                         {
                             Name= "creationdate",
                             Namespace = NamespacesSimple["D"],
@@ -264,7 +264,7 @@ namespace CalDav_tests
         }
 
         [Fact]
-        public void ModifyCollectionPropertySuccesful()
+        public void ModifyPropertySuccesful()
         {
             var db = MockDatabase();
             var fs = new FileSystemManagement();

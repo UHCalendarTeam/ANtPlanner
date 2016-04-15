@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using DataLayer.Models.ACL;
 
 namespace DataLayer.Models.Entities
@@ -16,6 +16,9 @@ namespace DataLayer.Models.Entities
             Namespace = nameSpace;
         }
 
+        public Property()
+        {
+        }
 
         [ScaffoldColumn(false)]
         public int PropertyId { get; set; }
