@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using CalDAV.Core;
 using DataLayer;
+using DataLayer.Entities;
 using Xunit;
 
 namespace CalDav_tests
