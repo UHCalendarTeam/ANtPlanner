@@ -14,8 +14,9 @@ namespace ACL.Core
 {
     public class ACLReport:IReportMethods
     {
-        public bool ProcessRequest(HttpRequest request, CalDavContext context)
+        public bool ProcessRequest(HttpRequest request, CalDavContext context, out HttpResponse response)
         {
+            response = null;
             //take the string representation of the body
             string bodyStr = request.Body.ToString();
             var xmlbody = XmlTreeStructure.Parse(bodyStr);
@@ -23,21 +24,21 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                    return AclPrincipalPropSet(xmlbody, request, context);
+                    return AclPrincipalPropSet(xmlbody, request, context, out response);
                 case "principal-match":
-                    return PrincipalMatch(xmlbody, request, context);
+                    return PrincipalMatch(xmlbody, request, context, out response);
                 case "principal-property-search":
-                    return PrincipalPropertySearch(xmlbody, request, context);
+                    return PrincipalPropertySearch(xmlbody, request, context, out response);
                 case "principal-search-property-set":
-                    return PrincipalSearchPropertySet();
+                    return PrincipalSearchPropertySet(out response);
             }
             return false;
 
         }
 
-        public bool AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
         {
-
+            response = null;
 
             ///take the requested properties from the body
             /// of the request
@@ -76,6 +77,8 @@ namespace ACL.Core
                     principals.Add(principal);
             }
 
+            ///take the requested properties from the principals
+            
 
 
             return true;
@@ -83,17 +86,17 @@ namespace ACL.Core
 
         }
 
-        public bool PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public bool PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context)
+        public bool PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, out HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public bool PrincipalSearchPropertySet()
+        public bool PrincipalSearchPropertySet(out HttpResponse response)
         {
             throw new NotImplementedException();
         }
