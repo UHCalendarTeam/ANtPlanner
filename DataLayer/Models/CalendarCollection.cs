@@ -33,7 +33,7 @@ namespace DataLayer
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:getcontentlength {Namespaces["D"]}>0</D:getcontentlength>"});
 
             Properties.Add(new CollectionProperty("supported-calendar-component-set", NamespacesSimple["C"])
-            { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $@"<C:supported-calendar-component-set {Namespaces["C"]}>&lt;C:comp name=""VEVENT""/&gt;&lt;C:comp name=""VTODO""/&gt;</C:supported-calendar-component-set>" });
+            { IsVisible = true, IsDestroyable = false, IsMutable = true, Value = $@"<C:supported-calendar-component-set {Namespaces["C"]}>&lt;C:comp name=""VEVENT""/&gt;&lt;C:comp name=""VTODO""/&gt;</C:supported-calendar-component-set>" });
 
             Properties.Add(new CollectionProperty("supported-calendar-data", NamespacesSimple["C"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $@"<C:supported-calendar-data {Namespaces["C"]}><C:comp name=""VEVENT""/><C:comp name=""VTODO""/></C:supported-calendar-data>" });
@@ -63,8 +63,6 @@ namespace DataLayer
             Calendarresources = new List<CalendarResource>();
             Properties = new List<CollectionProperty>();
             InitializeStandardCollectionProperties(Name);
-
-
         }
 
         [ScaffoldColumn(false)]

@@ -57,13 +57,29 @@ namespace CalDAV.Core
             //If not the corresponding statusCode and error message are returned inside
             //the errorMessage property
             var errorMessage = new KeyValuePair<HttpStatusCode, string>();
+            var createdMessage = new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+
+            //Cheking Preconditions
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
                 return errorMessage;
 
-            //If it has not body, it is created with default values.
+            //I create here the collection already but i wait for other comprobations before save the database.
+            CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+
+            //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
-                return CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                {
+                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                        StorageManagement.DeleteCalendarCollection();
+                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                   
+                }
+                    
+
+                db.SaveChanges();
+                return createdMessage;
             }
 
             //If a body exist the it is parsed like an XmlTree
@@ -72,7 +88,16 @@ namespace CalDAV.Core
             //if it does not have set property it is treated as a empty body.
             if (mkCalendarTree.Children.Count == 0)
             {
-                return CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                {
+                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                        StorageManagement.DeleteCalendarCollection();
+                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                }
+                    
+
+                db.SaveChanges();
+                return createdMessage;
             }
 
             //now it is assumed that the body contains a set
@@ -97,14 +122,25 @@ namespace CalDAV.Core
 
             if (hasError)
             {
+                if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                    StorageManagement.DeleteCalendarCollection();
                 ChangeToDependencyError(response);
                 //TODO: aki debe ser en realidad 207 multistatus pero no lo encuentro.
                 return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, multistatus.ToString());
             }
 
-            db.SaveChanges();
-            //StartUp.CreateCollectionForUser(propertiesAndHeaders["userEmail"], propertiesAndHeaders["collectionName"]);
-            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+            //Checking Preconditions   
+            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+            {
+                db.SaveChanges();
+                return createdMessage;
+            }
+
+            if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
+                StorageManagement.DeleteCalendarCollection();
+            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+
+
         }
 
         private KeyValuePair<HttpStatusCode, string> CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders, ref KeyValuePair<HttpStatusCode, string> errorMessage)
@@ -126,14 +162,6 @@ namespace CalDAV.Core
 
             //Adding the collection folder.
             StorageManagement.AddCalendarCollectionFolder(userEmail, collectionName);
-
-            //Checking Preconditions   
-            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
-            {
-                db.SaveChanges();
-                return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
-            }
-
 
             return errorMessage;
         }

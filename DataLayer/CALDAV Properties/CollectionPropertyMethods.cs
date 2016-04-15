@@ -39,8 +39,8 @@ namespace DataLayer
         /// error stack.
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="propertyName"></param>
-        /// <param name="mainNs"></param>
+        /// <param name="propertyName">Name of the property</param>
+        /// <param name="mainNs">Main Namespace</param>
         /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
         public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName, string mainNs, Stack<string> errorStack)
@@ -64,7 +64,7 @@ namespace DataLayer
         /// an "allprop" property method of Propfind.
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="errorStack"></param>
+        /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
         public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection, Stack<string> errorStack)
         {
@@ -141,7 +141,11 @@ namespace DataLayer
             }
             //if this property belongs to the fix system properties, it can not be changed.
             if (!property.IsMutable)
+            {
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
+            }
+                
 
             //if all previous conditions don't pass then the value of the property is changed.
             property.Value = propertyValue;

@@ -123,16 +123,20 @@ namespace DataLayer
                     IsDestroyable = true,
                     IsVisible = false,
                     IsMutable = true,
-                    Value = XmlTreeStructure.Parse(propertyValue).ToString()
+                    Value = propertyValue
                 });
                 return true;
             }
             //if this property belongs to the fix system properties, it can not be changed.
             if (!property.IsMutable)
+            {
+                errorStack.Push("HTTP/1.1 403 Forbidden");
                 return false;
+            }
+                
 
             //if all previous conditions don't pass then the value of the property is changed.
-            property.Value = XmlTreeStructure.Parse(propertyValue).ToString();
+            property.Value = propertyValue;
             return true;
         }
 

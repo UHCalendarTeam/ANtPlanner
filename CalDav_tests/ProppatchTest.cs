@@ -21,7 +21,7 @@ namespace CalDav_tests
         {
             #region FIlling Database
             //FileSystemManagement fs = new FileSystemManagement();
-            var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
+            //var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
             // optionsBuilder.UseInMemoryDatabase();
