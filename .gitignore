@@ -323,3 +323,4 @@ CalDAV/Migrations/20160404201014_InitialMigration.cs
 CalDAV/Migrations/20160404201014_InitialMigration.Designer.cs
 src/CalDav_Services/CalDAV/Migrations/20160326045720_ChangingPropNamesForEasyResolve.cs
 src/CalDav_Services/CalDAV/Migrations/20160326045720_ChangingPropNamesForEasyResolve.cs
+DataLayer/Migrations

@@ -4,6 +4,7 @@ using System.Text;
 using CalDAV.Core;
 using CalDAV.Core.Propfind;
 using DataLayer;
+using DataLayer.Entities;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;

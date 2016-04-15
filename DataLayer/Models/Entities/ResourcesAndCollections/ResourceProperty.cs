@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataLayer
+namespace DataLayer.Entities
 {
+    /// <summary>
+    ///     Define a set of properties for the
+    ///     resources.
+    /// </summary>
     public class ResourceProperty
     {
         public ResourceProperty(string name, string nameSpace)
@@ -18,6 +18,7 @@ namespace DataLayer
 
         [ScaffoldColumn(false)]
         public int ResourcePropertyId { get; set; }
+
         public CalendarResource Resource { get; set; }
 
         public int ResourceId { get; set; }
@@ -35,6 +36,5 @@ namespace DataLayer
         public bool IsMutable { get; set; }
 
         public bool IsVisible { get; set; }
-
     }
 }

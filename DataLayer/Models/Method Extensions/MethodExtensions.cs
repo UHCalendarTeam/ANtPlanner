@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.Data.Entity;
+using DataLayer.Entities;
 
 namespace DataLayer
 {

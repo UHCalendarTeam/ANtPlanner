@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLayer;
-
+using DataLayer.Entities;
 using Xunit;
 
 namespace CalDav_tests

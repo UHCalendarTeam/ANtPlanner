@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DataLayer;
-using TreeForXml;
 
-namespace DataLayer
+namespace DataLayer.Entities
 {
 
     /// <summary>
-    /// to store the main properties of a cal resource.
+    ///     to store the main properties of a cal resource.
     /// </summary>
     public class CalendarResource
     {
@@ -67,7 +64,8 @@ namespace DataLayer
         public int CollectionId { get; set; }
 
         /// <summary>
-        /// The collection where the resource is defined.
+        ///     The owner of the resource
+        ///     The collection where the resource is defined.
         /// </summary>
         public CalendarCollection Collection { get; set; }
 
@@ -75,7 +73,10 @@ namespace DataLayer
 
         public ICollection<ResourceProperty> Properties { get; set; }
 
-
+        /// </summary>
+        /// Default value = DateTime.Max
+        /// The endDateTime of the resource if defined.
+        //public string DtStart { get; set; }
 
     }
 }

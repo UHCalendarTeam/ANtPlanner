@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using TreeForXml;
 using System.Reflection;
+using DataLayer.Entities;
 
 namespace DataLayer
 {

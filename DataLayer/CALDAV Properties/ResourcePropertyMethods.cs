@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using DataLayer.Entities;
 using TreeForXml;
 
 namespace DataLayer

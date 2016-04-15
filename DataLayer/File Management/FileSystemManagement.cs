@@ -17,7 +17,7 @@ namespace DataLayer
                 Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
-                Root = Directory.GetCurrentDirectory() + root;
+                Root = Directory.GetCurrentDirectory() + "\\"+root;
         }
 
         public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")

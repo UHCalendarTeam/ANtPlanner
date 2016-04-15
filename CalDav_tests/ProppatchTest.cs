@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CalDAV.Core;
+using DataLayer.Entities;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;
