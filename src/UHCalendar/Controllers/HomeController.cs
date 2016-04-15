@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using DataLayer;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 
 namespace UHCalendar.Controllers
 {

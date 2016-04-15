@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using TreeForXml;
 
 namespace DataLayer
@@ -117,7 +117,7 @@ namespace DataLayer
             //if the property did not exist it is created.
             if (property == null)
             {
-                resource.Properties.Add(new ResourceProperty
+                resource.Properties.Add(new Property
                 {
                     Name = propertyName,
                     Namespace = nameSpace,

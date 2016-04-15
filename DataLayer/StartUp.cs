@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 
 
 namespace DataLayer
@@ -57,9 +57,9 @@ namespace DataLayer
                 {
                     User = user,
                     Name = collectionName,
-                    Properties = new List<CollectionProperty>()
+                    Properties = new List<Property>()
                     {
-                        new CollectionProperty()
+                        new Property()
                         {
                             Name = "calendar-description",
                             Namespace = "C:",

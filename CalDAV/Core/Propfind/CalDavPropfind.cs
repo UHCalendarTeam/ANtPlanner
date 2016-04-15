@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using DataLayer;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using TreeForXml;
 
 namespace CalDAV.Core.Propfind

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Http;
 using TreeForXml;
 
 
@@ -68,8 +69,8 @@ namespace CalDAV.Core
         /// </summary>
         /// <returns></returns>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="etag"></param>
-        string ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string etag);
+        /// <param name="response"></param>
+        Task ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         /// CalDav Http method for get a Calendar Collection

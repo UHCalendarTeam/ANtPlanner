@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace DataLayer.Entities
+namespace DataLayer.Models.Entities
 {
     /// <summary>
     ///     Defines the main properties for the users

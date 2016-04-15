@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.ACL;
 
-namespace DataLayer.Entities
+namespace DataLayer.Models.Entities
 {
 
     /// <summary>
@@ -16,40 +16,40 @@ namespace DataLayer.Entities
 
         private void InitializeStandardResourceProperties()
         {
-            Properties.Add(new ResourceProperty("getcontenttype", NamespacesSimple["D"])
+            Properties.Add(new Property("getcontenttype", NamespacesSimple["D"])
             { IsVisible = true, IsMutable = false, IsDestroyable = false, Value = $"<D:getcontenttype {Namespaces["D"]}>text/icalendar</D:getcontenttype>" });
 
-            Properties.Add(new ResourceProperty("resourcetype", NamespacesSimple["D"])
+            Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>" });
 
-            Properties.Add(new ResourceProperty("displayname", NamespacesSimple["D"])
+            Properties.Add(new Property("displayname", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = true });
 
             //TODO: Generar Etag en creacion.
-            Properties.Add(new ResourceProperty("getetag", NamespacesSimple["D"])
+            Properties.Add(new Property("getetag", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false });
 
-            Properties.Add(new ResourceProperty("creationdate", NamespacesSimple["D"])
+            Properties.Add(new Property("creationdate", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>" });
 
-            Properties.Add(new ResourceProperty("getcontentlanguage", NamespacesSimple["D"])
+            Properties.Add(new Property("getcontentlanguage", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = true, Value = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>" });
 
-            Properties.Add(new ResourceProperty("getcontentlength", NamespacesSimple["D"])
+            Properties.Add(new Property("getcontentlength", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:getcontentlength {Namespaces["D"]}>0</D:getcontentlength>" });
 
-            Properties.Add(new ResourceProperty("getlastmodified", NamespacesSimple["D"])
+            Properties.Add(new Property("getlastmodified", NamespacesSimple["D"])
             { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>" });
         }
         public CalendarResource()
         {
-            Properties = new List<ResourceProperty>();
+            Properties = new List<Property>();
             InitializeStandardResourceProperties();
         }
         public CalendarResource(string href)
         {
             Href = href;
-            Properties = new List<ResourceProperty>();
+            Properties = new List<Property>();
             InitializeStandardResourceProperties();
         }
 
@@ -74,7 +74,7 @@ namespace DataLayer.Entities
         public CalendarCollection Collection { get; set; }
        
 
-        public ICollection<ResourceProperty> Properties { get; set; }
+        public ICollection<Property> Properties { get; set; }
         
         /// <summary>
         /// The ACL properties of the resource.

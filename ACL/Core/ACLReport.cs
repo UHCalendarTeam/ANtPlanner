@@ -7,7 +7,7 @@ using ACL.Interfaces;
 using DataLayer;
 using Microsoft.AspNet.Http;
 using TreeForXml;
-using DataLayer.Entities;
+using DataLayer.Models.Entities;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 
