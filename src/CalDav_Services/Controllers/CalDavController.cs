@@ -10,6 +10,8 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.Extensions.Primitives;
 using DataLayer;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Http.Abstractions;
 
 namespace CalDav_Services.Controllers
 {
@@ -38,13 +40,15 @@ namespace CalDav_Services.Controllers
         }
 
         [AcceptVerbs("propfind")]
-        public string PropFind()
+        public async Task PropFind()
         {
-            return "test";
+
+            await Response.WriteAsync("sdf");
+            // return "test";
         }
         #endregion
 
-         
+
         #region Collection Methods
 
         //MKCAL api\caldav\{username}\calendars\{collection_name}
@@ -56,6 +60,7 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
+
             return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body)).Value;
         }
 
@@ -66,7 +71,7 @@ namespace CalDav_Services.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            
+
 
             return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
         }
@@ -81,7 +86,7 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
 
             StringValues depth;
-            if(Request.Headers.TryGetValue("Depth", out depth)) 
+            if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
             var res = CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
@@ -96,7 +101,7 @@ namespace CalDav_Services.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
-            
+
             return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
         }
         #endregion
@@ -108,7 +113,7 @@ namespace CalDav_Services.Controllers
         public void Put(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail",user);
+            propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
             propertiesAndHeaders.Add("body", StreamToString(Request.Body));
@@ -118,11 +123,11 @@ namespace CalDav_Services.Controllers
 
             string etag;
 
-            if (Request.Headers.TryGetValue("If-Match", out ifMatch) && ifMatch.Count==1)
+            if (Request.Headers.TryGetValue("If-Match", out ifMatch) && ifMatch.Count == 1)
             {
                 propertiesAndHeaders.Add("If-Match", ifMatch.FirstOrDefault());
             }
-            else if(Request.Headers.ContainsKey("If-None-Match"))
+            else if (Request.Headers.ContainsKey("If-None-Match"))
             {
                 propertiesAndHeaders.Add("If-Match", "*");
             }
@@ -130,7 +135,7 @@ namespace CalDav_Services.Controllers
             {
                 propertiesAndHeaders.Add("Etag", etags.FirstOrDefault());
             }
-            
+
 
             CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, out etag);
         }
@@ -159,18 +164,14 @@ END:VCALENDAR";
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("{user}/calendars/{collection}/{calendarResourceId}")]
-        public string Get(string user, string collection, string calendarResourceId)
+        public async Task Get(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
-            //if auth the this
-            string etag;
-            var result =  CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, out etag);
-            Response.Headers.Add("Etag", etag);
-            return result;
+            
+            await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
         // DELETE api/values/5
@@ -199,7 +200,7 @@ END:VCALENDAR";
         }
         #endregion
 
-      
+
 
 
         private string StreamToString(Stream stream)
@@ -208,9 +209,9 @@ END:VCALENDAR";
             return reader.ReadToEnd();
         }
 
-        
 
-       
+
+
 
 
     }

@@ -1,8 +1,10 @@
 {
-  "authors": [ "UHCalendarTeam" ],  
+  "authors": [ "UHCalendarTeam" ],
     "dependencies": {
-        "DataLayer": "1.0.0-*",        
+        "DataLayer": "1.0.0-*",
         "ICalendar": "1.0.0-rc2-*",
+        "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
+        "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
         "Microsoft.CSharp": "4.0.1-beta-23516",
         "System.Collections": "4.0.11-beta-23516",
         "System.IO": "4.0.11-beta-23516",

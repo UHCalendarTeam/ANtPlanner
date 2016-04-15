@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using DataLayer;
@@ -10,8 +11,11 @@ using CalDAV.Utils.XML_Processors;
 using DataLayer.Entities;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
+using Microsoft.AspNet.Http;
+
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Net.Http.Headers;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -75,9 +79,9 @@ namespace CalDAV.Core
                     if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
                         StorageManagement.DeleteCalendarCollection();
                     return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
-                   
+
                 }
-                    
+
 
                 db.SaveChanges();
                 return createdMessage;
@@ -95,7 +99,7 @@ namespace CalDAV.Core
                         StorageManagement.DeleteCalendarCollection();
                     return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
                 }
-                    
+
 
                 db.SaveChanges();
                 return createdMessage;
@@ -258,7 +262,7 @@ namespace CalDAV.Core
             return response;
         }
 
-        //TODO: Nacho
+        //TODO: Adriano
         public string Report(Dictionary<string, string> propertiesAndHeaders, string body)
         {
             throw new NotImplementedException();
@@ -550,18 +554,37 @@ namespace CalDAV.Core
             return StorageManagement.DeleteCalendarCollection();
         }
 
-        public string ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string etag)
+        public async Task ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceId"];
 
+            //An easy way of accessing the headers of the http response
+            var responseHeader = response.GetTypedHeaders();
+
+            StorageManagement.SetUserAndCollection(userEmail, collectionName);
             //Must return the Etag header of the COR
 
             var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-            etag = calendarRes.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
+            
+            if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+            {
+                
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
 
-            return StorageManagement.GetCalendarObjectResource(calendarResourceId);
+            var resourceBody = StorageManagement.GetCalendarObjectResource(calendarResourceId);
+
+            var etagProperty = calendarRes.Properties.SingleOrDefault(x => x.Name == "getetag");
+            if (etagProperty != null)
+            {
+                var etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
+                responseHeader.ETag = new EntityTagHeaderValue(etag, false);
+            }
+
+            await response.WriteAsync(resourceBody);
         }
 
         public string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
