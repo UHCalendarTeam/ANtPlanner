@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core;
 using DataLayer;
@@ -141,9 +142,10 @@ namespace CalDav_Services.Controllers
         }
 
         [HttpGet]
-        public string test()
+        public void test()
         {
-            return @"BEGIN:VCALENDAR
+           
+            var body= @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTODO
@@ -160,6 +162,15 @@ TRIGGER;RELATED=START:-PT10M
 END:VALARM
 END:VTODO
 END:VCALENDAR";
+            //var arr = UTF8Encoding.UTF8.GetBytes(body.ToArray());
+            //Response.Body.Write(arr,0,arr.Length);
+           
+            Response.StatusCode = 207;
+            Response.Headers["test"] = "test";
+            var headers = Response.GetTypedHeaders();
+            headers.ContentLength = 300;
+            Response.Headers["ContentLength"] = "300";
+
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
