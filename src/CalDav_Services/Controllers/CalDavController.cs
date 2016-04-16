@@ -194,7 +194,18 @@ END:VCALENDAR";
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders);
+            CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
+        }
+
+        // DELETE api/values/
+        [HttpDelete("{user}/calendars/{collection}")]
+        public void Delete(string user, string collection)
+        {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+
+            CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
         }
 
         //REPORT api/values/5
@@ -211,19 +222,11 @@ END:VCALENDAR";
         }
         #endregion
 
-
-
-
         private string StreamToString(Stream stream)
         {
             StreamReader reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
-
-
-
-
-
 
     }
 }

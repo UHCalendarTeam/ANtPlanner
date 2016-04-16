@@ -517,7 +517,7 @@ namespace CalDAV.Core
 
         #endregion
 
-        public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders)
+        public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
@@ -537,19 +537,22 @@ namespace CalDAV.Core
             return StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
         }
 
-        public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
+        public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
-            var resourceId = propertiesAndHeaders["resourceId"];
 
+            response.StatusCode = (int) HttpStatusCode.NoContent;
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
-                return false;
-
-
+                return true;
+            
             var collection = db.GetCollection(userEmail, collectionName);
             if (collection == null)
+            {
+                response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return false;
+            }
+                
             db.CalendarCollections.Remove(collection);
             return StorageManagement.DeleteCalendarCollection();
         }
