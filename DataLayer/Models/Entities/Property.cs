@@ -39,6 +39,7 @@ namespace DataLayer.Models.Entities
         ///     The string representation of the
         ///     xml that contains the values of the
         ///     property.
+        ///     Should contains the full ns of the node.
         /// </summary>
         public string Value { get; set; }
 
@@ -64,18 +65,16 @@ namespace DataLayer.Models.Entities
 
         public CalendarResource Resource { get; set; }
 
-        public int ResourceId { get; set; }
+        public int? ResourceId { get; set; }
         public CalendarCollection Collection { get; set; }
 
-        public int CollectionId { get; set; }
+        public int? CollectionId { get; set; }
 
-        public int PricipalId { get; set; }
+        public int? PricipalId { get; set; }
 
         public Principal Principal { get; set; }
 
-        public int AccessControlPropertiesId { get; set; }
-
-        public AccessControlProperties AccessControlProperties { get; set; }
+        
 
         #endregion
     }

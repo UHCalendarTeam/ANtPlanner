@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.Entities;
 
 namespace DataLayer.Models.ACL
 {
@@ -47,7 +49,7 @@ namespace DataLayer.Models.ACL
         //public string this[string propertyName]
         //{
         //    get{
-               
+
         //        try
         //        {
         //            return (string) this.GetType().GetProperty(propertyName).GetValue(this, null);
@@ -58,5 +60,11 @@ namespace DataLayer.Models.ACL
         //        }
         //    }
         //}
+
+        /// <summary>
+        ///     Contains the properties of 
+        ///     principal.
+        /// </summary>            
+        public List<Property> Properties { get; set; }
     }
 }

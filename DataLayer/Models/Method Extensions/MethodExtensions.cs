@@ -35,7 +35,7 @@ namespace DataLayer
             try
             {
                 return source.Users.Include(x => x.CalendarCollections).ThenInclude(c => c.Properties)
-                    .Include(k => k.CalendarCollections).ThenInclude(y => y.Calendarresources).ThenInclude(p => p.Properties)
+                    .Include(k => k.CalendarCollections).ThenInclude(y => y.CalendarResources).ThenInclude(p => p.Properties)
                     .First(u => u.Email == userEmail);
             }
             catch (Exception)
@@ -98,7 +98,7 @@ namespace DataLayer
                 return false;
 
             return (
-                from resource in GetCollection(source, userEmail, collectionName).Calendarresources
+                from resource in GetCollection(source, userEmail, collectionName).CalendarResources
                 where resource.Href == calResource
                 select resource
                 ).Any();
@@ -115,7 +115,7 @@ namespace DataLayer
             string collectionName, string calResource)
         {
             return source.GetCollection(userEmail, collectionName)
-                .Calendarresources
+                .CalendarResources
                 .First(cr => cr.Href == calResource);
         }
 

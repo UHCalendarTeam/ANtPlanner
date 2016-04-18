@@ -535,7 +535,7 @@ namespace CalDAV.Core
 
             var resource =
                 db.GetCollection(userEmail, collectionName)
-                    .Calendarresources.First(x => x.Href == calendarResourceId);
+                    .CalendarResources.First(x => x.Href == calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
 

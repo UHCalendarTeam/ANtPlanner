@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
 
 namespace ACL.Core
 {
@@ -21,19 +22,17 @@ namespace ACL.Core
             return output;
         }
 
-
-        public static string TakeProperties(this Principal principal, IEnumerable<string> properties)
+        /// <summary>
+        /// Take the requested properties for a given principal.
+        /// </summary>
+        /// <param name="principal">THe principal where to take the properties</param>
+        /// <param name="properties">The requested properties.</param>
+        /// <returns>The properties with its name and namespace equal to the given.</returns>
+        public static IEnumerable<Property> TakeProperties(this Principal principal, IEnumerable<KeyValuePair<string, string>> properties)
         {
-            var formatedNames = properties.FormatPropertyName();
-            var propertiesValues = new List<string>();
-
-            foreach (var name in formatedNames)
-            {
-                
-            }
-
-            return "";
-
+            return properties
+                .Select(pair => principal.Properties
+                .FirstOrDefault(x => x.Name == pair.Key && x.Namespace == pair.Value));
         }
 
         /// <summary>
@@ -71,5 +70,7 @@ namespace ACL.Core
                 return stringB.ToString();
             });
         }
+
+        
     }
 }

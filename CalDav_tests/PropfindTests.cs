@@ -791,7 +791,7 @@ namespace CalDav_tests
                     //Calendardescription = "<C:calendar-description xmlns:C=\"urn:ietf:params:xml:ns:caldav\">empty description</C:calendar-description>",
                     Name = "Foocollection",
                     User = user,
-                    Calendarresources = resources,/*,
+                    CalendarResources = resources,/*,
                     SupportedCalendarComponentSet = new List<string>()*/
                     //ResourceType = new List<string>(),
 
