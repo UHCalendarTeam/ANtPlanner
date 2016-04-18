@@ -57,7 +57,7 @@ namespace CalDAV.Core.Propfind
 
                 collection = db.GetCollection(userEmail, collectionName);
 
-                foreach (var calendarResource in collection.Calendarresources)
+                foreach (var calendarResource in collection.CalendarResources)
                 {
                     //For every resource in the collection it is added a new xml "response"
                     var resourceResponse = AllPropFillTree(userEmail, collectionName, calendarResource.Href, aditionalProperties);
@@ -109,7 +109,7 @@ namespace CalDAV.Core.Propfind
 
                 collection = db.GetCollection(userEmail, collectionName);
 
-                foreach (var calendarResource in collection.Calendarresources)
+                foreach (var calendarResource in collection.CalendarResources)
                 {
                     var resourceResponse = PropFillTree(userEmail, collectionName, calendarResource.Href, propertiesReq);
                     multistatusTree.AddChild(resourceResponse);
@@ -150,7 +150,7 @@ namespace CalDAV.Core.Propfind
 
                 collection = db.GetCollection(userEmail, collectionName);
 
-                foreach (var calendarResource in collection.Calendarresources)
+                foreach (var calendarResource in collection.CalendarResources)
                 {
                     var resourceResponse = PropNameFillTree(userEmail, collectionName, calendarResource.Href);
                     multistatusTree.AddChild(resourceResponse);

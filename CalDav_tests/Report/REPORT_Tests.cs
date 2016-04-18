@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Xml.Linq;
-using DataLayer;
 using CalDAV.Core;
+using DataLayer;
 using TreeForXml;
 using Xunit;
 
@@ -13,7 +10,7 @@ namespace CalDav_tests.Report
     public class REPORT_Tests
     {
         /// <summary>
-        /// 7.8.1 Example: Partial Retrieval of Events by Time Range
+        ///     7.8.1 Example: Partial Retrieval of Events by Time Range
         /// </summary>
         [Fact]
         public void UnitTest1()
@@ -55,7 +52,7 @@ end=""20060105T000000Z""/>
 
             var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-            var reportMet=new CalDavReport();
+            var reportMet = new CalDavReport();
 
             var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -65,9 +62,7 @@ end=""20060105T000000Z""/>
             XNamespace nsDAV = "DAV:";
 
 
-
-
-            var responses = xmlResult.Root.Elements(nsDAV+"response");
+            var responses = xmlResult.Root.Elements(nsDAV + "response");
 
             Assert.Equal(2, responses.Count());
 
@@ -77,18 +72,15 @@ end=""20060105T000000Z""/>
 
             Assert.True(hrefs.First().Value.Contains("abcd2.ics"));
             Assert.True(hrefs.Last().Value.Contains("abcd3.ics"));
-
         }
 
 
         /// <summary>
-        /// 7.8.7 Example: Retrieval of Events by PARTSTAT
+        ///     7.8.7 Example: Retrieval of Events by PARTSTAT
         /// </summary>
         [Fact]
         public void UnitTest2()
         {
-         
-
             var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <C:calendar-query xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <D:prop xmlns:D=""DAV:"">
@@ -125,8 +117,6 @@ end=""20060105T000000Z""/>
             XNamespace nsDAV = "DAV:";
 
 
-
-
             var responses = xmlResult.Root.Elements(nsDAV + "response");
 
             Assert.Equal(1, responses.Count());
@@ -136,12 +126,10 @@ end=""20060105T000000Z""/>
             Assert.Equal(1, hrefs.Count());
 
             Assert.True(hrefs.First().Value.Contains("abcd3.ics"));
-          
-
         }
 
         /// <summary>
-        /// 7.8.8 Example: Retrieval of Events Only
+        ///     7.8.8 Example: Retrieval of Events Only
         /// </summary>
         [Fact]
         public void UnitTest3()
@@ -173,8 +161,6 @@ end=""20060105T000000Z""/>
             XNamespace nsDAV = "DAV:";
 
 
-
-
             var responses = xmlResult.Root.Elements(nsDAV + "response");
 
             Assert.Equal(3, responses.Count());
@@ -188,13 +174,10 @@ end=""20060105T000000Z""/>
             Assert.EndsWith("abcd1.ics", hrefValues[0]);
             Assert.EndsWith("abcd2.ics", hrefValues[1]);
             Assert.EndsWith("abcd3.ics", hrefValues[2]);
-
-
-
         }
 
         /// <summary>
-        /// 7.8.9 Example: Retrieval of All Pending To-Dos
+        ///     7.8.9 Example: Retrieval of All Pending To-Dos
         /// </summary>
         [Fact]
         public void UnitTest4()
@@ -236,7 +219,6 @@ negate-condition=""yes"">CANCELLED</C:text-match>
             XNamespace nsCalDAV = "urn:ietf:params:xml:ns:caldav";
 
 
-
             var calDatas = xmlResult.Root.Descendants(nsCalDAV + "calendar-data");
 
             Assert.Equal(2, calDatas.Count());
@@ -254,10 +236,7 @@ negate-condition=""yes"">CANCELLED</C:text-match>
 
             Assert.EndsWith("abcd4.ics", hrefValues[0]);
             Assert.EndsWith("abcd5.ics", hrefValues[1]);
-          
         }
-
-
 
 
         [Fact]
@@ -296,8 +275,6 @@ xmlns:C=""urn:ietf:params:xml:ns:caldav"">
             Assert.Equal("HTTP/1.1 200 OK", status.First().Value);
 
             Assert.Equal("HTTP/1.1 404 Not Found", status.Last().Value);
-
-
         }
     }
 }

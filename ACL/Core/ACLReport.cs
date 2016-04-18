@@ -15,7 +15,7 @@ namespace ACL.Core
 {
     public class ACLReport:IReportMethods
     {
-        public void ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
+        public async Task ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
         {
 
             ///check the depth of the header
@@ -40,26 +40,24 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                     AclPrincipalPropSet(xmlbody, request, context, response );
+                     await AclPrincipalPropSet(xmlbody, request, context, response );
                     break;
                 case "principal-match":
-                     PrincipalMatch(xmlbody, request, context, response);
+                    await PrincipalMatch(xmlbody, request, context, response);
                     break;
                 case "principal-property-search":
-                     PrincipalPropertySearch(xmlbody, request, context, response);
+                    await PrincipalPropertySearch(xmlbody, request, context, response);
                     break;
                 case "principal-search-property-set":
-                     PrincipalSearchPropertySet( response);
+                    await PrincipalSearchPropertySet( response);
                     break;
             }
             
 
         }
 
-        public void AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
+        public async Task AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
-            response = null;
-
             ///take the requested properties from the body
             /// of the request
             IXMLTreeStructure propNode;
@@ -77,13 +75,12 @@ namespace ACL.Core
             var resource = context.CalendarResources.FirstOrDefault(x => x.Href == colUrl);
 
             //take the accessControlProperties of the resource
-            var accControlProp = resource.AccessControlProperties;
+            var aclProperty = resource.Properties.First(x=>x.Name == "acl");
 
             //take the string representation of the acl property
             //this property is stored in xml format so is needed to
             //be parsed to xml
-            var aclProperty = accControlProp.Acl;
-            var xml = XDocument.Parse(aclProperty);
+            var xml = XDocument.Parse(aclProperty.Value);
 
             ///take the href of the principals of the property
             var principalsURLs = xml.Elements("principal").Select(x => x.Descendants("href").FirstOrDefault());
@@ -104,33 +101,39 @@ namespace ACL.Core
                principals[principal.Key] = principal.Key.TakeProperties(requestedProperties);
             }
 
+            await WriteBody(response, principals);
 
-           
 
 
         }
 
-        public void PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
+        public async Task PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public void PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
+        public async Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
         {
             throw new NotImplementedException();
         }
 
-        public void PrincipalSearchPropertySet(HttpResponse response)
+        public async Task PrincipalSearchPropertySet(HttpResponse response)
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// Build the xml of the body and write
+        /// its string representation to the HttpRespose.Body
+        /// </summary>
+        /// <param name="response">The response of the request.</param>
+        /// <param name="principalsAndProperties">The principals with its properties.</param>
+        /// <returns></returns>
         public async Task WriteBody(HttpResponse response,
             Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
         {
 
             ///build the root of the xml
-           var mutistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+           var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {
@@ -172,9 +175,10 @@ namespace ACL.Core
 
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
                     var propNode = new XmlTreeStructure("prop", "DAV:");
+                    ///add the properties to the prop node.
                     foreach (var property in pp.Value)
                     {
-                        propNode.AddChild()
+                        propNode.AddChild(XmlTreeStructure.Parse(property.Value));
                     }
 
                     propstatNode.AddChild(propNode);
@@ -188,7 +192,8 @@ namespace ACL.Core
                     responseNode.AddChild(propstatNode);
                 }
 
-                mutistatusNode.AddChild(responseNode);
+                multistatusNode.AddChild(responseNode);
+                await response.WriteAsync(multistatusNode.ToString());
             }
 
         }

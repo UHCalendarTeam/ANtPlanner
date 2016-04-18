@@ -128,7 +128,7 @@ namespace CalDav_tests
 
                     Name = "Foocollection",
                     User = user,
-                    Calendarresources = resources,
+                    CalendarResources = resources,
 
                     Url = "url",
 
