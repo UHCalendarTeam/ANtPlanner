@@ -54,7 +54,7 @@ namespace CalDav_Services.Controllers
 
         //MKCAL api\caldav\{username}\calendars\{collection_name}
         [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
-        public string MkCalendar(string user, string collection)
+        public async Task MkCalendar(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
@@ -62,7 +62,7 @@ namespace CalDav_Services.Controllers
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
 
-            return CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body)).Value;
+            await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         //PROPFIND COLLECTIONS
@@ -111,7 +111,7 @@ namespace CalDav_Services.Controllers
         #region Calendar Object Resource Methods
         // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpPut("{user}/calendars/{collection}/{calendarResourceId}")]
-        public void Put(string user, string collection, string calendarResourceId)
+        public async Task Put(string user, string collection, string calendarResourceId)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
@@ -138,7 +138,7 @@ namespace CalDav_Services.Controllers
             }
 
 
-            CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, out etag);
+           await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
         [HttpGet]
@@ -227,6 +227,7 @@ END:VCALENDAR";
             StreamReader reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
+
 
     }
 }

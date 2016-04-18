@@ -5,11 +5,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
 using ICalendar.GeneralInterfaces;
 using ICalendar.Utils;
+using Microsoft.AspNet.Http;
 
 namespace CalDAV.Core.ConditionsCheck
 {
@@ -24,7 +26,7 @@ namespace CalDAV.Core.ConditionsCheck
             db = context;
             StorageManagement = manager;
         }
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, out KeyValuePair<HttpStatusCode, string> errorMessage)
+        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
             var userEmail = propertiesAndHeaders["userEmail"];
@@ -36,16 +38,61 @@ namespace CalDAV.Core.ConditionsCheck
             var iCalendar = new VCalendar(body);//lo que no estoy seguro que en el body solo haya el iCal string
             #endregion
 
-            errorMessage = new KeyValuePair<HttpStatusCode, string>();
 
             //check that resourceId don't exist but the collection does.
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            {
+                response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
+            }
+
+            if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+            {
+                var uid = iCalendar.GetComponentProperties("UID");
+                // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                var collection = db.GetCollection(userEmail, collectionName);
+                foreach (var calendarresource in collection.Calendarresources)
+                {
+
+                    if (uid.StringValue == calendarresource.Uid)
+                    {
+
+                        response.StatusCode = (int)HttpStatusCode.Conflict;
+                        response.Body.Write($@"<?xml version='1.0' encoding='UTF-8'?>
+<error xmlns='DAV:'>
+<no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
+<href xmlns='DAV:'>{calendarresource.Href}</href>
+</no-uid-conflict>
+</error>");
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                var uid = iCalendar.GetComponentProperties("UID");
+                var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                if (resource.Uid == uid.StringValue)
+                {
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.Body.Write($@"<?xml version='1.0' encoding='UTF-8'?>
+<error xmlns='DAV:'>
+<no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
+<href xmlns='DAV:'>{resource.Href}</href>
+</no-uid-conflict>
+</error>");
+                    return false;
+                }
+            }
+
+
+
+
 
             if (propertiesAndHeaders.ContainsKey("If-Match"))
             {
                 //check that the value do exist
-                if (!StorageManagement.ExistCalendarObjectResource( calendarResourceId))
+                if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
                     return false;
             }
 
@@ -88,13 +135,13 @@ namespace CalDAV.Core.ConditionsCheck
 
             var uidCalendar = ((ComponentProperty<string>)iCalendar.Properties["UID"]).Value;
             //Check that if the operation is create there is not another element in the collection with the same UID
-            if (!StorageManagement.ExistCalendarObjectResource( calendarResourceId))
+            if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
             {
                 using (db)
                 {
                     if ((from calendarResource in db.CalendarResources
-                        where calendarResource.Uid == uidCalendar
-                        select calendarResource).Count() > 0)
+                         where calendarResource.Uid == uidCalendar
+                         select calendarResource).Count() > 0)
                         return false;
 
                 }
@@ -130,7 +177,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             //TODO: Checking that the number of recurring instances is less-equal
             //than the max-instances property value.
-            
+
             return true;
         }
     }

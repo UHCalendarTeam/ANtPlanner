@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CalDAV.Core;
 using DataLayer;
 using DataLayer.Models.Entities;
+using Microsoft.AspNet.Http;
 using Xunit;
 
 namespace CalDav_tests
@@ -25,7 +26,7 @@ namespace CalDav_tests
             return db;
         }
         [Fact]
-        public void EmptyBodyCreation()
+        public async Task EmptyBodyCreation()
         {
             var fs = new FileSystemManagement();
             var db = Mockdatabase();
@@ -36,17 +37,17 @@ namespace CalDav_tests
                 {"collectionName", "DurtyPlans"},
                 {"url", "api/v1/caldav/f.underwood/calendars/durtyplans"}
             };
+            HttpResponse response = null;
+            await caldav.MkCalendar(propertiesAndHeader, null, response);
 
-            var mkres = caldav.MkCalendar(propertiesAndHeader, null);
-
-            Assert.Equal(mkres.Key,HttpStatusCode.Created);
-            Assert.True(string.IsNullOrEmpty(mkres.Value));
+            Assert.Equal(response.StatusCode, (int)HttpStatusCode.Created);
+            Assert.True(string.IsNullOrEmpty(response.Body.ToString()));
             Assert.True(fs.SetUserAndCollection("f.underwood@whitehouse.com","DurtyPlans"));
             Assert.True(db.CollectionExist("f.underwood@whitehouse.com", "DurtyPlans"));
         }
 
         [Fact]
-        public void SimpleBodyCreation()
+        public async  Task SimpleBodyCreation()
         {
             var fs = new FileSystemManagement();
             var db = Mockdatabase();
@@ -59,16 +60,17 @@ namespace CalDav_tests
             };
             var body = $@"<C:mkcalendar xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav""></C:mkcalendar>";
 
-            var mkres = caldav.MkCalendar(propertiesAndHeader, body);
+            HttpResponse response = null;
+            caldav.MkCalendar(propertiesAndHeader, body, response);
 
-            Assert.Equal(mkres.Key, HttpStatusCode.Created);
-            Assert.True(string.IsNullOrEmpty(mkres.Value));
+            Assert.Equal(response.StatusCode, (int)HttpStatusCode.Created);
+            Assert.True(string.IsNullOrEmpty(response.Body.ToString()));
             Assert.True(fs.SetUserAndCollection("f.underwood@whitehouse.com", "DurtyPlans"));
             Assert.True(db.CollectionExist("f.underwood@whitehouse.com", "DurtyPlans"));
         }
 
         [Fact]
-        public void ComplexBodyCreation()
+        public async Task ComplexBodyCreation()
         {
             var fs = new FileSystemManagement();
             var db = Mockdatabase();
@@ -91,10 +93,12 @@ namespace CalDav_tests
   </D:set>
 </C:mkcalendar>";
 
-            var mkres = caldav.MkCalendar(propertiesAndHeader, body);
+            HttpResponse response = null;
 
-            Assert.Equal(mkres.Key, HttpStatusCode.Created);
-            Assert.True(string.IsNullOrEmpty(mkres.Value));
+            caldav.MkCalendar(propertiesAndHeader, body, response);
+
+            Assert.Equal(response.StatusCode, (int)HttpStatusCode.Created);
+            Assert.True(string.IsNullOrEmpty(response.Body.ToString()));
             Assert.True(fs.SetUserAndCollection("f.underwood@whitehouse.com", "DurtyPlans"));
             Assert.True(db.CollectionExist("f.underwood@whitehouse.com", "DurtyPlans"));
             var col = db.GetCollection("f.underwood@whitehouse.com", "DurtyPlans");
@@ -103,7 +107,7 @@ namespace CalDav_tests
         }
 
         [Fact]
-        public void ComplexBodyFail()
+        public async Task ComplexBodyFail()
         {
             var fs = new FileSystemManagement();
             var db = Mockdatabase();
@@ -126,11 +130,11 @@ namespace CalDav_tests
     </D:prop>
   </D:set>
 </C:mkcalendar>";
+            HttpResponse response = null;
+             caldav.MkCalendar(propertiesAndHeader, body, response);
 
-            var mkres = caldav.MkCalendar(propertiesAndHeader, body);
-
-            Assert.Equal(mkres.Key, HttpStatusCode.Forbidden);
-            Assert.Equal(mkres.Value, @"<?xml version=""1.0"" encoding=""utf-8""?>
+            Assert.Equal(response.StatusCode, (int)HttpStatusCode.Forbidden);
+            Assert.Equal(response.Body.ToString(), @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>
     <D:propstat>

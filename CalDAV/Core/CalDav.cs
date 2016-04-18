@@ -7,14 +7,10 @@ using System.Threading.Tasks;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Propfind;
 using DataLayer;
-using CalDAV.Utils.XML_Processors;
 using DataLayer.Models.Entities;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
-
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
 using Microsoft.Net.Http.Headers;
 using TreeForXml;
 
@@ -40,7 +36,8 @@ namespace CalDAV.Core
 
         private CalDavContext db { get; }
 
-        public KeyValuePair<HttpStatusCode, string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body)
+        #region MkCalendar Methods
+        public async Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
         {
             #region Extracting Properties
             string userEmail;
@@ -59,32 +56,30 @@ namespace CalDAV.Core
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
 
             //Checking that all precondition pass
-            //If not the corresponding statusCode and error message are returned inside
-            //the errorMessage property
-            var errorMessage = new KeyValuePair<HttpStatusCode, string>();
-            var createdMessage = new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Created, null);
+            
 
+            //TODO: Response must be added
             //Cheking Preconditions
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
-                return errorMessage;
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+                return;
 
             //I create here the collection already but i wait for other comprobations before save the database.
-            CreateDefaultCalendar(propertiesAndHeaders, ref errorMessage);
+           await  CreateDefaultCalendar(propertiesAndHeaders);
 
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
-                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
                         StorageManagement.DeleteCalendarCollection();
-                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                    return;
+                    //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
 
                 }
 
 
                 db.SaveChanges();
-                return createdMessage;
             }
 
             //If a body exist the it is parsed like an XmlTree
@@ -93,16 +88,17 @@ namespace CalDAV.Core
             //if it does not have set property it is treated as a empty body.
             if (mkCalendarTree.Children.Count == 0)
             {
-                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
                         StorageManagement.DeleteCalendarCollection();
-                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                    return;
+                    //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
                 }
 
 
                 db.SaveChanges();
-                return createdMessage;
+                //return createdMessage;
             }
 
             //now it is assumed that the body contains a set
@@ -116,39 +112,46 @@ namespace CalDAV.Core
             multistatus.Namespaces.Add("D", "DAV:");
             multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
-            var response = new XmlTreeStructure("response", "DAV:");
-            multistatus.AddChild(response);
+            var responseTree = new XmlTreeStructure("response", "DAV:");
+            multistatus.AddChild(responseTree);
 
             var href = new XmlTreeStructure("href", "DAV:");
             href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
             #endregion
             //Check if any error occurred during body processing.
-            var hasError = BuiltResponseForSet(userEmail, collectionName, null, false, setTree, response);
+            var hasError = BuiltResponseForSet(userEmail, collectionName, null, false, setTree, responseTree);
 
             if (hasError)
             {
                 if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
                     StorageManagement.DeleteCalendarCollection();
-                ChangeToDependencyError(response);
+                ChangeToDependencyError(responseTree);
                 //TODO: aki debe ser en realidad 207 multistatus pero no lo encuentro.
-                return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, multistatus.ToString());
+                response.StatusCode = 207;
+                await response.WriteAsync(multistatus.ToString());
+                return;
+                //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, multistatus.ToString());
             }
 
             //Checking Preconditions   
-            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, out errorMessage))
+            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
             {
                 db.SaveChanges();
-                return createdMessage;
+                return;
+                // return createdMessage;
             }
 
             if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 StorageManagement.DeleteCalendarCollection();
-            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+            response.StatusCode = StatusCodes.Status403Forbidden;
+            await response.WriteAsync("Poscondition failed");
+            
+            //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
 
 
         }
 
-        private KeyValuePair<HttpStatusCode, string> CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders, ref KeyValuePair<HttpStatusCode, string> errorMessage)
+        private async Task CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders)
         {
             #region Extracting Properties
             string userEmail;
@@ -168,8 +171,9 @@ namespace CalDAV.Core
             //Adding the collection folder.
             StorageManagement.AddCalendarCollectionFolder(userEmail, collectionName);
 
-            return errorMessage;
+            return;
         }
+        #endregion
 
         //TODO: Nacho
         public XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string body)
@@ -517,6 +521,7 @@ namespace CalDAV.Core
 
         #endregion
 
+        #region Delete Methods
         public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
@@ -542,21 +547,23 @@ namespace CalDAV.Core
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
 
-            response.StatusCode = (int) HttpStatusCode.NoContent;
+            response.StatusCode = (int)HttpStatusCode.NoContent;
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 return true;
-            
+
             var collection = db.GetCollection(userEmail, collectionName);
             if (collection == null)
             {
-                response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return false;
             }
-                
+
             db.CalendarCollections.Remove(collection);
             return StorageManagement.DeleteCalendarCollection();
         }
+        #endregion
 
+        #region Get Methods
         public async Task ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
@@ -570,10 +577,10 @@ namespace CalDAV.Core
             //Must return the Etag header of the COR
 
             var calendarRes = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-            
+
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(calendarResourceId))
             {
-                
+
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return;
             }
@@ -586,15 +593,15 @@ namespace CalDAV.Core
                 var etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
                 responseHeader.ETag = new EntityTagHeaderValue(etag, false);
             }
-
-            await response.WriteAsync(resourceBody);
+            responseHeader.ContentType = new MediaTypeHeaderValue("text/calendar");
+            await response.WriteAsync(resourceBody.Result);
         }
 
         public string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
         {
             throw new NotImplementedException();
         }
-
+        #endregion
 
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.
@@ -634,7 +641,7 @@ namespace CalDAV.Core
         #region PUT resource
 
         //TODO: Nacho
-        public bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag)
+        public async Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
 
@@ -659,19 +666,17 @@ namespace CalDAV.Core
             /// the can't do anything
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
             {
-                retEtag = "";
-                return false;
+                response.StatusCode = (int) HttpStatusCode.NotFound;
+                return;
             }
-
-            retEtag = null;
 
             //Note: calendar object resource = COR
 
             //CheckAllPreconditions
             var errorMessage = new KeyValuePair<HttpStatusCode, string>();
             PreconditionCheck = new PutPrecondition(StorageManagement, db);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, out errorMessage))
-                return false;
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+                return;
 
             //etag value of "If-Match"
             string updateEtag;
@@ -680,11 +685,11 @@ namespace CalDAV.Core
             {
                 //Taking etag from If-Match header.
                 propertiesAndHeaders["etag"] = updateEtag;
-                return UpdateCalendarObjectResource(propertiesAndHeaders, out retEtag);
+                await UpdateCalendarObjectResource(propertiesAndHeaders, response);
             }
             if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
             {
-                return CreateCalendarObjectResource(propertiesAndHeaders, out retEtag);
+                await CreateCalendarObjectResource(propertiesAndHeaders, response);
             }
             //TODO: Trying to get db by dependency injection
             //update or create
@@ -693,10 +698,9 @@ namespace CalDAV.Core
             if (db.CalendarResourceExist(userEmail, collectionName, calendarResourceId) &&
                 StorageManagement.ExistCalendarObjectResource(calendarResourceId))
             {
-                return UpdateCalendarObjectResource(propertiesAndHeaders,
-                    out retEtag);
+                await UpdateCalendarObjectResource(propertiesAndHeaders, response);
             }
-            return CreateCalendarObjectResource(propertiesAndHeaders, out retEtag);
+            await CreateCalendarObjectResource(propertiesAndHeaders, response);
             // }
             //return HTTP 201 Created 
         }
@@ -705,9 +709,9 @@ namespace CalDAV.Core
         ///     Creates a new COR from a PUT when a "If-Non-Match" header is included
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="retEtag"></param>
+        /// <param name="response"></param>
         /// <param></param>
-        private bool CreateCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag)
+        private async Task CreateCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
 
@@ -725,6 +729,8 @@ namespace CalDAV.Core
 
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
+
+            var headers= response.GetTypedHeaders();
 
             #endregion
 
@@ -732,24 +738,24 @@ namespace CalDAV.Core
             /// the can't do anything
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
             {
-                retEtag = "";
-                return false;
+                response.StatusCode = (int) HttpStatusCode.NotFound;
+                return;
             }
 
             TextReader reader = new StringReader(body);
             var iCal = new VCalendar(body);
-            retEtag = etag;
+             headers.ETag = new EntityTagHeaderValue(etag, false); 
 
             //TODO: Trying to get db by dependency injection
             //using (var db = new CalDavContext())
             //{
             if (!db.CollectionExist(userEmail, collectionName))
-                return false;
+                return;
 
             //TODO:Calculate Etag
 
             //filling the resource
-            var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
+            var resource = FillResource(propertiesAndHeaders, iCal, response);
             //adding the resource to the db
             db.CalendarResources.Add(resource);
 
@@ -757,7 +763,7 @@ namespace CalDAV.Core
             StorageManagement.AddCalendarObjectResourceFile(calendarResourceId, body);
 
 
-            return true;
+            return ;
             //}
         }
 
@@ -765,8 +771,8 @@ namespace CalDAV.Core
         ///     Updates an existing COR from a PUT when a "If-Match" header is included using the corresponding etag.
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="retEtag"></param>
-        private bool UpdateCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag)
+        /// <param name="response"></param>
+        private async Task UpdateCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
 
@@ -785,34 +791,34 @@ namespace CalDAV.Core
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
 
+            var headers = response.GetTypedHeaders();
             #endregion
 
             ///if the collection doesn't exist in the user folder
             /// then can't do anything
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
             {
-                retEtag = "";
-                return false;
+                return ;
             }
 
             TextReader reader = new StringReader(body);
             var iCal = new VCalendar(body);
 
-            retEtag = etag;
+            headers.ETag = new EntityTagHeaderValue(etag, false);
 
             //This means that the object in the body is not correct
             if (iCal == null)
-                return false;
+                return ;
 
             //TODO: Trying to get db by dependency injection
             //  using (var db = new CalDavContext())
             // {
             if (!db.CollectionExist(userEmail, collectionName) ||
                 !db.CalendarResourceExist(userEmail, collectionName, calendarResourceId))
-                return false;
+                return ;
 
             //Fill the resource
-            var resource = FillResource(propertiesAndHeaders, iCal, out retEtag);
+            var resource = FillResource(propertiesAndHeaders, iCal, response);
             var prevResource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             int prevEtag;
             int actualEtag = 0;
@@ -821,28 +827,28 @@ namespace CalDAV.Core
             //var tempEtag = prevResource.Getetag;
 
             //TODO: esto siempre va a fallar pues los eTags no son int
-            if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
-            {
-                if (actualEtag > prevEtag)
-                {
-                    if (resource.Uid != prevResource.Uid)
-                        return false;
-                    //Adding to the dataBase
-                    db.CalendarResources.Update(resource);
+            //if (int.TryParse(tempEtag, out prevEtag) && int.TryParse(retEtag, out actualEtag))
+            //{
+            //    if (actualEtag > prevEtag)
+            //    {
+            //        if (resource.Uid != prevResource.Uid)
+            //            return false;
+            //        //Adding to the dataBase
+            //        db.CalendarResources.Update(resource);
 
-                    //Removing old File 
-                    StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
-                    //Adding New File
-                    StorageManagement.AddCalendarObjectResourceFile(calendarResourceId, body);
-                }
-                else
-                    retEtag = tempEtag;
-            }
-            else
-                return false;
+            //        //Removing old File 
+            //        StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
+            //        //Adding New File
+            //        StorageManagement.AddCalendarObjectResourceFile(calendarResourceId, body);
+            //    }
+            //    else
+            //        retEtag = tempEtag;
+            //}
+            //else
+            //    return false;
 
-            // }
-            return true;
+            //// }
+            //return true;
         }
 
         /// <summary>
@@ -853,7 +859,7 @@ namespace CalDAV.Core
         /// <param name="retEtag"></param>
         /// <returns></returns>
         private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders, VCalendar iCal,
-            out string retEtag)
+            HttpResponse response)
         {
             //TODO: Cambiar como se cogen las propiedades contruir como xml.
 
@@ -871,13 +877,15 @@ namespace CalDAV.Core
             string etag;
             propertiesAndHeaders.TryGetValue("etag", out etag);
 
+            var headers = response.GetTypedHeaders();
+
             #endregion
 
             ///if the collection doesnt exist in the user folder
             /// the can't do anything
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
             {
-                retEtag = "";
+               
                 return null;
             }
 
@@ -890,7 +898,7 @@ namespace CalDAV.Core
             //TODO: Take the resource Etag if the client send it if not assign one
             if (etag != null)
                 resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value = etag;
-            retEtag = resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value;
+            headers.ETag = new EntityTagHeaderValue(resource.Properties.Where(x => x.Name == "getetag").SingleOrDefault().Value, false);
 
             // resource.User = db.GetUser(userEmail);
             resource.Collection = db.GetCollection(userEmail, collectionName);

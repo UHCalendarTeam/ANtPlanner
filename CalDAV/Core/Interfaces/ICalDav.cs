@@ -17,9 +17,8 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
-        /// <returns>Returns a KeyValuePair where the key is the status code
-        ///  and the value is the body of the response</returns>
-        KeyValuePair<HttpStatusCode,string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body);
+        /// <param name="response"></param>
+        Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         /// WebDAV HTTP Method
@@ -49,8 +48,8 @@ namespace CalDAV.Core
         /// CalDAV PUT for create a new COR
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="retEtag"></param>
-        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag);
+        /// <param name="response"></param>
+        Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource

@@ -88,7 +88,7 @@ END:VCALENDAR";
 
             Assert.True(fs.ExistCalendarCollection());
 
-            Assert.True(fs.AddCalendarObjectResourceFile("resource1", calStr));
+            Assert.True(fs.AddCalendarObjectResourceFile("resource1", calStr).Result);
 
             Assert.True(fs.ExistCalendarObjectResource("resource1.ics"));
 
