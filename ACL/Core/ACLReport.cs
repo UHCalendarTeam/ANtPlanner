@@ -125,8 +125,74 @@ namespace ACL.Core
             throw new NotImplementedException();
         }
 
-       
+        public async Task WriteBody(HttpResponse response,
+            Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
+        {
 
-     
+            ///build the root of the xml
+           var mutistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            {
+                Namespaces = new Dictionary<string, string>
+                {
+                    {"D", "DAV:"},
+                    {"C", "urn:ietf:params:xml:ns:caldav"}
+                }
+            };
+
+            //take the node that specified the comp and properties
+            //to return
+
+
+            foreach (var pp in principalsAndProperties)
+            {
+
+                IXMLTreeStructure statusNode;
+
+                ///each returned resource has is own response and href nodes
+                var responseNode = new XmlTreeStructure("response", "DAV:");
+                var hrefNode = new XmlTreeStructure("href", "DAV:");
+                hrefNode.AddValue(pp.Key.PrincipalURL);
+
+                ///href is a child pf response
+                responseNode.AddChild(hrefNode);
+
+                ///if the resource is null it was not foound so
+                /// add an error status
+                if (pp.Value == null)
+                {
+                    statusNode = new XmlTreeStructure("status", "DAV:");
+                    statusNode.AddValue("HTTP/1.1 404 Not Found");
+                    responseNode.AddChild(statusNode);
+
+                }
+                else
+                {
+
+                    
+
+                    var propstatNode = new XmlTreeStructure("propstat", "DAV:");
+                    var propNode = new XmlTreeStructure("prop", "DAV:");
+                    foreach (var property in pp.Value)
+                    {
+                        propNode.AddChild()
+                    }
+
+                    propstatNode.AddChild(propNode);
+                    ///adding the status node
+                    /// TODO: check the status!!
+                    statusNode = new XmlTreeStructure("status", "DAV:");
+                    statusNode.AddValue("HTTP/1.1 200 OK");
+
+                    propstatNode.AddChild(statusNode);
+
+                    responseNode.AddChild(propstatNode);
+                }
+
+                mutistatusNode.AddChild(responseNode);
+            }
+
+        }
+
+
     }
 }
