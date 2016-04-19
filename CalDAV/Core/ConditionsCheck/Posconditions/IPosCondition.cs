@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
 {
-    interface IPoscondition
+    internal interface IPoscondition
     {
         IFileSystemManagement Fs { get; }
         DbContext Db { get; }
 
-        ///  <summary>
-        /// Checks that all postconditions passed. 
-        ///  </summary>
+        /// <summary>
+        ///     Checks that all postconditions passed.
+        /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         /// <returns></returns>

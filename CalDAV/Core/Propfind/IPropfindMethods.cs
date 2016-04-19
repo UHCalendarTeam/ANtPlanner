@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalDAV.Utils.XML_Processors;
-using CalDAV.XML_Processors;
+﻿using System.Collections.Generic;
 using TreeForXml;
-
 
 namespace CalDAV.Core.Propfind
 {
     public interface IPropfindMethods
     {
         /// <summary>
-        /// Returns all dead properties and some live properties.
+        ///     Returns all dead properties and some live properties.
         /// </summary>
         /// <param name="userEmail">User unique identification</param>
         /// <param name="collectionName">Target collection</param>
@@ -21,10 +15,11 @@ namespace CalDAV.Core.Propfind
         /// <param name="aditionalProperties">Properties contained in the include xml if any</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string,string>> aditionalProperties ,XmlTreeStructure multistatusTree);
+        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+            List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree);
 
         /// <summary>
-        /// Returns the value of the specified properties.
+        ///     Returns the value of the specified properties.
         /// </summary>
         /// <param name="userEmail">User unique identification</param>
         /// <param name="collectionName">Target collection</param>
@@ -33,10 +28,11 @@ namespace CalDAV.Core.Propfind
         /// <param name="propertiesReq">List with all the properties to retrieve</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void PropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq , XmlTreeStructure multistatusTree);
+        void PropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+            List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree);
 
         /// <summary>
-        ///  Returns the name of all the properties of a collection.
+        ///     Returns the name of all the properties of a collection.
         /// </summary>
         /// <param name="userEmail">User unique identification</param>
         /// <param name="collectionName">Target collection</param>
@@ -44,6 +40,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
+        void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+            XmlTreeStructure multistatusTree);
     }
 }

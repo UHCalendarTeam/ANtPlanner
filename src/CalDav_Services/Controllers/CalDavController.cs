@@ -55,7 +55,7 @@ namespace CalDav_Services.Controllers
         #region Collection Methods
 
         //MKCAL api\caldav\{username}\calendars\{collection_name}
-        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
+        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}/")]
         public async Task MkCalendar(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -122,11 +122,11 @@ namespace CalDav_Services.Controllers
 
             var headers = Request.GetTypedHeaders();
 
-            
+
 
             if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
             {
-                Response.StatusCode = (int) HttpStatusCode.ExpectationFailed;
+                Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
             }
             else
             {
@@ -238,6 +238,18 @@ END:VCALENDAR";
         {
             StreamReader reader = new StreamReader(stream);
             return reader.ReadToEnd();
+        }
+
+        [AcceptVerbs("Initialize")]
+        public void InitialiseDb()
+        {
+
+        }
+
+        [AcceptVerbs("Destroy")]
+        public void DestroyDb()
+        {
+
         }
 
 

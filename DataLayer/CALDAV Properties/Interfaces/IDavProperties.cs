@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TreeForXml;
 
 namespace DataLayer
@@ -22,7 +19,7 @@ namespace DataLayer
 
         string GetContentLanguage { get; }
 
-        XmlTreeStructure LockDiscovery { get;}
+        XmlTreeStructure LockDiscovery { get; }
 
         XmlTreeStructure ResourceType { get; }
 

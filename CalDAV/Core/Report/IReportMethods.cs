@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using DataLayer;
 using ICalendar.Calendar;
 using TreeForXml;
-using DataLayer;
 
 namespace CalDAV.Core
 {
@@ -10,8 +10,8 @@ namespace CalDAV.Core
         string ExpandProperty();
 
         /// <summary>
-        /// Process the REPORT request and send back the 
-        /// result of the applied operations.
+        ///     Process the REPORT request and send back the
+        ///     result of the applied operations.
         /// </summary>
         /// <param name="xmlBody">The xml send in the body of the REPORT request.</param>
         /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>
@@ -19,8 +19,8 @@ namespace CalDAV.Core
         string ProcessRequest(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement);
 
         /// <summary>
-        /// Apply the calendar-query opertation to a 
-        /// user calendars.
+        ///     Apply the calendar-query opertation to a
+        ///     user calendars.
         /// </summary>
         /// <param name="xmlBody">The xml send in the body of the request.</param>
         /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>

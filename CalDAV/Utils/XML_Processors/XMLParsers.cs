@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using CalDAV.XML_Processors;
 using TreeForXml;
-
 
 namespace CalDAV.Utils.XML_Processors
 {
@@ -20,12 +16,9 @@ namespace CalDAV.Utils.XML_Processors
                 {
                     if (x.Descendants().Any())
                     {
-                        return new List<string>(x.Descendants().Select(y => (string)y.Attribute("name")));
+                        return new List<string>(x.Descendants().Select(y => (string) y.Attribute("name")));
                     }
-                    else
-                    {
-                        return new List<string>() { (string)x.Value };
-                    }
+                    return new List<string> {x.Value};
                 });
 
             return properties;
@@ -35,8 +28,8 @@ namespace CalDAV.Utils.XML_Processors
         public static IXMLTreeStructure GenericParser(string doc)
         {
             var xml = XDocument.Parse(doc);
-            
-             var output= xmlWalker(xml.Root);
+
+            var output = xmlWalker(xml.Root);
             return output;
         }
 
@@ -48,7 +41,7 @@ namespace CalDAV.Utils.XML_Processors
                     ToDictionary(x => x.Name.LocalName, x => x.Value),
                 Value = node.Value
             };
-            foreach (var attribute in node.Attributes().Where(x=>!output.Namespaces.Keys.Contains(x.Name.LocalName)))
+            foreach (var attribute in node.Attributes().Where(x => !output.Namespaces.Keys.Contains(x.Name.LocalName)))
             {
                 output.AddAttribute(attribute.Name.LocalName, attribute.Value);
             }

@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
-
-using Microsoft.Data.Entity.ValueGeneration.Internal;
-using Xunit;
 using TreeForXml;
-
-
+using Xunit;
 
 namespace CalDav_tests
 {
-
     public class XMLTest
     {
         [Fact]
@@ -44,17 +34,15 @@ namespace CalDav_tests
         }
 
 
-
         [Fact]
         public void UnitTest2()
         {
-
             var tree = new XmlTreeStructure("node1", "DAV:",
-               new Dictionary<string, string>()
-               {
-                    { "D", "DAV:"},
-                    {"C","urn:ietf:params:xml: ns: caldav"}
-               });
+                new Dictionary<string, string>
+                {
+                    {"D", "DAV:"},
+                    {"C", "urn:ietf:params:xml: ns: caldav"}
+                });
             tree.AddChild(new XmlTreeStructure("child1", null)).
                 AddChild(new XmlTreeStructure("child2", null));
             IXMLTreeStructure child2;
@@ -125,7 +113,7 @@ end=""20060105T000000Z""/>
         }
 
         /// <summary>
-        /// Checking the getChildAtAnyLevel
+        ///     Checking the getChildAtAnyLevel
         /// </summary>
         [Fact]
         public void UnitTest4()
@@ -177,22 +165,21 @@ end=""20060105T000000Z""/>
         [Fact]
         public void UnitTestFoo()
         {
-
             XNamespace ns = "DAV:";
             XNamespace ns1 = "Attribute:";
-            XElement xmlTree1 = new XElement("Root",
-     new XElement(ns + "Child1", null),
-     new XElement(ns + "Child2", 2),
-     new XElement(ns1 + "Child3", 3),
-     new XElement(ns + "Child4", 4),
-     new XElement(ns + "Child5", 5),
-     new XElement(ns + "Child6", 6)
- );
+            var xmlTree1 = new XElement("Root",
+                new XElement(ns + "Child1", null),
+                new XElement(ns + "Child2", 2),
+                new XElement(ns1 + "Child3", 3),
+                new XElement(ns + "Child4", 4),
+                new XElement(ns + "Child5", 5),
+                new XElement(ns + "Child6", 6)
+                );
             xmlTree1.Add(new XAttribute(XNamespace.Xmlns + "D", "DAV:"));
             xmlTree1.Add(new XAttribute(XNamespace.Xmlns + "R", "Attribute:"));
 
 
-            XDocument document = new XDocument(new XDeclaration("1.0", "utf-8", null), xmlTree1);
+            var document = new XDocument(new XDeclaration("1.0", "utf-8", null), xmlTree1);
 
             var docStr = document.ToString(SaveOptions.DisableFormatting);
         }
@@ -241,11 +228,5 @@ end=""20060105T000000Z""/>
 
             Assert.Equal(xmlStr1, xmlStr2);
         }
-
-
-
-
-
-
     }
 }

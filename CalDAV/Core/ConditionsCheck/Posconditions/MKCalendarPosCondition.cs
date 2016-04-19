@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using Microsoft.AspNet.Http;
@@ -12,18 +9,19 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class MKCalendarPosCondition : IPoscondition
     {
-        public IFileSystemManagement Fs { get; }
-        public DbContext Db { get; }
-
         public MKCalendarPosCondition(IFileSystemManagement fs, CalDavContext db)
         {
             Db = db;
             Fs = fs;
         }
 
+        public IFileSystemManagement Fs { get; }
+        public DbContext Db { get; }
+
         public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             string userEmail;
             propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
 
@@ -32,8 +30,8 @@ namespace CalDAV.Core.ConditionsCheck
 
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
+
             #endregion
-           
 
             if (!Fs.SetUserAndCollection(userEmail, collectionName) ||
                 !((CalDavContext) Db).CollectionExist(userEmail, collectionName))

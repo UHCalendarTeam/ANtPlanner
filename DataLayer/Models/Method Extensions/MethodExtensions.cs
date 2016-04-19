@@ -35,7 +35,9 @@ namespace DataLayer
             try
             {
                 return source.Users.Include(x => x.CalendarCollections).ThenInclude(c => c.Properties)
-                    .Include(k => k.CalendarCollections).ThenInclude(y => y.CalendarResources).ThenInclude(p => p.Properties)
+                    .Include(k => k.CalendarCollections)
+                    .ThenInclude(y => y.CalendarResources)
+                    .ThenInclude(p => p.Properties)
                     .First(u => u.Email == userEmail);
             }
             catch (Exception)
@@ -119,14 +121,14 @@ namespace DataLayer
                 .First(cr => cr.Href == calResource);
         }
 
-        /// <param name="source"></param>
-        /// </summary>
-        /// by filter of the dates.
-        /// Filter the resources of the user in the given collection
-        /// <summary>
-
 
         //TODO: Adriano ver esto
+        /// <summary>
+        /// Filter the resources of the user in the given collection
+        /// by filter of the dates.
+        /// </summary>
+
+        /// <param name="source"></param>
         /// <param name="starTime">The startTime of the  </param>
         /// <param name="endTime"></param>
         /// <param name="ownerName"></param>

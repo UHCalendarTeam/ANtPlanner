@@ -1,54 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
-using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
 using ICalendar.GeneralInterfaces;
-using ICalendar.Utils;
 using Microsoft.AspNet.Http;
 
 namespace CalDAV.Core.ConditionsCheck
 {
     public class PutPrecondition : IPrecondition
     {
-        IFileSystemManagement StorageManagement { get; }
-
-        private CalDavContext db { get; }
-
         public PutPrecondition(IFileSystemManagement manager, CalDavContext context)
         {
             db = context;
             StorageManagement = manager;
         }
+
+        private IFileSystemManagement StorageManagement { get; }
+
+        private CalDavContext db { get; }
+
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
-            
+
             var body = propertiesAndHeaders["body"];
             //var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
-            var iCalendar = new VCalendar(body);//lo que no estoy seguro que en el body solo haya el iCal string
+            var iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
+
             #endregion
+
             //calendar data is ok
 
             if (iCalendar == null)
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 return false;
             }
 
             //check that resourceId don't exist but the collection does.
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
             {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
 
@@ -62,15 +61,15 @@ namespace CalDAV.Core.ConditionsCheck
                 var collection = db.GetCollection(userEmail, collectionName);
                 foreach (var calendarresource in collection.CalendarResources)
                 {
-
                     if (uid.StringValue == calendarresource.Uid)
                     {
-
-                        response.StatusCode = (int)HttpStatusCode.Conflict;
-                        response.Body.Write($@"<?xml version='1.0' encoding='UTF-8'?>
+                        response.StatusCode = (int) HttpStatusCode.Conflict;
+                        response.Body.Write(
+                            $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{calendarresource.Href}</href>
+<href xmlns='DAV:'>{calendarresource
+                                .Href}</href>
 </no-uid-conflict>
 </error>");
                         return false;
@@ -83,18 +82,18 @@ namespace CalDAV.Core.ConditionsCheck
                 var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 if (resource.Uid == uid.StringValue)
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    response.Body.Write($@"<?xml version='1.0' encoding='UTF-8'?>
+                    response.StatusCode = (int) HttpStatusCode.Conflict;
+                    response.Body.Write(
+                        $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{resource.Href}</href>
+<href xmlns='DAV:'>{resource
+                            .Href}</href>
 </no-uid-conflict>
 </error>");
                     return false;
                 }
             }
-            
-
 
 
             if (propertiesAndHeaders.ContainsKey("If-Match"))
@@ -102,10 +101,9 @@ namespace CalDAV.Core.ConditionsCheck
                 //check that the value do exist
                 if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
                 {
-                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                    response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                     return false;
                 }
-                    
             }
 
             if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
@@ -113,13 +111,11 @@ namespace CalDAV.Core.ConditionsCheck
                 //check that the value do not exist
                 if (StorageManagement.ExistCalendarObjectResource(calendarResourceId))
                 {
-                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                    response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                     return false;
                 }
-                    
             }
-            
-                
+
 
             //it does not contain more than two calendar components
             //and if it has 2, one must be VTIMEZONE
@@ -135,13 +131,13 @@ Wrong amount of calendar components
 </error>");
                 return false;
             }
-                
+
 
             if (iCalendar.CalendarComponents.Count == 2)
             {
                 if (!iCalendar.CalendarComponents.ContainsKey("VTIMEZONE"))
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.StatusCode = (int) HttpStatusCode.Conflict;
                     response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
@@ -151,21 +147,21 @@ VTimezone Calendar Component Must be present.
 </error>");
                     return false;
                 }
-                    
+
 
                 var calendarComponent =
                     iCalendar.CalendarComponents.Where(comp => comp.Key != "VTIMEZONE").Single().Value;
 
                 //A Calendar Component can be separated in multiples calendar components but all MUST
                 //have the same UID.
-                var uid = ((ComponentProperty<string>)calendarComponent.FirstOrDefault().Properties["UID"]).Value;
+                var uid = ((ComponentProperty<string>) calendarComponent.FirstOrDefault().Properties["UID"]).Value;
                 string uidComp;
                 foreach (var component in calendarComponent)
                 {
-                    uidComp = ((ComponentProperty<string>)component.Properties["UID"]).Value;
+                    uidComp = ((ComponentProperty<string>) component.Properties["UID"]).Value;
                     if (uid != uidComp)
                     {
-                        response.StatusCode = (int)HttpStatusCode.Conflict;
+                        response.StatusCode = (int) HttpStatusCode.Conflict;
                         response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
@@ -175,7 +171,6 @@ If the count of calendar components execeds 2 including VTimezone the rest must 
 </error>");
                         return false;
                     }
-                       
                 }
             }
 
@@ -210,7 +205,7 @@ If the count of calendar components execeds 2 including VTimezone the rest must 
             //iCalendar object MUST NOT implement METHOD property
             if (methodProp != null || ((IValue<string>) methodProp).Value != "")
             {
-                response.StatusCode = (int)HttpStatusCode.Conflict;
+                response.StatusCode = (int) HttpStatusCode.Conflict;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>

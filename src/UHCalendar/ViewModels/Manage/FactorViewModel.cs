@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace UHCalendar.ViewModels.Manage
+﻿namespace UHCalendar.ViewModels.Manage
 {
     public class FactorViewModel
     {
