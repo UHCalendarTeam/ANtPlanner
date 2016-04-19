@@ -36,6 +36,12 @@ namespace DataLayer.Models.ACL
         /// </summary>
         public string Displayname { get; set; }
 
+        /// <summary>
+        /// Cotnains the email of the principal if the
+        /// principal is a user.
+        /// </summary>
+        public string Email { get; set; }
+
         [ScaffoldColumn(false)]
         public int PrincipalId { get; set; }
 
