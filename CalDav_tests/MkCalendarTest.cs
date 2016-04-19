@@ -38,6 +38,7 @@ namespace CalDav_tests
                 {"url", "api/v1/caldav/f.underwood/calendars/durtyplans"}
             };
             HttpResponse response = null;
+            
             await caldav.MkCalendar(propertiesAndHeader, null, response);
 
             Assert.Equal(response.StatusCode, (int)HttpStatusCode.Created);
