@@ -837,12 +837,17 @@ namespace CalDAV.Core
             var etag = Guid.NewGuid().ToString();
             headers.ETag = new EntityTagHeaderValue(etag, false);
 
+
+
             var prevResource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
 
             var errorStack = new Stack<string>();
             prevResource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
-            
+
+            prevResource.CreateOrModifyProperty("getlastmodified", "DAV:",
+                $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>", errorStack);
+
 
             //Removing old File 
             StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
