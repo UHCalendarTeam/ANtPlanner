@@ -114,5 +114,12 @@ namespace DataLayer
         /// <param name="fileSystemManagement">The instance of the class.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
         bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
+
+        /// <summary>
+        /// Returns the size of a resource.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        long GetFileSize(string fileName);
     }
 }

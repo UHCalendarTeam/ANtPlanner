@@ -25,16 +25,18 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
+        void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="Body"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        string PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body);
+        void PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
 
         /// <summary>
         /// CalDav HTTP Method REPORT for Calendar Collections

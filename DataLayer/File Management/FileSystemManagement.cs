@@ -120,6 +120,7 @@ namespace DataLayer
             {
                await writer.WriteAsync(iCalendar.ToString());
             }
+
             return true;
         }
 
@@ -207,6 +208,13 @@ namespace DataLayer
                     calendarObjectResources.Add(userCollectionPath +fileName, temp.Result);
             }
             return true;
+        }
+
+        public long GetFileSize(string fileName)
+        {
+            var path = CollectionPath + "\\" + fileName;
+            FileInfo finfo = new FileInfo(path);
+            return finfo.Length;
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CalDAV.Core;
 using DataLayer.Models.Entities;
+using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;
@@ -280,10 +281,10 @@ namespace CalDav_tests
 </propertyupdate>";
 
             var request = XmlTreeStructure.Parse(body);
+            HttpResponse response = null;
+            caldav.PropPatch(propertiesAndHeaders, request.ToString(), response);
 
-            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
-
-            Assert.Equal(response,
+            Assert.Equal(response.Body.ToString(),
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>
@@ -327,10 +328,10 @@ namespace CalDav_tests
 </propertyupdate>";
 
             var request = XmlTreeStructure.Parse(body);
+            HttpResponse response = null;
+            caldav.PropPatch(propertiesAndHeaders, request.ToString(), response);
 
-            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
-
-            Assert.Equal(response,
+            Assert.Equal(response.Body.ToString(),
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>
@@ -380,10 +381,11 @@ namespace CalDav_tests
 </propertyupdate>";
 
             var request = XmlTreeStructure.Parse(body);
+            HttpResponse response = null;
 
-            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+            caldav.PropPatch(propertiesAndHeaders, request.ToString(), response);
 
-            Assert.Equal(response,
+            Assert.Equal(response.Body.ToString(),
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>
@@ -447,10 +449,11 @@ namespace CalDav_tests
 </propertyupdate>";
 
             var request = XmlTreeStructure.Parse(body);
+            HttpResponse response = null;
 
-            var response = caldav.PropPatch(propertiesAndHeaders, request.ToString());
+            caldav.PropPatch(propertiesAndHeaders, request.ToString(), response);
 
-            Assert.Equal(response,
+            Assert.Equal(response.Body.ToString(),
                 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
   <D:response>

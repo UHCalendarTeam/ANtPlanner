@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Primitives;
 using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Abstractions;
+using Microsoft.Net.Http.Headers;
 
 namespace CalDav_Services.Controllers
 {
@@ -67,19 +69,19 @@ namespace CalDav_Services.Controllers
 
         //PROPFIND COLLECTIONS
         [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}")]
-        public string PropFind(string user, string collection)
+        public void PropFind(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
 
 
-            return CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
+            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         //PROPFIND RESOURCES
         [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}/{calendarResource}")]
-        public string PropFind(string user, string collection, string calendarResource)
+        public void PropFind(string user, string collection, string calendarResource)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
@@ -90,9 +92,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            var res = CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body)).ToString();
-
-            return res;
+            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         //REPORT
@@ -118,34 +118,46 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
             propertiesAndHeaders.Add("body", StreamToString(Request.Body));
+            propertiesAndHeaders.Add("url", Request.GetEncodedUrl());
 
-            StringValues ifMatch;
-            StringValues etags;
+            var headers = Request.GetTypedHeaders();
 
-            string etag;
+            
 
-            if (Request.Headers.TryGetValue("If-Match", out ifMatch) && ifMatch.Count == 1)
+            if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
             {
-                propertiesAndHeaders.Add("If-Match", ifMatch.FirstOrDefault());
+                Response.StatusCode = (int) HttpStatusCode.ExpectationFailed;
             }
-            else if (Request.Headers.ContainsKey("If-None-Match"))
+            else
             {
-                propertiesAndHeaders.Add("If-Match", "*");
+                if (headers.IfMatch.Count > 0)
+                {
+                    propertiesAndHeaders.Add("If-Match", EtagAsString(headers.IfMatch));
+                }
+                else if (headers.IfNoneMatch.Count > 0)
+                {
+                    propertiesAndHeaders.Add("If-None-Match", EtagAsString(headers.IfNoneMatch));
+                }
+
+                await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
             }
-            if (Request.Headers.TryGetValue("Etag", out etags))
+        }
+
+        private string EtagAsString(IList<EntityTagHeaderValue> etags)
+        {
+            var res = "";
+            foreach (var etag in etags)
             {
-                propertiesAndHeaders.Add("Etag", etags.FirstOrDefault());
+                res += etag.Tag + ",";
             }
-
-
-           await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
+            return res.Remove(res.Length - 2);
         }
 
         [HttpGet]
         public void test()
         {
-           
-            var body= @"BEGIN:VCALENDAR
+
+            var body = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTODO
@@ -164,7 +176,7 @@ END:VTODO
 END:VCALENDAR";
             //var arr = UTF8Encoding.UTF8.GetBytes(body.ToArray());
             //Response.Body.Write(arr,0,arr.Length);
-           
+
             Response.StatusCode = 207;
             Response.Headers["test"] = "test";
             var headers = Response.GetTypedHeaders();
@@ -181,7 +193,7 @@ END:VCALENDAR";
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-            
+
             await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
