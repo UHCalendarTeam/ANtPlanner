@@ -24,7 +24,7 @@ namespace ACL.Interfaces
         ///     properties specified in the REPORT request body.
         /// </summary>
         /// <returns></returns>
-        Task AclPrincipalPropSet(IXMLTreeStructure body, HttpRequest request, CalDavContext context,
+        Task AclPrincipalPropSet(IXMLTreeStructure body,  CalDavContext context,
             HttpResponse response);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ACL.Interfaces
         ///     principals and that match the current user.
         /// </summary>
         /// <returns></returns>
-        Task PrincipalMatch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response);
+        Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href, CalDavContext context, HttpResponse response);
 
         /// <summary>
         ///     The DAV:principal-property-search REPORT performs a search for all
