@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using DataLayer;
+using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -13,7 +14,7 @@ namespace CalDAV.Core.ConditionsCheck
         public IFileSystemManagement Fs { get; }
         public DbContext Db { get; }
 
-        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, out KeyValuePair<HttpStatusCode, string> errorMessage)
+        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             throw new NotImplementedException();
         }

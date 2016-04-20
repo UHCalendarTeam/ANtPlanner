@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using DataLayer;
+using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -18,8 +19,8 @@ namespace CalDAV.Core.ConditionsCheck
         /// Checks that all postconditions passed. 
         ///  </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="errorMessage"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, out KeyValuePair<HttpStatusCode, string> errorMessage);
+        bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
     }
 }

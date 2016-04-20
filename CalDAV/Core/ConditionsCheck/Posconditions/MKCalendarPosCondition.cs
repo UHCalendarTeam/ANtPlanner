@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -19,7 +21,7 @@ namespace CalDAV.Core.ConditionsCheck
             Fs = fs;
         }
 
-        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, out KeyValuePair<HttpStatusCode, string> errorMessage)
+        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
             string userEmail;
@@ -31,13 +33,13 @@ namespace CalDAV.Core.ConditionsCheck
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
             #endregion
-
-            errorMessage = new KeyValuePair<HttpStatusCode, string>();
+           
 
             if (!Fs.SetUserAndCollection(userEmail, collectionName) ||
                 !((CalDavContext) Db).CollectionExist(userEmail, collectionName))
             {
-                errorMessage = new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, @"<?xml version='1.0' encoding='UTF-8'?>
+                response.StatusCode = (int) HttpStatusCode.Forbidden;
+                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns:D='DAV:' xmlns:C='urn:ietf:params:xml:ns:caldav'>
   <C:initialize-calendar-collection/>  
 </error>");

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ICalendar.Calendar;
 
 namespace DataLayer
@@ -53,21 +54,21 @@ namespace DataLayer
         /// <summary>
         ///     Adds a Calendar Object Resource to the calendar collection specified.
         /// </summary>
-        /// <param name="userEmail">Email of the owner of the calendar collection</param>
-        /// <param name="calendarCollectionName">Name of the calendar collection where is going to be stored</param>
         /// <param name="objectResourceName">Returns the name assigned to the iCalendar file.</param>
         /// <param name="bodyIcalendar">Body of the iCalendar Object that is going to be stored with .ics extension.</param>
+        /// <param name="userEmail">Email of the owner of the calendar collection</param>
+        /// <param name="calendarCollectionName">Name of the calendar collection where is going to be stored</param>
         /// <returns></returns>
-        bool AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar);
+        Task<bool> AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar);
 
         /// <summary>
         ///     Returns the iCalendar Object stored in the user calendar collection.
         /// </summary>
+        /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
         /// <param name="userEmail">Email of the owner of the collection.</param>
         /// <param name="calendarCollectionName">Name of the collection where is stored.</param>
-        /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
         /// <returns></returns>
-        string GetCalendarObjectResource(string objectResourceName);
+        Task<string> GetCalendarObjectResource(string objectResourceName);
 
         /// <summary>
         ///     Deletes the COR specified
@@ -113,5 +114,12 @@ namespace DataLayer
         /// <param name="fileSystemManagement">The instance of the class.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
         bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
+
+        /// <summary>
+        /// Returns the size of a resource.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        long GetFileSize(string fileName);
     }
 }

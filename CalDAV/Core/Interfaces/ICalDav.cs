@@ -17,25 +17,26 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
-        /// <returns>Returns a KeyValuePair where the key is the status code
-        ///  and the value is the body of the response</returns>
-        KeyValuePair<HttpStatusCode,string> MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body);
+        /// <param name="response"></param>
+        Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         /// WebDAV HTTP Method
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        XmlTreeStructure PropFind(Dictionary<string, string> propertiesAndHeaders, string  body);
+        void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         /// CalDav HTTP Method PROPPATCH
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="Body"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        string PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body);
+        void PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
 
         /// <summary>
         /// CalDav HTTP Method REPORT for Calendar Collections
@@ -49,20 +50,22 @@ namespace CalDAV.Core
         /// CalDAV PUT for create a new COR
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        /// <param name="retEtag"></param>
-        bool AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, out string retEtag);
+        /// <param name="response"></param>
+        Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         /// CalDav Method for delete a Calendar Object Resource
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders);
+        /// <param name="response"></param>
+        bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         /// CalDav & WebDav Method for delete a Collection
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
-        bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
+        /// <param name="response"></param>
+        bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         /// CalDav HTTP Method Get for a COR

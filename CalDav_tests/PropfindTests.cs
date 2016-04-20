@@ -5,6 +5,7 @@ using CalDAV.Core;
 using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.Entities;
+using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 using TreeForXml;
 using Xunit;
@@ -15,7 +16,7 @@ namespace CalDav_tests
     {
         //xmlns:C=\"urn:ietf:params:xml:ns:caldav\"
         private Dictionary<string, string> Namespaces = new Dictionary<string, string> { { "D", @"xmlns:D=""DAV:""" }, { "C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav""" } };
-        private Dictionary<string,string> NamespacesSimple = new Dictionary<string, string> { { "D", "DAV:"}, { "C", "urn:ietf:params:xml:ns:caldav" } }; 
+        private Dictionary<string, string> NamespacesSimple = new Dictionary<string, string> { { "D", "DAV:" }, { "C", "urn:ietf:params:xml:ns:caldav" } };
 
 
         //[Fact]
@@ -210,10 +211,10 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<propname/>");
             strBuilder.AppendLine("</propfind>");
 
+            HttpResponse response = null;
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
-
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.Body.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -242,7 +243,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.Body.ToString(), trueSolution);
 
         }
 
@@ -264,10 +265,10 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<allprop/>");
             strBuilder.AppendLine("</propfind>");
 
+            HttpResponse response = null;
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
-
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.Body.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -290,7 +291,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.Body.ToString(), trueSolution);
         }
 
         [Fact]
@@ -314,10 +315,10 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"</D:include>");
             strBuilder.AppendLine("</D:propfind>");
 
+            HttpResponse response = null;
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
-
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -341,7 +342,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.ToString(), trueSolution);
 
         }
 
@@ -378,9 +379,10 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"</prop>");
             strBuilder.AppendLine("</D:propfind>");
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+            HttpResponse response = null;
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -420,7 +422,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.ToString(), trueSolution);
         }
 
         [Fact]
@@ -441,10 +443,11 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<propname/>");
             strBuilder.AppendLine("</propfind>");
 
+            HttpResponse response = null;
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -489,7 +492,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.ToString(), trueSolution);
 
         }
 
@@ -511,10 +514,11 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<D:allprop/>");
             strBuilder.AppendLine("</D:propfind>");
 
+            HttpResponse response = null;
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.Body.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -552,7 +556,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.Body.ToString(), trueSolution);
 
         }
 
@@ -591,9 +595,10 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"</prop>");
             strBuilder.AppendLine("</D:propfind>");
 
-            var xmFinal = calDav.PropFind(prop, strBuilder.ToString());
+            HttpResponse response = null;
+            calDav.PropFind(prop, strBuilder.ToString(), response);
 
-            var strFinal = xmFinal.ToString();
+            var strFinal = response.Body.ToString();
 
             #region String solution
             var trueSolution = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -665,7 +670,7 @@ namespace CalDav_tests
 </D:multistatus>";
             #endregion
 
-            Assert.Equal(xmFinal.ToString(), trueSolution);
+            Assert.Equal(response.Body.ToString(), trueSolution);
         }
 
 
@@ -680,7 +685,7 @@ namespace CalDav_tests
             var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
             // This is the magic line
-          //  optionsBuilder.UseInMemoryDatabase();
+            //  optionsBuilder.UseInMemoryDatabase();
 
             var db = new CalDavContext();
 

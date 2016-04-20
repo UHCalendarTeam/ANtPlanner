@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TreeForXml;
+using CalDAV.Core.Method_Extensions;
 
 namespace CalDAV.Core.Method_Extensions
 {
