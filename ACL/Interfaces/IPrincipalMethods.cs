@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DataLayer.Models.ACL;
 
 namespace ACL.Interfaces
 {
@@ -8,14 +9,14 @@ namespace ACL.Interfaces
     ///     Implement this interface in order to have
     ///     full functionalities of the system.
     /// </summary>
-    public interface IPrincipal
+    public interface IPrincipalMethods
     {
         /// <summary>
         ///     This should be a human readable name for the principal.
         ///     If none is available, return the nodename.
         /// </summary>
         /// <returns>Returns the displayname property for the principal</returns>
-        string GetDispplayName();
+        string GetDispplayName(Principal principal);
 
         /// <summary>
         ///     This protected property, if non-empty, contains the URIs of network
@@ -23,28 +24,28 @@ namespace ACL.Interfaces
         ///     principal.
         /// </summary>
         /// <returns>The  DAV:alternate-URI-set property</returns>
-        string GetAlternateUriSet();
+        string GetAlternateUriSet(Principal principal);
 
         /// <summary>
         ///     This protected property contains the URL that MUST be used
         ///     to identify this principal in an ACL request.
         /// </summary>
         /// <returns>The principal-URL property</returns>
-        string GetPrincipalURL();
+        string GetPrincipalURL(Principal principal);
 
         /// <summary>
         ///     This protected property contains the URL that MUST be used to identify
         ///     this principal in an ACL request.
         /// </summary>
         /// <returns>The group-member-set property.</returns>
-        string GetGroupMemberSet();
+        string GetGroupMemberSet(Principal principal);
 
         /// <summary>
         ///     This protected property identifies the groups in which the principal
         ///     is directly a member.
         /// </summary>
         /// <returns></returns>
-        string GetGroupMembership();
+        string GetGroupMembership(Principal principal);
 
         /// <summary>
         ///     Set the principals of this group.
@@ -61,6 +62,6 @@ namespace ACL.Interfaces
         /// </summary>
         /// <param name="member">The member to be add.</param>
         /// <returns>True if successful operation, false otherwise.</returns>
-        bool AddGroupMember(string member);
+        bool AddGroupMember(Principal principal,string member);
     }
 }
