@@ -12,35 +12,45 @@ namespace DataLayer
         /// <summary>
         /// This is method is used to seed the database with some fictional values.
         /// </summary>
-        /// <param name="db"></param>
-        /// <param name="fs"></param>
-        public static async Task SeedDb_Fs(CalDavContext db, IFileSystemManagement fs)
+        public static void SeedDb_Fs()
         {
-            var frank = new User("Frank", "f.underwood@wh.org") { LastName = "Underwood" };
-            var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyPlans");
-            frank.CalendarCollections.Add(frankCollection);
-            db.Users.Add(frank);
+            using (var db = new CalDavContext())
+            {
+                var fs = new FileSystemManagement();
+                var frank = new User("Frank", "f.underwood@wh.org") { LastName = "Underwood" };
+                var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyPlans");
+                frank.CalendarCollections.Add(frankCollection);
+                db.Users.Add(frank);
 
-            fs.AddUserFolder(frank.Email);
-            fs.AddCalendarCollectionFolder(frank.Email, frankCollection.Name);
+                fs.AddUserFolder(frank.Email);
+                fs.AddCalendarCollectionFolder(frank.Email, frankCollection.Name);
 
-            var claire = new User("Claire", "c.underwood@wh.org") {LastName = "Underwood"};
-            db.Users.Add(claire);
-            fs.AddUserFolder(claire.Email);
+                var claire = new User("Claire", "c.underwood@wh.org") { LastName = "Underwood" };
+                db.Users.Add(claire);
+                fs.AddUserFolder(claire.Email);
 
-            await db.SaveChangesAsync();
+                db.SaveChanges();
+            }
+
         }
 
-        public static async Task RecreateDb(CalDavContext db, IFileSystemManagement fs)
+        public static void RecreateDb()
         {
-            await db.Database.EnsureDeletedAsync();
-            await db.Database.EnsureCreatedAsync();
-            fs.DestroyAll();
+            using (var db = new CalDavContext())
+            {
+                var fs = new FileSystemManagement();
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+                db.SaveChanges();
+                fs.DestroyAll();
+            }
+            
         }
 
         public static void DestroyAll(this IFileSystemManagement fs)
         {
-            Directory.Delete(fs.Root, true);
+            if (Directory.Exists(fs.Root))
+                Directory.Delete(fs.Root, true);
         }
     }
 }

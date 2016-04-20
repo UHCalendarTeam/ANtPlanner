@@ -30,11 +30,12 @@ namespace CalDAV.Core.ConditionsCheck
 
             if (fs.SetUserAndCollection(userEmail, collectionName) || db.CollectionExist(userEmail, collectionName))
             {
+                response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
   <resource-must-be-null/>  
 </error>");
-                response.StatusCode = (int) HttpStatusCode.Forbidden;
+                
                 return false;
             }
 

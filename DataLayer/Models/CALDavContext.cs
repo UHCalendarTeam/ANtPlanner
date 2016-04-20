@@ -29,8 +29,8 @@ namespace DataLayer
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
             var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
-            //optionBuilder.UseSqlServer(connection);
-            optionBuilder.UseInMemoryDatabase();
+            optionBuilder.UseSqlServer(connection);
+            //optionBuilder.UseInMemoryDatabase();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

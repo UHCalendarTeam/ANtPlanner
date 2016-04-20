@@ -221,20 +221,23 @@ namespace CalDAV.Core
 
             //I create here the collection already but i wait for other comprobations before save the database.
             CreateDefaultCalendar(propertiesAndHeaders);
+            response.StatusCode = (int)HttpStatusCode.Created;
 
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
-                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
-                        StorageManagement.DeleteCalendarCollection();
+                    DeleteCalendarCollection(propertiesAndHeaders, response);
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    await response.WriteAsync("Poscondition Failed");
                     return;
                     //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
                 }
 
 
                 db.SaveChanges();
+                return;
             }
 
             //If a body exist the it is parsed like an XmlTree
@@ -245,14 +248,17 @@ namespace CalDAV.Core
             {
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
-                    if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
-                        StorageManagement.DeleteCalendarCollection();
+                    DeleteCalendarCollection(propertiesAndHeaders, response);
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    await response.WriteAsync("Poscondition Failed");
+
                     return;
                     //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
                 }
 
 
                 db.SaveChanges();
+                return;
                 //return createdMessage;
             }
 
@@ -300,10 +306,10 @@ namespace CalDAV.Core
                 // return createdMessage;
             }
 
-            if (StorageManagement.SetUserAndCollection(userEmail, collectionName))
-                StorageManagement.DeleteCalendarCollection();
-            response.StatusCode = StatusCodes.Status403Forbidden;
-            await response.WriteAsync("Poscondition failed");
+            DeleteCalendarCollection(propertiesAndHeaders, response);
+            response.StatusCode = (int)HttpStatusCode.Forbidden;
+            await response.WriteAsync("Poscondition Failed");
+            
 
             //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
         }

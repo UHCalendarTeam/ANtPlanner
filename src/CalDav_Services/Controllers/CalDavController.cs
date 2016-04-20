@@ -54,13 +54,14 @@ namespace CalDav_Services.Controllers
 
         #region Collection Methods
 
-        //MKCAL api\caldav\{username}\calendars\{collection_name}
+        //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
         [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}/")]
         public async Task MkCalendar(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("url", Request.GetEncodedUrl());
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
 
@@ -243,13 +244,18 @@ END:VCALENDAR";
         [AcceptVerbs("Initialize")]
         public void InitialiseDb()
         {
+            Response.StatusCode = (int)HttpStatusCode.NoContent;
+            var fs = new FileSystemManagement();
+            SqlMock.RecreateDb();
 
+            SqlMock.SeedDb_Fs();
         }
 
         [AcceptVerbs("Destroy")]
         public void DestroyDb()
         {
-
+            Response.StatusCode = (int)HttpStatusCode.NoContent;
+            SqlMock.RecreateDb();
         }
 
 
