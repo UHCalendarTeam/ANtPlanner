@@ -44,7 +44,6 @@ namespace DataLayer
                 db.SaveChanges();
                 fs.DestroyAll();
             }
-            
         }
 
         public static void DestroyAll(this IFileSystemManagement fs)
