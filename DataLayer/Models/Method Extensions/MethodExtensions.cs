@@ -119,7 +119,7 @@ namespace DataLayer
             try
             {
                 var collection = source.GetCollection(userEmail, collectionName);
-                return source.CalendarResources.Include(r => r.Properties).First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
+                return source.CalendarResources.First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
             }
             catch (Exception)
             {
