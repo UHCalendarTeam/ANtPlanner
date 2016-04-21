@@ -18,16 +18,19 @@ namespace DataLayer.Models.Entities
         [Required]
         public string Href { get; set; }
 
+        [Required]
+        public string Name { get; set; }
+
         //public string Getetag { get; set; }
 
         public string Uid { get; set; }
 
-        public int CollectionId { get; set; }
+        public int CalendarCollectionId { get; set; }
 
         /// <summary>
         ///     The collection where the resource is defined.
         /// </summary>
-        public CalendarCollection Collection { get; set; }
+        public CalendarCollection CalendarCollection { get; set; }
 
 
         public ICollection<Property> Properties { get; set; }
@@ -116,8 +119,9 @@ namespace DataLayer.Models.Entities
             InitializeStandardResourceProperties();
         }
 
-        public CalendarResource(string href)
+        public CalendarResource(string href, string name)
         {
+            Name = name;
             Href = href;
             Properties = new List<Property>();
             InitializeStandardResourceProperties();

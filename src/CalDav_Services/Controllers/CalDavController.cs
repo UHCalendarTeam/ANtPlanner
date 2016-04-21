@@ -76,7 +76,6 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
 
-
             CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 

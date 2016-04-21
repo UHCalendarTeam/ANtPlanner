@@ -62,7 +62,7 @@ namespace IntegrationTests
             principal.Properties.Add(aclProperty);
 
             ///create a calendarResource entry in the DB
-            var calRes = new CalendarResource("http://example.com/resources/example1");
+            var calRes = new CalendarResource("http://example.com/resources/example1", "example1");
             calRes.Properties.Add(aclProperty);
             context.SaveChanges();
         }

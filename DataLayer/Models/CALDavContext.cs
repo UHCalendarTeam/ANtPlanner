@@ -41,9 +41,9 @@ namespace DataLayer
                 .HasForeignKey(k => k.UserId);
 
             modelBuilder.Entity<CalendarResource>()
-                .HasOne(cl => cl.Collection)
+                .HasOne(cl => cl.CalendarCollection)
                 .WithMany(u => u.CalendarResources)
-                .HasForeignKey(k => k.CollectionId);
+                .HasForeignKey(k => k.CalendarCollectionId);
 
             modelBuilder.Entity<Property>()
                 .HasOne(c => c.Collection)

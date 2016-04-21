@@ -627,7 +627,7 @@ namespace CalDAV.Core
 
             var resource =
                 db.GetCollection(userEmail, collectionName)
-                    .CalendarResources.First(x => x.Href == calendarResourceId);
+                    .CalendarResources.First(x => x.Name == calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
 
@@ -926,7 +926,7 @@ namespace CalDAV.Core
             var etag = Guid.NewGuid().ToString();
             headers.ETag = new EntityTagHeaderValue(etag, false);
 
-            var resource = new CalendarResource(url);
+            var resource = new CalendarResource(url, calendarResourceId);
 
             var errorStack = new Stack<string>();
             resource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",

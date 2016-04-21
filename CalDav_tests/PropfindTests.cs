@@ -45,18 +45,27 @@ namespace CalDav_tests
         [Fact]
         public void GetAllNames()
         {
-            var db = MockDatabase();
+            SqlMock.RecreateDb();
+            SqlMock.SeedDb_Fs();
+            //var db = MockDatabase();
+            using (var db = new CalDavContext())
+            {
+                var collection = db.GetCollection("f.underwood@wh.org", "durtyplans");
+                Assert.True(collection.Properties.Count < 14);
+            }
+            
+            
 
-            var response = new XmlTreeStructure("multistatus", "DAV:");
-            response.Namespaces.Add("D", "DAV:");
-            response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            //var response = new XmlTreeStructure("multistatus", "DAV:");
+            //response.Namespaces.Add("D", "DAV:");
+            //response.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
-            var propMethods = new CalDavPropfind(db);
-            propMethods.PropNameMethod("foo@gmail.com", "Foocollection", null, 0, response);
-            IXMLTreeStructure prop;
-            response.GetChildAtAnyLevel("prop", out prop);
-            Assert.NotNull(prop);
-            Assert.True(prop.Children.Count > 0);
+            //var propMethods = new CalDavPropfind(db);
+            //propMethods.PropNameMethod("foo@gmail.com", "Foocollection", null, 0, response);
+            //IXMLTreeStructure prop;
+            //response.GetChildAtAnyLevel("prop", out prop);
+            //Assert.NotNull(prop);
+            //Assert.True(prop.Children.Count > 0);
         }
 
         [Fact]
@@ -120,7 +129,8 @@ namespace CalDav_tests
                     //TODO: Adriano ver esto
                     //DtStart = DateTime.Now,
                     //DtEnd = DateTime.Now,
-                    Href = "test.ics",
+                    Name = "test.ics",
+                    Href = ".....",
                     Properties = new List<Property>
                     {
                         new Property
