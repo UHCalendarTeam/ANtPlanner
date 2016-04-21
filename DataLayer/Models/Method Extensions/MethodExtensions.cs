@@ -76,7 +76,7 @@ namespace DataLayer
             {
                 var user = source.GetUser(userEmail);
                 return
-                    source.CalendarCollections.Include(r => r.CalendarResources)
+                    source.CalendarCollections.Include(r => r.CalendarResources).Include(p => p.Properties)
                         .First(c => c.Name == collectionName && c.UserId == user.UserId);
             }
             catch (Exception)
@@ -119,7 +119,7 @@ namespace DataLayer
             try
             {
                 var collection = source.GetCollection(userEmail, collectionName);
-                return source.CalendarResources.First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
+                return source.CalendarResources.Include(p => p.Properties).First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
             }
             catch (Exception)
             {

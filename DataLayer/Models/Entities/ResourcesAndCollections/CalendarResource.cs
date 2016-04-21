@@ -115,8 +115,8 @@ namespace DataLayer.Models.Entities
 
         public CalendarResource()
         {
-            Properties = new List<Property>();
-            InitializeStandardResourceProperties();
+            //Properties = new List<Property>();
+            //InitializeStandardResourceProperties();
         }
 
         public CalendarResource(string href, string name)

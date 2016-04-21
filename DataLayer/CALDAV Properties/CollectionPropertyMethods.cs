@@ -73,8 +73,9 @@ namespace DataLayer
 
             foreach (var property in collection.Properties.Where(prop => prop.IsVisible))
             {
+                //TODO: Check that the property is accessible beyond its visibility.
                 var tempTree = property.Value == null
-                    ? new XmlTreeStructure(property.Name, property.Namespace)
+                    ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
                     : XmlTreeStructure.Parse(property.Value);
 
                 list.Add((XmlTreeStructure) tempTree);

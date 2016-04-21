@@ -106,7 +106,7 @@ namespace CalDAV.Core
             PropFindMethods = new CalDavPropfind(db);
 
             //if the body is empty assume that is an allprop request.          
-            if (body == null)
+            if (string.IsNullOrEmpty(body))
             {
                 PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, null, responseTree);
 
