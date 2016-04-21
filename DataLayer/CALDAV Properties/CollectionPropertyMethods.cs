@@ -49,7 +49,7 @@ namespace DataLayer
             IXMLTreeStructure prop;
             if (property != null)
                 prop = property.Value == null
-                    ? new XmlTreeStructure(propertyName, mainNs)
+                    ? new XmlTreeStructure(propertyName, mainNs) { Value = ""}
                     : XmlTreeStructure.Parse(property.Value);
             else
             {

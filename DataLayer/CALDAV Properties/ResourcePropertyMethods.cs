@@ -27,14 +27,14 @@ namespace DataLayer
             IXMLTreeStructure prop;
             if (property != null)
                 prop = property.Value == null
-                    ? new XmlTreeStructure(propertyName, mainNs)
+                    ? new XmlTreeStructure(propertyName, mainNs) { Value = ""}
                     : XmlTreeStructure.Parse(property.Value);
             else
             {
                 prop = new XmlTreeStructure(propertyName, mainNs);
             }
 
-            return (XmlTreeStructure) prop;
+            return (XmlTreeStructure)prop;
         }
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace DataLayer
             foreach (var property in calendarResource.Properties.Where(prop => prop.IsVisible))
             {
                 var tempTree = property.Value == null
-                    ? new XmlTreeStructure(property.Name, property.Namespace)
+                    ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
                     : XmlTreeStructure.Parse(property.Value);
 
-                list.Add((XmlTreeStructure) tempTree);
+                list.Add((XmlTreeStructure)tempTree);
             }
             return list;
         }
@@ -70,7 +70,7 @@ namespace DataLayer
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
             return
-                calendarResource.Properties.Select(property =>  new XmlTreeStructure(property.Name,property.Namespace))
+                calendarResource.Properties.Select(property => new XmlTreeStructure(property.Name, property.Namespace))
                     .ToList();
         }
 

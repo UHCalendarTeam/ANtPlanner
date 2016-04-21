@@ -672,7 +672,7 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<C:calendar-timezone/>");
             strBuilder.AppendLine(@"<getetag/>");
             strBuilder.AppendLine(@"<getcontentlanguage/>");
-            ;
+            
             strBuilder.AppendLine(@"<C:min-date-time/>");
             strBuilder.AppendLine(@"<C:max-date-time/>");
             strBuilder.AppendLine(@"<C:max-instances/>");
@@ -891,7 +891,7 @@ namespace CalDav_tests
             strBuilder.AppendLine(@"<C:calendar-timezone/>");
             strBuilder.AppendLine(@"<getetag/>");
             strBuilder.AppendLine(@"<getcontentlanguage/>");
-            ;
+            
             strBuilder.AppendLine(@"<C:min-date-time/>");
             strBuilder.AppendLine(@"<C:max-date-time/>");
             strBuilder.AppendLine(@"<C:max-instances/>");

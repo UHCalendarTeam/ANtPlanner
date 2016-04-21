@@ -12,6 +12,7 @@ using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
 using Microsoft.Net.Http.Headers;
 using TreeForXml;
+using System.Diagnostics.Contracts;
 
 namespace CalDAV.Core
 {
@@ -166,7 +167,7 @@ namespace CalDAV.Core
 
             if (propFindTree.GetChildAtAnyLevel("prop", out props))
                 retList.AddRange(
-                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
+                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, string.IsNullOrEmpty(child.MainNamespace)?"DAV:":child.MainNamespace)));
             return retList;
         }
 
@@ -309,7 +310,7 @@ namespace CalDAV.Core
             DeleteCalendarCollection(propertiesAndHeaders, response);
             response.StatusCode = (int)HttpStatusCode.Forbidden;
             await response.WriteAsync("Poscondition Failed");
-            
+
 
             //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
         }
@@ -332,6 +333,8 @@ namespace CalDAV.Core
             //Adding the collection to the database
             var user = db.GetUser(userEmail);
             var collection = new CalendarCollection { Name = collectionName, Url = url };
+            var stack = new Stack<string>();
+            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) {Value = Guid.NewGuid().ToString()}).ToString(), stack);
             user.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
@@ -811,7 +814,7 @@ namespace CalDAV.Core
 
             var iCal = new VCalendar(body);
 
-            //TODO:Calculate Etag
+            
 
             //filling the resource
             var resource = FillResource(propertiesAndHeaders, iCal, response);
@@ -930,6 +933,10 @@ namespace CalDAV.Core
             var errorStack = new Stack<string>();
             resource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
+
+            var collection = db.GetCollection(userEmail, collectionName);
+            var stack = new Stack<string>();
+            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
 
 
             var property = iCal.GetComponentProperties("UID");
