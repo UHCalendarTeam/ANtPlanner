@@ -18,7 +18,9 @@ namespace DataLayer
             {
                 var fs = new FileSystemManagement();
                 var frank = new User("Frank", "f.underwood@wh.org") { LastName = "Underwood" };
-                var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyPlans");
+                var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyplans");
+                var assesinationEvent = new CalendarResource("api/v1/caldav/f.underwood@wh.org/durtyplans/russodies", "russodies");
+                frankCollection.CalendarResources.Add(assesinationEvent);
                 frank.CalendarCollections.Add(frankCollection);
                 db.Users.Add(frank);
 
@@ -44,7 +46,6 @@ namespace DataLayer
                 db.SaveChanges();
                 fs.DestroyAll();
             }
-            
         }
 
         public static void DestroyAll(this IFileSystemManagement fs)

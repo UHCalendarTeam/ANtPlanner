@@ -34,10 +34,7 @@ namespace DataLayer
         {
             try
             {
-                return source.Users.Include(x => x.CalendarCollections).ThenInclude(c => c.Properties)
-                    .Include(k => k.CalendarCollections)
-                    .ThenInclude(y => y.CalendarResources)
-                    .ThenInclude(p => p.Properties)
+                return source.Users.Include(x => x.CalendarCollections)
                     .First(u => u.Email == userEmail);
             }
             catch (Exception)
@@ -77,11 +74,14 @@ namespace DataLayer
         {
             try
             {
-                return source.GetUser(userEmail).CalendarCollections.First(cl => cl.Name == collectionName);
+                var user = source.GetUser(userEmail);
+                return
+                    source.CalendarCollections.Include(r => r.CalendarResources).Include(p => p.Properties)
+                        .First(c => c.Name == collectionName && c.UserId == user.UserId);
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
 
@@ -101,7 +101,7 @@ namespace DataLayer
 
             return (
                 from resource in GetCollection(source, userEmail, collectionName).CalendarResources
-                where resource.Href == calResource
+                where resource.Name == calResource
                 select resource
                 ).Any();
         }
@@ -118,9 +118,16 @@ namespace DataLayer
         public static CalendarResource GetCalendarResource(this CalDavContext source, string userEmail,
             string collectionName, string calResource)
         {
-            return source.GetCollection(userEmail, collectionName)
-                .CalendarResources
-                .FirstOrDefault(cr => cr.Href == calResource);
+            try
+            {
+                var collection = source.GetCollection(userEmail, collectionName);
+                return source.CalendarResources.Include(p => p.Properties).First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
 
        

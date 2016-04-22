@@ -13,7 +13,7 @@ namespace DataLayer.Models.Entities
         
         public User()
         {
-            CalendarCollections = new List<CalendarCollection>();
+            //CalendarCollections = new List<CalendarCollection>();
         }
 
         public User(string ftname, string email)

@@ -106,7 +106,7 @@ namespace CalDAV.Core
             PropFindMethods = new CalDavPropfind(db);
 
             //if the body is empty assume that is an allprop request.          
-            if (body == null)
+            if (string.IsNullOrEmpty(body))
             {
                 PropFindMethods.AllPropMethod(userEmail, collectionName, calendarResourceId, depth, null, responseTree);
 
@@ -626,8 +626,7 @@ namespace CalDAV.Core
                 return true;
 
             var resource =
-                db.GetCollection(userEmail, collectionName)
-                    .CalendarResources.First(x => x.Href == calendarResourceId);
+                db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
             db.CalendarResources.Remove(resource);
             db.SaveChanges();
 
@@ -926,7 +925,7 @@ namespace CalDAV.Core
             var etag = Guid.NewGuid().ToString();
             headers.ETag = new EntityTagHeaderValue(etag, false);
 
-            var resource = new CalendarResource(url);
+            var resource = new CalendarResource(url, calendarResourceId);
 
             var errorStack = new Stack<string>();
             resource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",

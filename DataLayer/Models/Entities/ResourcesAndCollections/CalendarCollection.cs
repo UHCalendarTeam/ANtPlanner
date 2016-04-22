@@ -23,9 +23,9 @@ namespace DataLayer.Models.Entities
 
         public CalendarCollection()
         {
-            CalendarResources = new List<CalendarResource>();
-            Properties = new List<Property>();
-            InitializeStandardCollectionProperties(null);
+            //CalendarResources = new List<CalendarResource>();
+            //Properties = new List<Property>();
+           // InitializeStandardCollectionProperties(null);
         }
 
         public CalendarCollection(string url, string name)

@@ -70,7 +70,7 @@ namespace DataLayer
         public static List<XmlTreeStructure> GetAllPropertyNames(this CalendarResource calendarResource)
         {
             return
-                calendarResource.Properties.Select(property => (XmlTreeStructure) XmlTreeStructure.Parse(property.Value))
+                calendarResource.Properties.Select(property =>  new XmlTreeStructure(property.Name,property.Namespace))
                     .ToList();
         }
 

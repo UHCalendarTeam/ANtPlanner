@@ -48,7 +48,8 @@ namespace CalDav_tests
             {
                 new CalendarResource
                 {
-                    Href = "test.ics",
+                    Name = "test.ics",
+                    Href = "....",
                     Properties = new List<Property>
                     {
                         new Property
