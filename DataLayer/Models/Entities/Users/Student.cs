@@ -6,6 +6,14 @@
     /// </summary>
     public class Student : User
     {
+        public Student(string displayName, string email, string password,
+            string career, string group, int year) : base(displayName, email, password)
+        {
+            Career = career;
+            Group = group;
+            Year = year;
+        }
+
         /// <summary>
         ///     The user career.
         /// </summary>

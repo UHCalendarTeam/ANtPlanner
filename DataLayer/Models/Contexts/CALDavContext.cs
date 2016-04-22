@@ -2,18 +2,45 @@
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
+using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
 {
     public class CalDavContext : DbContext
     {
+        public readonly IConfigurationRoot Configuration;
+
+        /// <summary>
+        /// Contains the url for the user's collections
+        /// Add the email of the user
+        /// </summary>
+        public readonly string _userCollectionUrl = "collections/users/";
+
+        /// <summary>
+        /// Contains the url for the groups collection.
+        /// Add the name of the group
+        /// </summary>
+        public readonly string _groupCollectionUrl = "collections/group/";
+
+        /// <summary>
+        /// Contains the default name for the user collections
+        /// </summary>
+        public readonly string _defualtInitialCollectionName = "DefualCalendar";
+
+
+
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
+           
         }
-
+        /// <summary>
+        /// inject the configuration of the app to be accessible in the DataLayer
+        /// </summary>
+        /// <param name="config"></param>
         public CalDavContext()
         {
+            
         }
 
         public DbSet<User> Users { get; set; }
