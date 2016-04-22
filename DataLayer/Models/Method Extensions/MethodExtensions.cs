@@ -105,6 +105,8 @@ namespace DataLayer
         }
 
         /// <summary>
+        /// Get the calendarResourse object in the given collection
+        /// by the given resource's name.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail">The email of the calendarResource's user.</param>
@@ -116,8 +118,30 @@ namespace DataLayer
         {
             return source.GetCollection(userEmail, collectionName)
                 .CalendarResources
-                .First(cr => cr.Href == calResource);
+                .FirstOrDefault(cr => cr.Href == calResource);
         }
+
+        /// <summary>
+        /// Add a user to the system.
+        /// </summary>
+        /// <param name="context">The system Db context.</param>
+        /// <param name="email">The user email.</param>
+        /// <param name="fullName">The user full name. This gonna be the displayname for the system.</param>
+        /// <param name="password">THe user not encrypted password</param>
+        /// <returns>The instance of the new User.</returns>
+        public static User CreateUserInSystem(this CalDavContext context, string email, string fullName,
+            string password)
+        {
+            var user = new User()
+            {
+                Email = email,
+
+            };
+        }
+
+
+
+
 
         /// <param name="source"></param>
         /// </summary>

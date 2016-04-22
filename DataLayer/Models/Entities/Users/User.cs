@@ -21,12 +21,42 @@ namespace DataLayer.Models.Entities
             CalendarCollections = new List<CalendarCollection>();
         }
 
+        /// <summary>
+        ///     Create a new instance of a user
+        /// </summary>
+        /// <param name="displayName">The user full name.</param>
+        /// <param name="email">The user email.</param>
+        /// <param name="password">The user password.</param>
+        public User(string displayName, string email, string password)
+        {
+            Email = email;
+            Password = password;
+            DisplayName = displayName;
+        }
+
         [ScaffoldColumn(false)]
         public int UserId { get; set; }
 
         [Required]
         public string Email { get; set; }
 
+        /// <summary>
+        ///     Contains the user collections.
+        /// </summary>
+        public ICollection<CalendarCollection> CalendarCollections { get; set; }
+
+        /// <summary>
+        ///     Contains the user fullName.
+        /// </summary>
+        public string DisplayName { get; set; }
+
+        /// <summary>
+        ///     Contains the user password.
+        ///     The password is encrypted before save it.
+        /// </summary>
+        public string Password { get; set; }
+
+        #region remove this and use displayname instead
 
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
@@ -35,8 +65,6 @@ namespace DataLayer.Models.Entities
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        //public ICollection<CalendarResource> Resources { get; set; }
-
-        public ICollection<CalendarCollection> CalendarCollections { get; set; }
+        #endregion
     }
 }
