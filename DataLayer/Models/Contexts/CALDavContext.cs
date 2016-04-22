@@ -17,6 +17,10 @@ namespace DataLayer
         }
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Student> Students { get; set; }
+
+        public DbSet<Worker> Workers { get; set; }
         public DbSet<CalendarCollection> CalendarCollections { get; set; }
 
         public DbSet<CalendarResource> CalendarResources { get; set; }

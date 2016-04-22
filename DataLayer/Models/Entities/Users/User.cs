@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace DataLayer.Models.Entities
 {
@@ -7,8 +8,9 @@ namespace DataLayer.Models.Entities
     ///     Defines the main properties for the users
     ///     of the system.
     /// </summary>
-    public class User
+    public class User 
     {
+        
         public User()
         {
             CalendarCollections = new List<CalendarCollection>();
