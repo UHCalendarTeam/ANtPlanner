@@ -30,11 +30,23 @@ namespace CalDav_tests
 
             var user = context.CreateUserInSystem(_email, _fullName, _password);
             context.Users.Add(user);
-           
+            context.SaveChanges();
+            Assert.True(context.Users.Count()>0);
+
             var dbUser = context.Users.FirstOrDefault(x => x.Email == _email);
             
             Assert.NotNull(dbUser);
 
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            DataLayer.SqlMock.SeedDb_Fs();
+            var context = new CalDavContext();
+            var frank = context.Users.FirstOrDefault(x => x.Email == "f.underwood@wh.org");
+
+            Assert.NotNull(frank);
         }
     }
 }
