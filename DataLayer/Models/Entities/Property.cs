@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataLayer.Models.Entities;
 using DataLayer.Models.ACL;
 
 namespace DataLayer.Models.Entities
@@ -73,8 +72,6 @@ namespace DataLayer.Models.Entities
         public int? PricipalId { get; set; }
 
         public Principal Principal { get; set; }
-
-        
 
         #endregion
     }

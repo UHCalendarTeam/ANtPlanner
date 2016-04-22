@@ -54,13 +54,14 @@ namespace CalDav_Services.Controllers
 
         #region Collection Methods
 
-        //MKCAL api\caldav\{username}\calendars\{collection_name}
-        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}")]
+        //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
+        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}/")]
         public async Task MkCalendar(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("url", Request.GetEncodedUrl());
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
 
@@ -122,11 +123,11 @@ namespace CalDav_Services.Controllers
 
             var headers = Request.GetTypedHeaders();
 
-            
+
 
             if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
             {
-                Response.StatusCode = (int) HttpStatusCode.ExpectationFailed;
+                Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
             }
             else
             {
@@ -238,6 +239,23 @@ END:VCALENDAR";
         {
             StreamReader reader = new StreamReader(stream);
             return reader.ReadToEnd();
+        }
+
+        [AcceptVerbs("Initialize")]
+        public void InitialiseDb()
+        {
+            Response.StatusCode = (int)HttpStatusCode.NoContent;
+            var fs = new FileSystemManagement();
+            SqlMock.RecreateDb();
+
+            SqlMock.SeedDb_Fs();
+        }
+
+        [AcceptVerbs("Destroy")]
+        public void DestroyDb()
+        {
+            Response.StatusCode = (int)HttpStatusCode.NoContent;
+            SqlMock.RecreateDb();
         }
 
 

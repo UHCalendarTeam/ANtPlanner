@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using CalDAV.Core.Method_Extensions;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
@@ -10,15 +8,15 @@ using Xunit;
 
 namespace CalDav_tests
 {
-	public class FiltersTests
-	{
+    public class FiltersTests
+    {
         /// <summary>
-        /// 7.8.5 Example: Retrieval of To-Dos by Alarm Time Range
+        ///     7.8.5 Example: Retrieval of To-Dos by Alarm Time Range
         /// </summary>
-		[Fact]
-		public void UnitTest3()
-		{
-			var calStr = @"BEGIN:VCALENDAR
+        [Fact]
+        public void UnitTest3()
+        {
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTODO
@@ -35,7 +33,7 @@ TRIGGER;RELATED=START:-PT10M
 END:VALARM
 END:VTODO
 END:VCALENDAR";
-			var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+            var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VTODO"">
 <C:comp-filter name=""VALARM"">
@@ -44,17 +42,16 @@ end=""20060107T100000Z""/>
 </C:comp-filter>
 </C:comp-filter>
 </C:comp-filter></C:filter>";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
             var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
-		
-		}
+            Assert.True(result);
+        }
 
-		[Fact]
-		public void RecursiveSeekerTest2()
-		{
-			var calStr = @"BEGIN:VCALENDAR
+        [Fact]
+        public void RecursiveSeekerTest2()
+        {
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTIMEZONE
@@ -89,7 +86,7 @@ UID:DC6C50A017428C5216A2F1CD@example.com
 X-ABC-GUID:E1CX5Dr-0007ym-Hz@example.com
 END:VEVENT
 END:VCALENDAR";
-			var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+            var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VEVENT"">
 <C:prop-filter name=""UID"">
 <C:text-match collation=""i;octet""
@@ -97,19 +94,20 @@ END:VCALENDAR";
 </C:prop-filter>
 </C:comp-filter>
 </C:comp-filter>";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			IXMLTreeStructure tree;
-			ICalendarComponent comp;
-			var result = ExtensionsForFilters.ComponentSeeker(calendar, xmlTree, out tree, out comp);
-			Assert.True(result);
-			Assert.Equal("VEVENT", comp.Name);
-			Assert.Equal("VEVENT", tree.Attributes["name"]);
-		}
- [Fact]
-		public void RecursiveSeekerTest3()
-		{
-			var calStr = @"BEGIN:VCALENDAR
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            IXMLTreeStructure tree;
+            ICalendarComponent comp;
+            var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
+            Assert.True(result);
+            Assert.Equal("VEVENT", comp.Name);
+            Assert.Equal("VEVENT", tree.Attributes["name"]);
+        }
+
+        [Fact]
+        public void RecursiveSeekerTest3()
+        {
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTIMEZONE
@@ -144,7 +142,7 @@ UID:DC6C50A017428C5216A2F1CD@example.com
 X-ABC-GUID:E1CX5Dr-0007ym-Hz@example.com
 END:VEVENT
 END:VCALENDAR";
-			var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+            var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VTODO"">
 <C:prop-filter name=""UID"">
 <C:text-match collation=""i;octet""
@@ -152,35 +150,35 @@ END:VCALENDAR";
 </C:prop-filter>
 </C:comp-filter>
 </C:comp-filter>";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			IXMLTreeStructure tree;
-			ICalendarComponent comp;
-			var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
-			Assert.False(result);
-			/*Assert.Equal("VEVENT", comp.Name);
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            IXMLTreeStructure tree;
+            ICalendarComponent comp;
+            var result = calendar.ComponentSeeker(xmlTree, out tree, out comp);
+            Assert.False(result);
+            /*Assert.Equal("VEVENT", comp.Name);
 			Assert.Equal("VEVENT", tree.Attributes["name"]);*/
-		}
+        }
 
 
         /// <summary>
-        /// Test for the ApplyTextFilter.
-        /// Should apply a substring filter.
+        ///     Test for the ApplyTextFilter.
+        ///     Should apply a substring filter.
         /// </summary>
-		[Fact]
-		public void UnitTest4()
-		{
-			byte[] propValueOctet = System.Text.Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.comwithsomemore");
-			byte[] filterValueOctet = System.Text.Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.com");
-			var result = ExtensionsForFilters.ApplyTextFilter(propValueOctet, filterValueOctet);
-			Assert.True(result);
-		}
+        [Fact]
+        public void UnitTest4()
+        {
+            var propValueOctet = Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.comwithsomemore");
+            var filterValueOctet = Encoding.ASCII.GetBytes("DC6C50A017428C5216A2F1CD@example.com");
+            var result = ExtensionsForFilters.ApplyTextFilter(propValueOctet, filterValueOctet);
+            Assert.True(result);
+        }
 
 
-		[Fact]
-		public void FilterResourceTest1()
-		{
-			var calStr = @"BEGIN:VCALENDAR
+        [Fact]
+        public void FilterResourceTest1()
+        {
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTIMEZONE
@@ -215,7 +213,7 @@ UID:DC6C50A017428C5216A2F1CD@example.com
 X-ABC-GUID:E1CX5Dr-0007ym-Hz@example.com
 END:VEVENT
 END:VCALENDAR";
-			var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+            var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 	<C:comp-filter name=""VEVENT"">
 		<C:prop-filter name=""ATTENDEE"">
@@ -226,17 +224,17 @@ END:VCALENDAR";
 		</C:prop-filter>
 	</C:comp-filter>
 </C:comp-filter></C:filter>";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
-		}
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
 
-		[Fact]
-		public void FilterResourceTest2()
-		{
-			var calStr = @"BEGIN:VCALENDAR
+        [Fact]
+        public void FilterResourceTest2()
+        {
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTIMEZONE
@@ -271,7 +269,7 @@ UID:DC6C50A017428C5216A2F1CD@example.com
 X-ABC-GUID:E1CX5Dr-0007ym-Hz@example.com
 END:VEVENT
 END:VCALENDAR";
-			var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+            var xmlStr = @"<C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 	<C:comp-filter name=""VEVENT"">
 <C:prop-filter name=""UID"">
 <C:text-match collation=""i;octet""
@@ -279,17 +277,17 @@ END:VCALENDAR";
 </C:prop-filter>
 </C:comp-filter>
 </C:comp-filter>";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
-		}
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
 
-		[Fact]
-		public void RetrievalofAllPendingToDos()
-		{
-			var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+        [Fact]
+        public void RetrievalofAllPendingToDos()
+        {
+            var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 	<C:comp-filter name=""VTODO"">
 <C:prop-filter name=""COMPLETED"">
@@ -301,7 +299,7 @@ negate-condition=""yes"">CANCELLED</C:text-match>
 </C:prop-filter>
 </C:comp-filter>
 </C:comp-filter></C:filter>";
-			var calStr = @"BEGIN:VCALENDAR
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VTODO
@@ -316,22 +314,22 @@ TRIGGER;RELATED=START:-PT10M
 END:VALARM
 END:VTODO
 END:VCALENDAR";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
-		}
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
-		[Fact]
-		public void PartialRetrievalofEventsbyTimeRange()
-		{
-			var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+        [Fact]
+        public void PartialRetrievalofEventsbyTimeRange()
+        {
+            var xmlStr = @"<C:filter  xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <C:comp-filter name=""VCALENDAR"" xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 	<C:comp-filter name=""VEVENT"">
 		<C:time-range start=""20060104T000000Z"" end=""20060105T000000Z""/>
 	</C:comp-filter>
 </C:comp-filter></C:filter>";
-			var calStr = @"BEGIN:VCALENDAR
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VTIMEZONE
 LAST-MODIFIED:20040110T032845Z
@@ -359,19 +357,19 @@ SUMMARY:Event #2
 UID:00959BC664CA650E933C892C@example.com
 END:VEVENT
 END:VCALENDAR";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
-		}
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
-		/// <summary>
-		/// 7.8.1 Example: Partial Retrieval of Events by Time Range
-		/// </summary>
-		[Fact]
-		public void UnitTest1()
-		{
-			var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+        /// <summary>
+        ///     7.8.1 Example: Partial Retrieval of Events by Time Range
+        /// </summary>
+        [Fact]
+        public void UnitTest1()
+        {
+            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <C:calendar-query xmlns:D=""DAV:""
 xmlns:C=""urn:ietf:params:xml:ns:caldav"">
 <D:prop>
@@ -404,7 +402,7 @@ end=""20060105T000000Z""/>
 </C:comp-filter>
 </C:filter>
 </C:calendar-query>";
-			var calStr = @"BEGIN:VCALENDAR
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VTIMEZONE
 LAST-MODIFIED:20040110T032845Z
@@ -446,20 +444,19 @@ SUMMARY:Event #2 bis bis
 UID:00959BC664CA650E933C892C@example.com
 END:VEVENT
 END:VCALENDAR";
-			var calendar = new VCalendar(calStr);
-			var xmlTree = XmlTreeStructure.Parse(xmlStr);
-			var result = calendar.FilterResource(xmlTree);
-			Assert.True(result);
+            var calendar = new VCalendar(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
-		}
-
-	    /// <summary>
-	    /// 7.8.4 Example: Partial Retrieval of Stored Free Busy Components
-	    /// </summary>
-	    [Fact]
-	    public void UnitTest2()
-	    {
-	        var xmlStr = @"<C:filter xmlns:C=""urn:ietf:params:xml:ns:caldav"">
+        /// <summary>
+        ///     7.8.4 Example: Partial Retrieval of Stored Free Busy Components
+        /// </summary>
+        [Fact]
+        public void UnitTest2()
+        {
+            var xmlStr = @"<C:filter xmlns:C=""urn:ietf:params:xml:ns:caldav"">
                    <C:comp-filter name=""VCALENDAR"">
                 <C:comp-filter name=""VFREEBUSY"">
                 <C:time-range start=""20060102T000000Z""
@@ -467,7 +464,7 @@ END:VCALENDAR";
                 </C:comp-filter>
                 </C:comp-filter>
                 </C:filter>";
-	        var calStr = @"BEGIN:VCALENDAR
+            var calStr = @"BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Example Corp.//CalDAV Client//EN
 BEGIN:VFREEBUSY
@@ -480,21 +477,17 @@ FREEBUSY;FBTYPE=BUSY-TENTATIVE:20060102T100000Z/20060102T120000Z
 END:VFREEBUSY
 END:VCALENDAR";
 
-	        var calendar = VCalendar.Parse(calStr);
-	        var xmlTree = XmlTreeStructure.Parse(xmlStr);
-	        var result = calendar.FilterResource(xmlTree);
-	        Assert.True(result);
-	    }
+            var calendar = VCalendar.Parse(calStr);
+            var xmlTree = XmlTreeStructure.Parse(xmlStr);
+            var result = calendar.FilterResource(xmlTree);
+            Assert.True(result);
+        }
 
 
-
-	    [Fact]
-		public void TestingStuffs()
-		{
-			var temp =TimeZoneInfo.GetSystemTimeZones();
-
-		}
-
-
-	}
+        [Fact]
+        public void TestingStuffs()
+        {
+            var temp = TimeZoneInfo.GetSystemTimeZones();
+        }
+    }
 }

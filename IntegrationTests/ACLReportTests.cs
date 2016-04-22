@@ -1,16 +1,11 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using CalDav_Services;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Internal;
 using Microsoft.AspNet.TestHost;
-
 using Xunit;
-
 
 namespace IntegrationTests
 {
@@ -83,9 +78,8 @@ namespace IntegrationTests
             var acl = new ACLReportTests();
 
             var response = await sendRequest();
-            
-            Assert.NotNull(response);
 
+            Assert.NotNull(response);
         }
 
         private async Task<string> sendRequest(string method = "profind", string uri = "http://localhost/api/v1/caldav")
@@ -94,11 +88,9 @@ namespace IntegrationTests
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
-
     }
 
-     class MockHelper
+    internal class MockHelper
     {
-        
     }
 }

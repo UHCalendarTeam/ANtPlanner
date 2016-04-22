@@ -116,7 +116,7 @@ namespace DataLayer
         bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
 
         /// <summary>
-        /// Returns the size of a resource.
+        ///     Returns the size of a resource.
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>

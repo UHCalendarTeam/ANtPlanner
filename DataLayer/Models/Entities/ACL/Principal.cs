@@ -37,8 +37,8 @@ namespace DataLayer.Models.ACL
         public string Displayname { get; set; }
 
         /// <summary>
-        /// Cotnains the email of the principal if the
-        /// principal is a user.
+        ///     Cotnains the email of the principal if the
+        ///     principal is a user.
         /// </summary>
         public string Email { get; set; }
 
@@ -46,31 +46,16 @@ namespace DataLayer.Models.ACL
         public int PrincipalId { get; set; }
 
         /// <summary>
-        /// retrun the value of a property by the
-        /// string representation of the name.
-        /// This is done by reflection.
+        ///     retrun the value of a property by the
+        ///     string representation of the name.
+        ///     This is done by reflection.
         /// </summary>
         /// <param name="propertyName">The string representation of the property.</param>
         /// <returns>The value of the desire property</returns>
-        //public string this[string propertyName]
-        //{
-        //    get{
-
-        //        try
-        //        {
-        //            return (string) this.GetType().GetProperty(propertyName).GetValue(this, null);
-        //        }
-        //        catch
-        //        {
-        //            return "";
-        //        }
-        //    }
-        //}
-
         /// <summary>
-        ///     Contains the properties of 
+        ///     Contains the properties of
         ///     principal.
-        /// </summary>            
+        /// </summary>
         public List<Property> Properties { get; set; }
     }
 }

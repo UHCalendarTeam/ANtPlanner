@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNet.Http;
 
 namespace CalDAV.Core.ConditionsCheck
 {
-    interface IPrecondition
+    internal interface IPrecondition
     {
-        ///  <summary>
-        /// Checks that all preconditions passed. 
-        ///  </summary>
+        /// <summary>
+        ///     Checks that all preconditions passed.
+        /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         /// <returns></returns>

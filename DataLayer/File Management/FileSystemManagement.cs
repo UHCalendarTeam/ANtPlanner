@@ -18,7 +18,7 @@ namespace DataLayer
                 Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
                 Root = root;
             else
-                Root = Directory.GetCurrentDirectory() + "\\"+root;
+                Root = Directory.GetCurrentDirectory() + "\\" + root;
         }
 
         public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")
@@ -102,7 +102,6 @@ namespace DataLayer
 
         public async Task<bool> AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar)
         {
-
             //Check Directory
             if (!Directory.Exists(CollectionPath))
                 return false;
@@ -118,7 +117,7 @@ namespace DataLayer
             //
             using (var writer = File.CreateText(CollectionPath + "\\" + objectResourceName + @".ics"))
             {
-               await writer.WriteAsync(iCalendar.ToString());
+                await writer.WriteAsync(iCalendar.ToString());
             }
 
             return true;
@@ -126,7 +125,6 @@ namespace DataLayer
 
         public async Task<string> GetCalendarObjectResource(string objectResourceName)
         {
-           
             if (File.Exists(objectResourceName))
             {
                 //Task<string> result = new Task<string>(null);
@@ -136,7 +134,6 @@ namespace DataLayer
                     var result = await reader.ReadToEndAsync();
                     return result;
                 }
-                
             }
             return null;
         }
@@ -175,7 +172,7 @@ namespace DataLayer
 
             foreach (var file in filesPath)
             {
-                body =  GetCalendarObjectResource(file).Result;
+                body = GetCalendarObjectResource(file).Result;
                 if (body != null)
                 {
                     iCalendar = new VCalendar(body);
@@ -205,7 +202,7 @@ namespace DataLayer
                 var fileName = file.Substring(lstIndex + 1);
                 var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(userCollectionPath +fileName, temp.Result);
+                    calendarObjectResources.Add(userCollectionPath + fileName, temp.Result);
             }
             return true;
         }
@@ -213,7 +210,7 @@ namespace DataLayer
         public long GetFileSize(string fileName)
         {
             var path = CollectionPath + "\\" + fileName;
-            FileInfo finfo = new FileInfo(path);
+            var finfo = new FileInfo(path);
             return finfo.Length;
         }
     }

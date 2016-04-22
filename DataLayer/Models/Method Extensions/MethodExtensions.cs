@@ -35,7 +35,9 @@ namespace DataLayer
             try
             {
                 return source.Users.Include(x => x.CalendarCollections).ThenInclude(c => c.Properties)
-                    .Include(k => k.CalendarCollections).ThenInclude(y => y.CalendarResources).ThenInclude(p => p.Properties)
+                    .Include(k => k.CalendarCollections)
+                    .ThenInclude(y => y.CalendarResources)
+                    .ThenInclude(p => p.Properties)
                     .First(u => u.Email == userEmail);
             }
             catch (Exception)
@@ -121,36 +123,20 @@ namespace DataLayer
                 .FirstOrDefault(cr => cr.Href == calResource);
         }
 
-        /// <summary>
-        /// Add a user to the system.
-        /// </summary>
-        /// <param name="context">The system Db context.</param>
-        /// <param name="email">The user email.</param>
-        /// <param name="fullName">The user full name. This gonna be the displayname for the system.</param>
-        /// <param name="password">THe user not encrypted password</param>
-        /// <returns>The instance of the new User.</returns>
-        public static User CreateUserInSystem(this CalDavContext context, string email, string fullName,
-            string password)
-        {
-            var user = new User()
-            {
-                Email = email,
-
-            };
-        }
+       
 
 
 
 
-
-        /// <param name="source"></param>
-        /// </summary>
-        /// by filter of the dates.
-        /// Filter the resources of the user in the given collection
-        /// <summary>
 
 
         //TODO: Adriano ver esto
+        /// <summary>
+        /// Filter the resources of the user in the given collection
+        /// by filter of the dates.
+        /// </summary>
+
+        /// <param name="source"></param>
         /// <param name="starTime">The startTime of the  </param>
         /// <param name="endTime"></param>
         /// <param name="ownerName"></param>

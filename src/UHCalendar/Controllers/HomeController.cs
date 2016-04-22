@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+﻿using System.Collections.Generic;
 using DataLayer;
 using DataLayer.Models.Entities;
+using Microsoft.AspNet.Mvc;
 
 namespace UHCalendar.Controllers
 {
@@ -15,7 +12,7 @@ namespace UHCalendar.Controllers
             var users = new List<User>();
             using (var context = new CalDavContext())
             {
-                context.Users.Add(new User() {FirstName = "Adriano", LastName = "Flechilla"});
+                context.Users.Add(new User {FirstName = "Adriano", LastName = "Flechilla"});
                 context.SaveChanges();
 
                 users.AddRange(context.Users);

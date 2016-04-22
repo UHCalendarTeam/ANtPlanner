@@ -46,7 +46,7 @@ namespace CalDav_Services
 
             services.AddMvc();
 
-            services.AddSingleton<ICalDav, CalDav>();
+            services.AddScoped<ICalDav, CalDav>();
             services.AddSingleton<IFileSystemManagement, FileSystemManagement>();
         }
 

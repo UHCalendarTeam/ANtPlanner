@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
-using TreeForXml;
-
 
 namespace CalDAV.Core
 {
     public interface ICalDav
     {
         /// <summary>
-        /// CalDAV HTTP Method for create a new collection of COR (new calendar)
+        ///     CalDAV HTTP Method for create a new collection of COR (new calendar)
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
@@ -21,7 +15,7 @@ namespace CalDAV.Core
         Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
-        /// WebDAV HTTP Method
+        ///     WebDAV HTTP Method
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
@@ -30,7 +24,7 @@ namespace CalDAV.Core
         void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
-        /// CalDav HTTP Method PROPPATCH
+        ///     CalDav HTTP Method PROPPATCH
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="Body"></param>
@@ -39,7 +33,7 @@ namespace CalDAV.Core
         void PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
 
         /// <summary>
-        /// CalDav HTTP Method REPORT for Calendar Collections
+        ///     CalDav HTTP Method REPORT for Calendar Collections
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="body"></param>
@@ -47,28 +41,28 @@ namespace CalDAV.Core
         string Report(Dictionary<string, string> propertiesAndHeaders, string body);
 
         /// <summary>
-        /// CalDAV PUT for create a new COR
+        ///     CalDAV PUT for create a new COR
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
-        /// CalDav Method for delete a Calendar Object Resource
+        ///     CalDav Method for delete a Calendar Object Resource
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
-        /// CalDav & WebDav Method for delete a Collection
+        ///     CalDav & WebDav Method for delete a Collection
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
-        /// CalDav HTTP Method Get for a COR
+        ///     CalDav HTTP Method Get for a COR
         /// </summary>
         /// <returns></returns>
         /// <param name="propertiesAndHeaders"></param>
@@ -76,11 +70,10 @@ namespace CalDAV.Core
         Task ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
-        /// CalDav Http method for get a Calendar Collection
+        ///     CalDav Http method for get a Calendar Collection
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <returns></returns>
         string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
-
     }
 }

@@ -32,6 +32,13 @@ namespace DataLayer.Models.Entities
 
         public ICollection<Property> Properties { get; set; }
 
+        ///// <summary>
+        ///// The ACL properties of the resource.
+        ///// </summary>
+        //public AccessControlProperties AccessControlProperties { get; set; }
+
+        //public int AccessControlPropertiesId { get; set; }
+
         #region auxiliary properties
 
         private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
@@ -117,12 +124,5 @@ namespace DataLayer.Models.Entities
         }
 
         #endregion
-
-        //public int AccessControlPropertiesId { get; set; }
-        //public AccessControlProperties AccessControlProperties { get; set; }
-        ///// </summary>
-        ///// The ACL properties of the resource.
-
-        ///// <summary>
     }
 }

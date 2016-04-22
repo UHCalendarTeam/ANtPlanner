@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalDAV.Core;
+﻿using DataLayer;
 using Xunit;
-using DataLayer;
 
 namespace CalDav_tests
 {
     public class IFileSysManagementTest
     {
         /// <summary>
-        /// Create a folder.
+        ///     Create a folder.
         /// </summary>
         [Fact]
         public void UnitTest1()
@@ -27,12 +22,10 @@ namespace CalDav_tests
             Assert.True(fs.DeleteCalendarCollection());
 
             Assert.False(fs.ExistCalendarCollection());
-
-
         }
 
         /// <summary>
-        /// Adding and deleting resources
+        ///     Adding and deleting resources
         /// </summary>
         [Fact]
         public void UnitTest2()
@@ -93,9 +86,6 @@ END:VCALENDAR";
             Assert.True(fs.ExistCalendarObjectResource("resource1.ics"));
 
             var fileStr = fs.GetCalendarObjectResource("resource1.ics");
-
-            
-
         }
     }
 }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CalDAV.Core.Method_Extensions;
-using ICalendar.Calendar;
 using DataLayer;
+using ICalendar.Calendar;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -53,11 +53,11 @@ namespace CalDAV.Core
 
 
         /// <summary>
-        /// The CALDAV:calendar-query REPORT performs a search for all calendar object resources that match a
-        /// specified filter. The response of this report will contain all the WebDAV properties and calendar object
-        /// resource data specified in the request. In the case of the CALDAV:calendar-data XML element, one can
-        /// explicitly specify the calendar components and properties that should be returned in the calendar object
-        /// resource data that matches the filter.
+        ///     The CALDAV:calendar-query REPORT performs a search for all calendar object resources that match a
+        ///     specified filter. The response of this report will contain all the WebDAV properties and calendar object
+        ///     resource data specified in the request. In the case of the CALDAV:calendar-data XML element, one can
+        ///     explicitly specify the calendar components and properties that should be returned in the calendar object
+        ///     resource data that matches the filter.
         /// </summary>
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="fs">The FileManagementSystem instance that points to the requested collection.</param>
@@ -116,7 +116,6 @@ namespace CalDAV.Core
 
             foreach (var resource in resources)
             {
-
                 IXMLTreeStructure statusNode;
 
                 ///each returned resource has is own response and href nodes
@@ -134,13 +133,9 @@ namespace CalDAV.Core
                     statusNode = new XmlTreeStructure("status", "DAV:");
                     statusNode.AddValue("HTTP/1.1 404 Not Found");
                     responseNode.AddChild(statusNode);
-
                 }
                 else
                 {
-
-                    
-
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                     //that the requested data
@@ -202,8 +197,10 @@ namespace CalDAV.Core
                 result.Add(href, resourceContent);
             }
             return ReportResponseBuilder(result
-                .Select( x=> new KeyValuePair<string, VCalendar>(x.Key,string.IsNullOrEmpty(x.Value)?null: VCalendar.Parse(x.Value))), propNode);
-
+                .Select(
+                    x =>
+                        new KeyValuePair<string, VCalendar>(x.Key,
+                            string.IsNullOrEmpty(x.Value) ? null : VCalendar.Parse(x.Value))), propNode);
         }
 
         /// <summary>
