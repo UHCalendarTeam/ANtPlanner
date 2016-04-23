@@ -24,13 +24,12 @@ namespace DataLayer.Models.Entities
 
         public CalendarCollection() { }
 
-        public CalendarCollection(string url, string name)
+        public CalendarCollection(string url,string name,  params Property[] properties)
         {
-            Url = url;
-            Name = name;
+            Url = url;           
             CalendarResources = new List<CalendarResource>();
-            Properties = new List<Property>();
-            InitializeStandardCollectionProperties(Name);
+            Properties = new List<Property>(properties);
+            InitializeStandardCollectionProperties(name);
         }
 
         [ScaffoldColumn(false)]

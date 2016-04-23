@@ -31,7 +31,7 @@ namespace IntegrationTests
             ///create the principal
             var principal = new Principal
             {
-                Displayname = "Adriano",
+                //Displayname = "Adriano",
                 PrincipalURL =
                     @"<D:href xmlns:D=""DAV:"">http://www.example.com/acl/user/a.flechilla91@gmail.com</D:href>"
             };

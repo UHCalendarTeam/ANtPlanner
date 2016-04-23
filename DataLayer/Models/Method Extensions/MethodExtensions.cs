@@ -49,16 +49,16 @@ namespace DataLayer
         /// <param name="source"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public static Principal GetPrincipalByEmail(this CalDavContext source, string email)
-        {
-            return source.Principals.Include(p => p.Properties)
-                    .Include(c => c.CalendarCollections)
-                    .ThenInclude(cp => cp.Properties)
-                    .Include(c2 => c2.CalendarCollections)
-                    .ThenInclude(r => r.CalendarResources)
-                    .ThenInclude(rp => rp.Properties)
-                .FirstOrDefault(u => u.Email == email);
-        }
+        //public static Principal GetPrincipalByEmail(this CalDavContext source, string email)
+        //{
+        //    return source.Principals.Include(p => p.Properties)
+        //            .Include(c => c.CalendarCollections)
+        //            .ThenInclude(cp => cp.Properties)
+        //            .Include(c2 => c2.CalendarCollections)
+        //            .ThenInclude(r => r.CalendarResources)
+        //            .ThenInclude(rp => rp.Properties)
+        //        .FirstOrDefault(u => u.Email == email);
+        //}
 
         /// <summary>
         ///     Check if a collection exist in the system.

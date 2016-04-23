@@ -23,7 +23,7 @@ namespace CalDav_tests
         readonly string _faculty = "Computer Science";
         readonly int _year = 5;
        
-        /// <summary>
+        /// <summary>a
         /// Create a user in the DB
         /// </summary>
         [Fact]
@@ -42,17 +42,7 @@ namespace CalDav_tests
 
         }
 
-        [Fact]
-        public void Test2()
-        {
-            
-            var context = new CalDavContext();
-            var users = context.Users;
-            //DataLayer.SqlMock.SeedDb_Fs();
-            var frank = context.Users.FirstOrDefault(x => x.Email == "f.underwood@wh.org");
-
-            Assert.NotNull(frank);
-        }
+     
 
         /// <summary>
         /// Testing the password verification
@@ -81,18 +71,7 @@ namespace CalDav_tests
 
             using (var context = new CalDavContext())
             {
-
-                //create the collection for the user group ]
-                context.CalendarCollections.Add(new CalendarCollection()
-                {
-                    Name = $"Group {_group} collection",
-                    Url = DataLayer.SystemProperties._groupCollectionUrl + _group
-
-                });
-                context.SaveChanges();
-
-
-                context.CreateStudentInSystem(_email, _fullName, _password, _career, _group, _year);
+                context.CreateStudentInSystem("unittest4@gmail.com", "Student1", _password, _career, _group, _year);
                 context.SaveChanges();
                 var user = context.Students.FirstOrDefaultAsync(x => x.Email == _email && x.Career == _career);
                
@@ -122,19 +101,19 @@ namespace CalDav_tests
         /// <summary>
         /// Taking the principal from the user.
         /// </summary>
-        [Fact]
-        public void UnitTest6()
-        {
-            using (var _ctx = new CalDavContext())
-            {
+        //[Fact]
+        //public void UnitTest6()
+        //{
+        //    using (var _ctx = new CalDavContext())
+        //    {
 
-                var principal = _ctx.Principals.First(x=>x.Email == _email);
+        //        var principal = _ctx.Principals.First(x=>x.Email == _email);
 
-                var pri = _ctx.Users.First(x=>x.PrincipalId == principal.PrincipalId).Principal;
+        //        var pri = _ctx.Users.First(x=>x.PrincipalId == principal.PrincipalId).Principal;
 
-                Assert.Equal(pri.PrincipalId, principal.PrincipalId);
-            }
-        }
+        //        Assert.Equal(pri.PrincipalId, principal.PrincipalId);
+        //    }
+        //}
 
 
         /// <summary>
@@ -148,7 +127,6 @@ namespace CalDav_tests
 
                 var principal = new Principal()
                 {
-                    Displayname = "Adriano FLechilla",
                     PrincipalURL = DataLayer.SystemProperties._userPrincipalUrl+_email
                 };
 
@@ -156,7 +134,7 @@ namespace CalDav_tests
 
                 _ctx.SaveChanges();
 
-                Assert.NotNull(_ctx.Principals.FirstOrDefault(p=>p.Displayname == "Adriano Flechilla"));
+                //Assert.NotNull(_ctx.Principals.FirstOrDefault(p=>p.Displayname == "Adriano Flechilla"));
             }
         }
 
@@ -168,7 +146,7 @@ namespace CalDav_tests
         {
             using (var cont = new CalDavContext())
             {
-                var col = new CalendarCollection(DataLayer.SystemProperties._groupCollectionUrl+_group, 
+                var col = new CalendarCollection(DataLayer.SystemProperties._groupCollectionUrl+_group+"/", 
                     $"Group {_group} Calendar")
                 {
                     //Group = _group
@@ -179,6 +157,26 @@ namespace CalDav_tests
 
                // Assert.NotNull(cont.CalendarCollections.FirstOrDefault(x=>x.Group == _group));
             }
+        }
+
+        /// <summary>
+        /// testing the worker creation.
+        /// </summary>
+        [Fact]
+        public void UnitTest9()
+        {
+            var context = new CalDavContext(new DbContextOptions<CalDavContext>());
+
+            var user = context.CreateWorkerInSystem("worker1@gmail.com", "worker", "UnitTest9 worker", _faculty,"Weboo");
+
+            context.SaveChanges();
+            Assert.True(context.Workers.Count() > 0);
+
+            var worker = context.Workers.FirstOrDefault(x => x.Email == "worker1@gmail.com");
+
+            Assert.NotNull(worker);
+            Assert.NotNull(context.Principals.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
+            Assert.NotNull(context.CalendarCollections.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
         }
     }
 }

@@ -69,12 +69,28 @@ namespace DataLayer
         /// <returns></returns>
         public static Property CreateCalendarHomeSet(SystemProperties.PrinicpalType pType, string principalId)
         {
-            var property = new Property("group-member-set", "DAV:")
+            var property = new Property("calendar-home-set", "DAV:")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
                         $"<d:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</d:href></C:calendar-home-set>"
             };
             return property;
+        }
+
+        /// <summary>
+        /// Create a property instance with the given values
+        /// </summary>
+        /// <param name="nodeName">The name for the node. ej:displayname</param>
+        /// <param name="nodePrefix">The ns prefix of the node. ej: the prefix of DAV: is D, so pass D</param>
+        /// <param name="nodeValue">The value for the node. Clean value, dont construct the xml.</param>
+        /// <returns></returns>
+        public static Property CreateProperty(string nodeName, string nodePrefix, string nodeValue)
+        {
+            var xmlValue = $"<{nodePrefix}:{nodeName} xmlns:d=\"DAV:\">{nodeValue}</{nodePrefix}:{nodeName}>";
+            return new Property(nodeName, NamespacesSimple[nodePrefix])
+            {
+                Value = xmlValue
+            };
         }
 
         /// <summary>

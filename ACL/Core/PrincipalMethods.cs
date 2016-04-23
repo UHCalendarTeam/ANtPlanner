@@ -21,7 +21,8 @@ namespace ACL.Core
         /// <returns></returns>
         public  string GetDispplayName(Principal principal)
         {
-            return principal.Displayname;
+            var dpn = principal.Properties.FirstOrDefault(x=>x.Name == "displayname");
+            return dpn == null ? "" : dpn.Value;
         }
 
         public string GetAlternateUriSet(Principal principal)

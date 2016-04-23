@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity.Scaffolding.Internal.Configuration;
 
 namespace DataLayer.ExtensionMethods
 {
@@ -39,14 +38,32 @@ namespace DataLayer.ExtensionMethods
                 Password = password,
                 DisplayName = fullName
             };
+
+            //create useful properties for the principal
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+            var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
+
             ///create the principal the represents the user
-            var principal = new Principal()
-            {
-                Email = email,
-                PrincipalURL = DataLayer.SystemProperties._userPrincipalUrl + email,
-            };
+            var principal = new Principal(email, SystemProperties.PrinicpalType.User,
+                displayName, calHomeSet);
 
             user.Principal = principal;
+
+            //create the collection for the user.
+            var col =
+                new CalendarCollection(
+                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}",
+                    SystemProperties._defualtInitialCollectionName)
+                {
+                    Principal = principal
+                };
+
+            //add the calaendar to the collection of the principal
+            principal.CalendarCollections.Add(col);
+
+            //create the folder that will contain the 
+            //calendars of the user
+            new FileSystemManagement().AddCalendarCollectionFolder(col.Url);
 
             ///hass the user password 
             /// the instance of the user has to be pass but is not used
@@ -57,6 +74,7 @@ namespace DataLayer.ExtensionMethods
             //add the user and its principal to the context
             context.Users.Add(user);
             context.Principals.Add(principal);
+            context.CalendarCollections.Add(col);
 
             return user;
         }
@@ -80,7 +98,7 @@ namespace DataLayer.ExtensionMethods
             string password, string career, string group, int year)
         {
             var student = new Student(fullname, email, password, career, group, year);
-            
+
             student.Password = student.PasswordHasher(password);
 
             ///create the necessary properties for the students
@@ -89,17 +107,21 @@ namespace DataLayer.ExtensionMethods
             var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
 
             //create the calendar-home-set
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.Group, group);
 
+            //create the displayname
+            var displayName = PropertyCreation.CreateProperty("displayname", "D", fullname);
 
             ///create the principal the represents the user
-            var principal = new Principal(fullname, email,SystemProperties.PrinicpalType.Student,calHomeSet, gMembership);
+            var principal = new Principal(email, SystemProperties.PrinicpalType.Student, calHomeSet, gMembership, displayName);
 
             student.Principal = principal;
             principal.User = student;
 
             //take the collection with user group name
-            var collection = context.CalendarCollections.FirstOrDefault(col => col.Url == SystemProperties._groupCollectionUrl+group);
+            var collection =
+                context.CalendarCollections.FirstOrDefault(
+                    col => col.Url == SystemProperties._groupCollectionUrl + group);
 
             //if the collection doent exit then something is wrong with the group
             //and either has to be created or the user group is not valid
@@ -115,36 +137,50 @@ namespace DataLayer.ExtensionMethods
 
 
         public static Worker CreateWorkerInSystem(this CalDavContext context, string email, string password,
-            string fullname, string faculty, string department)
+            string fullName, string faculty, string department)
         {
-            var worker = new Worker(fullname, email, password, department, faculty);
+            var worker = new Worker(fullName, email, password, department, faculty);
             worker.Password = worker.PasswordHasher(password);
 
 
-            var collection = new CalendarCollection(DataLayer.SystemProperties._userCollectionUrl + email,
-                DataLayer.SystemProperties._defualtInitialCollectionName)
-            {
-               
-            };
-            //worker.CalendarCollections.Add(collection);
+            //create useful properties for the principal
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+            var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
+
+            ///create the principal the represents the user
+            var principal = new Principal(email, SystemProperties.PrinicpalType.User,
+                displayName, calHomeSet);
+
+            worker.Principal = principal;
+
+            //create the collection for the user.
+            var col =
+                new CalendarCollection(
+                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}",
+                    SystemProperties._defualtInitialCollectionName)
+                {
+                    Principal = principal
+                };
+
+            //add the calaendar to the collection of the principal
+            principal.CalendarCollections.Add(col);
+
+            //create the folder that will contain the 
+            //calendars of the user
+            new FileSystemManagement().AddCalendarCollectionFolder(col.Url);
+
+            //add the user and its principal to the context
+            context.Workers.Add(worker);
+            context.Principals.Add(principal);
+            context.CalendarCollections.Add(col);
 
             return worker;
         }
 
-        /// <summary>
-        /// Create a principal in the system.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="pUrl">The url that uniquely identifies the principal</param>
-        /// <param name="displayName">The principal's displayname</param>
-        /// <param name="userOrGroup">True if the princioal represent a user, false otherwise</param>
-        /// <returns>The instance of the new Principal.</returns>
-        //public static Principal CreatePrincipalInSystem(this CalDavContext context, string pUrl, string displayName,
-        //    bool userOrGroup)
-        //{
-        //    var p = new Principal(displayName, pUrl, userOrGroup);
-        //}
 
-       
+        public static Principal CreateGroup(this CalDavContext context, string pUrl, string groupName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
