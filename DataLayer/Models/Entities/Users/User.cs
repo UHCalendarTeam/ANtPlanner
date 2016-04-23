@@ -56,6 +56,7 @@ namespace DataLayer.Models.Entities
         /// Contains the principal that represent the user. 
         /// </summary>
         public Principal Principal { get; set; }
+
         public int? PrincipalId { get; set; }
         
 

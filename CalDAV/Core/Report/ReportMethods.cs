@@ -4,6 +4,7 @@ using System.Linq;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
+using Microsoft.AspNet.Http;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -33,18 +34,26 @@ namespace CalDAV.Core
             throw new NotImplementedException();
         }
 
-        public string ProcessRequest(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement)
+        /// <summary>
+        /// Process the report depending on the values of the header 
+        /// and the body.
+        /// </summary>
+        /// <param name="headerValues">The neccessary properties and values of the header</param>
+        /// <param name="body">The string representation of the body</param>
+        /// <returns></returns>
+        public string ProcessRequest(Dictionary<string, string> headerValues, string body)
         {
             //take the first node of the xml and process the request
             //by the name of the first node
             // var node = xmlBody.Children.First();
-
+            var xmlBody = XmlTreeStructure.Parse(body);
+         
             switch (xmlBody.NodeName)
             {
                 case "calendar-query":
-                    return CalendarQuery(xmlBody, storageManagement);
+                    return CalendarQuery(xmlBody,  headerValues["url"]);
                 case "calendar-multiget":
-                    return CalendarMultiget(xmlBody, storageManagement);
+                    return CalendarMultiget(xmlBody);
                 default:
                     throw new NotImplementedException(
                         $"The REPORT request {xmlBody.NodeName} with ns equal to {xmlBody.MainNamespace} is not implemented yet .");
@@ -62,8 +71,9 @@ namespace CalDAV.Core
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="fs">The FileManagementSystem instance that points to the requested collection.</param>
         /// <returns></returns>
-        public string CalendarQuery(IXMLTreeStructure xmlDoc, IFileSystemManagement fs)
+        public string CalendarQuery(IXMLTreeStructure xmlDoc,  string collectionURl)
         {
+            IFileSystemManagement fs = new FileSystemManagement();
             /// take the first prop node to know the data that
             /// should ne returned
             IXMLTreeStructure propNode;
@@ -75,8 +85,8 @@ namespace CalDAV.Core
 
 
             Dictionary<string, string> userResources;
-            var fileM = new FileSystemManagement();
-            fs.GetAllCalendarObjectResource(TODO, out userResources);
+          
+            fs.GetAllCalendarObjectResource(collectionURl, out userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
 
@@ -169,7 +179,7 @@ namespace CalDAV.Core
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="storageManagement">The FileManagementSystem instance that points to the requested collection.</param>
         /// <returns></returns>
-        private string CalendarMultiget(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement)
+        private string CalendarMultiget(IXMLTreeStructure xmlBody)
         {
             /// take the first prop node to know the data that
             /// should ne returned
@@ -185,14 +195,9 @@ namespace CalDAV.Core
             /// process the requested resources
             foreach (var href in hrefs)
             {
-                var hrefComp = href.Split('/');
-                var userName = hrefComp[1];
-                var collectionName = hrefComp[2];
-                var resourceName = hrefComp[3];
-
                 var fs = new FileSystemManagement();
 
-                var resourceContent = fs.GetCalendarObjectResource($"{fs.CollectionPath}\\{resourceName}").Result;
+                var resourceContent = fs.GetCalendarObjectResource(href).Result;
 
                 result.Add(href, resourceContent);
             }

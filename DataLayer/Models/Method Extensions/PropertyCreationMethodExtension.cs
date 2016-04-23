@@ -14,13 +14,13 @@ namespace DataLayer
     public static class PropertyCreation
     {
 
-        private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""}
         };
 
-        private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"}
@@ -85,9 +85,9 @@ namespace DataLayer
         /// <param name="nodeName"></param>
         /// <param name="ns"></param>
         /// <returns></returns>
-        public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
-        {
-            var xml = XDocument.Parse(property.Value);
-        }
+        //public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
+        //{
+        //    var xml = XDocument.Parse(property.Value);
+        //}
     }
 }

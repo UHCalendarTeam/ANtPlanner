@@ -33,15 +33,15 @@ namespace DataLayer
         /// <param name="url"></param>
         /// <returns></returns>
         public static Principal GetPrincipal(this CalDavContext source, string url)
-        //{
-            return
-                source.Principals.Include(p => p.Properties)
-                    .Include(c => c.CalendarCollections)
-                    .ThenInclude(cp => cp.Properties)
-                    .Include(c2 => c2.CalendarCollections)
-                    .ThenInclude(r => r.CalendarResources)
-                    .ThenInclude(rp => rp.Properties)
-                    .FirstOrDefault();
+        {
+            return source.Principals.Include(p => p.Properties)
+                .Include(c => c.CalendarCollections)
+                .ThenInclude(cp => cp.Properties)
+                .Include(c2 => c2.CalendarCollections)
+                .ThenInclude(r => r.CalendarResources)
+                .ThenInclude(rp => rp.Properties)
+                .FirstOrDefault();
+        }
 
         /// <summary>
         ///     Returns a Principal for a given UserEmail

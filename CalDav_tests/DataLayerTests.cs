@@ -86,7 +86,6 @@ namespace CalDav_tests
                 context.CalendarCollections.Add(new CalendarCollection()
                 {
                     Name = $"Group {_group} collection",
-                    Group = _group,
                     Url = DataLayer.SystemProperties._groupCollectionUrl + _group
 
                 });
@@ -172,13 +171,13 @@ namespace CalDav_tests
                 var col = new CalendarCollection(DataLayer.SystemProperties._groupCollectionUrl+_group, 
                     $"Group {_group} Calendar")
                 {
-                    Group = _group
+                    //Group = _group
                 };
 
                 cont.CalendarCollections.Add(col);
                 cont.SaveChanges();
 
-                Assert.NotNull(cont.CalendarCollections.FirstOrDefault(x=>x.Group == _group));
+               // Assert.NotNull(cont.CalendarCollections.FirstOrDefault(x=>x.Group == _group));
             }
         }
     }

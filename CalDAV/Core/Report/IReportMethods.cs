@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DataLayer;
 using ICalendar.Calendar;
+using Microsoft.AspNet.Http;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -16,7 +17,7 @@ namespace CalDAV.Core
         /// <param name="xmlBody">The xml send in the body of the REPORT request.</param>
         /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>
         /// <returns>The data for the body of the response of the request.</returns>
-        string ProcessRequest(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement);
+        string ProcessRequest(Dictionary<string, string> headerValues, string bod);
 
         /// <summary>
         ///     Apply the calendar-query opertation to a
@@ -25,7 +26,7 @@ namespace CalDAV.Core
         /// <param name="xmlBody">The xml send in the body of the request.</param>
         /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>
         /// <returns></returns>
-        string CalendarQuery(IXMLTreeStructure xmlBody, IFileSystemManagement storageManagement);
+        string CalendarQuery(IXMLTreeStructure xmlBody, string collectionUrl);
 
         /// <summary>
         ///     Take the calendar that passed the filter and
