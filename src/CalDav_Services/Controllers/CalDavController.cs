@@ -69,7 +69,7 @@ namespace CalDav_Services.Controllers
         }
 
         //PROPFIND COLLECTIONS
-        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}")]
+        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}/")]
         public void PropFind(string user, string collection)
         {
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -97,6 +97,27 @@ namespace CalDav_Services.Controllers
                 propertiesAndHeaders.Add("depth", depth);
 
             CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        }
+
+        [AcceptVerbs("Proppatch", Route = "{userEmail}/calendars/{collectionName}/")]
+        public void PropPatch(string userEmail, string collectionName)
+        {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", userEmail);
+            propertiesAndHeaders.Add("collectionName", collectionName);
+
+            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        }
+
+        [AcceptVerbs("Proppatch", Route = "{userEmail}/calendars/{collectionName}/{calendarResourceId}")]
+        public void PropPatch(string userEmail, string collectionName, string calendarResourceId)
+        {
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", userEmail);
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+
+            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         //REPORT
@@ -249,16 +270,16 @@ END:VCALENDAR";
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
             var fs = new FileSystemManagement();
-            SqlMock.RecreateDb();
+            //SqlMock.RecreateDb();
 
-            SqlMock.SeedDb_Fs();
+            //SqlMock.SeedDb_Fs();
         }
 
         [AcceptVerbs("Destroy")]
         public void DestroyDb()
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
-            SqlMock.RecreateDb();
+            //SqlMock.RecreateDb();
         }
 
 

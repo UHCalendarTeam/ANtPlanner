@@ -62,12 +62,13 @@ namespace DataLayer.Models.Entities
 
         #region Foreign keys and navigators
 
-        public CalendarResource Resource { get; set; }
+        public CalendarResource CalendarResource { get; set; }
 
-        public int? ResourceId { get; set; }
-        public CalendarCollection Collection { get; set; }
+        public int? CalendarResourceId { get; set; }
 
-        public int? CollectionId { get; set; }
+        public CalendarCollection CalendarCollection { get; set; }
+
+        public int? CalendarCollectionId { get; set; }
 
         public int? PricipalId { get; set; }
 

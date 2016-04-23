@@ -73,14 +73,24 @@ namespace DataLayer.Models.Entities
             });
 
             Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
-            {IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>"});
+            { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>" });
 
             Properties.Add(new Property("displayname", NamespacesSimple["D"])
-            {IsVisible = true, IsDestroyable = false, IsMutable = true});
+            {
+                IsVisible = true,
+                IsDestroyable = false,
+                IsMutable = true,
+                Value = $"<D:displayname {Namespaces["D"]}></D:displayname>"
+            });
 
             //TODO: Generar Etag en creacion.
             Properties.Add(new Property("getetag", NamespacesSimple["D"])
-            {IsVisible = true, IsDestroyable = false, IsMutable = false});
+            {
+                IsVisible = true,
+                IsDestroyable = false,
+                IsMutable = false,
+                Value = $"<D:getetag {Namespaces["D"]}>0</D:getetag>"
+            });
 
             Properties.Add(new Property("creationdate", NamespacesSimple["D"])
             {
@@ -117,8 +127,7 @@ namespace DataLayer.Models.Entities
 
         public CalendarResource()
         {
-            //Properties = new List<Property>();
-            //InitializeStandardResourceProperties();
+
         }
 
         public CalendarResource(string href, string name)

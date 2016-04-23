@@ -9,92 +9,93 @@ namespace DataLayer
         /// <summary>
         ///     Get the Root local directory location.
         /// </summary>
-        string Root { get; }
+       // string Root { get; }
 
         /// <summary>
         ///     Creates a new folder which will contain all user calendar collections.
         /// </summary>
-        /// <param name="userEmail">Email of the owner of the folder</param>
+        /// <param name="principalUrl">Email of the owner of the folder</param>
         /// <returns></returns>
-        bool AddUserFolder(string userEmail);
+        bool AddPrincipalFolder(string principalUrl);
 
         /// <summary>
         ///     Creates a new folder which will contain all calendar object resource.
         /// </summary>
-        /// <param name="userEmail">Email of the owner of the calendar collection</param>
-        /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
+        /// <param name="collectionUrl"></param>
         /// <returns></returns>
-        bool AddCalendarCollectionFolder(string userEmail, string calendarCollectionName);
+        bool AddCalendarCollectionFolder(string collectionUrl);
 
         /// <summary>
         ///     Retrieves all iCalendar Objects stored in calendarCollection specified.
         /// </summary>
+        /// <param name="collectionUrl"></param>
+        /// <param name="calendarObjectResources"></param>
         /// <param name="userEmail">Email of the collection owner.</param>
         /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
-        /// <param name="calendarObjectResources"></param>
         /// <returns></returns>
-        bool GetAllCalendarObjectResource(out Dictionary<string, string> calendarObjectResources);
+        bool GetAllCalendarObjectResource(string collectionUrl, out Dictionary<string, string> calendarObjectResources);
 
         /// <summary>
         ///     Returns all iCalendar Objects contained in the collection.
         /// </summary>
+        /// <param name="collectionUrl"></param>
         /// <param name="userEmail"></param>
         /// <param name="calendarCollectionName"></param>
         /// <returns></returns>
-        IEnumerable<VCalendar> GetAllCalendarObjectResource();
+        IEnumerable<VCalendar> GetAllCalendarObjectResource(string collectionUrl);
 
         /// <summary>
         ///     Deletes the folder which represent the calendar collection and all the COR contained in it.
         /// </summary>
-        /// <param name="userEmail">Email of the owner of the collection.</param>
-        /// <param name="calendarCollectionName">Name of the calendar collection.</param>
+        /// <param name="collectionUrl"></param>
         /// <returns></returns>
-        bool DeleteCalendarCollection();
+        bool DeleteCalendarCollection(string collectionUrl);
 
         /// <summary>
         ///     Adds a Calendar Object Resource to the calendar collection specified.
         /// </summary>
-        /// <param name="objectResourceName">Returns the name assigned to the iCalendar file.</param>
-        /// <param name="bodyIcalendar">Body of the iCalendar Object that is going to be stored with .ics extension.</param>
+        /// <param name="resourceUrl"></param>
+        /// <param name="body"></param>
         /// <param name="userEmail">Email of the owner of the calendar collection</param>
         /// <param name="calendarCollectionName">Name of the calendar collection where is going to be stored</param>
         /// <returns></returns>
-        Task<bool> AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar);
+        Task<bool> AddCalendarObjectResourceFile(string resourceUrl, string body);
 
         /// <summary>
         ///     Returns the iCalendar Object stored in the user calendar collection.
         /// </summary>
-        /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
+        /// <param name="resourceUrl">Name of the iCalendar File (must include .ics extension)</param>
         /// <param name="userEmail">Email of the owner of the collection.</param>
         /// <param name="calendarCollectionName">Name of the collection where is stored.</param>
         /// <returns></returns>
-        Task<string> GetCalendarObjectResource(string objectResourceName);
+        Task<string> GetCalendarObjectResource(string resourceUrl);
 
         /// <summary>
         ///     Deletes the COR specified
         /// </summary>
         /// <param name="userEmail">Email of the owner of the collection.</param>
         /// <param name="calendarCollectionName">Name of the collection where is stored.</param>
-        /// <param name="objectResourceName">Name of the iCalendar File (must include .ics extension)</param>
+        /// <param name="resourceUrl">Name of the iCalendar File (must include .ics extension)</param>
         /// <returns></returns>
-        bool DeleteCalendarObjectResource(string objectResourceName);
+        bool DeleteCalendarObjectResource(string resourceUrl);
 
         /// <summary>
         ///     Check if the folder corresponding with the Calendar Collection Exits
         /// </summary>
+        /// <param name="collectioUrl"></param>
         /// <param name="userEmail"></param>
         /// <param name="calendarCollectionName"></param>
         /// <returns></returns>
-        bool ExistCalendarCollection();
+        bool ExistCalendarCollection(string collectioUrl);
 
         /// <summary>
         ///     Check if the file corresponding with the Calendar Object Resource exist.
         /// </summary>
         /// <param name="userEmail"></param>
         /// <param name="calendarCollectionName"></param>
-        /// <param name="objectResourceName"></param>
+        /// <param name="resourceUrl"></param>
         /// <returns></returns>
-        bool ExistCalendarObjectResource(string objectResourceName);
+        bool ExistCalendarObjectResource(string resourceUrl);
 
         /// <summary>
         ///     After created the class with the default constructor
@@ -104,7 +105,7 @@ namespace DataLayer
         /// <param name="userId">The desired user.</param>
         /// <param name="collectionId">The desired Collection name.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-        bool SetUserAndCollection(string userId, string collectionId);
+       // bool SetUserAndCollection(string userId, string collectionId);
 
         /// <summary>
         ///     Create an instance of this class and check if the collection is valid..
@@ -113,13 +114,13 @@ namespace DataLayer
         /// <param name="collectionId">The desired collection.</param>
         /// <param name="fileSystemManagement">The instance of the class.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-        bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
+        //bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
 
         /// <summary>
         ///     Returns the size of a resource.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="resourceUrl"></param>
         /// <returns></returns>
-        long GetFileSize(string fileName);
+        long GetFileSize(string resourceUrl);
     }
 }

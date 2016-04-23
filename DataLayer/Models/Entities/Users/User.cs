@@ -17,10 +17,10 @@ namespace DataLayer.Models.Entities
            
         }
 
-        public User(string ftname, string email)
+        public User(string displayName, string email)
         {
             Email = email;
-            FirstName = ftname;
+            DisplayName = displayName;
         }
 
         /// <summary>
@@ -42,8 +42,6 @@ namespace DataLayer.Models.Entities
         [Required]
         public string Email { get; set; }
       
-
-        /// <summary>
         ///     Contains the user fullName.
         /// </summary>
         public string DisplayName { get; set; }
@@ -59,17 +57,7 @@ namespace DataLayer.Models.Entities
         /// </summary>
         public Principal Principal { get; set; }
         public int? PrincipalId { get; set; }
-
-        #region remove this and use displayname instead
-
-        [Display(Name = "Last Name")]
-        public string LastName { get; set; }
-
         
-        [Display(Name = "First Name")]
-        public string FirstName { get; set; }
-
-        #endregion
 
        
     }

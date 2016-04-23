@@ -12,8 +12,7 @@ namespace CalDav_tests
             var user = new User
             {
                 Email = "hohn@noname.com",
-                LastName = "Doe",
-                FirstName = "John"
+          
             };
             var colecction = new CalendarCollection();
 

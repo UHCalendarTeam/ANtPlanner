@@ -40,6 +40,7 @@ namespace DataLayer
         public DbSet<CalendarResource> CalendarResources { get; set; }
 
         public DbSet<Principal> Principals { get; set; }
+
         public DbSet<Property> Properties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
@@ -68,15 +69,22 @@ namespace DataLayer
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Property>()
-                .HasOne(c => c.Collection)
+                .HasOne(c => c.CalendarCollection)
                 .WithMany(p => p.Properties)
-                .HasForeignKey(k => k.CollectionId);
+                .HasForeignKey(k => k.CalendarCollectionId);
+
 
 
             modelBuilder.Entity<Property>()
-                .HasOne(r => r.Resource)
+                .HasOne(r => r.CalendarResource)
                 .WithMany(p => p.Properties)
-                .HasForeignKey(k => k.ResourceId);
+                .HasForeignKey(k => k.CalendarResourceId);
+
+
+            modelBuilder.Entity<Property>()
+                .HasOne(p => p.Principal)
+                .WithMany(pr => pr.Properties)
+                .HasForeignKey(k => k.PricipalId);
 
         }
     }

@@ -22,12 +22,7 @@ namespace DataLayer.Models.Entities
             {"C", "urn:ietf:params:xml:ns:caldav"}
         };
 
-        public CalendarCollection()
-        {
-            //CalendarResources = new List<CalendarResource>();
-            //Properties = new List<Property>();
-           // InitializeStandardCollectionProperties(null);
-        }
+        public CalendarCollection() { }
 
         public CalendarCollection(string url, string name)
         {
@@ -150,7 +145,12 @@ namespace DataLayer.Models.Entities
             });
 
             Properties.Add(new Property("calendar-description", NamespacesSimple["C"])
-            {IsVisible = true, IsDestroyable = false, IsMutable = true});
+            {
+                IsVisible = true,
+                IsDestroyable = false,
+                IsMutable = true,
+                Value = $"<C:calendar-description {Namespaces["C"]}>No Description Available</C:calendar-description>"
+            });
 
             Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
             {
@@ -175,6 +175,13 @@ namespace DataLayer.Models.Entities
                 IsDestroyable = false,
                 IsMutable = true,
                 Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
+            });
+            Properties.Add(new Property("getctag", NamespacesSimple["C"])
+            {
+                IsVisible = false,
+                IsDestroyable = false,
+                IsMutable = true,
+                Value = $"<C:getctag {Namespaces["C"]}>{Guid.NewGuid()}</C:getctag>"
             });
         }
     }
