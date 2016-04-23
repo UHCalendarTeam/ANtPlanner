@@ -2,6 +2,8 @@
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
+using Microsoft.Data.Entity.Metadata;
+using Microsoft.Data.Entity.Scaffolding.Internal.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
@@ -10,22 +12,7 @@ namespace DataLayer
     {
         public readonly IConfigurationRoot Configuration;
 
-        /// <summary>
-        /// Contains the url for the user's collections
-        /// Add the email of the user
-        /// </summary>
-        public readonly string _userCollectionUrl = "collections/users/";
-
-        /// <summary>
-        /// Contains the url for the groups collection.
-        /// Add the name of the group
-        /// </summary>
-        public readonly string _groupCollectionUrl = "collections/group/";
-
-        /// <summary>
-        /// Contains the default name for the user collections
-        /// </summary>
-        public readonly string _defualtInitialCollectionName = "DefualCalendar";
+      
 
 
 
@@ -66,25 +53,34 @@ namespace DataLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Principal>()
+                .HasOne(p=>p.User)
+                .WithOne(u=>u.Principal)
+                .HasForeignKey<User>(u=>u.PrincipalId);
+
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(u => u.User)
                 .WithMany(cr => cr.CalendarCollections)
-                .HasForeignKey(k => k.UserId);
+                .HasForeignKey(k => k.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.CalendarCollection)
                 .WithMany(u => u.CalendarResources)
-                .HasForeignKey(k => k.CalendarCollectionId);
+                .HasForeignKey(k => k.CalendarCollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Property>()
                 .HasOne(c => c.Collection)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.CollectionId);
 
+
             modelBuilder.Entity<Property>()
                 .HasOne(r => r.Resource)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.ResourceId);
+
         }
     }
 }

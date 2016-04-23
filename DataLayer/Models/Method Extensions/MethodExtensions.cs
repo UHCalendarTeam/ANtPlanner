@@ -130,7 +130,21 @@ namespace DataLayer
 
         }
 
-       
+
+
+        public static void ClearDB(this CalDavContext ctx)
+        {
+            if(ctx.Users.Any())
+                ctx.Users.RemoveRange(ctx.Users.Include(x=>x.Principal));
+            if(ctx.Principals.Any())
+                ctx.Principals.RemoveRange(ctx.Principals);
+            if(ctx.CalendarCollections.Any())
+                ctx.CalendarCollections.RemoveRange(ctx.CalendarCollections.Include(x=>x.CalendarResources));
+            if(ctx.CalendarResources.Any())
+                ctx.CalendarResources.RemoveRange(ctx.CalendarResources);
+            ctx.SaveChanges();
+        }
+   
 
 
 

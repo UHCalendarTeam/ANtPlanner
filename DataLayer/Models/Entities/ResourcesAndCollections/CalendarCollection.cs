@@ -51,7 +51,10 @@ namespace DataLayer.Models.Entities
         [Required]
         public string Url { get; set; }
 
-        public int UserId { get; set; }
+        /// <summary>
+        /// The collection can belongs to a 
+        /// </summary>
+        public int? UserId { get; set; }
 
         /// <summary>
         ///     The owner of the collection.

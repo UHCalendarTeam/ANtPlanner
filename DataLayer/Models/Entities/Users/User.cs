@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.ACL;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace DataLayer.Models.Entities
@@ -13,7 +14,7 @@ namespace DataLayer.Models.Entities
         
         public User()
         {
-            //CalendarCollections = new List<CalendarCollection>();
+           
         }
 
         public User(string ftname, string email)
@@ -58,12 +59,18 @@ namespace DataLayer.Models.Entities
         /// </summary>
         public string Password { get; set; }
 
+        /// <summary>
+        /// Contains the principal that represent the user. 
+        /// </summary>
+        public Principal Principal { get; set; }
+        public int? PrincipalId { get; set; }
+
         #region remove this and use displayname instead
 
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required]
+        
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 

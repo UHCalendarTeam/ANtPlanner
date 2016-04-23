@@ -7,6 +7,11 @@
     /// </summary>
     public class Worker : User
     {
+        public Worker()
+        {
+            
+        }
+
         public Worker(string displayName, string email, string password,
             string deparment, string faculty): base(displayName,email, password)
         {

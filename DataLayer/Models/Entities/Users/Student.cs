@@ -6,6 +6,10 @@
     /// </summary>
     public class Student : User
     {
+        public Student()
+        {
+            
+        }
         public Student(string displayName, string email, string password,
             string career, string group, int year) : base(displayName, email, password)
         {

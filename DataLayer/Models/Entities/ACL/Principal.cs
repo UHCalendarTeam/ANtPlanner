@@ -7,9 +7,16 @@ namespace DataLayer.Models.ACL
     /// <summary>
     ///     Entity for the properties of the principals.
     ///     A principal may be a user or a group that contains many users.
+    ///     All the groups and users contains a Principal because contains
+    ///     useful properties for the ACL.
     /// </summary>
     public class Principal
     {
+        public Principal()
+        {
+            
+        }
+
         /// <summary>
         ///     Identify uniquely a principal.
         ///     A principal may have many URLs, but there must be one "principal URL"
@@ -45,17 +52,13 @@ namespace DataLayer.Models.ACL
         [ScaffoldColumn(false)]
         public int PrincipalId { get; set; }
 
-        /// <summary>
-        ///     retrun the value of a property by the
-        ///     string representation of the name.
-        ///     This is done by reflection.
-        /// </summary>
-        /// <param name="propertyName">The string representation of the property.</param>
-        /// <returns>The value of the desire property</returns>
+  
         /// <summary>
         ///     Contains the properties of
         ///     principal.
         /// </summary>
         public List<Property> Properties { get; set; }
+
+        public User User { get; set; }
     }
 }
