@@ -19,7 +19,7 @@ namespace DataLayer
             {
                 var fs = new FileSystemManagement();
                 var frank = new User("Frank", "f.underwood@wh.org");
-                var frankPrincipal = new Principal("Frank", "f.underwood@wh.org", SystemProperties.PrinicpalType.User);
+                var frankPrincipal = new Principal("f.underwood@wh.org", SystemProperties.PrinicpalType.User);
                 frankPrincipal.User = frank;
                 
                 var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyplans");
@@ -73,7 +73,7 @@ END:VCALENDAR
                 fs.AddCalendarObjectResourceFile(frankUrl + frankCollection.Name, body);
 
                 var claire = new User("Claire", "c.underwood@wh.org");
-                var clairePrincipal = new Principal("Claire", claire.Email, SystemProperties.PrinicpalType.User);
+                var clairePrincipal = new Principal(claire.Email, SystemProperties.PrinicpalType.User);
 
                 db.Principals.Add(clairePrincipal);
                 var claireUrl = "collections/users/" + claire.Email + "/";
