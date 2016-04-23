@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using DataLayer.Models.Entities;
 
 namespace DataLayer.Models.ACL
@@ -15,36 +14,51 @@ namespace DataLayer.Models.ACL
     {
         public Principal()
         {
-            
         }
 
         /// <summary>
-        /// Main cont for this obj
+        ///     Main cont for this obj
         /// </summary>
         /// <param name="dispName">The DAV:displayname property value of the principal.</param>
-        /// <param name="pUrl">The url that uniquely identifies this principal.</param>
-        /// <param name="userOrGroup">True if the principal represent a user, false otherwise</param>
-        /// <param name="groupName">If this principal represents a student
-        /// then this param is the name of the group that the student belongs</param>
+        /// <param name="pIdentifier">If the principal represents a group then send
+        /// the name of the group, otherwise send the email of the user</param>
+        /// <param name="userOrGroup">If the principal represents a group or a user.</param>
         /// <param name="properties">The initial properties.</param>
-        public Principal(string dispName, string pUrl,bool userOrGroup,string groupName="", params Property[] properties)
+        public Principal(string dispName, string pIdentifier, SystemProperties.PrinicpalType userOrGroup, 
+            params Property[] properties)
         {
             Displayname = dispName;
-            PrincipalURL = pUrl;
+
+            //build the principalUrl depending if the principal represents a user
+            //or a group
+            PrincipalURL = userOrGroup != SystemProperties.PrinicpalType.Group?
+                SystemProperties._userPrincipalUrl+pIdentifier+"/":
+                SystemProperties._groupPrincipalUrl+pIdentifier+"/";
+
             Properties = new List<Property>(properties);
 
 
-            //create some properties
-            //if is a user then add the DAV:group-membership property
-            if (userOrGroup)
-                Properties.Add(CreateGroupMemberSet());
-            else
-            {
-                //if empty is not a student the user
-                var url = groupName==""?"": DataLayer.SystemProperties._groupPrincipalUrl + groupName;
-                Properties.Add(CreateGroupMembership(url));
-            }
+            ///create some properties
+            /// 
+            ///if represents a group then add the DAV:group-membership property
+            //if (userOrGroup == SystemProperties.PrinicpalType.User)
+            //    Properties.Add(CreateGroupMemberSet());
 
+            /////if the principal represents a user then add the DAV:group-membership property
+            //else
+            //{
+            //    //if empty is not a student the user
+            //    var url = groupName == "" ? "" : SystemProperties._groupPrincipalUrl + groupName;
+            //    Properties.Add(CreateGroupMembership(url));
+            //}
+            ////if the principal represents a group take the name
+            /////of the group, otherwise take the email of the 
+            ///// user.
+            //var pId = userOrGroup == SystemProperties.PrinicpalType.User?
+            //    em
+
+            /////create and add the calendar-home-set property
+            //Properties.Add(CreateCalendarHomeSet(userOrGroup,));
         }
 
         /// <summary>
@@ -55,18 +69,7 @@ namespace DataLayer.Models.ACL
         ///     in an ACL request.
         /// </summary>
         public string PrincipalURL { get; set; }
-
-        /// <summary>
-        ///     This property of a group principal identifies the principals that are
-        ///     direct members of this group.
-        /// </summary>
-        public string GroupMemberSet { get; set; }
-
-        /// <summary>
-        ///     This protected property identifies the groups in which the principal
-        ///     is directly a member.
-        /// </summary>
-        public string GroupMembership { get; set; }
+     
 
         /// <summary>
         ///     The readable name of the principal.
@@ -82,7 +85,7 @@ namespace DataLayer.Models.ACL
         [ScaffoldColumn(false)]
         public int PrincipalId { get; set; }
 
-  
+
         /// <summary>
         ///     Contains the properties of
         ///     principal.
@@ -90,45 +93,16 @@ namespace DataLayer.Models.ACL
         public List<Property> Properties { get; set; }
 
         /// <summary>
-        /// Contains the collection of the principal.
+        ///     Contains the collection of the principal.
         /// </summary>
         public ICollection<CalendarCollection> CalendarCollections { get; set; }
 
         /// <summary>
-        /// If the principal represents a user then 
-        /// this is.
+        ///     If the principal represents a user then
+        ///     this is.
         /// </summary>
         public User User { get; set; }
 
-
-        #region useful methods
-        /// <summary>
-        /// Create and return a DAV:group-membership property.
-        /// </summary>
-        /// <param name="groupHref"></param>
-        /// <returns></returns>
-        private static Property CreateGroupMembership(string groupHref)
-        {
-            var hrefNode = groupHref == "" ? "" : $"<D:href>{groupHref}</D:href>";
-            var property = new Property("group-membership", "DAV:")
-            {
-                Value = $"<D:group-membership xmlns:D=\"DAV:\">{hrefNode}</D:group-membership>"
-            };
-            return property;
-        }
-
-        /// <summary>
-        /// Create and return a  DAV:group-member-set property.
-        /// </summary>
-        /// <returns></returns>
-        private static Property CreateGroupMemberSet()
-        {
-            var property = new Property("group-member-set", "DAV:")
-            {
-                Value = $"<D:group-member-set xmlns:D=\"DAV:\"></D:group-member-set>"
-            };
-            return property;
-        }
-        #endregion
+        
     }
 }

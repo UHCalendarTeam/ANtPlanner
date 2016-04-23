@@ -48,7 +48,7 @@ namespace DataLayer
         /// A principal represent either a group or
         /// a user.
         /// </summary>
-        public enum PrinicpalType { Group, User}
+        public enum PrinicpalType { Group, Student, Worker, User}
 
         /// <summary>
         /// Build the url that identify the collection where are the 

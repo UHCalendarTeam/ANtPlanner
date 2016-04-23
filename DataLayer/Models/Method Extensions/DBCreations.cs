@@ -83,8 +83,17 @@ namespace DataLayer.ExtensionMethods
             
             student.Password = student.PasswordHasher(password);
 
+            ///create the necessary properties for the students
+            /// 
+            /// create the DAV:group-membership
+            var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
+
+            //create the calendar-home-set
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+
+
             ///create the principal the represents the user
-            var principal = new Principal(fullname, DataLayer.SystemProperties._userPrincipalUrl + email,true, group);
+            var principal = new Principal(fullname, email,SystemProperties.PrinicpalType.Student,calHomeSet, gMembership);
 
             student.Principal = principal;
             principal.User = student;
