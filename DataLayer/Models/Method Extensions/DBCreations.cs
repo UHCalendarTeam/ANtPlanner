@@ -99,7 +99,7 @@ namespace DataLayer.ExtensionMethods
             principal.User = student;
 
             //take the collection with user group name
-            var collection = context.CalendarCollections.FirstOrDefault(col => col.Group == group);
+            var collection = context.CalendarCollections.FirstOrDefault(col => col.Url == SystemProperties._groupCollectionUrl+group);
 
             //if the collection doent exit then something is wrong with the group
             //and either has to be created or the user group is not valid
@@ -126,7 +126,7 @@ namespace DataLayer.ExtensionMethods
             {
                
             };
-            worker.CalendarCollections.Add(collection);
+           // worker.CalendarCollections.Add(collection);
 
             return worker;
         }

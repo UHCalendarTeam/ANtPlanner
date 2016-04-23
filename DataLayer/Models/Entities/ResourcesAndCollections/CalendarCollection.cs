@@ -73,13 +73,7 @@ namespace DataLayer.Models.Entities
         /// </summary>
         public ICollection<Property> Properties { get; set; }
 
-        /// <summary>
-        /// If the owner of the collection belongs to a 
-        /// group then the collection is gonna be of the group.
-        /// Use this property to know the group that the 
-        /// collection belongs;
-        /// </summary>
-        public string Group { get; set; }
+        
 
         private void InitializeStandardCollectionProperties(string name)
         {

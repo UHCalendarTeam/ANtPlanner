@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using DataLayer.Models.Entities;
 
 namespace DataLayer
 {
@@ -9,7 +11,7 @@ namespace DataLayer
     /// Contains some useful properties for the system.
     /// Declare here the appSettings.
     /// </summary>
-    public class SystemProperties
+    public static  class SystemProperties
     {
         /// <summary>
         /// Contains the url for the user's collections
@@ -66,5 +68,8 @@ namespace DataLayer
             //add the identifier of the pricipal
             return $"{colUrl}{principalId}";
         }
+
+
+   
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DataLayer.Models.Entities;
 
 namespace DataLayer
@@ -12,6 +13,19 @@ namespace DataLayer
     /// </summary>
     public static class PropertyCreation
     {
+
+        private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
+        {
+            {"D", @"xmlns:D=""DAV:"""},
+            {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""}
+        };
+
+        private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
+        {
+            {"D", "DAV:"},
+            {"C", "urn:ietf:params:xml:ns:caldav"}
+        };
+
         /// <summary>
         ///     Create and return a DAV:group-membership property.
         ///  This protected property identifies the groups in 
@@ -63,6 +77,17 @@ namespace DataLayer
             return property;
         }
 
-      
+        /// <summary>
+        /// Add a single node to this property
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="nodeValue"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="ns"></param>
+        /// <returns></returns>
+        public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
+        {
+            var xml = XDocument.Parse(property.Value);
+        }
     }
 }

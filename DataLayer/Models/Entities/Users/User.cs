@@ -21,7 +21,6 @@ namespace DataLayer.Models.Entities
         {
             Email = email;
             FirstName = ftname;
-            CalendarCollections = new List<CalendarCollection>();
         }
 
         /// <summary>
@@ -42,11 +41,7 @@ namespace DataLayer.Models.Entities
 
         [Required]
         public string Email { get; set; }
-
-        /// <summary>
-        ///     Contains the user collections.
-        /// </summary>
-        public ICollection<CalendarCollection> CalendarCollections { get; set; }
+      
 
         /// <summary>
         ///     Contains the user fullName.
@@ -75,5 +70,7 @@ namespace DataLayer.Models.Entities
         public string FirstName { get; set; }
 
         #endregion
+
+       
     }
 }

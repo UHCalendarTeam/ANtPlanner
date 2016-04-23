@@ -40,9 +40,7 @@ namespace DataLayer
         public DbSet<CalendarResource> CalendarResources { get; set; }
 
         public DbSet<Principal> Principals { get; set; }
-        public DbSet<Property> CollectionProperties { get; set; }
-
-        public DbSet<Property> ResourceProperties { get; set; }
+        public DbSet<Property> Properties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
