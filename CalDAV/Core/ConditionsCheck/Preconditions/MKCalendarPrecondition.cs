@@ -22,14 +22,14 @@ namespace CalDAV.Core.ConditionsCheck
         {
             #region Extracting Properties
 
-            var userEmail = propertiesAndHeaders["userEmail"];
+            var principalUrl = propertiesAndHeaders["principalUrl"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var body = propertiesAndHeaders["body"];
             var url = propertiesAndHeaders["url"];
 
             #endregion
 
-            if (fs.ExistCalendarCollection(url) || db.CollectionExist(userEmail, collectionName))
+            if (fs.ExistCalendarCollection(url) || db.CollectionExist(principalUrl, collectionName))
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>

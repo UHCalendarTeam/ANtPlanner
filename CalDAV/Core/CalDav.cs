@@ -255,13 +255,13 @@ namespace CalDAV.Core
                     await response.WriteAsync("Poscondition Failed");
 
                     return;
-                    //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
+                 
                 }
 
 
                 db.SaveChanges();
                 return;
-                //return createdMessage;
+               
             }
 
             //now it is assumed that the body contains a set
@@ -649,7 +649,7 @@ namespace CalDAV.Core
                 db.DeleteResource(resource);
                 db.SaveChanges();
 
-                return StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
+                return StorageManagement.DeleteCalendarObjectResource(url);
             }
 
 
@@ -721,7 +721,7 @@ namespace CalDAV.Core
 
             var calendarRes = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
 
-            if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+            if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return;
@@ -825,7 +825,7 @@ namespace CalDAV.Core
                 return;
             }
 
-            if (resourceExist && StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+            if (resourceExist && StorageManagement.ExistCalendarObjectResource(url))
             {
                 await UpdateCalendarObjectResource(propertiesAndHeaders, response);
             }
@@ -881,7 +881,7 @@ namespace CalDAV.Core
             //setting the content lenght property.
             var errorStack = new Stack<string>();
             resource.CreateOrModifyProperty("getcontentlenght", "DAV:",
-                $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(calendarResourceId)}</D:getcontentlength>",
+                $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack);
             db.SaveChanges();
         }
@@ -935,12 +935,12 @@ namespace CalDAV.Core
 
 
             //Removing old File 
-            StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
+            StorageManagement.DeleteCalendarObjectResource(url);
             //Adding New File
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 
             prevResource.CreateOrModifyProperty("getcontentlenght", "DAV:",
-                $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(calendarResourceId)}</D:getcontentlength>",
+                $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack);
 
             //Adding to the dataBase

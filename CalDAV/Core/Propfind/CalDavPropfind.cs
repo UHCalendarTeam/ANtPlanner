@@ -32,7 +32,7 @@ namespace CalDAV.Core.Propfind
         }
 
 
-        public void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+        public void AllPropMethod(string principalUrl, string collectionName, string calendarResourceId, int? depth,
             List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree)
         {
             //error flag
@@ -40,7 +40,7 @@ namespace CalDAV.Core.Propfind
 
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
-            var primaryResponse = AllPropFillTree(userEmail, collectionName, calendarResourceId, aditionalProperties);
+            var primaryResponse = AllPropFillTree(principalUrl, collectionName, calendarResourceId, aditionalProperties);
 
             //The response body is added to the result xml tree.
             multistatusTree.AddChild(primaryResponse);
@@ -58,12 +58,12 @@ namespace CalDAV.Core.Propfind
             {
                 CalendarCollection collection;
 
-                collection = db.GetCollection(userEmail, collectionName);
+                collection = db.GetCollection(principalUrl, collectionName);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
                     //For every resource in the collection it is added a new xml "response"
-                    var resourceResponse = AllPropFillTree(userEmail, collectionName, calendarResource.Name,
+                    var resourceResponse = AllPropFillTree(principalUrl, collectionName, calendarResource.Name,
                         aditionalProperties);
                     multistatusTree.AddChild(resourceResponse);
 
@@ -256,11 +256,12 @@ namespace CalDAV.Core.Propfind
         /// and property values of the visible properties.
         /// </summary>
         /// <param name="userEmail">Unique identifier of User</param>
+        /// <param name="principalUrl"></param>
         /// <param name="collectionName">Name of the collection</param>
         /// <param name="calendarResourceId">Name of the resource</param>
         /// <param name="additionalProperties">List of additional requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
-        private XmlTreeStructure AllPropFillTree(string userEmail, string collectionName, string calendarResourceId,
+        private XmlTreeStructure AllPropFillTree(string principalUrl, string collectionName, string calendarResourceId,
             List<KeyValuePair<string, string>> additionalProperties)
         {
             #region Adding the response of the collection or resource.
@@ -268,14 +269,14 @@ namespace CalDAV.Core.Propfind
             //Adding standard structure for a "response" element.
             var treeChild = new XmlTreeStructure("response", "DAV:");
 
-            #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
+            #region Adding the <D:href>/api/v1/collections/users|groups/principalId/{collectionName}/{calendarResourceId}?</D:href>
 
             var href = new XmlTreeStructure("href", "DAV:");
 
             if (calendarResourceId == null)
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
+                href.AddValue(principalUrl + "/" + collectionName + "/");
             else
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/" + calendarResourceId);
+                href.AddValue(principalUrl + "/" + collectionName + "/" + calendarResourceId);
 
             treeChild.AddChild(href);
 
@@ -295,7 +296,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null)
             {
-                var collection = db.GetCollection(userEmail, collectionName);
+                var collection = db.GetCollection(principalUrl, collectionName);
                 propertiesCol = collection.GetAllVisibleProperties(errorStack);
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
@@ -305,7 +306,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                var resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
                 propertiesCol = resource.GetAllVisibleProperties(errorStack);
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
@@ -399,12 +400,12 @@ namespace CalDAV.Core.Propfind
         ///     Returns a Response XML tree for a prop request with all the property names
         ///     and property values specified in the request.
         /// </summary>
-        /// <param name="userEmail">Unique identifier of User</param>
+        /// <param name="principalUrl">Unique identifier of User</param>
         /// <param name="collectionName">Name of the collection</param>
         /// <param name="calendarResourceId">Name of the resource</param>
         /// <param name="propertiesNameNamespace">List of requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
-        private XmlTreeStructure PropFillTree(string userEmail, string collectionName, string calendarResourceId,
+        private XmlTreeStructure PropFillTree(string principalUrl, string collectionName, string calendarResourceId,
             List<KeyValuePair<string, string>> propertiesNameNamespace)
         {
             //a "response xml element is added for each collection or resource"
@@ -418,9 +419,9 @@ namespace CalDAV.Core.Propfind
             var href = new XmlTreeStructure("href", "DAV:");
 
             if (calendarResourceId == null)
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
+                href.AddValue(principalUrl + "/" + collectionName + "/");
             else
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/" + calendarResourceId);
+                href.AddValue( principalUrl + "/" + collectionName + "/" + calendarResourceId);
 
             treeChild.AddChild(href);
 
@@ -445,7 +446,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = db.GetCollection(userEmail, collectionName);
+                collection = db.GetCollection(principalUrl, collectionName);
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {
@@ -454,7 +455,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {

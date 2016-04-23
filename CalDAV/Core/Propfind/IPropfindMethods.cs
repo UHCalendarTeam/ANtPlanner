@@ -8,14 +8,14 @@ namespace CalDAV.Core.Propfind
         /// <summary>
         ///     Returns all dead properties and some live properties.
         /// </summary>
-        /// <param name="userEmail">User unique identification</param>
+        /// <param name="principalUrl">User unique identification</param>
         /// <param name="collectionName">Target collection</param>
         /// <param name="calendarResourceId">Target resource</param>
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="aditionalProperties">Properties contained in the include xml if any</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void AllPropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+        void AllPropMethod(string principalUrl, string collectionName, string calendarResourceId, int? depth,
             List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree);
 
         /// <summary>

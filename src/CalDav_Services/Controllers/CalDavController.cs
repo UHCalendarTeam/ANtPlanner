@@ -37,7 +37,7 @@ namespace CalDav_Services.Controllers
         #region
 
         [AcceptVerbs("PROPFIND", Route = "{user}")]
-        public string PropFind(string user)
+        public string PropFind(string groupOrUser)
         {
             return "test";
         }
@@ -55,13 +55,15 @@ namespace CalDav_Services.Controllers
         #region Collection Methods
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "{user}/calendars/{collection}/")]
-        public async Task MkCalendar(string user, string collection)
+        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
         {
+            var url = Request.GetEncodedUrl();
+
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("url", Request.GetEncodedUrl());
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
 
@@ -69,12 +71,14 @@ namespace CalDav_Services.Controllers
         }
 
         //PROPFIND COLLECTIONS
-        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}/")]
-        public void PropFind(string user, string collection)
+        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        public void PropFind(string groupOrUser, string principalId, string collectionName)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
@@ -84,14 +88,17 @@ namespace CalDav_Services.Controllers
         }
 
         //PROPFIND RESOURCES
-        [AcceptVerbs("PropFind", Route = "{user}/calendars/{collection}/{calendarResource}")]
-        public void PropFind(string user, string collection, string calendarResource)
+        [AcceptVerbs("PropFind", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
+        public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
+
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
-            
+
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
@@ -99,22 +106,26 @@ namespace CalDav_Services.Controllers
             CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
-        [AcceptVerbs("Proppatch", Route = "{userEmail}/calendars/{collectionName}/")]
-        public void PropPatch(string userEmail, string collectionName)
+        [AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/")]
+        public void PropPatch(string groupOrUser, string principalId, string collectionName)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", userEmail);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
             propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
 
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
-        [AcceptVerbs("Proppatch", Route = "{userEmail}/calendars/{collectionName}/{calendarResourceId}")]
-        public void PropPatch(string userEmail, string collectionName, string calendarResourceId)
+        [AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", userEmail);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
             propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
@@ -135,15 +146,16 @@ namespace CalDav_Services.Controllers
 
         #region Calendar Object Resource Methods
         // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpPut("{user}/calendars/{collection}/{calendarResourceId}")]
-        public async Task Put(string user, string collection, string calendarResourceId)
+        [HttpPut("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
             propertiesAndHeaders.Add("body", StreamToString(Request.Body));
-            propertiesAndHeaders.Add("url", Request.GetEncodedUrl());
 
             var headers = Request.GetTypedHeaders();
 
@@ -211,47 +223,54 @@ END:VCALENDAR";
         }
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpGet("{user}/calendars/{collection}/{calendarResourceId}")]
-        public async Task Get(string user, string collection, string calendarResourceId)
+        [HttpGet("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public async Task Get(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url); propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
         // DELETE api/values/5
-        [HttpDelete("{user}/calendars/{collection}/{calendarResourceId}")]
-        public void Delete(string user, string collection, string calendarResourceId)
+        [HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public void Delete(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
         // DELETE api/values/
-        [HttpDelete("{user}/calendars/{collection}")]
-        public void Delete(string user, string collection)
+        [HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}")]
+        public void Delete(string groupOrUser, string principalId, string collectionName)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
 
             CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
         }
 
         //REPORT api/values/5
-        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}/{calendarResourceId}")]
-        public string Report(string user, string collection, string calendarResourceId)
+        [AcceptVerbs("Report", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public string Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            var url = Request.GetEncodedUrl();
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
@@ -270,18 +289,21 @@ END:VCALENDAR";
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
             var fs = new FileSystemManagement();
-            //SqlMock.RecreateDb();
+            SqlMock.RecreateDb();
 
-            //SqlMock.SeedDb_Fs();
+            SqlMock.SeedDb_Fs();
         }
 
         [AcceptVerbs("Destroy")]
         public void DestroyDb()
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
-            //SqlMock.RecreateDb();
+            SqlMock.RecreateDb();
         }
 
-
+        private string GetPrincipalUrlFronUrl(string url, string collectionName)
+        {
+            return url.Remove(url.IndexOf(collectionName));
+        }
     }
 }
