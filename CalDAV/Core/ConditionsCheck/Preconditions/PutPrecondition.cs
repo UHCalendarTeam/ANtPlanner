@@ -26,7 +26,7 @@ namespace CalDAV.Core.ConditionsCheck
         {
             #region Extracting Properties
 
-            var userEmail = propertiesAndHeaders["userEmail"];
+            var principalUrl = propertiesAndHeaders["principalUrl"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
             var url = propertiesAndHeaders["url"];
@@ -55,11 +55,11 @@ namespace CalDAV.Core.ConditionsCheck
 
             //check that if the resource exist then it has to have the same UID
             //if the resource not exist can not be another resource with the same uid.
-            if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+            if (!StorageManagement.ExistCalendarObjectResource(url))
             {
                 var uid = iCalendar.GetComponentProperties("UID");
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                var collection = db.GetCollection(userEmail, collectionName);
+                var collection = db.GetCollection(principalUrl, collectionName);
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid.StringValue == calendarresource.Uid)
@@ -80,7 +80,7 @@ namespace CalDAV.Core.ConditionsCheck
             else
             {
                 var uid = iCalendar.GetComponentProperties("UID");
-                var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                var resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
                 if (resource.Uid == uid.StringValue)
                 {
                     response.StatusCode = (int) HttpStatusCode.Conflict;
@@ -100,7 +100,7 @@ namespace CalDAV.Core.ConditionsCheck
             if (propertiesAndHeaders.ContainsKey("If-Match"))
             {
                 //check that the value do exist
-                if (!StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+                if (!StorageManagement.ExistCalendarObjectResource(url))
                 {
                     response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                     return false;
@@ -110,7 +110,7 @@ namespace CalDAV.Core.ConditionsCheck
             if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
             {
                 //check that the value do not exist
-                if (StorageManagement.ExistCalendarObjectResource(calendarResourceId))
+                if (StorageManagement.ExistCalendarObjectResource(url))
                 {
                     response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                     return false;
