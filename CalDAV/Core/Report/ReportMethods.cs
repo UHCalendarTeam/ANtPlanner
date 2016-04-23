@@ -76,7 +76,7 @@ namespace CalDAV.Core
 
             Dictionary<string, string> userResources;
             var fileM = new FileSystemManagement();
-            fs.GetAllCalendarObjectResource(out userResources);
+            fs.GetAllCalendarObjectResource(TODO, out userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
 
@@ -190,7 +190,7 @@ namespace CalDAV.Core
                 var collectionName = hrefComp[2];
                 var resourceName = hrefComp[3];
 
-                var fs = new FileSystemManagement(userName, collectionName);
+                var fs = new FileSystemManagement();
 
                 var resourceContent = fs.GetCalendarObjectResource($"{fs.CollectionPath}\\{resourceName}").Result;
 

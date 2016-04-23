@@ -117,7 +117,7 @@ namespace DataLayer.ExtensionMethods
             {
                
             };
-            worker.CalendarCollections.Add(collection);
+            //worker.CalendarCollections.Add(collection);
 
             return worker;
         }

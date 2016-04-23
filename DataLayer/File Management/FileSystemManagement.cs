@@ -12,42 +12,42 @@ namespace DataLayer
         ///     Use this constructor to set the root path of the files.
         /// </summary>
         /// <param name="root"></param>
-        public FileSystemManagement(string root = "CalDav\\Users")
-        {
-            if (root != "CalDav\\Users" && !string.IsNullOrEmpty(root) &&
-                Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
-                Root = root;
-            else
-                Root = Directory.GetCurrentDirectory() + "\\" + root;
-        }
+        //public FileSystemManagement(string root = "CalDav\\Users")
+        //{
+        //    if (root != "CalDav\\Users" && !string.IsNullOrEmpty(root) &&
+        //        Uri.IsWellFormedUriString(root, UriKind.Relative) && Path.IsPathRooted(root))
+        //        Root = root;
+        //    else
+        //        Root = Directory.GetCurrentDirectory() + "\\" + root;
+        //}
 
-        public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")
-        {
-            Root = root;
-            UserId = userId;
-            CollectionId = collectionId;
-            CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
-        }
+        //public FileSystemManagement(string userId, string collectionId, string root = "CalDav\\Users")
+        //{
+        //    Root = root;
+        //    UserId = userId;
+        //    CollectionId = collectionId;
+        //    CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
+        //}
 
         /// <summary>
         ///     Contains the userId where to apply the operations.
         /// </summary>
-        public string UserId { get; set; }
+        //public string UserId { get; set; }
 
-        /// <summary>
-        ///     Contains the collection name where to apply the operations.
-        /// </summary>
-        public string CollectionId { get; set; }
+        ///// <summary>
+        /////     Contains the collection name where to apply the operations.
+        ///// </summary>
+        //public string CollectionId { get; set; }
 
-        /// <summary>
-        ///     Contains the path to the collection where to apply the operations..
-        /// </summary>
-        public string CollectionPath { get; set; }
+        ///// <summary>
+        /////     Contains the path to the collection where to apply the operations..
+        ///// </summary>
+        //public string CollectionPath { get; set; }
 
-        /// <summary>
-        ///     Contains the root where are the collections.
-        /// </summary>
-        public string Root { get; }
+        ///// <summary>
+        /////     Contains the root where are the collections.
+        ///// </summary>
+        //public string Root { get; }
 
         /// <summary>
         ///     After created the class with the default constructor
@@ -57,13 +57,13 @@ namespace DataLayer
         /// <param name="userId">The desired user.</param>
         /// <param name="collectionId">The desired Collection name.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-        public bool SetUserAndCollection(string userId, string collectionId)
-        {
-            UserId = userId;
-            CollectionId = collectionId;
-            CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
-            return ExistCalendarCollection();
-        }
+        //public static bool SetUserAndCollection(string userId, string collectionId)
+        //{
+        //    UserId = userId;
+        //    CollectionId = collectionId;
+        //    CollectionPath = Path.GetFullPath(Root) + "\\" + userId + "\\Calendars\\" + collectionId;
+        //    return ExistCalendarCollection();
+        //}
 
         /// <summary>
         ///     Create an instance of this class and check if the collection is valid..
@@ -72,50 +72,52 @@ namespace DataLayer
         /// <param name="collectionId">The desired collection.</param>
         /// <param name="fileSystemManagement">The instance of the class.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-        public bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement)
-        {
-            fileSystemManagement = new FileSystemManagement(userId, collectionId);
-            return fileSystemManagement.ExistCalendarCollection();
-        }
+        //public bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement)
+        //{
+        //   // fileSystemManagement = new FileSystemManagement(userId, collectionId);
+        //    return fileSystemManagement.ExistCalendarCollection();
+        //}
 
-        public bool AddUserFolder(string userEmail)
+        public bool AddPrincipalFolder(string principalUrl)
         {
-            var path = Path.GetFullPath(Root) + "\\" + userEmail;
+            var path = principalUrl.Replace('/', Path.DirectorySeparatorChar);
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
 
-        public bool AddCalendarCollectionFolder(string userEmail, string calendarCollectionName)
+        public bool AddCalendarCollectionFolder(string collectionUrl)
         {
-            var path = Path.GetFullPath(Root) + "\\" + userEmail + "\\Calendars\\" + calendarCollectionName;
+            var path = collectionUrl.Replace('/', Path.DirectorySeparatorChar);
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
 
 
-        public bool DeleteCalendarCollection()
+        public bool DeleteCalendarCollection(string collectionUrl)
         {
-            if (!Directory.Exists(CollectionPath)) return false;
-            Directory.Delete(CollectionPath, true);
+            var path = collectionUrl.Replace('/', Path.DirectorySeparatorChar);
+            if (!Directory.Exists(path)) return false;
+            Directory.Delete(path, true);
             return true;
         }
 
-        public async Task<bool> AddCalendarObjectResourceFile(string objectResourceName, string bodyIcalendar)
+        public async Task<bool> AddCalendarObjectResourceFile(string resourceUrl, string body)
         {
+            var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
             //Check Directory
-            if (!Directory.Exists(CollectionPath))
+            if (!Directory.Exists(path))
                 return false;
 
 
             //Parse the iCalendar Object
             //Construimos el objeto pa verificar que esta bien
-            var iCalendar = VCalendar.Parse(bodyIcalendar);
+            var iCalendar = VCalendar.Parse(body);
             if (iCalendar == null)
                 return false;
 
             //Write to Disk the toString of the object, so it splits the lines
             //
-            using (var writer = File.CreateText(CollectionPath + "\\" + objectResourceName))
+            using (var writer = File.CreateText(path))
             {
                 await writer.WriteAsync(iCalendar.ToString());
             }
@@ -123,12 +125,12 @@ namespace DataLayer
             return true;
         }
 
-        public async Task<string> GetCalendarObjectResource(string objectResourceName)
+        public async Task<string> GetCalendarObjectResource(string resourceUrl)
         {
-            if (File.Exists(objectResourceName))
+            var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
+            if (File.Exists(path))
             {
-                //Task<string> result = new Task<string>(null);
-                using (var stream = File.OpenRead(objectResourceName))
+                using (var stream = File.OpenRead(path))
                 {
                     var reader = new StreamReader(stream);
                     var result = await reader.ReadToEndAsync();
@@ -138,37 +140,39 @@ namespace DataLayer
             return null;
         }
 
-        public bool DeleteCalendarObjectResource(string objectResourceName)
+        public bool DeleteCalendarObjectResource(string resourceUrl)
         {
-            var path = CollectionPath + "\\" + objectResourceName;
+            var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
             if (!File.Exists(path))
                 return false;
             File.Delete(path);
             return true;
         }
 
-        public bool ExistCalendarCollection()
+        public bool ExistCalendarCollection(string collectioUrl)
         {
-            return Directory.Exists(CollectionPath);
+            var path = collectioUrl.Replace('/', Path.DirectorySeparatorChar);
+            return Directory.Exists(path);
         }
 
-        public bool ExistCalendarObjectResource(string objectResourceName)
+        public bool ExistCalendarObjectResource(string resourceUrl)
         {
-            var path = CollectionPath + "\\" + objectResourceName;
+            var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
             return File.Exists(path);
         }
 
-        public IEnumerable<VCalendar> GetAllCalendarObjectResource()
+        public IEnumerable<VCalendar> GetAllCalendarObjectResource(string collectionUrl)
         {
+            var path = collectionUrl.Replace('/', Path.DirectorySeparatorChar);
             var calendarObjectResources = new List<VCalendar>();
 
             string body;
             VCalendar iCalendar;
 
-            if (!Directory.Exists(CollectionPath))
+            if (!Directory.Exists(path))
                 return null;
 
-            var filesPath = Directory.EnumerateFiles(CollectionPath);
+            var filesPath = Directory.EnumerateFiles(path);
 
             foreach (var file in filesPath)
             {
@@ -185,31 +189,33 @@ namespace DataLayer
         /// <summary>
         ///     Get all the resources of a collection.
         /// </summary>
+        /// <param name="collectionUrl"></param>
+        /// <param name="calendarObjectResources"></param>
         /// <param name="userId"></param>
         /// <param name="userCollectionId"></param>
-        /// <param name="calendarObjectResources"></param>
         /// <returns></returns>
-        public bool GetAllCalendarObjectResource(out Dictionary<string, string> calendarObjectResources)
+        public bool GetAllCalendarObjectResource(string collectionUrl, out Dictionary<string, string> calendarObjectResources)
         {
+            var path = collectionUrl.Replace('/', Path.DirectorySeparatorChar);
             calendarObjectResources = new Dictionary<string, string>();
-            if (!Directory.Exists(CollectionPath))
+            if (!Directory.Exists(path))
                 return false;
-            var filesPath = Directory.EnumerateFiles(CollectionPath);
-            var userCollectionPath = $"{UserId}\\{CollectionId}\\";
+            var filesPath = Directory.EnumerateFiles(path);
+            
             foreach (var file in filesPath)
             {
                 var lstIndex = file.LastIndexOf("\\");
                 var fileName = file.Substring(lstIndex + 1);
                 var temp = GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(userCollectionPath + fileName, temp.Result);
+                    calendarObjectResources.Add(collectionUrl + fileName, temp.Result);
             }
             return true;
         }
 
-        public long GetFileSize(string fileName)
+        public long GetFileSize(string resourceUrl)
         {
-            var path = CollectionPath + "\\" + fileName;
+            var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
             var finfo = new FileInfo(path);
             return finfo.Length;
         }

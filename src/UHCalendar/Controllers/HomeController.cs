@@ -12,7 +12,7 @@ namespace UHCalendar.Controllers
             var users = new List<User>();
             using (var context = new CalDavContext())
             {
-                context.Users.Add(new User {FirstName = "Adriano", LastName = "Flechilla"});
+                context.Users.Add(new User());
                 context.SaveChanges();
 
                 users.AddRange(context.Users);

@@ -48,7 +48,7 @@ namespace CalDav_tests
             
             var context = new CalDavContext();
             var users = context.Users;
-            DataLayer.SqlMock.SeedDb_Fs();
+            //DataLayer.SqlMock.SeedDb_Fs();
             var frank = context.Users.FirstOrDefault(x => x.Email == "f.underwood@wh.org");
 
             Assert.NotNull(frank);

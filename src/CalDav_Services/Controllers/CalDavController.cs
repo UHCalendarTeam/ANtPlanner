@@ -270,16 +270,16 @@ END:VCALENDAR";
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
             var fs = new FileSystemManagement();
-            SqlMock.RecreateDb();
+            //SqlMock.RecreateDb();
 
-            SqlMock.SeedDb_Fs();
+            //SqlMock.SeedDb_Fs();
         }
 
         [AcceptVerbs("Destroy")]
         public void DestroyDb()
         {
             Response.StatusCode = (int)HttpStatusCode.NoContent;
-            SqlMock.RecreateDb();
+            //SqlMock.RecreateDb();
         }
 
 

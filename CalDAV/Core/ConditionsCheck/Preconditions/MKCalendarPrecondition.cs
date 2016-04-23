@@ -25,10 +25,11 @@ namespace CalDAV.Core.ConditionsCheck
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var body = propertiesAndHeaders["body"];
+            var url = propertiesAndHeaders["url"];
 
             #endregion
 
-            if (fs.SetUserAndCollection(userEmail, collectionName) || db.CollectionExist(userEmail, collectionName))
+            if (fs.ExistCalendarCollection(url) || db.CollectionExist(userEmail, collectionName))
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>

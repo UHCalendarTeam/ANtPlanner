@@ -33,7 +33,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             #endregion
 
-            if (!Fs.SetUserAndCollection(userEmail, collectionName) ||
+            if (!Fs.ExistCalendarCollection(url) ||
                 !((CalDavContext) Db).CollectionExist(userEmail, collectionName))
             {
                 response.StatusCode = (int) HttpStatusCode.Forbidden;

@@ -29,6 +29,7 @@ namespace CalDAV.Core.ConditionsCheck
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
             var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
+            var url = propertiesAndHeaders["url"];
 
             var body = propertiesAndHeaders["body"];
             //var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
@@ -45,7 +46,7 @@ namespace CalDAV.Core.ConditionsCheck
             }
 
             //check that resourceId don't exist but the collection does.
-            if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
+            if (!StorageManagement.ExistCalendarCollection(url))
             {
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;

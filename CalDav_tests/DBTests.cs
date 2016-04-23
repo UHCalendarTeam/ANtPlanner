@@ -25,9 +25,7 @@ namespace CalDav_tests
             var user = new User
             {
                 Email = "foo@gmail.com",
-                LastName = "Doo",
-                FirstName = "John",
-                CalendarCollections = new List<CalendarCollection>()
+               
             };
             var resources = new List<CalendarResource>
             {
@@ -103,12 +101,12 @@ namespace CalDav_tests
                     }
                 }
             };
-            user.CalendarCollections = collection;
+           
             // user.Resources = resources;
             db.Users.Add(user);
             db.SaveChanges();
 
-            var userResult = db.GetUser("foo@gmail.com");
+            var principla = db.GetPrincipal("...");
             Assert.NotNull(user);
         }
     }
