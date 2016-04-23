@@ -9,6 +9,8 @@ namespace DataLayer.Models.Entities
     /// </summary>
     public class CalendarResource
     {
+       
+
         [ScaffoldColumn(false)]
         public int CalendarResourceId { get; set; }
 

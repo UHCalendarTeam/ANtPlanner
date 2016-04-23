@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.ACL;
 
 namespace DataLayer.Models.Entities
 {
@@ -46,12 +47,16 @@ namespace DataLayer.Models.Entities
         [Required]
         public string Url { get; set; }
 
-        public int UserId { get; set; }
+        /// <summary>
+        /// The collection can belongs to a 
+        /// </summary>
+        public int? PrincipalId { get; set; }
 
         /// <summary>
-        ///     The owner of the collection.
+        ///     The principal can represent either a 
+        ///     user or a group. Both have a collection.
         /// </summary>
-        public User User { get; set; }
+        public Principal Principal { get; set; }
 
         /// <summary>
         ///     Contains the resources that are defined in this collection.
@@ -62,6 +67,14 @@ namespace DataLayer.Models.Entities
         ///     Contains the properties of the collection.
         /// </summary>
         public ICollection<Property> Properties { get; set; }
+
+        /// <summary>
+        /// If the owner of the collection belongs to a 
+        /// group then the collection is gonna be of the group.
+        /// Use this property to know the group that the 
+        /// collection belongs;
+        /// </summary>
+        public string Group { get; set; }
 
         private void InitializeStandardCollectionProperties(string name)
         {

@@ -71,7 +71,7 @@ namespace CalDav_tests
                 {
                     //Calendardescription = "Foo description",
                     Name = "Foo collection",
-                    User = user,
+                    //User = user,
                     CalendarResources = resources /*,
                     SupportedCalendarComponentSet = new List<string>()*/,
                     //ResourceType = new List<string>(),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 
@@ -32,16 +33,20 @@ namespace DataLayer
         /// <returns></returns>
         public static User GetUser(this CalDavContext source, string userEmail)
         {
-            try
-            {
                 return source.Users.Include(x => x.CalendarCollections).ThenInclude(pc => pc.Properties)
                     .Include(c => c.CalendarCollections).ThenInclude(r => r.CalendarResources).ThenInclude(pr => pr.Properties)
-                    .First(u => u.Email == userEmail);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+        }
+
+        /// <summary>
+        ///     Returns a Principal for a given name
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public static Principal GetPrincipal(this CalDavContext source, string email)
+        {
+            return source.Principals
+                .FirstOrDefault(u => u.Email == email);
         }
 
         /// <summary>
@@ -75,7 +80,7 @@ namespace DataLayer
         {
             try
             {
-                var user = source.GetUser(userEmail);
+                var principal = source.GetPrincipal(userEmail);
                 return
                     source.CalendarCollections.First(c => c.Name == collectionName && c.UserId == user.UserId);
             }
@@ -107,6 +112,8 @@ namespace DataLayer
         }
 
         /// <summary>
+        ///     Get the calendarResourse object in the given collection
+        ///     by the given resource's name.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="userEmail">The email of the calendarResource's user.</param>
@@ -120,24 +127,41 @@ namespace DataLayer
             {
                 var collection = source.GetCollection(userEmail, collectionName);
                 return source.CalendarResources.First(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
+                    source.CalendarResources.Include(p => p.Properties)
+                        .First(
+                            cr => cr.Name == calResource && cr.CalendarCollectionId == collection.CalendarCollectionId);
             }
             catch (Exception)
             {
                 return null;
             }
-
         }
 
 
-        //TODO: Adriano ver esto
-        /// <summary>
-        /// Filter the resources of the user in the given collection
-        /// by filter of the dates.
-        /// </summary>
+        public static void ClearDB(this CalDavContext ctx)
+        {
+            if (ctx.Users.Any())
+                ctx.Users.RemoveRange(ctx.Users.Include(x => x.Principal));
+            if (ctx.Principals.Any())
+                ctx.Principals.RemoveRange(ctx.Principals);
+            if (ctx.CalendarCollections.Any())
+                ctx.CalendarCollections.RemoveRange(ctx.CalendarCollections.Include(x => x.CalendarResources));
+            if (ctx.CalendarResources.Any())
+                ctx.CalendarResources.RemoveRange(ctx.CalendarResources);
+            ctx.SaveChanges();
+        }
+
+        /// <param name="endTime"></param>
+        /// <param name="starTime">The startTime of the  </param>
 
         /// <param name="source"></param>
-        /// <param name="starTime">The startTime of the  </param>
-        /// <param name="endTime"></param>
+        /// </summary>
+        /// by filter of the dates.
+        /// Filter the resources of the user in the given collection
+        /// <summary>
+
+
+        //TODO: Adriano ver esto
         /// <param name="ownerName"></param>
         /// <param name="colName"></param>
         /// <returns></returns>

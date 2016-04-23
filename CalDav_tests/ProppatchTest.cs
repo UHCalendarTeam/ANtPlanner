@@ -132,7 +132,7 @@ namespace CalDav_tests
                 new CalendarCollection
                 {
                     Name = "Foocollection",
-                    User = user,
+                    //User = user,
                     CalendarResources = resources,
                     Url = "url",
                     Properties = new List<Property>
