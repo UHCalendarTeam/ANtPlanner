@@ -177,7 +177,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="collectionName"></param>
         /// <param name="calendarResourceId"></param>
         /// <returns></returns>
-        private XmlTreeStructure PropNameFillTree(string userEmail, string collectionName, string calendarResourceId)
+        private XmlTreeStructure PropNameFillTree(string userEmail, string collectionName, string calendarResourceId = null)
         {
             #region Adding the response of the collection or resource.
 
@@ -252,19 +252,20 @@ namespace CalDAV.Core.Propfind
         }
 
         /// <summary>
-        ///     Returns a Response XML element with all the property names
-        ///     and property values that the allprop method should contain.
+        /// Returns a Response XML element with all the property names
+        /// and property values of the visible properties.
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="calendarResourceId"></param>
-        /// <param name="additionalProperties"></param>
+        /// <param name="userEmail">Unique identifier of User</param>
+        /// <param name="collectionName">Name of the collection</param>
+        /// <param name="calendarResourceId">Name of the resource</param>
+        /// <param name="additionalProperties">List of additional requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
         private XmlTreeStructure AllPropFillTree(string userEmail, string collectionName, string calendarResourceId,
             List<KeyValuePair<string, string>> additionalProperties)
         {
             #region Adding the response of the collection or resource.
 
+            //Adding standard structure for a "response" element.
             var treeChild = new XmlTreeStructure("response", "DAV:");
 
             #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
@@ -288,6 +289,10 @@ namespace CalDAV.Core.Propfind
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
             var errorStack = new Stack<string>();
+
+            //Here all visible properties are retrieve plus a collection of extra properties that can be 
+            //defined in the request body.  
+
             if (calendarResourceId == null)
             {
                 var collection = db.GetCollection(userEmail, collectionName);
@@ -321,6 +326,8 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #region Adding nested propOK
+            //This procedure has been explained in another method.
+            //Here the retrieve properties are grouped.
 
             var propstatOK = new XmlTreeStructure("propstat", "DAV:");
             var propOk = new XmlTreeStructure("prop", "DAV:");
@@ -344,7 +351,7 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #region Adding nested propWrong
-
+            //Here the properties that could not be retrieved are grouped.
             var propstatWrong = new XmlTreeStructure("propstat", "DAV:");
             var propWrong = new XmlTreeStructure("prop", "DAV:");
 
@@ -365,7 +372,9 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #region Adding responseDescription when wrong
-
+            //Here i add an description for explain the errors.
+            //This should be aplied in all method with an similar structure but for the moment is only used here.
+            //However this is not required. 
             var responseDescrpWrong = new XmlTreeStructure("responsedescription", "DAV:");
             responseDescrpWrong.AddValue("The properties doesn't  exist");
             propstatWrong.AddChild(responseDescrpWrong);
@@ -373,7 +382,7 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #endregion
-
+            //If any of the "status" group is empty, it is not included.
             if (propertiesOk.Count > 0)
                 treeChild.AddChild(propstatOK);
             if (propertiesWrong.Count > 0)
@@ -387,23 +396,25 @@ namespace CalDAV.Core.Propfind
         }
 
         /// <summary>
-        ///     Returns a Response XML tree with all the property names
+        ///     Returns a Response XML tree for a prop request with all the property names
         ///     and property values specified in the request.
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="calendarResourceId"></param>
-        /// <param name="propertiesNameNamespace"></param>
+        /// <param name="userEmail">Unique identifier of User</param>
+        /// <param name="collectionName">Name of the collection</param>
+        /// <param name="calendarResourceId">Name of the resource</param>
+        /// <param name="propertiesNameNamespace">List of requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
         private XmlTreeStructure PropFillTree(string userEmail, string collectionName, string calendarResourceId,
             List<KeyValuePair<string, string>> propertiesNameNamespace)
         {
+            //a "response xml element is added for each collection or resource"
             #region Adding the response of the collection or resource.
 
             var treeChild = new XmlTreeStructure("response", "DAV:");
 
             #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
 
+            //an href with the corresponding url is added to the response
             var href = new XmlTreeStructure("href", "DAV:");
 
             if (calendarResourceId == null)
@@ -419,12 +430,19 @@ namespace CalDAV.Core.Propfind
 
             #region Selecting properties
 
+
+            
             CalendarCollection collection;
             CalendarResource resource;
             var propertiesCol = new List<XmlTreeStructure>();
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
             var errorStack = new Stack<string>();
+
+            //It take the list of requested properties and tries to get the corresponding property from db.
+            //The methods are called for a resource or a collection accordingly its circumstances.
+            //The properties are stored inside the propertiesCol. Where if the value is null it means that the collection could not be 
+            //retrieve.
             if (calendarResourceId == null)
             {
                 collection = db.GetCollection(userEmail, collectionName);
@@ -444,7 +462,7 @@ namespace CalDAV.Core.Propfind
                     }
             }
 
-            //Here there are divided all properties between recovered and error recovering
+            //Here, properties are divided between recovered and error recovering
             foreach (var propTree in propertiesCol)
             {
                 if (propTree.Value != null)
@@ -455,6 +473,13 @@ namespace CalDAV.Core.Propfind
 
             #endregion
 
+            //For each returned status a "propstat" is created, containing a "prop" with all properties that belong to that current status.
+            // And a "status" containing the message of the corresponding status.
+            //Right Now there are only two "propstat" taking place OK and Wrong an therefore only two "status"
+            //200 OK and 400 Not Found.
+            //More should be added when ACL is working entairly.
+
+            //TODO: Add the status forbidden for authentication permissions problems.
             #region Adding nested propOK
 
             var propstatOk = new XmlTreeStructure("propstat", "DAV:");
@@ -467,7 +492,7 @@ namespace CalDAV.Core.Propfind
             }
 
             propstatOk.AddChild(propOk);
-
+            //This when i group the OK properties
             #region Adding nested status OK
 
             var statusOk = new XmlTreeStructure("status", "DAV:");
@@ -477,7 +502,7 @@ namespace CalDAV.Core.Propfind
             #endregion
 
             #endregion
-
+            //Here the same is made. The Wrong properties are grouped. 
             #region Adding nested propWrong
 
             var propstatWrong = new XmlTreeStructure("propstat", "DAV:");
@@ -509,6 +534,7 @@ namespace CalDAV.Core.Propfind
 
             #endregion
 
+            //If anyone of the property groups is empty it is not included in the response.
             if (propertiesOk.Count > 0)
                 treeChild.AddChild(propstatOk);
             if (propertiesWrong.Count > 0)

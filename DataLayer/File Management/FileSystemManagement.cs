@@ -115,7 +115,7 @@ namespace DataLayer
 
             //Write to Disk the toString of the object, so it splits the lines
             //
-            using (var writer = File.CreateText(CollectionPath + "\\" + objectResourceName + @".ics"))
+            using (var writer = File.CreateText(CollectionPath + "\\" + objectResourceName))
             {
                 await writer.WriteAsync(iCalendar.ToString());
             }

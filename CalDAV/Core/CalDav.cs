@@ -167,7 +167,7 @@ namespace CalDAV.Core
 
             if (propFindTree.GetChildAtAnyLevel("prop", out props))
                 retList.AddRange(
-                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, string.IsNullOrEmpty(child.MainNamespace)?"DAV:":child.MainNamespace)));
+                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, string.IsNullOrEmpty(child.MainNamespace) ? "DAV:" : child.MainNamespace)));
             return retList;
         }
 
@@ -334,7 +334,7 @@ namespace CalDAV.Core
             var user = db.GetUser(userEmail);
             var collection = new CalendarCollection { Name = collectionName, Url = url };
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) {Value = Guid.NewGuid().ToString()}).ToString(), stack);
+            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
             user.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
@@ -630,29 +630,45 @@ namespace CalDAV.Core
 
             var resource =
                 db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-            db.CalendarResources.Remove(resource);
-            db.SaveChanges();
+            if (resource != null)
+            {
+                db.CalendarResources.Remove(resource);
+                db.SaveChanges();
 
-            return StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
+                return StorageManagement.DeleteCalendarObjectResource(calendarResourceId);
+            }
+                return true;
         }
 
         public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             var userEmail = propertiesAndHeaders["userEmail"];
             var collectionName = propertiesAndHeaders["collectionName"];
-
+            //The delete method default status code
             response.StatusCode = (int)HttpStatusCode.NoContent;
+            //If the collection already is gone it is treated as a successful operation.
             if (!StorageManagement.SetUserAndCollection(userEmail, collectionName))
                 return true;
 
+            //The collection is retrieve and if something unexpected happened an internal error is reflected.
             var collection = db.GetCollection(userEmail, collectionName);
             if (collection == null)
             {
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return false;
             }
+            //As a contingent plan i will delete all properties of all resource child 
+            //of the collection manually as the cascade delete should do.
+            //foreach (var resource in collection.CalendarResources)
+            //{
+            //    foreach (var property in resource.Properties)
+            //    {
+            //        resource.Properties.Remove(property);
+            //    }
+            //}
 
             db.CalendarCollections.Remove(collection);
+            db.SaveChanges();
             return StorageManagement.DeleteCalendarCollection();
         }
 
@@ -814,7 +830,7 @@ namespace CalDAV.Core
 
             var iCal = new VCalendar(body);
 
-            
+
 
             //filling the resource
             var resource = FillResource(propertiesAndHeaders, iCal, response);

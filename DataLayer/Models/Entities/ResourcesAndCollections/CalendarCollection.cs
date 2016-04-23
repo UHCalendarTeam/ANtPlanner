@@ -142,7 +142,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
-                Value = $"<C:calendar-description {NamespacesSimple["C"]}>No Description Available</C:calendar-description>"
+                Value = $"<C:calendar-description {Namespaces["C"]}>No Description Available</C:calendar-description>"
             });
 
             Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
