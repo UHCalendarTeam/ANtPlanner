@@ -80,20 +80,14 @@ namespace DataLayer.ExtensionMethods
             string password, string career, string group, int year)
         {
             var student = new Student(fullname, email, password, career, group, year);
+            
             student.Password = student.PasswordHasher(password);
 
             ///create the principal the represents the user
-            var principal = new Principal()
-            {
-                Email = email,
-                PrincipalURL = DataLayer.SystemProperties._userPrincipalUrl + email,
-                //Initialize the properties of the principal with the 
-                //require property that represents the groups in wich the principal
-                //is directly a member
-                Properties = new List<Property>() { GroupMembershipCreation(DataLayer.SystemProperties._groupPrincipalUrl+group) }
-            };
+            var principal = new Principal(fullname, DataLayer.SystemProperties._userPrincipalUrl + email,true, group);
 
             student.Principal = principal;
+            principal.User = student;
 
             //take the collection with user group name
             var collection = context.CalendarCollections.FirstOrDefault(col => col.Group == group);
@@ -121,8 +115,7 @@ namespace DataLayer.ExtensionMethods
             var collection = new CalendarCollection(DataLayer.SystemProperties._userCollectionUrl + email,
                 DataLayer.SystemProperties._defualtInitialCollectionName)
             {
-                User = worker,
-                UserId = worker.UserId
+               
             };
             worker.CalendarCollections.Add(collection);
 
@@ -130,17 +123,19 @@ namespace DataLayer.ExtensionMethods
         }
 
         /// <summary>
-        /// Create and return a DAV:group-membership property.
+        /// Create a principal in the system.
         /// </summary>
-        /// <param name="groupHref"></param>
-        /// <returns></returns>
-        private static Property GroupMembershipCreation(string groupHref)
-        {
-            var property = new Property("group-membership", "DAV:")
-            {
-                Value = $"<D:group-membership xmlns:D=\"DAV:\"><D:href>{groupHref}</D:href></D:group-membership>"
-            };
-            return property;
-        }
+        /// <param name="context"></param>
+        /// <param name="pUrl">The url that uniquely identifies the principal</param>
+        /// <param name="displayName">The principal's displayname</param>
+        /// <param name="userOrGroup">True if the princioal represent a user, false otherwise</param>
+        /// <returns>The instance of the new Principal.</returns>
+        //public static Principal CreatePrincipalInSystem(this CalDavContext context, string pUrl, string displayName,
+        //    bool userOrGroup)
+        //{
+        //    var p = new Principal(displayName, pUrl, userOrGroup);
+        //}
+
+       
     }
 }

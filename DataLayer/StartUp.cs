@@ -48,10 +48,10 @@ namespace DataLayer
             //TODO: check for the result of the collection creation in the DB
             using (var db = new CalDavContext())
             {
-                var user = db.GetUser(userEmail);
+                var principal = db.GetPrincipal(userEmail);
                 var collection = new CalendarCollection
                 {
-                    User = user,
+                    Principal = principal,
                     Name = collectionName,
                     Properties = new List<Property>
                     {
@@ -74,7 +74,7 @@ namespace DataLayer
                     //TODO: take the other properties from the class that is gonna contain the 
                     //custom properties of the collections
                 };
-                user.CalendarCollections.Add(collection);
+                principal.CalendarCollections.Add(collection);
                 db.SaveChanges();
                 var result = FileSystemMangement.AddCalendarCollectionFolder(userEmail, collectionName);
                 return result;

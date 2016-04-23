@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.ACL;
 
 namespace DataLayer.Models.Entities
 {
@@ -54,12 +55,13 @@ namespace DataLayer.Models.Entities
         /// <summary>
         /// The collection can belongs to a 
         /// </summary>
-        public int? UserId { get; set; }
+        public int? PrincipalId { get; set; }
 
         /// <summary>
-        ///     The owner of the collection.
+        ///     The principal can represent either a 
+        ///     user or a group. Both have a collection.
         /// </summary>
-        public User User { get; set; }
+        public Principal Principal { get; set; }
 
         /// <summary>
         ///     Contains the resources that are defined in this collection.
