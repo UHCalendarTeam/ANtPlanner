@@ -40,11 +40,11 @@ namespace DataLayer.ExtensionMethods
             };
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
             ///create the principal the represents the user
-            var principal = new Principal(email, SystemProperties.PrinicpalType.User,
+            var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName, calHomeSet);
 
             user.Principal = principal;
@@ -107,13 +107,13 @@ namespace DataLayer.ExtensionMethods
             var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
 
             //create the calendar-home-set
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.Group, group);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.Group, group);
 
             //create the displayname
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullname);
 
             ///create the principal the represents the user
-            var principal = new Principal(email, SystemProperties.PrinicpalType.Student, calHomeSet, gMembership, displayName);
+            var principal = new Principal(email, SystemProperties.PrincipalType.Student, calHomeSet, gMembership, displayName);
 
             student.Principal = principal;
             principal.User = student;
@@ -144,11 +144,11 @@ namespace DataLayer.ExtensionMethods
 
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrinicpalType.User, email);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
             ///create the principal the represents the user
-            var principal = new Principal(email, SystemProperties.PrinicpalType.User,
+            var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName, calHomeSet);
 
             worker.Principal = principal;

@@ -67,7 +67,7 @@ namespace DataLayer
         /// <param name="principalId">If the principal represents a group then send
         /// the name of the group, otherwise send the email of the user</param>
         /// <returns></returns>
-        public static Property CreateCalendarHomeSet(SystemProperties.PrinicpalType pType, string principalId)
+        public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId)
         {
             var property = new Property("calendar-home-set", "DAV:")
             {

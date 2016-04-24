@@ -21,20 +21,13 @@ namespace CalDAV.Core.ConditionsCheck
         public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
-
-            string userEmail;
-            propertiesAndHeaders.TryGetValue("userEmail", out userEmail);
-
-            string collectionName;
-            propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
-
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
             #endregion
 
             if (!Fs.ExistCalendarCollection(url) ||
-                !((CalDavContext) Db).CollectionExist(userEmail, collectionName))
+                !((CalDavContext) Db).CollectionExist(url))
             {
                 response.StatusCode = (int) HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>

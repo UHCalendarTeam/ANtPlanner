@@ -23,12 +23,12 @@ namespace DataLayer
         /// Contains the url for the groups collection.
         /// Add the name of the group
         /// </summary>
-        public static readonly string _groupCollectionUrl = "collections/group/";
+        public static readonly string _groupCollectionUrl = "collections/groups/";
 
         /// <summary>
         /// Contains the default name for the user collections
         /// </summary>
-        public static readonly string _defualtInitialCollectionName = "DefualCalendar";
+        public static readonly string _defualtInitialCollectionName = "DefaultCalendar";
 
         public static readonly string _principalUrl = "principals";
 
@@ -50,7 +50,7 @@ namespace DataLayer
         /// A principal represent either a group or
         /// a user.
         /// </summary>
-        public enum PrinicpalType { Group, Student, Worker, User}
+        public enum PrincipalType { Group, Student, Worker, User}
 
         /// <summary>
         /// Build the url that identify the collection where are the 
@@ -60,10 +60,10 @@ namespace DataLayer
         /// <param name="principalId">If the principal represents a user then put ith email here
         /// otherwise put the name of the group here.</param>
         /// <returns>The url where to find the calendars of the principal.</returns>
-        public static string BuildHomeSetUrl(PrinicpalType type, string principalId)
+        public static string BuildHomeSetUrl(PrincipalType type, string principalId)
         {
             ///take the beginning of the url depending of the king of principal
-            var colUrl = type == PrinicpalType.User ? _userCollectionUrl : _groupCollectionUrl;
+            var colUrl = type == PrincipalType.User ? _userCollectionUrl : _groupCollectionUrl;
 
             //add the identifier of the pricipal
             return $"{colUrl}{principalId}";

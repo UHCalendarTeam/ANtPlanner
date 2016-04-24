@@ -21,15 +21,12 @@ namespace CalDAV.Core.ConditionsCheck
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
-
-            var principalUrl = propertiesAndHeaders["principalUrl"];
-            var collectionName = propertiesAndHeaders["collectionName"];
             var body = propertiesAndHeaders["body"];
             var url = propertiesAndHeaders["url"];
 
             #endregion
 
-            if (fs.ExistCalendarCollection(url) || db.CollectionExist(principalUrl, collectionName))
+            if (fs.ExistCalendarCollection(url) || db.CollectionExist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
