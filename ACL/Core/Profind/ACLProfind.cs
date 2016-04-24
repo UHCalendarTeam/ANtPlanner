@@ -15,7 +15,7 @@ namespace ACL.Core
     /// Contains the PROFIND method for 
     /// the principals
     /// </summary>
-    public class ACLProfind
+    public class ACLProfind : IACLProfind
     {
         private IAuthenticate _authenticate;
         public ACLProfind(IAuthenticate authenticate)
