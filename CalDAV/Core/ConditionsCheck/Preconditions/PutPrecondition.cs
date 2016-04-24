@@ -25,10 +25,6 @@ namespace CalDAV.Core.ConditionsCheck
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
-
-            var principalUrl = propertiesAndHeaders["principalUrl"];
-            var collectionName = propertiesAndHeaders["collectionName"];
-            var calendarResourceId = propertiesAndHeaders["calendarResourceID"];
             var url = propertiesAndHeaders["url"];
 
             var body = propertiesAndHeaders["body"];
@@ -59,7 +55,7 @@ namespace CalDAV.Core.ConditionsCheck
             {
                 var uid = iCalendar.GetComponentProperties("UID");
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                var collection = db.GetCollection(principalUrl, collectionName);
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/")+1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid.StringValue == calendarresource.Uid)
@@ -80,7 +76,7 @@ namespace CalDAV.Core.ConditionsCheck
             else
             {
                 var uid = iCalendar.GetComponentProperties("UID");
-                var resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
+                var resource = db.GetCalendarResource(url);
                 if (resource.Uid == uid.StringValue)
                 {
                     response.StatusCode = (int) HttpStatusCode.Conflict;

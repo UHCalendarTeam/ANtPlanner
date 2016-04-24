@@ -25,18 +25,20 @@ namespace DataLayer.Models.ACL
         /// </param>
         /// <param name="userOrGroup">If the principal represents a group or a user.</param>
         /// <param name="properties">The initial properties.</param>
-        public Principal(string pIdentifier, SystemProperties.PrinicpalType userOrGroup,
+        public Principal(string pIdentifier, SystemProperties.PrincipalType userOrGroup,
             params Property[] properties)
         {
             //build the principalUrl depending if the principal represents a user
             //or a group
-            PrincipalURL = userOrGroup != SystemProperties.PrinicpalType.Group
+            PrincipalURL = userOrGroup != SystemProperties.PrincipalType.Group
                 ? SystemProperties._userPrincipalUrl + pIdentifier + "/"
                 : SystemProperties._groupPrincipalUrl + pIdentifier + "/";
 
             Properties = new List<Property>(properties);
 
             CalendarCollections = new List<CalendarCollection>();
+
+            PrincipalStringIdentifier = pIdentifier;
         }
 
         /// <summary>
@@ -69,5 +71,11 @@ namespace DataLayer.Models.ACL
         ///     this is.
         /// </summary>
         public User User { get; set; }
+        /// <summary>
+        /// When the principal represents an User this property
+        /// will contain the userEmail. When the principal represents a group
+        /// this property will contain the group name.
+        /// </summary>
+        public string PrincipalStringIdentifier { get; set; }
     }
 }

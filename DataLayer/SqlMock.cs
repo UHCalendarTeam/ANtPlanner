@@ -19,18 +19,20 @@ namespace DataLayer
             {
                 var fs = new FileSystemManagement();
                 var frank = new User("Frank", "f.underwood@wh.org");
-                var frankPrincipal = new Principal("f.underwood@wh.org", SystemProperties.PrinicpalType.User);
-                frankPrincipal.User = frank;
+                var frankPrincipal = new Principal("f.underwood@wh.org", SystemProperties.PrincipalType.User)
+                {
+                    User = frank
+                };
+
+                var frankCollection = new CalendarCollection($"collections/users/f.underwood@wh.org/durtyplans/", "durtyplans");
+                var assesinationEvent = new CalendarResource("collections/users/f.underwood@wh.org/durtyplans/russodies.ics", "russodies.ics");
                 
-                var frankCollection = new CalendarCollection($"caldav/{frank.Email}/durtyplans/", "durtyplans");
-                var assesinationEvent = new CalendarResource("api/v1/caldav/f.underwood@wh.org/durtyplans/russodies.ics", "russodies.ics");
                 frankCollection.CalendarResources.Add(assesinationEvent);
                 frankPrincipal.CalendarCollections.Add(frankCollection);
                 db.Principals.Add(frankPrincipal);
-
-                var frankUrl = "collections/users/f.underwood@wh.org/";
-                fs.AddPrincipalFolder(frankUrl);
-                fs.AddCalendarCollectionFolder(frankUrl + frankCollection.Name);
+                
+                fs.AddPrincipalFolder(SystemProperties._userCollectionUrl + frank.Email);
+                fs.AddCalendarCollectionFolder(frankCollection.Url);
 
                 #region Body
                 var body = @"BEGIN:VCALENDAR
@@ -70,14 +72,13 @@ END:VCALENDAR
                 #endregion
 
                 
-                fs.AddCalendarObjectResourceFile(frankUrl + frankCollection.Name, body);
+                fs.AddCalendarObjectResourceFile(assesinationEvent.Href, body);
 
                 var claire = new User("Claire", "c.underwood@wh.org");
-                var clairePrincipal = new Principal(claire.Email, SystemProperties.PrinicpalType.User);
+                var clairePrincipal = new Principal(claire.Email, SystemProperties.PrincipalType.User) {User = claire};
 
                 db.Principals.Add(clairePrincipal);
-                var claireUrl = "collections/users/" + claire.Email + "/";
-                fs.AddPrincipalFolder(claireUrl);
+                fs.AddPrincipalFolder(SystemProperties._userCollectionUrl+claire.Email);
 
                 db.SaveChanges();
             }

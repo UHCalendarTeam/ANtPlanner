@@ -47,74 +47,50 @@ namespace DataLayer
         ///     Returns a Principal for a given UserEmail
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="source"></param>
+        /// <param name="url"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        //public static Principal GetPrincipalByEmail(this CalDavContext source, string email)
-        //{
-        //    return source.Principals.Include(p => p.Properties)
-        //            .Include(c => c.CalendarCollections)
-        //            .ThenInclude(cp => cp.Properties)
-        //            .Include(c2 => c2.CalendarCollections)
-        //            .ThenInclude(r => r.CalendarResources)
-        //            .ThenInclude(rp => rp.Properties)
-        //        .FirstOrDefault(u => u.Email == email);
-        //}
-
         /// <summary>
         ///     Check if a collection exist in the system.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="principalUrl"></param>
-        /// <param name="collectionName"></param>
         /// <returns></returns>
-        public static bool CollectionExist(this CalDavContext source, string principalUrl, string collectionName)
+        public static bool CollectionExist(this CalDavContext source, string url)
         {
-            if (!PrincipalExist(source, principalUrl))
-                return false;
-
-            return (
-                from collection in GetPrincipal(source, principalUrl).CalendarCollections
-                where collection.Name == collectionName
-                select collection
-                ).Any();
+            return source.CalendarCollections.Any(c => c.Url == url);
         }
 
         /// <summary>
         ///     return a collection for a given user and collectionName
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="userEmail"></param>
+        /// <param name="principalUrl"></param>
         /// <param name="collectionName"></param>
         /// <returns></returns>
-        public static CalendarCollection GetCollection(this CalDavContext source, string userEmail,
-            string collectionName)
+        //public static CalendarCollection GetCollection(this CalDavContext source, string principalUrl,
+        //    string collectionName)
+        //{
+
+        //    var principal = source.GetPrincipal(principalUrl);
+        //    return
+        //        source.CalendarCollections.FirstOrDefault(c => c.Name == collectionName && c.PrincipalId == principal.PrincipalId);
+        //}
+
+        public static CalendarCollection GetCollection(this CalDavContext source, string collectionUrl)
         {
-           
-                var principal = source.GetPrincipal(userEmail);
-                return
-                    source.CalendarCollections.FirstOrDefault(c => c.Name == collectionName && c.PrincipalId == principal.PrincipalId);
-            }
-           
+            return source.CalendarCollections.Include(p => p.Properties).Include(r => r.CalendarResources).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == collectionUrl);
+        }
+
 
         /// <summary>
         ///     Check if a CalendarResource Exist
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="principalUrl"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="calResource"></param>
+        /// <param name="url"></param>
         /// <returns></returns>
-        public static bool CalendarResourceExist(this CalDavContext source, string principalUrl, string collectionName,
-            string calResource)
+        public static bool CalendarResourceExist(this CalDavContext source, string url)
         {
-            if (!CollectionExist(source, principalUrl, collectionName))
-                return false;
-
-            return (
-                from resource in GetCollection(source, principalUrl, collectionName).CalendarResources
-                where resource.Name == calResource
-                select resource
-                ).Any();
+            return source.CalendarResources.Any(r => r.Href == url);
         }
 
         /// <summary>
@@ -126,11 +102,16 @@ namespace DataLayer
         /// <param name="collectionName">The collection where is the resource</param>
         /// <param name="calResource">the name of the resource</param>
         /// <returns>return a calendar resource by the given name.</returns>
-        public static CalendarResource GetCalendarResource(this CalDavContext source, string principalUrl,
-            string collectionName, string calResource)
+        //public static CalendarResource GetCalendarResource(this CalDavContext source, string principalUrl,
+        //    string collectionName, string calResource)
+        //{
+        //    var collection = source.GetCollection(principalUrl, collectionName);
+        //    return source.CalendarResources.FirstOrDefault(cr => cr.Name == calResource && cr.CalendarCollectionId == collection.CalendarCollectionId);
+        //}
+
+        public static CalendarResource GetCalendarResource(this CalDavContext source, string resourceUrl)
         {
-                var collection = source.GetCollection(principalUrl, collectionName);
-                return source.CalendarResources.FirstOrDefault(cr => cr.Name == calResource && cr.CalendarCollectionId==collection.CalendarCollectionId);
+            return source.CalendarResources.Include(p=>p.Properties).FirstOrDefault(r => r.Href == resourceUrl);
         }
 
 

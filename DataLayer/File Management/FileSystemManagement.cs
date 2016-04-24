@@ -104,8 +104,9 @@ namespace DataLayer
         public async Task<bool> AddCalendarObjectResourceFile(string resourceUrl, string body)
         {
             var path = resourceUrl.Replace('/', Path.DirectorySeparatorChar);
+            var colPath = path.Remove(path.LastIndexOf(Path.DirectorySeparatorChar));
             //Check Directory
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(colPath))
                 return false;
 
 

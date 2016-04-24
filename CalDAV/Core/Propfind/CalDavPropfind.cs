@@ -34,7 +34,7 @@ namespace CalDAV.Core.Propfind
         }
 
 
-        public void AllPropMethod(string principalUrl, string collectionName, string calendarResourceId, int? depth,
+        public void AllPropMethod(string url, string calendarResourceId,  int? depth,
             List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree)
         {
             //error flag
@@ -42,7 +42,7 @@ namespace CalDAV.Core.Propfind
 
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
-            var primaryResponse = AllPropFillTree(principalUrl, collectionName, calendarResourceId, aditionalProperties);
+            var primaryResponse = AllPropFillTree(url, calendarResourceId, aditionalProperties);
 
             //The response body is added to the result xml tree.
             multistatusTree.AddChild(primaryResponse);
@@ -60,12 +60,12 @@ namespace CalDAV.Core.Propfind
             {
                 CalendarCollection collection;
 
-                collection = db.GetCollection(principalUrl, collectionName);
+                collection = db.GetCollection(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
                     //For every resource in the collection it is added a new xml "response"
-                    var resourceResponse = AllPropFillTree(principalUrl, collectionName, calendarResource.Name,
+                    var resourceResponse = AllPropFillTree(url + calendarResource.Name, calendarResource.Name,
                         aditionalProperties);
                     multistatusTree.AddChild(resourceResponse);
 
@@ -88,7 +88,7 @@ namespace CalDAV.Core.Propfind
             #endregion
         }
 
-        public void PropMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+        public void PropMethod(string url, string calendarResourceId,  int? depth,
             List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree)
         {
             //error flag
@@ -96,7 +96,7 @@ namespace CalDAV.Core.Propfind
 
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
-            var primaryResponse = PropFillTree(userEmail, collectionName, calendarResourceId, propertiesReq);
+            var primaryResponse = PropFillTree(url, calendarResourceId, propertiesReq);
 
             //The response body is added to the result xml tree.
             multistatusTree.AddChild(primaryResponse);
@@ -112,13 +112,11 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                CalendarCollection collection;
-
-                collection = db.GetCollection(userEmail, collectionName);
+                var collection = db.GetCollection(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
-                    var resourceResponse = PropFillTree(userEmail, collectionName, calendarResource.Name, propertiesReq);
+                    var resourceResponse = PropFillTree(url + calendarResource.Name, calendarResource.Name, propertiesReq);
                     multistatusTree.AddChild(resourceResponse);
 
                     //error check
@@ -138,12 +136,12 @@ namespace CalDAV.Core.Propfind
             #endregion
         }
 
-        public void PropNameMethod(string userEmail, string collectionName, string calendarResourceId, int? depth,
+        public void PropNameMethod(string url, string calendarResourceId, int? depth,
             XmlTreeStructure multistatusTree)
         {
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
-            var primaryResponse = PropNameFillTree(userEmail, collectionName, calendarResourceId);
+            var primaryResponse = PropNameFillTree(url);
 
             //The response body is added to the result xml tree.
             multistatusTree.AddChild(primaryResponse);
@@ -155,13 +153,11 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                CalendarCollection collection;
-
-                collection = db.GetCollection(userEmail, collectionName);
+                var collection = db.GetCollection(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
-                    var resourceResponse = PropNameFillTree(userEmail, collectionName, calendarResource.Name);
+                    var resourceResponse = PropNameFillTree(url + calendarResource.Name, calendarResource.Name);
                     multistatusTree.AddChild(resourceResponse);
                 }
             }
@@ -175,11 +171,10 @@ namespace CalDAV.Core.Propfind
         ///     Returns a Response XML element with the name of all properties
         ///     of a collection or resource.
         /// </summary>
-        /// <param name="userEmail"></param>
-        /// <param name="collectionName"></param>
+        /// <param name="url"></param>
         /// <param name="calendarResourceId"></param>
         /// <returns></returns>
-        private XmlTreeStructure PropNameFillTree(string userEmail, string collectionName, string calendarResourceId = null)
+        private XmlTreeStructure PropNameFillTree(string url, string calendarResourceId = null)
         {
             #region Adding the response of the collection or resource.
 
@@ -189,11 +184,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
 
             var href = new XmlTreeStructure("href", "DAV:");
-
-            if (calendarResourceId == null)
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/");
-            else
-                href.AddValue("/api/v1/caldav/" + userEmail + "/calendars/" + collectionName + "/" + calendarResourceId);
+            href.AddValue(url);
 
             treeChild.AddChild(href);
 
@@ -225,12 +216,12 @@ namespace CalDAV.Core.Propfind
             //will find the object in the database and get from there all names of properties.
             if (calendarResourceId == null)
             {
-                collection = db.GetCollection(userEmail, collectionName);
+                collection = db.GetCollection(url);
                 properties = collection.GetAllPropertyNames();
             }
             else
             {
-                resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
+                resource = db.GetCalendarResource(url);
                 properties = resource.GetAllPropertyNames();
             }
 
@@ -257,13 +248,11 @@ namespace CalDAV.Core.Propfind
         /// Returns a Response XML element with all the property names
         /// and property values of the visible properties.
         /// </summary>
-        /// <param name="userEmail">Unique identifier of User</param>
-        /// <param name="principalUrl"></param>
-        /// <param name="collectionName">Name of the collection</param>
+        /// <param name="url"></param>
         /// <param name="calendarResourceId">Name of the resource</param>
         /// <param name="additionalProperties">List of additional requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
-        private XmlTreeStructure AllPropFillTree(string principalUrl, string collectionName, string calendarResourceId,
+        private XmlTreeStructure AllPropFillTree(string url, string calendarResourceId,
             List<KeyValuePair<string, string>> additionalProperties)
         {
             #region Adding the response of the collection or resource.
@@ -274,11 +263,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the <D:href>/api/v1/collections/users|groups/principalId/{collectionName}/{calendarResourceId}?</D:href>
 
             var href = new XmlTreeStructure("href", "DAV:");
-
-            if (calendarResourceId == null)
-                href.AddValue(principalUrl + "/" + collectionName + "/");
-            else
-                href.AddValue(principalUrl + "/" + collectionName + "/" + calendarResourceId);
+            href.AddValue(url);
 
             treeChild.AddChild(href);
 
@@ -298,8 +283,9 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null)
             {
-                var collection = db.GetCollection(principalUrl, collectionName);
+                var collection = db.GetCollection(url);
                 propertiesCol = collection.GetAllVisibleProperties(errorStack);
+                //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
                     {
@@ -308,8 +294,9 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                var resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
+                var resource = db.GetCalendarResource(url);
                 propertiesCol = resource.GetAllVisibleProperties(errorStack);
+                //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var property in additionalProperties)
                     {
@@ -402,12 +389,11 @@ namespace CalDAV.Core.Propfind
         ///     Returns a Response XML tree for a prop request with all the property names
         ///     and property values specified in the request.
         /// </summary>
-        /// <param name="principalUrl">Unique identifier of User</param>
-        /// <param name="collectionName">Name of the collection</param>
+        /// <param name="url"></param>
         /// <param name="calendarResourceId">Name of the resource</param>
         /// <param name="propertiesNameNamespace">List of requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
-        private XmlTreeStructure PropFillTree(string principalUrl, string collectionName, string calendarResourceId,
+        private XmlTreeStructure PropFillTree(string url, string calendarResourceId,
             List<KeyValuePair<string, string>> propertiesNameNamespace)
         {
             //a "response xml element is added for each collection or resource"
@@ -419,11 +405,7 @@ namespace CalDAV.Core.Propfind
 
             //an href with the corresponding url is added to the response
             var href = new XmlTreeStructure("href", "DAV:");
-
-            if (calendarResourceId == null)
-                href.AddValue(principalUrl + "/" + collectionName + "/");
-            else
-                href.AddValue( principalUrl + "/" + collectionName + "/" + calendarResourceId);
+            href.AddValue(url);
 
             treeChild.AddChild(href);
 
@@ -434,7 +416,7 @@ namespace CalDAV.Core.Propfind
             #region Selecting properties
 
 
-            
+
             CalendarCollection collection;
             CalendarResource resource;
             var propertiesCol = new List<XmlTreeStructure>();
@@ -448,7 +430,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = db.GetCollection(principalUrl, collectionName);
+                collection = db.GetCollection(url);
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {
@@ -457,7 +439,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = db.GetCalendarResource(principalUrl, collectionName, calendarResourceId);
+                resource = db.GetCalendarResource(url);
                 if (propertiesNameNamespace != null)
                     foreach (var property in propertiesNameNamespace)
                     {

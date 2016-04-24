@@ -89,7 +89,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<D:getetag {Namespaces["D"]}>0</D:getetag>"
+                Value = $"<D:getetag {Namespaces["D"]}>{Guid.NewGuid()}</D:getetag>"
             });
 
             Properties.Add(new Property("creationdate", NamespacesSimple["D"])
