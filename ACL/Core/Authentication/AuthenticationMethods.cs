@@ -9,10 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.ExtensionMethods;
+using DataLayer.Models.ACL;
 using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Http.Internal;
+using Microsoft.Data.Entity;
 using Microsoft.Extensions.Primitives;
 
 
@@ -31,7 +33,7 @@ namespace ACL.Core.Authentication
         /// <param name="clientRequest">THe request from the client. THe authentication 
         /// credential are taken from it.</param>
         /// <returns></returns>
-        public async Task AuthenticateRequest(HttpRequest clientRequest, HttpResponse response)
+        public async Task<Principal> AuthenticateRequest(HttpRequest clientRequest, HttpResponse response)
         {
             string username;
             string password;
@@ -63,17 +65,18 @@ namespace ACL.Core.Authentication
             /// if does then check if can authenticate
             if (context.VerifyPassword(username, password))
             {
-                response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
-                return;
+               
             }
 
 
             else
             {
+                ///Temporaly if the WCF services doesnt work we are gonna create
+                /// the users automatically in the system.
+                /// TODO: check if is a student or teacher
                 context.CreateUserInSystem(username, "Defaul User", password);
                 context.SaveChanges();
-                response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
-                return;
+              
 
                 #region taking data from the UH api
 
@@ -114,15 +117,11 @@ namespace ACL.Core.Authentication
                 #endregion
             }
 
-
-            return;
-        }
-
-
-        public bool AuthenticateInSystem(string useremail, string password)
-        {
-            var context = new CalDavContext();
-            return context.VerifyPassword(useremail, password);
+            response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
+            //take the user with the email and take the principal that
+            //represents him.
+            var prinId = context.Users.FirstOrDefault(x => x.Email == username).PrincipalId;
+            return await context.Principals.Include(p=>p.Properties).FirstOrDefaultAsync(x=>x.PrincipalId == prinId);
         }
     }
 

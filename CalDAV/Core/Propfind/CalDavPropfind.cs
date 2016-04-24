@@ -534,9 +534,5 @@ namespace CalDAV.Core.Propfind
 
         #endregion
 
-
-        //#region ACL profind
-        //public async Task ACLProfind(HttpResponse response, string body, D)
-        //#endregion
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
 
 namespace ACL.Core.Authentication
@@ -20,6 +21,6 @@ namespace ACL.Core.Authentication
         /// <param name="request">The request from the client. </param>
         /// <returns>Returns a dict with the username, email, group, student or professor.
         /// This data is taken from the response of the authentication api.</returns>
-        Task AuthenticateRequest(HttpRequest clientRequest, HttpResponse response);
+        Task<Principal> AuthenticateRequest(HttpRequest clientRequest, HttpResponse response);
     }
 }

@@ -147,6 +147,10 @@ namespace CalDAV.Core
             response.Body.Write(responseTree.ToString());
         }
 
+
+
+        
+
         //TODO: Adriano
         public string Report(Dictionary<string, string> propertiesAndHeaders, string body)
         {
