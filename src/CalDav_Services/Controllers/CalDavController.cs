@@ -15,6 +15,8 @@ using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Abstractions;
 using Microsoft.Net.Http.Headers;
+using ACL.Core.Authentication;
+
 
 namespace CalDav_Services.Controllers
 {
@@ -32,166 +34,16 @@ namespace CalDav_Services.Controllers
         {
             CalDavRepository = repoCalDav;
             _context = context;
+            //string body;
+            //if (Request.Body != null)
+            //      body = StreamToString(Request.Body);
+            //string path = Request.PathBase.Value + Request.Path;
+            //string mehod = Request.Method;
         }
 
-        #region
-
-        [AcceptVerbs("PROPFIND", Route = "{user}")]
-        public string PropFind(string groupOrUser)
-        {
-            return "test";
-        }
-
-        [AcceptVerbs("propfind")]
-        public async Task PropFind()
-        {
-
-            await Response.WriteAsync("sdf");
-            // return "test";
-        }
-        #endregion
-
-
-        #region Collection Methods
-
-        //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
-        public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
-        {
-            var url = Request.GetEncodedUrl();
-
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            //TODO: I have to fix this the status is in the first element.
-            //Response.StatusCode=GetHashCode() 
-
-            await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
-        //PROPFIND COLLECTIONS
-        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-
-            StringValues depth;
-            if (Request.Headers.TryGetValue("Depth", out depth))
-                propertiesAndHeaders.Add("depth", depth);
-
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
-        //PROPFIND RESOURCES
-        [AcceptVerbs("PropFind", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-
-            propertiesAndHeaders.Add("calendarResourceId", calendarResource);
-
-            StringValues depth;
-            if (Request.Headers.TryGetValue("Depth", out depth))
-                propertiesAndHeaders.Add("depth", depth);
-
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
-        [AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public void PropPatch(string groupOrUser, string principalId, string collectionName)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-
-            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
-        [AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
-            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
-        //REPORT
-        [AcceptVerbs("Report", Route = "{user}/calendars/{collection}")]
-        public string Report(string user, string collection)
-        {
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
-
-            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
-        }
-        #endregion
-
-
-        #region Calendar Object Resource Methods
-        // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpPut("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-            propertiesAndHeaders.Add("body", StreamToString(Request.Body));
-
-            var headers = Request.GetTypedHeaders();
-
-
-
-            if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
-            {
-                Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
-            }
-            else
-            {
-                if (headers.IfMatch.Count > 0)
-                {
-                    propertiesAndHeaders.Add("If-Match", EtagAsString(headers.IfMatch));
-                }
-                else if (headers.IfNoneMatch.Count > 0)
-                {
-                    propertiesAndHeaders.Add("If-None-Match", EtagAsString(headers.IfNoneMatch));
-                }
-
-                await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
-            }
-        }
-
-        private string EtagAsString(IList<EntityTagHeaderValue> etags)
-        {
-            var res = "";
-            foreach (var etag in etags)
-            {
-                res += etag.Tag + ",";
-            }
-            return res.Remove(res.Length - 2);
-        }
-
+        #region test action
         [HttpGet]
-        public void test()
+        public string test()
         {
 
             var body = @"BEGIN:VCALENDAR
@@ -219,64 +71,225 @@ END:VCALENDAR";
             var headers = Response.GetTypedHeaders();
             headers.ContentLength = 300;
             Response.Headers["ContentLength"] = "300";
-
-        }
-
-        // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
-        [HttpGet("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public async Task Get(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url); propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
-            await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public void Delete(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
-            CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
-        }
-
-        // DELETE api/values/
-        [HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}")]
-        public void Delete(string groupOrUser, string principalId, string collectionName)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-
-            CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
-        }
-
-        //REPORT api/values/5
-        [AcceptVerbs("Report", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public string Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
-        {
-            var url = Request.GetEncodedUrl();
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
-            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+            Response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
+            return body;
 
         }
         #endregion
+
+        #region
+
+        [AcceptVerbs("PROPFIND", Route = "{user}")]
+        public string PropFind(string groupOrUser)
+        {
+            return "test";
+        }
+
+        [AcceptVerbs("propfind")]
+        public async Task PropFind()
+        {
+            string body = StreamToString(Request.Body);
+            var auth = new UhCalendarAuthentication();
+            await auth.AuthenticateRequest(Request, Response);
+        }
+        #endregion
+
+
+        //#region Collection Methods
+
+        ////MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
+        //[AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        //public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
+        //{
+        //    var url = Request.GetEncodedUrl();
+
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+        //    //TODO: I have to fix this the status is in the first element.
+        //    //Response.StatusCode=GetHashCode() 
+
+        //    await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        //}
+
+        ////PROPFIND COLLECTIONS
+        //[AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        //public void PropFind(string groupOrUser, string principalId, string collectionName)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+
+        //    StringValues depth;
+        //    if (Request.Headers.TryGetValue("Depth", out depth))
+        //        propertiesAndHeaders.Add("depth", depth);
+
+        //    CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        //}
+
+        ////PROPFIND RESOURCES
+        //[AcceptVerbs("PropFind", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
+        //public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+
+        //    propertiesAndHeaders.Add("calendarResourceId", calendarResource);
+
+        //    StringValues depth;
+        //    if (Request.Headers.TryGetValue("Depth", out depth))
+        //        propertiesAndHeaders.Add("depth", depth);
+
+        //    CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        //}
+
+        //[AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/")]
+        //public void PropPatch(string groupOrUser, string principalId, string collectionName)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+
+        //    CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        //}
+
+        //[AcceptVerbs("Proppatch", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        //public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+        //    propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+
+        //    CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        //}
+
+        ////REPORT
+        //[AcceptVerbs("Report", Route = "{user}/calendars/{collection}")]
+        //public string Report(string user, string collection)
+        //{
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("userEmail", user);
+        //    propertiesAndHeaders.Add("collectionName", collection);
+
+        //    return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+        //}
+        //#endregion
+
+
+        //#region Calendar Object Resource Methods
+        //// PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
+        //[HttpPut("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        //public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+        //    propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+        //    propertiesAndHeaders.Add("body", StreamToString(Request.Body));
+
+        //    var headers = Request.GetTypedHeaders();
+
+
+
+        //    if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
+        //    {
+        //        Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
+        //    }
+        //    else
+        //    {
+        //        if (headers.IfMatch.Count > 0)
+        //        {
+        //            propertiesAndHeaders.Add("If-Match", EtagAsString(headers.IfMatch));
+        //        }
+        //        else if (headers.IfNoneMatch.Count > 0)
+        //        {
+        //            propertiesAndHeaders.Add("If-None-Match", EtagAsString(headers.IfNoneMatch));
+        //        }
+
+        //        await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
+        //    }
+        //}
+
+        //private string EtagAsString(IList<EntityTagHeaderValue> etags)
+        //{
+        //    var res = "";
+        //    foreach (var etag in etags)
+        //    {
+        //        res += etag.Tag + ",";
+        //    }
+        //    return res.Remove(res.Length - 2);
+        //}
+
+
+
+        //// GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
+        //[HttpGet("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        //public async Task Get(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url); propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+
+        //    await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
+        //}
+
+        //// DELETE api/values/5
+        //[HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        //public void Delete(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+        //    propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+
+        //    CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
+        //}
+
+        //// DELETE api/values/
+        //[HttpDelete("{collections/{groupOrUser}/{principalId}/{collectionName}")]
+        //public void Delete(string groupOrUser, string principalId, string collectionName)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+
+        //    CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
+        //}
+
+        ////REPORT api/values/5
+        //[AcceptVerbs("Report", Route = "{collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        //public string Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        //{
+        //    var url = Request.GetEncodedUrl();
+        //    var propertiesAndHeaders = new Dictionary<string, string>();
+        //    propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFronUrl(url, collectionName));
+        //    propertiesAndHeaders.Add("collectionName", collectionName);
+        //    propertiesAndHeaders.Add("url", url);
+        //    propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+
+        //    return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+
+        //}
+        //#endregion
 
         private string StreamToString(Stream stream)
         {
@@ -284,26 +297,26 @@ END:VCALENDAR";
             return reader.ReadToEnd();
         }
 
-        [AcceptVerbs("Initialize")]
-        public void InitialiseDb()
-        {
-            Response.StatusCode = (int)HttpStatusCode.NoContent;
-            var fs = new FileSystemManagement();
-            SqlMock.RecreateDb();
+        //[AcceptVerbs("Initialize")]
+        //public void InitialiseDb()
+        //{
+        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
+        //    var fs = new FileSystemManagement();
+        //    SqlMock.RecreateDb();
 
-            SqlMock.SeedDb_Fs();
-        }
+        //    SqlMock.SeedDb_Fs();
+        //}
 
-        [AcceptVerbs("Destroy")]
-        public void DestroyDb()
-        {
-            Response.StatusCode = (int)HttpStatusCode.NoContent;
-            SqlMock.RecreateDb();
-        }
+        //[AcceptVerbs("Destroy")]
+        //public void DestroyDb()
+        //{
+        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
+        //    SqlMock.RecreateDb();
+        //}
 
-        private string GetPrincipalUrlFronUrl(string url, string collectionName)
-        {
-            return url.Remove(url.IndexOf(collectionName));
-        }
+        //private string GetPrincipalUrlFronUrl(string url, string collectionName)
+        //{
+        //    return url.Remove(url.IndexOf(collectionName));
+        //}
     }
 }

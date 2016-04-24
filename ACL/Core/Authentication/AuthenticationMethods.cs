@@ -4,9 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
+using DataLayer.ExtensionMethods;
+using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Http.Internal;
@@ -15,22 +18,28 @@ using Microsoft.Extensions.Primitives;
 
 namespace ACL.Core.Authentication
 {
-    public class AuthenticationMethods 
+    public class UhCalendarAuthentication : IAuthenticate
     {
 
         /// <summary>
         /// Takes the necessary content from the UH's authentication API response. 
+        /// Check if the user exist in the system, if does then check if the authentication
+        /// credential are OK.
+        /// If dont then take the user data from UH apis and create the user in the 
+        /// system with this data.
         /// </summary>
-        /// <param name="clientRequest"></param>
+        /// <param name="clientRequest">THe request from the client. THe authentication 
+        /// credential are taken from it.</param>
         /// <returns></returns>
-        public async  Task<Dictionary<string, string>> AuthenticateRequest(HttpRequest clientRequest)
+        public async Task AuthenticateRequest(HttpRequest clientRequest, HttpResponse response)
         {
             string username;
             string password;
-            
+            var context = new CalDavContext();
+
 
             ///take the creadentials from the request
-            string  authHeader = clientRequest.Headers["Authorization"];
+            string authHeader = clientRequest.Headers["Authorization"];
 
             ///check if has the authorization header and is basic
             if (authHeader != null && authHeader.StartsWith("Basic"))
@@ -44,20 +53,30 @@ namespace ACL.Core.Authentication
                 username = usernamePassword.Substring(0, seperatorIndex);
                 password = usernamePassword.Substring(seperatorIndex + 1);
             }
-            else {
+            else
+            {
                 //Handle what happens if that isn't the case
                 throw new Exception("The authorization header is either empty or isn't Basic.");
             }
 
             ///check if the user exist in out DB
             /// if does then check if can authenticate
-            if (AuthenticateInSystem(username, password))
+            if (context.VerifyPassword(username, password))
             {
-
+                response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
+                return;
             }
+
 
             else
             {
+                context.CreateUserInSystem(username, "Defaul User", password);
+                context.SaveChanges();
+                response.Cookies.Append("AuthId", Guid.NewGuid().ToString());
+                return;
+
+                #region taking data from the UH api
+
                 /*
             
              //Igore the invalid certificate
@@ -88,29 +107,24 @@ namespace ACL.Core.Authentication
                 /// if not create it with all his stuffs
                 /// send the data back
                 ///put the data in the output
+
+
+                //create the token and shit
+
+                #endregion
             }
 
-            //create the token and shit
 
-            var output = new Dictionary<string, string>();
-
-            return output;
+            return;
         }
 
 
         public bool AuthenticateInSystem(string useremail, string password)
         {
             var context = new CalDavContext();
-            
-            //take the user with the gieven username
-            var user = context.Users.FirstOrDefault(u => u.Email == useremail);
-
-            //if null the user doesn't exist
-            if (user == null)
-                return false;
-
-            //TODO: check the user password and see if match the password
-            return true;
+            return context.VerifyPassword(useremail, password);
         }
     }
+
+    
 }
