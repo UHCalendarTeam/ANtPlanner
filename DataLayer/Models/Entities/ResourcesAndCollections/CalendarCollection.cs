@@ -29,7 +29,11 @@ namespace DataLayer.Models.Entities
             Url = url;
             Name = name;          
             CalendarResources = new List<CalendarResource>();
-            Properties = new List<Property>(properties);
+            Properties = new List<Property>();
+            if (properties != null && properties.Length > 0)
+            {
+                Properties = properties;
+            }
             InitializeStandardCollectionProperties(name);
         }
 
