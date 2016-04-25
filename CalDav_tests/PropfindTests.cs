@@ -187,7 +187,7 @@
 //                        },
 //                        new Property
 //                        {
-//                            Name = "getcontentlength",
+//                            Name = "",
 //                            Namespace = NamespacesSimple["D"],
 //                            Value = $"<D:getcontentlength {Namespaces["D"]}>10000</D:getcontentlength>",
 //                            IsVisible = true,

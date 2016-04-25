@@ -165,5 +165,40 @@ namespace DataLayer
             property.Value = propertyValue;
             return true;
         }
+
+
+        public static bool CreateOrModifyPropertyAdmin(this CalendarCollection collection, string propertyName,
+            string nameSpace, string propertyValue, Stack<string> errorStack)
+        {
+            //get the property
+            var property =
+                collection.Properties
+                    .SingleOrDefault(prop => prop.Name == propertyName && prop.Namespace == nameSpace);
+            //if the property did not exist it is created.
+            if (property == null)
+            {
+                collection.Properties.Add(new Property
+                {
+                    Name = propertyName,
+                    Namespace = nameSpace,
+                    IsDestroyable = true,
+                    IsVisible = false,
+                    IsMutable = true,
+                    Value = propertyValue
+                });
+                return true;
+            }
+            //if this property belongs to the fix system properties, it can not be changed.
+            //if (!property.IsMutable)
+            //{
+            //    errorStack.Push("HTTP/1.1 403 Forbidden");
+            //    return false;
+            //}
+
+
+            //if all previous conditions don't pass then the value of the property is changed.
+            property.Value = propertyValue;
+            return true;
+        }
     }
 }

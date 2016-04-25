@@ -184,7 +184,7 @@ namespace DataLayer.Models.Entities
             {
                 IsVisible = false,
                 IsDestroyable = false,
-                IsMutable = true,
+                IsMutable = false,
                 Value = $"<C:getctag {Namespaces["C"]}>{Guid.NewGuid()}</C:getctag>"
             });
         }
