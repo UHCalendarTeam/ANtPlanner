@@ -73,8 +73,6 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collectionName);
 
             propertiesAndHeaders.Add("url", url);
-            //TODO: I have to fix this the status is in the first element.
-            //Response.StatusCode=GetHashCode() 
 
             await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
@@ -183,6 +181,11 @@ namespace CalDav_Services.Controllers
                 if (ifnonematch.Count > 0)
                 {
                     propertiesAndHeaders.Add("If-None-Match", ifnonematch.ToString());
+                }
+                var contentSize = Request.Headers["Content-Length"];
+                if (contentSize.Count > 0)
+                {
+                    propertiesAndHeaders.Add("content-length", contentSize);
                 }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);

@@ -7,6 +7,8 @@ using ICalendar.Calendar;
 using ICalendar.ComponentProperties;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
+using Microsoft.Data.Entity.ChangeTracking.Internal;
+using TreeForXml;
 
 namespace CalDAV.Core.ConditionsCheck
 {
@@ -27,8 +29,9 @@ namespace CalDAV.Core.ConditionsCheck
             #region Extracting Properties
             var url = propertiesAndHeaders["url"];
 
+            var contentSize = propertiesAndHeaders["content-length"];
             var body = propertiesAndHeaders["body"];
-            //var reader = new StringReader(body);//esto aki no es necesario pues el constructor de VCalendar coge un string
+            
             var iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
 
             #endregion
@@ -53,7 +56,7 @@ namespace CalDAV.Core.ConditionsCheck
             //if the resource not exist can not be another resource with the same uid.
             if (!StorageManagement.ExistCalendarObjectResource(url))
             {
-                var component  = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+                var component = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
                 var uid = component.FirstOrDefault().Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
@@ -180,7 +183,7 @@ If the count of calendar components execeds 2 including VTimezone the rest must 
                 //                return false;
             }
 
-
+            //precondition responsible of check that an VTIMEZONE is obligatory 
             if (iCalendar.CalendarComponents.Count == 2)
             {
                 if (!iCalendar.CalendarComponents.ContainsKey("VTIMEZONE"))
@@ -240,9 +243,29 @@ Method prop must not be present
                 return false;
             }
 
-
-            //TODO: Check if the size in octets of the resource is less-equal
-            //than the max-resource-size property
+            //This precondition is the one in charge of check that the size of the body of the resource
+            //included in the request dont exceeds the max-resource-size property of the colletion.
+            int contentSizeInt;
+            //for that i need that the controller has as request header content-size available 
+            if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
+            {
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
+                //here the max-resource-property of the collection is called.
+                var maxSize = collection.Properties.FirstOrDefault(p => p.Name == "max-resource-size" && p.Namespace == "urn:ietf:params:xml:ns:caldav");
+                int maxSizeInt;
+                if (int.TryParse(XmlTreeStructure.Parse(maxSize.Value).Value, out maxSizeInt) && contentSizeInt > maxSizeInt)
+                {
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+<error xmlns='DAV:'>
+<max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'></max-resource-size>
+<error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
+Content size exceeds max size allowed.
+</error-description>
+</error>");
+                    return false;
+                }
+            }
 
 
             //TODO: Checking that all DateTime values are less-equal than

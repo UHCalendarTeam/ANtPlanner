@@ -98,7 +98,7 @@ namespace CalDAV.Core
 
             //Creating and filling the root of the xml tree response
             //All response are composed of a "multistatus" xml element
-            //witch contains a "response" element for each collection and resource analized.
+            //witch contains a "response" element for each collection and resource analized witch url is included in a "href" element as a child of "response".
             //As a child of the "response" there is a list of "propstat". One for each different status obtained
             //trying to get the specified properties.
             //Inside every "propstatus" there are a xml element "prop" with all the properties that match with
@@ -239,9 +239,7 @@ namespace CalDAV.Core
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
 
             //Checking that all precondition pass
-
-
-            //TODO: Response must be added
+            
             //Cheking Preconditions
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
@@ -924,8 +922,6 @@ namespace CalDAV.Core
         private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders, VCalendar iCal,
             HttpResponse response)
         {
-            //TODO: Cambiar como se cogen las propiedades contruir como xml.
-
             #region Extracting Properties
             string calendarResourceId;
             propertiesAndHeaders.TryGetValue("calendarResourceId", out calendarResourceId);
