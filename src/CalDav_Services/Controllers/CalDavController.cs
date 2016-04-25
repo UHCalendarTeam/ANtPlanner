@@ -67,8 +67,6 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collectionName);
 
             propertiesAndHeaders.Add("url", url);
-            //TODO: I have to fix this the status is in the first element.
-            //Response.StatusCode=GetHashCode() 
 
             await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }

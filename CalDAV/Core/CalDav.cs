@@ -212,9 +212,7 @@ namespace CalDAV.Core
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
 
             //Checking that all precondition pass
-
-
-            //TODO: Response must be added
+            
             //Cheking Preconditions
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
@@ -897,8 +895,6 @@ namespace CalDAV.Core
         private CalendarResource FillResource(Dictionary<string, string> propertiesAndHeaders, VCalendar iCal,
             HttpResponse response)
         {
-            //TODO: Cambiar como se cogen las propiedades contruir como xml.
-
             #region Extracting Properties
             string calendarResourceId;
             propertiesAndHeaders.TryGetValue("calendarResourceId", out calendarResourceId);
