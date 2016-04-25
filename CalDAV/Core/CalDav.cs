@@ -44,6 +44,7 @@ namespace CalDAV.Core
         {
             StorageManagement = fsManagement;
             db = _context;
+            _aclProfind = aclProfind;
         }
 
 
@@ -58,14 +59,15 @@ namespace CalDAV.Core
         private CalDavContext db { get; }
 
         private IACLProfind _aclProfind;
-
+        #region PORFIND methods
         //TODO: Nacho
         /// <summary>
-        /// This PROFIND is used 
+        /// This PROFIND is used for the collection and the resources.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
-        /// <param name="response"></param>
+        /// <param name="propertiesAndHeaders">Put here: resourceURL, depth, calendarResourceId</param>
+        /// <param name="body">The request body from the client.</param>
+        /// <param name="response">The Response property in the controller. We fill up the response object
+        /// with out response.</param>
         public void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
         {
             #region Extracting Properties
@@ -162,10 +164,20 @@ namespace CalDAV.Core
             response.Body.Write(responseTree.ToString());
         }
 
+        /// <summary>
+        /// This method perfoms a profind on a principal.
+        /// </summary>
+        /// <param name="request">The request from the controller.</param>
+        /// <param name="response">The response from the controller.</param>
+        /// <returns></returns>
+        public async Task ACLProfind(HttpRequest request, HttpResponse response)
+        {
+            await _aclProfind.Profind(request, response);
+        }
 
 
-        
 
+        #endregion
         //TODO: Adriano
         public string Report(Dictionary<string, string> propertiesAndHeaders, string body)
         {

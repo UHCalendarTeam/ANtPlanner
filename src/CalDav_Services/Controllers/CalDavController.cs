@@ -36,18 +36,24 @@ namespace CalDav_Services.Controllers
 
         #region
 
-        [AcceptVerbs("PROPFIND", Route = "{user}")]
-        public string PropFind(string groupOrUser)
+        /// <summary>
+        /// Accepts the PROFIND calls for the principals.
+        /// </summary>
+        /// <param name="groupOrUser">Says if the principal represents a user or a group</param>
+        /// <param name="principalId">If the principal represents a group then it has the name
+        /// of the group. Otherwise has the email of the user that the principal represents.</param>
+        /// <returns></returns>
+        [AcceptVerbs("PROPFIND", Route = "principal/{ussersOrGroups}/{principalId}")]
+        public async Task PropFind(string groupOrUser, string principalId)
         {
-            return "test";
+            await CalDavRepository.ACLProfind(Request, Response);
         }
 
-        [AcceptVerbs("propfind")]
+        [AcceptVerbs("PROPFIND", Route = "")]
         public async Task PropFind()
         {
 
-            await Response.WriteAsync("sdf");
-            // return "test";
+            await CalDavRepository.ACLProfind(Request, Response);
         }
         #endregion
 

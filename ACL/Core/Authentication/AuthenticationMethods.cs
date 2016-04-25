@@ -75,7 +75,7 @@ namespace ACL.Core.Authentication
                 /// the users automatically in the system.
                 /// TODO: check if is a student or teacher
                 context.CreateUserInSystem(username, "Defaul User", password);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
               
 
                 #region taking data from the UH api

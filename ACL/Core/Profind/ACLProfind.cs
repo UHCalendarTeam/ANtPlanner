@@ -67,9 +67,9 @@ namespace ACL.Core
         public async Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal)
         {
-            var multistatus = new XmlTreeStructure("multistatus", "DAV:");
-            multistatus.Namespaces.Add("D", "DAV:");
-            multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:");
+            multistatusNode.Namespaces.Add("D", "DAV:");
+            multistatusNode.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
             //create the response node.
             var responseNode = new XmlTreeStructure("response", "DAV:");
@@ -107,12 +107,14 @@ namespace ACL.Core
 
             responseNode.AddChild(propstatNode);
 
-            multistatus.AddChild(responseNode);
+            multistatusNode.AddChild(responseNode);
 
             //here the multistatus xml for the body is built
             //have to write it to the response body.
 
-            await response.WriteAsync(multistatus.ToString());
+            string multiStatus = multistatusNode.ToString();
+
+            await response.WriteAsync(multiStatus);
         }
 
 

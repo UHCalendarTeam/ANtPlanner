@@ -75,5 +75,13 @@ namespace CalDAV.Core
         /// <param name="propertiesAndHeaders"></param>
         /// <returns></returns>
         string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
+
+        /// <summary>
+        /// This method perfoms a profind on a principal.
+        /// </summary>
+        /// <param name="request">The request from the controller.</param>
+        /// <param name="response">The response from the controller.</param>
+        /// <returns></returns>
+        Task ACLProfind(HttpRequest request, HttpResponse response);
     }
 }
