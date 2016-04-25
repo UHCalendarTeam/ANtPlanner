@@ -25,7 +25,7 @@ namespace DataLayer
                 };
 
                 var frankCollection = new CalendarCollection($"collections/users/f.underwood@wh.org/durtyplans/", "durtyplans");
-                var assesinationEvent = new CalendarResource("collections/users/f.underwood@wh.org/durtyplans/russodies.ics", "russodies.ics");
+                var assesinationEvent = new CalendarResource("collections/users/f.underwood@wh.org/durtyplans/russodies.ics", "russodies.ics") {Uid = "0kusnhnnacaok1r02v16simh8c@google.com" };
                 
                 frankCollection.CalendarResources.Add(assesinationEvent);
                 frankPrincipal.CalendarCollections.Add(frankCollection);

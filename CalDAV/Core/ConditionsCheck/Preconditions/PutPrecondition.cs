@@ -49,16 +49,17 @@ namespace CalDAV.Core.ConditionsCheck
             }
 
 
-            //check that if the resource exist then it has to have the same UID
+            //check that if the resource exist then all its components different of VTIMEZONE has to have the same UID
             //if the resource not exist can not be another resource with the same uid.
             if (!StorageManagement.ExistCalendarObjectResource(url))
             {
-                var uid = iCalendar.GetComponentProperties("UID");
+                var component  = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+                var uid = component.FirstOrDefault().Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
-                    if (uid.StringValue == calendarresource.Uid)
+                    if (uid == calendarresource.Uid)
                     {
                         response.StatusCode = (int)HttpStatusCode.Conflict;
                         response.Body.Write(
@@ -75,20 +76,28 @@ namespace CalDAV.Core.ConditionsCheck
             }
             else
             {
-                var uid = iCalendar.GetComponentProperties("UID");
-                var resource = db.GetCalendarResource(url);
-                if (resource.Uid != null && resource.Uid == uid.StringValue)
+                //If the resource exist the procedure is update and for that the uid has to be the same.
+                var components = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+                var calendarComponent = components.FirstOrDefault();
+                if (calendarComponent != null)
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    response.Body.Write(
-                        $@"<?xml version='1.0' encoding='UTF-8'?>
+                    var uid = calendarComponent.Properties["UID"].StringValue;
+
+                    var resource = db.GetCalendarResource(url);
+
+                    if (resource.Uid != null && resource.Uid != uid)
+                    {
+                        response.StatusCode = (int)HttpStatusCode.Conflict;
+                        response.Body.Write(
+                            $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
 <href xmlns='DAV:'>{resource
-                            .Href}</href>
+                                .Href}</href>
 </no-uid-conflict>
 </error>");
-                    return false;
+                        return false;
+                    }
                 }
             }
 
@@ -103,8 +112,9 @@ namespace CalDAV.Core.ConditionsCheck
                 }
             }
 
-            if (propertiesAndHeaders.ContainsKey("If-Non-Match"))
+            if (propertiesAndHeaders.ContainsKey("If-None-Match"))
             {
+
                 //check that the value do not exist
                 if (StorageManagement.ExistCalendarObjectResource(url))
                 {
@@ -118,15 +128,56 @@ namespace CalDAV.Core.ConditionsCheck
             //and if it has 2, one must be VTIMEZONE
             if (iCalendar.CalendarComponents.Count > 2)
             {
-                response.StatusCode = (int)HttpStatusCode.Conflict;
-                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+
+                if (!iCalendar.CalendarComponents.ContainsKey("VTIMEZONE"))
+                {
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
-Wrong amount of calendar components
+VTimezone Calendar Component Must be present.
 </error-description>
 </error>");
-                return false;
+                    return false;
+                }
+
+                var calendarComponents =
+                                    iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+
+                //A Calendar Component can be separated in multiples calendar components but all MUST
+                //have the same UID.
+                var calendarComponent = calendarComponents.FirstOrDefault();
+                if (calendarComponent != null)
+                {
+                    var uid = calendarComponent.Properties["UID"].StringValue;
+                    foreach (var component in calendarComponents)
+                    {
+                        var uidComp = component.Properties["UID"].StringValue;
+                        if (uid != uidComp)
+                        {
+                            response.StatusCode = (int)HttpStatusCode.Conflict;
+                            response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+<error xmlns='DAV:'>
+<valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
+<error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
+If the count of calendar components execeds 2 including VTimezone the rest must have the same Uid and the same type.
+</error-description>
+</error>");
+                            return false;
+                        }
+                    }
+                }
+
+                //                response.StatusCode = (int)HttpStatusCode.Conflict;
+                //                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                //<error xmlns='DAV:'>
+                //<valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
+                //<error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
+                //Wrong amount of calendar components
+                //</error-description>
+                //</error>");
+                //                return false;
             }
 
 
@@ -145,30 +196,6 @@ VTimezone Calendar Component Must be present.
                     return false;
                 }
 
-
-                var calendarComponent =
-                    iCalendar.CalendarComponents.Where(comp => comp.Key != "VTIMEZONE").Single().Value;
-
-                //A Calendar Component can be separated in multiples calendar components but all MUST
-                //have the same UID.
-                var uid = ((ComponentProperty<string>)calendarComponent.FirstOrDefault().Properties["UID"]).Value;
-                string uidComp;
-                foreach (var component in calendarComponent)
-                {
-                    uidComp = ((ComponentProperty<string>)component.Properties["UID"]).Value;
-                    if (uid != uidComp)
-                    {
-                        response.StatusCode = (int)HttpStatusCode.Conflict;
-                        response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
-<error xmlns='DAV:'>
-<valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
-<error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
-If the count of calendar components execeds 2 including VTimezone the rest must have the same Uid and the same type.
-</error-description>
-</error>");
-                        return false;
-                    }
-                }
             }
 
 
