@@ -13,6 +13,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.Net.Http.Headers;
 using TreeForXml;
 using System.Diagnostics.Contracts;
+using ACL.Core;
 using DataLayer.Models.Method_Extensions;
 
 namespace CalDAV.Core
@@ -33,7 +34,13 @@ namespace CalDAV.Core
             {"C", "urn:ietf:params:xml:ns:caldav"}
         };
 
-        public CalDav(IFileSystemManagement fsManagement, CalDavContext _context)
+        /// <summary>
+        /// DI in the params.
+        /// </summary>
+        /// <param name="fsManagement"></param>
+        /// <param name="_context"></param>
+        /// <param name="aclProfind"></param>
+        public CalDav(IFileSystemManagement fsManagement, CalDavContext _context, IACLProfind aclProfind)
         {
             StorageManagement = fsManagement;
             db = _context;
@@ -50,7 +57,15 @@ namespace CalDAV.Core
 
         private CalDavContext db { get; }
 
+        private IACLProfind _aclProfind;
+
         //TODO: Nacho
+        /// <summary>
+        /// This PROFIND is used 
+        /// </summary>
+        /// <param name="propertiesAndHeaders"></param>
+        /// <param name="body"></param>
+        /// <param name="response"></param>
         public void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
         {
             #region Extracting Properties
