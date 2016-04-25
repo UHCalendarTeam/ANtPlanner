@@ -1,13 +1,14 @@
 {
     "commands": {
         "web": "Microsoft.AspNet.Server.Kestrel",
-        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls https://localhost:5003",
+        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls https://192.168.0.101:5003",
         "ef": "EntityFramework.Commands"
     },
     "compilationOptions": {
         "emitEntryPoint": true
     },
   "dependencies": {
+    "ACL": "1.0.0-*",
     "CalDAV": "1.0.0-*",
     "EntityFramework.Commands": "7.0.0-rc1-final",
     "EntityFramework.Core": "7.0.0-rc1-final",
