@@ -14,6 +14,7 @@ using Microsoft.Extensions.Primitives;
 using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Abstractions;
+using Microsoft.Data.Entity.Metadata.Internal;
 using Microsoft.Net.Http.Headers;
 
 namespace CalDav_Services.Controllers
@@ -55,6 +56,7 @@ namespace CalDav_Services.Controllers
 
             await CalDavRepository.ACLProfind(Request, Response);
         }
+
         #endregion
 
 
@@ -120,7 +122,8 @@ namespace CalDav_Services.Controllers
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
-        [AcceptVerbs("Proppatch", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        [AcceptVerbs("Proppatch",
+            Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
@@ -142,10 +145,12 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("url", GetRealUrl(Request));
             return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
         }
+
         #endregion
 
 
         #region Calendar Object Resource Methods
+
         // PUT api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpPut("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
@@ -161,23 +166,29 @@ namespace CalDav_Services.Controllers
 
 
 
-            if (headers.ContentType != null && !string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
+            if (headers.ContentType != null && !string.IsNullOrEmpty(headers.ContentType.MediaType) &&
+                headers.ContentType.MediaType != "text/calendar")
             {
                 Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
             }
             else
             {
-                if (headers.IfMatch != null && headers.IfMatch.Count > 0)
+                var ifmatch = Request.Headers["If-Match"];
+                if (ifmatch.Count > 0)
                 {
-                    propertiesAndHeaders.Add("If-Match", EtagAsString(headers.IfMatch));
+                    propertiesAndHeaders.Add("If-Match", ifmatch.ToString());
                 }
-                else if (headers.IfNoneMatch != null && headers.IfNoneMatch.Count > 0)
+
+                var ifnonematch = Request.Headers["If-None-Match"];
+                if (ifnonematch.Count > 0)
                 {
-                    propertiesAndHeaders.Add("If-None-Match", EtagAsString(headers.IfNoneMatch));
+                    propertiesAndHeaders.Add("If-None-Match", ifnonematch.ToString());
                 }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
             }
+
+
         }
 
         private string EtagAsString(IList<EntityTagHeaderValue> etags)
@@ -187,7 +198,7 @@ namespace CalDav_Services.Controllers
             {
                 res += etag.Tag + ",";
             }
-            return res.Remove(res.Length - 2);
+            return res.Remove(res.Length - 1);
         }
 
         [HttpGet]
@@ -272,6 +283,7 @@ END:VCALENDAR";
             return report.ProcessRequest(propertiesAndHeaders, StreamToString(Request.Body));
 
         }
+
         #endregion
 
         private string StreamToString(Stream stream)
@@ -311,3 +323,4 @@ END:VCALENDAR";
         }
     }
 }
+

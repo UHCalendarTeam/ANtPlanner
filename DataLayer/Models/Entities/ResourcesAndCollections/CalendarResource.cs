@@ -69,7 +69,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsMutable = false,
                 IsDestroyable = false,
-                Value = $"<D:getcontenttype {Namespaces["D"]}>text/icalendar</D:getcontenttype>"
+                Value = $"<D:getcontenttype {Namespaces["D"]}>text/calendar</D:getcontenttype>"
             });
 
             Properties.Add(new Property("resourcetype", NamespacesSimple["D"])

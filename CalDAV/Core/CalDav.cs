@@ -951,11 +951,12 @@ namespace CalDAV.Core
             var stack = new Stack<string>();
             collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
 
-
-            var property = iCal.GetComponentProperties("UID");
-            if (property != null)
+            var calendarComponents =
+                                   iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+            var calendarComponent = calendarComponents.FirstOrDefault();
+            if (calendarComponent != null)
             {
-                resource.Uid = property.StringValue;
+                resource.Uid = calendarComponent.Properties["UID"].StringValue;
             }
 
             return resource;
