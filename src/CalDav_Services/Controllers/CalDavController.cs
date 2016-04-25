@@ -178,6 +178,11 @@ namespace CalDav_Services.Controllers
                 {
                     propertiesAndHeaders.Add("If-None-Match", ifnonematch.ToString());
                 }
+                var contentSize = Request.Headers["Content-Length"];
+                if (contentSize.Count > 0)
+                {
+                    propertiesAndHeaders.Add("content-length", contentSize);
+                }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
             }
