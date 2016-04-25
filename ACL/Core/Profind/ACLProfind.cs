@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using ACL.Core.Authentication;
 using DataLayer;
 using DataLayer.Models.ACL;
@@ -76,7 +78,8 @@ namespace ACL.Core
 
             //create the href node
             var hrefNode = new XmlTreeStructure("href", "DAV:");
-            hrefNode.AddValue(requestedUrl);
+            string url = requestedUrl.Replace("/api/v1/caldav", "");
+            hrefNode.AddValue(url);
 
             responseNode.AddChild(hrefNode);
 
@@ -88,9 +91,10 @@ namespace ACL.Core
             //add the requested properties to the propNode 
             //if the properties exist in the principal
             var properties = principal.Properties
-                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Namespace, p.Name)))
+                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name,p.Namespace)))
                 .Select(x => XmlTreeStructure.Parse(x.Value));
-
+            var xdocS = XDocument.Parse(principal.Properties[1].Value).ToString();
+            Console.WriteLine(xdocS);
             //add the properties to the propNode
             foreach (var property in properties)
             {

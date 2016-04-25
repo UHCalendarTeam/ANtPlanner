@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DataLayer.Models.Entities;
+using Microsoft.Data.Entity.Scaffolding.Internal;
 
 namespace DataLayer
 {
@@ -69,10 +71,10 @@ namespace DataLayer
         /// <returns></returns>
         public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId)
         {
-            var property = new Property("calendar-home-set", "DAV:")
+            var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
-                        $"<d:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</d:href></C:calendar-home-set>"
+                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</D:href></C:calendar-home-set>"
             };
             return property;
         }
@@ -86,7 +88,7 @@ namespace DataLayer
         /// <returns></returns>
         public static Property CreateProperty(string nodeName, string nodePrefix, string nodeValue)
         {
-            var xmlValue = $"<{nodePrefix}:{nodeName} xmlns:d=\"DAV:\">{nodeValue}</{nodePrefix}:{nodeName}>";
+            var xmlValue = $"<{nodePrefix}:{nodeName} {Namespaces[nodePrefix]}>{nodeValue}</{nodePrefix}:{nodeName}>";
             return new Property(nodeName, NamespacesSimple[nodePrefix])
             {
                 Value = xmlValue

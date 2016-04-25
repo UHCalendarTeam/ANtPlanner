@@ -42,6 +42,7 @@ namespace DataLayer.ExtensionMethods
             //create useful properties for the principal
             var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
+            
 
             ///create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.User,

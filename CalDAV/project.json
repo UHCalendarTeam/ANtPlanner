@@ -12,7 +12,7 @@
     "System.Reflection": "4.1.0-beta-23516",
     "System.Runtime": "4.0.21-beta-23516",
     "System.Threading": "4.0.11-beta-23516",
-    "TreeForXml": "1.0.2",
+    "TreeForXml": "1.0.3",
     "ACL": "1.0.0-*"
   },
  

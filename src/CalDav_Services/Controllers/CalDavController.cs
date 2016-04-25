@@ -44,7 +44,7 @@ namespace CalDav_Services.Controllers
         /// <param name="principalId">If the principal represents a group then it has the name
         /// of the group. Otherwise has the email of the user that the principal represents.</param>
         /// <returns></returns>
-        [AcceptVerbs("PROPFIND", Route = "principal/{ussersOrGroups}/{principalId}")]
+        [AcceptVerbs("PROPFIND", Route = "principals/{ussersOrGroups}/{principalId}")]
         public async Task PropFind(string groupOrUser, string principalId)
         {
             await CalDavRepository.ACLProfind(Request, Response);
