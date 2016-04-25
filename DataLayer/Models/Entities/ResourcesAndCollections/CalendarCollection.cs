@@ -135,7 +135,7 @@ namespace DataLayer.Models.Entities
                 IsMutable = true,
                 Value =
                     $@"<C:supported-calendar-component-set {Namespaces["C"]
-                        }>&lt;C:comp name=""VEVENT""/&gt;&lt;C:comp name=""VTODO""/&gt;</C:supported-calendar-component-set>"
+                        }><C:comp name=""VEVENT""/><C:comp name=""VTODO""/></C:supported-calendar-component-set>"
             });
 
             Properties.Add(new Property("supported-calendar-data", NamespacesSimple["C"])
