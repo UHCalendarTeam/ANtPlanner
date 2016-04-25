@@ -42,7 +42,24 @@ namespace DataLayer
                 .Include(c2 => c2.CalendarCollections)
                 .ThenInclude(r => r.CalendarResources)
                 .ThenInclude(rp => rp.Properties)
-                .FirstOrDefault();
+                .FirstOrDefault(u => u.PrincipalURL == url);
+        }
+        /// <summary>
+        /// Return a principal given the name of the group it represent
+        /// or the email of the user it represents.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="uEmailOrgName"></param>
+        /// <returns></returns>
+        public static Principal GetPrincipalByName(this CalDavContext source, string uEmailOrgName)
+        {
+            return source.Principals.Include(p => p.Properties)
+                .Include(c => c.CalendarCollections)
+                .ThenInclude(cp => cp.Properties)
+                .Include(c2 => c2.CalendarCollections)
+                .ThenInclude(r => r.CalendarResources)
+                .ThenInclude(rp => rp.Properties)
+                .FirstOrDefault(u => u.PrincipalStringIdentifier == uEmailOrgName);
         }
 
         /// <summary>

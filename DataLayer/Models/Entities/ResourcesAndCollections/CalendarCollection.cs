@@ -29,7 +29,11 @@ namespace DataLayer.Models.Entities
             Url = url;
             Name = name;          
             CalendarResources = new List<CalendarResource>();
-            Properties = new List<Property>(properties);
+            Properties = new List<Property>();
+            if (properties != null && properties.Length > 0)
+            {
+                Properties = properties;
+            }
             InitializeStandardCollectionProperties(name);
         }
 
@@ -180,7 +184,7 @@ namespace DataLayer.Models.Entities
             {
                 IsVisible = false,
                 IsDestroyable = false,
-                IsMutable = true,
+                IsMutable = false,
                 Value = $"<C:getctag {Namespaces["C"]}>{Guid.NewGuid()}</C:getctag>"
             });
         }

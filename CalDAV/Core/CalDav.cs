@@ -298,13 +298,13 @@ namespace CalDAV.Core
             #endregion
 
             //Check if any error occurred during body processing.
-            var hasError = BuiltResponseForSet(principalId, null, false, setTree, responseTree);
+            var hasError = BuiltResponseForSet(url, null, false, setTree, responseTree);
 
             if (hasError)
             {
+                DeleteCalendarCollection(propertiesAndHeaders, response);
                 response.ContentType = "application/xml";
-                if (StorageManagement.ExistCalendarCollection(url))
-                    StorageManagement.DeleteCalendarCollection(url);
+
                 ChangeToDependencyError(responseTree);
 
                 response.StatusCode = 207;
@@ -345,14 +345,16 @@ namespace CalDAV.Core
             #endregion
 
             //Adding the collection to the database
-            var principal = db.Principals.FirstOrDefault(p => p.PrincipalStringIdentifier == principalId);
-            var collection = new CalendarCollection { Name = collectionName, Url = url };
+
+            var principal = db.GetPrincipalByName(principalId);
+            var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
             collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
             principal.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
             StorageManagement.AddCalendarCollectionFolder(url);
+            db.SaveChanges();
         }
 
         #endregion
@@ -636,7 +638,7 @@ namespace CalDAV.Core
 
             ///if the collection doesnt exist in the user folder
             /// the can't do anything
-            if (!StorageManagement.ExistCalendarCollection(url))
+            if (!StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/") + 1)))
                 return true;
 
             var resource =
@@ -648,10 +650,7 @@ namespace CalDAV.Core
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
             }
-
-
-
-            return true;
+            return StorageManagement.DeleteCalendarObjectResource(url); ;
         }
 
         public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
@@ -670,6 +669,7 @@ namespace CalDAV.Core
             var collection = db.GetCollection(url);
             if (collection == null)
             {
+                StorageManagement.DeleteCalendarCollection(url);
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return false;
             }
@@ -713,7 +713,7 @@ namespace CalDAV.Core
             if (etagProperty != null)
             {
                 string etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
-                responseHeader.ETag = new EntityTagHeaderValue(etag, false);
+                response.Headers["etag"] = etag;
             }
             responseHeader.ContentType = new MediaTypeHeaderValue("text/calendar");
             await response.WriteAsync(resourceBody.Result);
@@ -746,7 +746,7 @@ namespace CalDAV.Core
             string ifnonematch;
             var ifNoneMatchEtags = new List<string>();
             propertiesAndHeaders.TryGetValue("If-None-Match", out ifnonematch);
-            if (ifnonematch == null)
+            if (ifnonematch != null)
             {
                 ifNoneMatchEtags = ifnonematch.Split(',').ToList();
             }
@@ -784,7 +784,7 @@ namespace CalDAV.Core
                 }
             }
 
-            if (ifnonematch.Length > 0 && ifNoneMatchEtags.Contains("*"))
+            if (ifNoneMatchEtags.Count > 0 && ifNoneMatchEtags.Contains("*"))
             {
                 if (!resourceExist)
                 {
@@ -798,6 +798,7 @@ namespace CalDAV.Core
             if (resourceExist && StorageManagement.ExistCalendarObjectResource(url))
             {
                 await UpdateCalendarObjectResource(propertiesAndHeaders, response);
+                return;
             }
             await CreateCalendarObjectResource(propertiesAndHeaders, response);
 
@@ -832,7 +833,7 @@ namespace CalDAV.Core
             var resource = FillResource(propertiesAndHeaders, iCal, response);
 
             //adding the resource to the db
-            var collection = db.GetCollection(url.Remove(url.LastIndexOf("/")+1));
+            var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             collection.CalendarResources.Add(resource);
 
             //adding the file
@@ -840,7 +841,7 @@ namespace CalDAV.Core
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
-            resource.CreateOrModifyProperty("getcontentlenght", "DAV:",
+            resource.CreateOrModifyPropertyAdmin("getcontentlength", "DAV:",
                 $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack);
             db.SaveChanges();
@@ -861,7 +862,7 @@ namespace CalDAV.Core
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
 
-            var headers = response.GetTypedHeaders();
+            //var headers = response.GetTypedHeaders();
 
             #endregion
 
@@ -871,16 +872,17 @@ namespace CalDAV.Core
             //var resource = FillResource(propertiesAndHeaders, iCal, response);
 
             var etag = Guid.NewGuid().ToString();
-            headers.ETag = new EntityTagHeaderValue(etag, false);
+            response.Headers["etag"] = etag;
+            //headers.ETag = new EntityTagHeaderValue(etag, false);
 
 
             var prevResource = db.GetCalendarResource(url);
 
             var errorStack = new Stack<string>();
-            prevResource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
+            prevResource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
-            prevResource.CreateOrModifyProperty("getlastmodified", "DAV:",
+            prevResource.CreateOrModifyPropertyAdmin("getlastmodified", "DAV:",
                 $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>", errorStack);
 
 
@@ -889,7 +891,7 @@ namespace CalDAV.Core
             //Adding New File
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 
-            prevResource.CreateOrModifyProperty("getcontentlenght", "DAV:",
+            prevResource.CreateOrModifyPropertyAdmin("getcontentlength", "DAV:",
                 $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack);
 
@@ -914,28 +916,28 @@ namespace CalDAV.Core
 
             #region Extracting Properties
             string calendarResourceId;
-            propertiesAndHeaders.TryGetValue("calendarResourceID", out calendarResourceId);
+            propertiesAndHeaders.TryGetValue("calendarResourceId", out calendarResourceId);
 
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
 
-            var headers = response.GetTypedHeaders();
+            //var headers = response.GetTypedHeaders();
 
             #endregion
 
             var etag = Guid.NewGuid().ToString();
-            headers.ETag = new EntityTagHeaderValue(etag, false);
+            response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
 
             var errorStack = new Stack<string>();
-            resource.CreateOrModifyProperty("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
+            resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
-            var collection = db.GetCollection(url.Remove(url.LastIndexOf("/")+1));
+            var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
+            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
 
 
             var property = iCal.GetComponentProperties("UID");

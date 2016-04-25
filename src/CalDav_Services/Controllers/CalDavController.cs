@@ -61,8 +61,9 @@ namespace CalDav_Services.Controllers
             var url = GetRealUrl(Request);
 
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
+            propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("collectionName", collectionName);
+
             propertiesAndHeaders.Add("url", url);
             //TODO: I have to fix this the status is in the first element.
             //Response.StatusCode=GetHashCode() 
@@ -76,8 +77,6 @@ namespace CalDav_Services.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
             propertiesAndHeaders.Add("url", url);
 
             StringValues depth;
@@ -93,8 +92,7 @@ namespace CalDav_Services.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
+
             propertiesAndHeaders.Add("url", url);
 
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
@@ -111,8 +109,6 @@ namespace CalDav_Services.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
             propertiesAndHeaders.Add("url", url);
 
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
@@ -123,8 +119,6 @@ namespace CalDav_Services.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
@@ -152,8 +146,7 @@ namespace CalDav_Services.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
             propertiesAndHeaders.Add("body", StreamToString(Request.Body));
@@ -162,17 +155,17 @@ namespace CalDav_Services.Controllers
 
 
 
-            if (!string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
+            if (headers.ContentType != null && !string.IsNullOrEmpty(headers.ContentType.MediaType) && headers.ContentType.MediaType != "text/calendar")
             {
                 Response.StatusCode = (int)HttpStatusCode.ExpectationFailed;
             }
             else
             {
-                if (headers.IfMatch.Count > 0)
+                if (headers.IfMatch != null && headers.IfMatch.Count > 0)
                 {
                     propertiesAndHeaders.Add("If-Match", EtagAsString(headers.IfMatch));
                 }
-                else if (headers.IfNoneMatch.Count > 0)
+                else if (headers.IfNoneMatch != null && headers.IfNoneMatch.Count > 0)
                 {
                     propertiesAndHeaders.Add("If-None-Match", EtagAsString(headers.IfNoneMatch));
                 }
@@ -229,10 +222,7 @@ END:VCALENDAR";
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
             propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
         }
@@ -243,10 +233,8 @@ END:VCALENDAR";
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
             CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
         }
@@ -257,8 +245,7 @@ END:VCALENDAR";
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("url", url);
 
             CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
@@ -275,7 +262,7 @@ END:VCALENDAR";
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CalDavReport report= new CalDavReport();
+            CalDavReport report = new CalDavReport();
             return report.ProcessRequest(propertiesAndHeaders, StreamToString(Request.Body));
 
         }
@@ -312,7 +299,7 @@ END:VCALENDAR";
         private string GetRealUrl(HttpRequest request)
         {
             var url = Request.GetEncodedUrl();
-            var host = "http://" + Request.Host.Value + "/api/v1/caldav/" ;
+            var host = "http://" + Request.Host.Value + "/api/v1/caldav/";
             url = url.Replace(host, "");
             return url;
         }

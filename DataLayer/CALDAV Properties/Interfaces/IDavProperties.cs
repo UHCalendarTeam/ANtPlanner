@@ -9,7 +9,7 @@ namespace DataLayer
 
         DateTime CreationDate { get; }
 
-        int GetContentLenght { get; }
+        int GetContentLength { get; }
 
         string GetContentType { get; }
 
