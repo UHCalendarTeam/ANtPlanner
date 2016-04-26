@@ -251,11 +251,11 @@ namespace CalDAV.Core
                     case "calendar-data":
                         ///see if the calendar-data describes pros to take
                         /// if does then take them if not take it all
-                        currentProp.AddValue(prop.Children.Any() ? resource.Value.ToString(prop) : resource.ToString());
+                        currentProp.AddValue(prop.Children.Any() ? resource.Value.ToString(prop) : resource.Value.ToString());
                         break;
                     default:
                         throw new NotImplementedException(
-                            $"The requested property with name {prop.NodeName} is not implented.");
+                            $"The requested property with name {prop.NodeName} is not implemented.");
                 }
                 outputRoot.AddChild(currentProp);
             }
