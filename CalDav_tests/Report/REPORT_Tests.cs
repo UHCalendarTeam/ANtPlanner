@@ -66,7 +66,8 @@
 
 //            Assert.Equal(2, responses.Count());
 
-//            var hrefs = responses.SelectMany(x => x.Elements(nsDAV + "href"));
+//            var 
+//s = responses.SelectMany(x => x.Elements(nsDAV + "href"));
 
 //            Assert.Equal(2, hrefs.Count());
 

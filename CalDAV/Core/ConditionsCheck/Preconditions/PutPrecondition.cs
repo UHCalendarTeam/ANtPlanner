@@ -69,7 +69,7 @@ namespace CalDAV.Core.ConditionsCheck
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{calendarresource
+<href xmlns='DAV:'>{SystemProperties._baseUrl + calendarresource
                                 .Href}</href>
 </no-uid-conflict>
 </error>");
@@ -95,7 +95,7 @@ namespace CalDAV.Core.ConditionsCheck
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{resource
+<href xmlns='DAV:'>{SystemProperties._baseUrl + resource
                                 .Href}</href>
 </no-uid-conflict>
 </error>");

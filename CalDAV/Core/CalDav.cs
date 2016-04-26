@@ -314,7 +314,7 @@ namespace CalDAV.Core
             multistatus.AddChild(responseTree);
 
             var href = new XmlTreeStructure("href", "DAV:");
-            href.AddValue(url);
+            href.AddValue(SystemProperties._baseUrl + url);
 
             #endregion
 
@@ -472,7 +472,7 @@ namespace CalDAV.Core
 
             var href = new XmlTreeStructure("href", "DAV:");
 
-            href.AddValue(url);
+            href.AddValue(SystemProperties._baseUrl + url);
 
 
             responseTree.AddChild(href);
