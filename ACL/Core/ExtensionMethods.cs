@@ -79,7 +79,7 @@ namespace ACL.Core
         /// <param name="username">The user email (this is out username)</param>
         /// <param name="password">The provided password.</param>
         /// <returns></returns>
-        public static bool VerifyPassword(this CalDavContext context, string username, string password)
+        public static bool VerifyPassword(this CalDavContext context, string username, string password = "")
         {
             var user = context.Users.FirstOrDefault(u => u.Email == username);
 

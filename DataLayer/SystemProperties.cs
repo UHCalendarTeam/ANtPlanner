@@ -21,19 +21,19 @@
         /// <summary>
         /// Contains the base url path for the system.
         /// </summary>
-        public static readonly string _baseUrl = "/api/v1/caldav";
+        public static readonly string _baseUrl = "/api/v1/caldav/";
 
         /// <summary>
         ///     Contains the url for the user's collections
         ///     Add the email of the user
         /// </summary>
-        public static readonly string _userCollectionUrl = _baseUrl + "/collections/users/";
+        public static readonly string _userCollectionUrl =  "collections/users/";
 
         /// <summary>
         ///     Contains the url for the groups collection.
         ///     Add the name of the group
         /// </summary>
-        public static readonly string _groupCollectionUrl = _baseUrl + "/collections/groups/";
+        public static readonly string _groupCollectionUrl =  "collections/groups/";
 
         /// <summary>
         ///     Contains the default name for the user collections
@@ -47,14 +47,14 @@
         ///     represent a normal user.
         ///     The email of the user has to be added to the end of the url
         /// </summary>
-        public static readonly string _userPrincipalUrl = _baseUrl + "/principals/users/";
+        public static readonly string _userPrincipalUrl =  "principals/users/";
 
         /// <summary>
         ///     Contains the url that has to be assigned the the priciapl that
         ///     represent a group.
         ///     The name of the group has to be added.
         /// </summary>
-        public static readonly string _groupPrincipalUrl = _baseUrl + "/principals/groups/";
+        public static readonly string _groupPrincipalUrl =  "principals/groups/";
 
         /// <summary>
         ///     Build the url that identify the collection where are the
@@ -72,7 +72,7 @@
             var colUrl = type == PrincipalType.User ? _userCollectionUrl : _groupCollectionUrl;
 
             //add the identifier of the pricipal
-            return $"{colUrl}{principalId}/";
+            return $"{_baseUrl}{colUrl}{principalId}/";
         }
     }
 }

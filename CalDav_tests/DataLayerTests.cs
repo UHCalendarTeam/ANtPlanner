@@ -187,14 +187,7 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest10()
         {
-            var c = new CalDavContext();
-            var principal = c.Principals.Include(x=>x.Properties).FirstOrDefault(x => x.User.Email == "postman5@postman.com");
-            var prop = principal.Properties[1];
-            var propS = prop.Value;
-            var xDoc = XDocument.Parse(propS);
-
-            
-
+            DataLayer.SqlMock.SeedDb_Fs();
         }
 
        

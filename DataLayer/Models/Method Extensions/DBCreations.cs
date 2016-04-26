@@ -53,7 +53,7 @@ namespace DataLayer.ExtensionMethods
             //create the collection for the user.
             var col =
                 new CalendarCollection(
-                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/".Replace(SystemProperties._baseUrl + "/", ""),
+                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/",
                     SystemProperties._defualtInitialCollectionName)
                 {
                     Principal = principal
@@ -161,7 +161,7 @@ namespace DataLayer.ExtensionMethods
             //create the collection for the user.
             var col =
                 new CalendarCollection(
-                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/".Replace(SystemProperties._baseUrl+"/", ""),
+                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/",
                     SystemProperties._defualtInitialCollectionName)
                 {
                     Principal = principal
