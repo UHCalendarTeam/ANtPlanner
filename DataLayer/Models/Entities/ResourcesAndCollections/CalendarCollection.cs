@@ -185,7 +185,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = false,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:getctag {Namespaces["C"]}>{Guid.NewGuid()}</C:getctag>"
+                Value = @"<getctag xmlns=""http://calendarserver.org/ns/"" }>{Guid.NewGuid()}</getctag>"
             });
         }
     }

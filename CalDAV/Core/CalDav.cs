@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using ACL.Core;
 using CalDAV.Core.ConditionsCheck;
+using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
 using DataLayer;
@@ -126,6 +127,11 @@ namespace CalDAV.Core
             //al intentar recobrar las propiedades especificadas.
             //Dentro de cada "propstatus" hay un xml "prop" con todas las propiedades que mapean con el
             //status correspondiente y un xml "status" que tiene el mensaje del estado de dicho "propstat". 
+
+            //checking Precondtions
+            PreconditionCheck = new PropfindPrecondition(StorageManagement, db);
+            if(!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+                return;
 
             response.StatusCode = 207;
             response.ContentType = "application/xml";
@@ -370,8 +376,8 @@ namespace CalDAV.Core
             var principal = db.GetPrincipalByName(principalId);
             var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"],
-                new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            collection.CreateOrModifyProperty("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
             principal.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
@@ -414,6 +420,11 @@ namespace CalDAV.Core
             propertiesAndHeaders.TryGetValue("url", out url);
 
             #endregion
+
+            //Checking precondition
+            PreconditionCheck = new ProppatchPrecondition(StorageManagement, db);
+            if(!PreconditionCheck.PreconditionsOK(propertiesAndHeaders,response))
+                return;
 
             //Creating and filling the root of the xml tree response
             //All response of a request is conformed by a "multistatus" element.
@@ -967,8 +978,8 @@ namespace CalDAV.Core
 
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             var stack = new Stack<string>();
-            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"],
-                new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
 
             var calendarComponents =
                 iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
