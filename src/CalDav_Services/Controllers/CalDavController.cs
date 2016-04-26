@@ -88,7 +88,7 @@ namespace CalDav_Services.Controllers
         /// </summary>
         /// <param name="groupOrUser">If the principals represents a user or a group</param>
         /// <param name="principalId">If user then the email, otherwise the name of the group.</param>
-        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}")]
+        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/")]
         public void CollectionRootProfind(string groupOrUser, string principalId)
         {
             var url = GetRealUrl(Request);
@@ -104,7 +104,7 @@ namespace CalDav_Services.Controllers
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
@@ -119,7 +119,7 @@ namespace CalDav_Services.Controllers
         }
 
         //PROPFIND COLLECTIONS
-        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void PropFind(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
@@ -184,7 +184,7 @@ namespace CalDav_Services.Controllers
         }
 
         //REPORT
-        [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
+        [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task Report(string user, string collection)
         {
             var url = GetRealUrl(Request);
@@ -193,6 +193,13 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("url", GetRealUrl(Request));
             await CalDavRepository.Report(HttpContext);
+        }
+
+        //OPTIONS
+        [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
+        public void Options(string groupOrUser, string principalId, string collectionName)
+        {
+            Response.Headers["Allow"] = "GET, PUT, PROPFIND";
         }
 
         #endregion
@@ -311,7 +318,7 @@ END:VCALENDAR";
         }
 
         // DELETE api/values/
-        [HttpDelete("collections/{groupOrUser}/{principalId}/{collectionName}")]
+        [HttpDelete("collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void Delete(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
@@ -336,6 +343,12 @@ END:VCALENDAR";
             CollectionReport collectionReport = new CollectionReport();
             await collectionReport.ProcessRequest(HttpContext);
 
+        }
+
+        [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
+        public void Options(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        {
+            Response.Headers["Allow"] = "GET, PUT, PROPFIND";
         }
 
         #endregion
