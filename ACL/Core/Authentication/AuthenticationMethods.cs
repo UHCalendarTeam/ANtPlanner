@@ -25,7 +25,7 @@ namespace ACL.Core.Authentication
         public async Task<Principal> AuthenticateRequest(HttpRequest clientRequest, HttpResponse response)
         {
             string username;
-            string password;
+            string password = "";
             var context = new CalDavContext();
 
             ///take the creadentials from the request

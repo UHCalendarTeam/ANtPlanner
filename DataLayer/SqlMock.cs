@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Identity;
 
 namespace DataLayer
 {
@@ -15,14 +16,21 @@ namespace DataLayer
         /// </summary>
         public static void SeedDb_Fs()
         {
+            ///create the core passHasher
+            var passHasher = new PasswordHasher<User>();
             using (var db = new CalDavContext())
             {
                 var fs = new FileSystemManagement();
                 var frank = new User("Frank", "f.underwood@wh.org");
-                var frankPrincipal = new Principal("f.underwood@wh.org", SystemProperties.PrincipalType.User)
+                //create useful properties for the principal
+                var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, "f.underwood@wh.org", "durtyplans");
+                var displayName = PropertyCreation.CreateProperty("displayname", "D", "Frank");
+                var frankPrincipal = new Principal("f.underwood@wh.org", SystemProperties.PrincipalType.User, calHomeSet, displayName)
                 {
                     User = frank
                 };
+                var hashedPassword = passHasher.HashPassword(frank, "frank");
+                frank.Password = hashedPassword;
 
                 var frankCollection = new CalendarCollection($"collections/users/f.underwood@wh.org/durtyplans/", "durtyplans");
                 var assesinationEvent = new CalendarResource("collections/users/f.underwood@wh.org/durtyplans/russodies.ics", "russodies.ics") {Uid = "0kusnhnnacaok1r02v16simh8c@google.com" };

@@ -264,37 +264,7 @@ namespace CalDav_Services.Controllers
             return res.Remove(res.Length - 1);
         }
 
-        [HttpGet]
-        public void test()
-        {
-
-            var body = @"BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Example Corp.//CalDAV Client//EN
-BEGIN:VTODO
-DTSTAMP:20060205T235300Z
-DUE;TZID=US/Eastern:20060106T120000
-LAST-MODIFIED:20060205T235308Z
-SEQUENCE:1
-STATUS:NEEDS-ACTION
-SUMMARY:Task #2
-UID:E10BA47467C5C69BB74E8720@example.com
-BEGIN:VALARM
-ACTION:AUDIO
-TRIGGER;RELATED=START:-PT10M
-END:VALARM
-END:VTODO
-END:VCALENDAR";
-            //var arr = UTF8Encoding.UTF8.GetBytes(body.ToArray());
-            //Response.Body.Write(arr,0,arr.Length);
-
-            Response.StatusCode = 207;
-            Response.Headers["test"] = "test";
-            var headers = Response.GetTypedHeaders();
-            headers.ContentLength = 300;
-            Response.Headers["ContentLength"] = "300";
-
-        }
+       
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
