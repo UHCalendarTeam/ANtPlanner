@@ -184,7 +184,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the <D:href>/api/v1/caldav/{userEmail}/calendars/{collectionName}/{calendarResourceId}?</D:href>
 
             var href = new XmlTreeStructure("href", "DAV:");
-            href.AddValue(url);
+            href.AddValue(SystemProperties._baseUrl + url);
 
             treeChild.AddChild(href);
 
@@ -263,7 +263,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the <D:href>/api/v1/collections/users|groups/principalId/{collectionName}/{calendarResourceId}?</D:href>
 
             var href = new XmlTreeStructure("href", "DAV:");
-            href.AddValue(url);
+            href.AddValue(SystemProperties._baseUrl + url);
 
             treeChild.AddChild(href);
 
@@ -405,7 +405,7 @@ namespace CalDAV.Core.Propfind
 
             //an href with the corresponding url is added to the response
             var href = new XmlTreeStructure("href", "DAV:");
-            href.AddValue(url);
+            href.AddValue(SystemProperties._baseUrl + url);
 
             treeChild.AddChild(href);
 

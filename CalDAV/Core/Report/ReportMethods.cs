@@ -137,7 +137,9 @@ namespace CalDAV.Core
             {
                 IXMLTreeStructure statusNode;
 
-                ///each returned resource has is own response and href nodes
+                ///each returned resource has is own response and 
+                /// 
+                ///  nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
                 hrefNode.AddValue(resource.Key);

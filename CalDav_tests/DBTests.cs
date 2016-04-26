@@ -34,8 +34,9 @@ namespace CalDav_tests
                     //TODO: Adriano ver esto
                     //DtStart = DateTime.Now,
                     //DtEnd = DateTime.Now,
-                    Name = "test.ics",
-                    Href = ".......",
+                    //Name = "test.ics",
+                    
+                    //= ".......",
                     //Recurrence = "test",
                     // User = user,
                     Properties = new List<Property>
