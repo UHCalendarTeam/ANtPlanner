@@ -27,7 +27,7 @@ namespace DataLayer
             IXMLTreeStructure prop;
             if (property != null)
                 prop = property.Value == null
-                    ? new XmlTreeStructure(propertyName, mainNs) { Value = ""}
+                    ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
                     : XmlTreeStructure.Parse(property.Value);
             else
             {
