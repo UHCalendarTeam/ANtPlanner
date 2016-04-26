@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using DataLayer;
+﻿using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.AspNet.Identity;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace ACL.Core
 {
@@ -71,10 +71,6 @@ namespace ACL.Core
                 return stringB.ToString();
             });
         }
-
-
-
-
 
         /// <summary>
         /// Verify if the provided password match with the user's password.

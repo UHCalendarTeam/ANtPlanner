@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using ACL.Core.Authentication;
+﻿using ACL.Core.Authentication;
 using DataLayer;
 using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using TreeForXml;
 
 namespace ACL.Core
 {
     /// <summary>
-    /// Contains the PROFIND method for 
+    /// Contains the PROFIND method for
     /// the principals
     /// </summary>
     public class ACLProfind : IACLProfind
     {
         private IAuthenticate _authenticate;
         private CalDavContext _context;
+
         public ACLProfind(IAuthenticate authenticate, CalDavContext context)
         {
             _authenticate = authenticate;
@@ -29,11 +29,11 @@ namespace ACL.Core
         }
 
         /// <summary>
-        /// Call the method to perform a PROFIND over a 
+        /// Call the method to perform a PROFIND over a
         /// principal.
         /// Initially the client could do a PROFIND over
         /// the server to discover all the user calendars
-        /// or could PORFIND directly over a calendar URL. 
+        /// or could PORFIND directly over a calendar URL.
         /// </summary>
         /// <param name="request">THe HttpRequest from the controller.</param>
         /// <param name="response">The HttpResponse property from the controller.</param>
@@ -62,7 +62,6 @@ namespace ACL.Core
             //authenticate the user if exist, if not create it in the system
             else
                 principal = await _authenticate.AuthenticateRequest(request, response);
-
 
             IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);
 
@@ -104,10 +103,10 @@ namespace ACL.Core
 
             var propNode = new XmlTreeStructure("prop", "DAV:");
 
-            //add the requested properties to the propNode 
+            //add the requested properties to the propNode
             //if the properties exist in the principal
             var properties = principal.Properties
-                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name,p.Namespace)))
+                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
                 .Select(x => XmlTreeStructure.Parse(x.Value));
             var xdocS = XDocument.Parse(principal.Properties[1].Value).ToString();
             Console.WriteLine(xdocS);
@@ -136,9 +135,6 @@ namespace ACL.Core
 
             await response.WriteAsync(multiStatus);
         }
-
-
-
 
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.

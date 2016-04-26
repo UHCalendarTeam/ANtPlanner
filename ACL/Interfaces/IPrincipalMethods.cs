@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DataLayer.Models.ACL;
+﻿using DataLayer.Models.ACL;
+using System.Collections.Generic;
 
 namespace ACL.Interfaces
 {
@@ -62,6 +62,6 @@ namespace ACL.Interfaces
         /// </summary>
         /// <param name="member">The member to be add.</param>
         /// <returns>True if successful operation, false otherwise.</returns>
-        bool AddGroupMember(Principal principal,string member);
+        bool AddGroupMember(Principal principal, string member);
     }
 }

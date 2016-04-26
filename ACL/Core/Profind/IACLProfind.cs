@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using DataLayer.Models.ACL;
+﻿using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ACL.Core
 {
@@ -11,6 +11,5 @@ namespace ACL.Core
 
         Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal);
-
     }
 }
