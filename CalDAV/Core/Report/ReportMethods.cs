@@ -44,9 +44,9 @@ namespace CalDAV.Core
         /// <returns></returns>
         public async Task ProcessRequest(HttpContext httpContext)
         {
-           
+            var body = new StreamReader(httpContext.Request.Body).ReadToEnd();
             // var node = xmlBody.Children.First();
-            var xmlBody = XmlTreeStructure.Parse(new StreamReader(httpContext.Request.Body).ReadToEnd());
+            var xmlBody = XmlTreeStructure.Parse(body);
 
             ///take the target url that is the identifier of the collection
             var urlId = httpContext.Request.GetRealUrl();
@@ -174,7 +174,8 @@ namespace CalDAV.Core
 
                 multistatusNode.AddChild(responseNode);
             }
-            await httpContext.Response.WriteAsync(multistatusNode.ToString());
+            var bodyS = multistatusNode.ToString();
+            await httpContext.Response.WriteAsync(bodyS);
         }
 
 
