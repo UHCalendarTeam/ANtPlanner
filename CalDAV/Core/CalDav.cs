@@ -370,8 +370,8 @@ namespace CalDAV.Core
             var principal = db.GetPrincipalByName(principalId);
             var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"],
-                new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            collection.CreateOrModifyProperty("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
             principal.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
@@ -967,8 +967,8 @@ namespace CalDAV.Core
 
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             var stack = new Stack<string>();
-            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"],
-                new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
 
             var calendarComponents =
                 iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
