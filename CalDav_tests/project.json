@@ -9,7 +9,7 @@
     "xunit": "2.1.0",
     "xunit.runner.dnx": "2.1.0-rc1-build204",
     "CalDAV": "1.0.0",
-    "TreeForXml": "1.0.2",
+    "TreeForXml": "1.0.3",
     "Microsoft.AspNet.TestHost": "1.0.0-rc1-final",
     "ACL": "1.0.0-*"
   },
@@ -22,11 +22,11 @@
     },
     "dnxcore50": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
+        "Microsoft.CSharp": "4.0.1-beta-*",
+        "System.Collections": "4.0.11-beta-*",
+        "System.Linq": "4.0.1-beta-*",
+        "System.Runtime": "4.0.21-beta-*",
+        "System.Threading": "4.0.11-beta-*"
       }
     }
   },
