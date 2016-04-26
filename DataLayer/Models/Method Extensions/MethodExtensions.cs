@@ -148,17 +148,7 @@ namespace DataLayer
         }
 
 
-        /// <summary>
-        /// Take the properties in the given collection that match
-        /// with given requested properties
-        /// </summary>
-        /// <param name="properties">The properties collection where to perfom the seach.</param>
-        /// <param name="reqProperties">The requested properties. Pass the property name and namespace</param>
-        /// <returns>Return a list with IXMlTree nodes that contains the values for the requested properties.</returns>
-        public static async Task RequestProperties(this ICollection<Property> properties, params string[] reqProperties)
-        {
-            
-        }
+       
 
 
         //TODO: Adriano ver esto

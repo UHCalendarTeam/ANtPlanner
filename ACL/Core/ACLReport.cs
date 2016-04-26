@@ -1,24 +1,21 @@
-﻿using System;
+﻿using ACL.Interfaces;
+using DataLayer;
+using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
+using Microsoft.AspNet.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using System.Xml.Schema;
-using ACL.Interfaces;
-using DataLayer;
-using Microsoft.AspNet.Http;
 using TreeForXml;
-using DataLayer.Models.Entities;
-using DataLayer.Models.ACL;
-using DataLayer.Models.Entities;
 
 namespace ACL.Core
 {
-    public class ACLReport:IReportMethods
+    public class ACLReport : IReportMethods
     {
         public async Task ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
         {
-
             ///check the depth of the header
             /// This report is only defined when the Depth header has value "0";
             /// other values result in a 400 (Bad Request) error response.
@@ -36,7 +33,6 @@ namespace ACL.Core
             //TODO: take here the email of the user by calling
             //to the authentication api
             string userEmail = "";
-            
 
             response = null;
             //take the string representation of the body
@@ -46,22 +42,22 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                     await AclPrincipalPropSet(xmlbody, context, response );
+                    await AclPrincipalPropSet(xmlbody, context, response);
                     break;
+
                 case "principal-match":
                     await PrincipalMatch(xmlbody, userEmail, href, context, response);
                     break;
+
                 case "principal-property-search":
                     await PrincipalPropertySearch(xmlbody, request, context, response);
                     break;
+
                 case "principal-search-property-set":
-                    await PrincipalSearchPropertySet( response);
+                    await PrincipalSearchPropertySet(response);
                     break;
             }
-            
-
         }
-
 
         public async Task AclPrincipalPropSet(IXMLTreeStructure body, CalDavContext context, HttpResponse response)
         {
@@ -70,11 +66,11 @@ namespace ACL.Core
             IXMLTreeStructure propNode;
 
             ///first take the node container of the property names
-            body.GetChildAtAnyLevel("prop",out propNode);
+            body.GetChildAtAnyLevel("prop", out propNode);
 
             ///take the children of the node, these are the proeprties
-            var requestedProperties = propNode.Children.Select(x => 
-            new KeyValuePair<string, string>( x.NodeName, x.MainNamespace));
+            var requestedProperties = propNode.Children.Select(x =>
+            new KeyValuePair<string, string>(x.NodeName, x.MainNamespace));
 
             string colUrl = "";
 
@@ -85,58 +81,53 @@ namespace ACL.Core
             //take the string representation of the acl property
             //this property is stored in xml format so is needed to
             //be parsed to xml
-            var aclProperty = resource.Properties.First(x=>x.Name == "acl");
+            var aclProperty = resource.Properties.First(x => x.Name == "acl");
             var aclXmlProperty = XDocument.Parse(aclProperty.Value);
 
             ///take the href of the principals of the property
             var principalsURLs = aclXmlProperty.Elements("principal").Select(x => x.Descendants("href").FirstOrDefault());
 
-            Dictionary<Principal,IEnumerable<Property>> principals = new Dictionary<Principal,IEnumerable<Property>>();
+            Dictionary<Principal, IEnumerable<Property>> principals = new Dictionary<Principal, IEnumerable<Property>>();
 
             ///take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
                 var principal = context.Principals.FirstOrDefault(principal1 => principal1.PrincipalURL == pUrl.Value);
-                if(principal!=null)
+                if (principal != null)
                     principals.Add(principal, null);
             }
 
             ///take the requested properties from the principals
             foreach (var principal in principals)
             {
-               principals[principal.Key] = principal.Key.TakeProperties(requestedProperties);
+                principals[principal.Key] = principal.Key.TakeProperties(requestedProperties);
             }
 
             await WriteBody(response, principals);
-
-
-
         }
-
 
         /// <summary>
         ///     The DAV:principal-match REPORT is used to identify all members (at
         ///     any depth) of the collection identified by the Request-URI that are
         ///     principals and that match the current user.
         ///     So it takes the resources of the collection and see wich ones match
-        ///     the given principal. This is done comparing the principal's email 
+        ///     the given principal. This is done comparing the principal's email
         ///     of the resource with the email of the given principal.
         /// </summary>
         /// <returns></returns>
-        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail,string href, CalDavContext context, HttpResponse response)
+        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href, CalDavContext context, HttpResponse response)
         {
             ///take the collection with the given href
             var col = context.CalendarCollections.FirstOrDefault(x => x.Url == href);
-            
+
             //if the collection doesnt exit then return an error
             if (col == null)
             {
                 await ReturnError(response, "Not Found", 404, href);
             }
-            
+
             ///take all the resources from the collection.
             //var colResources = col.CalendarResources.Where(x=>x.)
-
         }
 
         public async Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
@@ -148,6 +139,7 @@ namespace ACL.Core
         {
             throw new NotImplementedException();
         }
+
         /// <summary>
         /// Build the xml of the body and write
         /// its string representation to the HttpRespose.Body
@@ -158,9 +150,8 @@ namespace ACL.Core
         public async Task WriteBody(HttpResponse response,
             Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
         {
-
             ///build the root of the xml
-           var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {
@@ -172,10 +163,8 @@ namespace ACL.Core
             //take the node that specified the comp and properties
             //to return
 
-
             foreach (var pp in principalsAndProperties)
             {
-
                 IXMLTreeStructure statusNode;
 
                 ///each returned resource has is own response and href nodes
@@ -193,13 +182,9 @@ namespace ACL.Core
                     statusNode = new XmlTreeStructure("status", "DAV:");
                     statusNode.AddValue("HTTP/1.1 404 Not Found");
                     responseNode.AddChild(statusNode);
-
                 }
                 else
                 {
-
-                    
-
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
                     var propNode = new XmlTreeStructure("prop", "DAV:");
                     ///add the properties to the prop node.
@@ -222,7 +207,6 @@ namespace ACL.Core
                 multistatusNode.AddChild(responseNode);
                 await response.WriteAsync(multistatusNode.ToString());
             }
-
         }
 
         /// <summary>
@@ -255,7 +239,6 @@ namespace ACL.Core
             ///href is a child pf response
             responseNode.AddChild(hrefNode);
 
-           
             statusNode = new XmlTreeStructure("status", "DAV:");
             statusNode.AddValue($"HTTP/1.1 {errorCode} {errorMessage}");
             responseNode.AddChild(statusNode);
@@ -263,9 +246,6 @@ namespace ACL.Core
             multistatusNode.AddChild(responseNode);
 
             await response.WriteAsync(multistatusNode.ToString());
-
         }
-
-
     }
 }

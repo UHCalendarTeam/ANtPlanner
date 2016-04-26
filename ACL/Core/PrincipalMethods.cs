@@ -1,27 +1,26 @@
-﻿using System;
+﻿using ACL.Interfaces;
+using DataLayer.Models.ACL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using ACL.Interfaces;
-using DataLayer.Models.ACL;
 
 namespace ACL.Core
 {
     /// <summary>
     /// Implementation of the IPrincipalMethods.
-    /// 
+    ///
     /// </summary>
     public class PrincipalMethods : IPrincipalMethods
     {
         /// <summary>
-        /// Return the DAV:displayname property of 
+        /// Return the DAV:displayname property of
         /// the given principal
         /// </summary>
         /// <param name="principal"></param>
         /// <returns></returns>
-        public  string GetDispplayName(Principal principal)
+        public string GetDispplayName(Principal principal)
         {
-            var dpn = principal.Properties.FirstOrDefault(x=>x.Name == "displayname");
+            var dpn = principal.Properties.FirstOrDefault(x => x.Name == "displayname");
             return dpn == null ? "" : dpn.Value;
         }
 

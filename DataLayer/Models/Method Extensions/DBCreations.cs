@@ -42,6 +42,7 @@ namespace DataLayer.ExtensionMethods
             //create useful properties for the principal
             var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
+            
 
             ///create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
@@ -121,7 +122,7 @@ namespace DataLayer.ExtensionMethods
             //take the collection with user group name
             var collection =
                 context.CalendarCollections.FirstOrDefault(
-                    col => col.Url == SystemProperties._groupCollectionUrl + group);
+                    col => col.Url ==SystemProperties._groupCollectionUrl + group);
 
             //if the collection doent exit then something is wrong with the group
             //and either has to be created or the user group is not valid

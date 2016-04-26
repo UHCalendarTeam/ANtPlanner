@@ -1,50 +1,67 @@
-﻿using System;
+﻿using ACL.Core.Authentication;
+using DataLayer;
+using DataLayer.Models.ACL;
+using Microsoft.AspNet.Http;
+using Microsoft.Data.Entity;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ACL.Core.Authentication;
-using DataLayer;
-using DataLayer.Models.ACL;
-using Microsoft.AspNet.Http;
+using System.Xml.Linq;
 using TreeForXml;
 
 namespace ACL.Core
 {
     /// <summary>
-    /// Contains the PROFIND method for 
+    /// Contains the PROFIND method for
     /// the principals
     /// </summary>
-    public class ACLProfind
+    public class ACLProfind : IACLProfind
     {
         private IAuthenticate _authenticate;
-        public ACLProfind(IAuthenticate authenticate)
+        private CalDavContext _context;
+
+        public ACLProfind(IAuthenticate authenticate, CalDavContext context)
         {
             _authenticate = authenticate;
+            _context = context;
         }
 
         /// <summary>
-        /// Call the method to perform a PROFIND over a 
+        /// Call the method to perform a PROFIND over a
         /// principal.
         /// Initially the client could do a PROFIND over
         /// the server to discover all the user calendars
-        /// or could PORFIND directly over a calendar URL. 
-        /// </summary> 
+        /// or could PORFIND directly over a calendar URL.
+        /// </summary>
         /// <param name="request">THe HttpRequest from the controller.</param>
-        /// <param name="body">The request's body</param>
         /// <param name="response">The HttpResponse property from the controller.</param>
+        /// <param name="data"></param>
+        /// <param name="body">The request's body</param>
         /// <returns>The request</returns>
-        public async Task Profind(HttpRequest request, HttpResponse response)
+        public async Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data)
         {
             var requestPath = request.Path;
 
             //read the body of the request
             var bodyString = new StreamReader(request.Body).ReadToEnd();
-            var context = new CalDavContext();
 
-            //authenticate the user if exit if not create it in the system
-            var principal = await _authenticate.AuthenticateRequest(request, response);
+            Principal principal;
 
+            //if from the controller comes the principal data, means that the user
+            //exist in the system, so take it
+            if (data != null)
+            {
+                principal =
+                    _context.Principals.Include(p => p.Properties)
+                        .FirstOrDefault(p => p.PrincipalStringIdentifier == data["principalId"]);
+                //TODO: check the user's credentials
+            }
+
+            //authenticate the user if exist, if not create it in the system
+            else
+                principal = await _authenticate.AuthenticateRequest(request, response);
 
             IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);
 
@@ -67,16 +84,17 @@ namespace ACL.Core
         public async Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal)
         {
-            var multistatus = new XmlTreeStructure("multistatus", "DAV:");
-            multistatus.Namespaces.Add("D", "DAV:");
-            multistatus.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:");
+            multistatusNode.Namespaces.Add("D", "DAV:");
+            multistatusNode.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
 
             //create the response node.
             var responseNode = new XmlTreeStructure("response", "DAV:");
 
             //create the href node
             var hrefNode = new XmlTreeStructure("href", "DAV:");
-            hrefNode.AddValue(requestedUrl);
+            string url = requestedUrl.Replace("/api/v1/caldav", "");
+            hrefNode.AddValue(url);
 
             responseNode.AddChild(hrefNode);
 
@@ -85,12 +103,13 @@ namespace ACL.Core
 
             var propNode = new XmlTreeStructure("prop", "DAV:");
 
-            //add the requested properties to the propNode 
+            //add the requested properties to the propNode
             //if the properties exist in the principal
             var properties = principal.Properties
-                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Namespace, p.Name)))
+                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
                 .Select(x => XmlTreeStructure.Parse(x.Value));
-
+            var xdocS = XDocument.Parse(principal.Properties[1].Value).ToString();
+            Console.WriteLine(xdocS);
             //add the properties to the propNode
             foreach (var property in properties)
             {
@@ -107,16 +126,15 @@ namespace ACL.Core
 
             responseNode.AddChild(propstatNode);
 
-            multistatus.AddChild(responseNode);
+            multistatusNode.AddChild(responseNode);
 
             //here the multistatus xml for the body is built
             //have to write it to the response body.
 
-            await response.WriteAsync(multistatus.ToString());
+            string multiStatus = multistatusNode.ToString();
+
+            await response.WriteAsync(multiStatus);
         }
-
-
-
 
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.

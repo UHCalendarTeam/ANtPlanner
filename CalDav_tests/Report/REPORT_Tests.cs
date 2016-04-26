@@ -52,7 +52,7 @@
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-//            var reportMet = new CalDavReport();
+//            var reportMet = new CollectionReport();
 
 //            var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -107,7 +107,7 @@
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-//            var reportMet = new CalDavReport();
+//            var reportMet = new CollectionReport();
 
 //            var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -151,7 +151,7 @@
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-//            var reportMet = new CalDavReport();
+//            var reportMet = new CollectionReport();
 
 //            var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -208,7 +208,7 @@
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-//            var reportMet = new CalDavReport();
+//            var reportMet = new CollectionReport();
 
 //            var result = reportMet.ProcessRequest(xmlTree, fs);
 
@@ -258,7 +258,7 @@
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
-//            var reportMet = new CalDavReport();
+//            var reportMet = new CollectionReport();
 
 //            var result = reportMet.ProcessRequest(xmlTree, fs);
 

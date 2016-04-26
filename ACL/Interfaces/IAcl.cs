@@ -61,7 +61,6 @@
         /// <returns>The acl-restricion property.</returns>
         string GetAclRestriction();
 
-
         /// <summary>
         ///     Contains a set of URLs that identify the root
         ///     collections that contain the principals that are

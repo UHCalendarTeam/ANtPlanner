@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Primitives;
 using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Abstractions;
+using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity.Metadata.Internal;
 using Microsoft.Net.Http.Headers;
 
@@ -37,24 +39,69 @@ namespace CalDav_Services.Controllers
 
         #region
 
-        [AcceptVerbs("PROPFIND", Route = "{user}")]
-        public string PropFind(string groupOrUser)
+        /// <summary>
+        /// Accepts the PROFIND calls for the principals.
+        /// </summary>
+        /// <param name="groupOrUser">Says if the principal represents a user or a group</param>
+        /// <param name="principalId">If the principal represents a group then it has the name
+        /// of the group. Otherwise has the email of the user that the principal represents.</param>
+        /// <returns></returns>
+        [AcceptVerbs("PROPFIND", Route = "principals/{groupOrUser}/{principalId}")]
+        public async Task ACLPropFind(string groupOrUser, string principalId)
         {
-            return "test";
+            
+            var dict = new Dictionary<string, string>()
+            {
+                {"principalId", principalId },
+                {"groupOrUser", groupOrUser }
+            };
+            Response.StatusCode = 207;
+            await CalDavRepository.ACLProfind(Request, Response, dict);
+           
+            
         }
 
-        [AcceptVerbs("propfind")]
+        /// <summary>
+        /// If a PROFIND is perform to an empty URL
+        /// means that the client is discovering the
+        /// service.
+        /// So create the principal and return a cookie
+        /// to remember the user.
+        /// </summary>
+        /// <returns></returns>
+        [AcceptVerbs("PROPFIND", Route = "")]
         public async Task PropFind()
         {
-
-            await Response.WriteAsync("sdf");
-            // return "test";
+            Response.StatusCode = 207;
+            await CalDavRepository.ACLProfind(Request, Response, null);
+           
+            
         }
 
         #endregion
 
 
         #region Collection Methods
+        /// <summary>
+        /// THis action is called when the client perfoms a PROFIND
+        /// on a collection to take the calendars.
+        /// </summary>
+        /// <param name="groupOrUser">If the principals represents a user or a group</param>
+        /// <param name="principalId">If user then the email, otherwise the name of the group.</param>
+        [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}")]
+        public void CollectionRootProfind(string groupOrUser, string principalId)
+        {
+            var url = GetRealUrl(Request);
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("url", url);
+            var body = StreamToString(Request.Body);
+
+            StringValues depth;
+            if (Request.Headers.TryGetValue("Depth", out depth))
+                propertiesAndHeaders.Add("depth", depth);
+
+            CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
+        }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
         [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
@@ -85,6 +132,16 @@ namespace CalDav_Services.Controllers
 
             CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
+        ///TODO: annadir un PROFIND q tenga la ruta "collections/{usersOrGroups}/principalId"
+        /// por aki es donde el cliente realiza el primer PROFIND sobre una coleccion para coger los 
+        /// calendarios del usuario.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupOrUser"></param>
+        /// <param name="principalId"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="calendarResource"></param>
 
         //PROPFIND RESOURCES
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
@@ -128,14 +185,14 @@ namespace CalDav_Services.Controllers
 
         //REPORT
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
-        public string Report(string user, string collection)
+        public async Task Report(string user, string collection)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("url", GetRealUrl(Request));
-            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+            await CalDavRepository.Report(HttpContext);
         }
 
         #endregion
@@ -267,7 +324,7 @@ END:VCALENDAR";
 
         //REPORT api/values/5
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public string Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -276,8 +333,8 @@ END:VCALENDAR";
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CalDavReport report = new CalDavReport();
-            return report.ProcessRequest(propertiesAndHeaders, StreamToString(Request.Body));
+            CollectionReport collectionReport = new CollectionReport();
+            await collectionReport.ProcessRequest(HttpContext);
 
         }
 

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using ACL.Core;
 using DataLayer;
 using DataLayer.ExtensionMethods;
@@ -179,5 +182,21 @@ namespace CalDav_tests
             Assert.NotNull(context.Principals.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
             Assert.NotNull(context.CalendarCollections.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
         }
+
+
+        [Fact]
+        public void UnitTest10()
+        {
+            var c = new CalDavContext();
+            var principal = c.Principals.Include(x=>x.Properties).FirstOrDefault(x => x.User.Email == "postman5@postman.com");
+            var prop = principal.Properties[1];
+            var propS = prop.Value;
+            var xDoc = XDocument.Parse(propS);
+
+            
+
+        }
+
+       
     }
 }

@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DataLayer.Models.ACL;
+﻿using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
+using System.Threading.Tasks;
 
 namespace ACL.Core.Authentication
 {
     /// <summary>
-    /// Defines the methods for the communication between the 
+    /// Defines the methods for the communication between the
     /// client and the UH's authentication api.
     /// </summary>
-    public  interface IAuthenticate
+    public interface IAuthenticate
     {
         /// <summary>
         /// Take the request from the client and
-        /// create a WebRequest to take the data from the 
+        /// create a WebRequest to take the data from the
         /// Universith authentication api.
         /// </summary>
         /// <param name="request">The request from the client. </param>

@@ -71,7 +71,7 @@ END:VCALENDAR
 ";
                 #endregion
 
-                
+
                 fs.AddCalendarObjectResourceFile(assesinationEvent.Href, body);
 
                 var claire = new User("Claire", "c.underwood@wh.org");

@@ -34,11 +34,11 @@ namespace CalDAV.Core
 
         /// <summary>
         ///     CalDav HTTP Method REPORT for Calendar Collections
+        ///     Call this method form the controller and will handle
+        ///     the report for the collections.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
         /// <returns></returns>
-        string Report(Dictionary<string, string> propertiesAndHeaders, string body);
+        Task Report(HttpContext context);
 
         /// <summary>
         ///     CalDAV PUT for create a new COR
@@ -75,5 +75,14 @@ namespace CalDAV.Core
         /// <param name="propertiesAndHeaders"></param>
         /// <returns></returns>
         string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
+
+        /// <summary>
+        /// This method perfoms a profind on a principal.
+        /// </summary>
+        /// <param name="request">The request from the controller.</param>
+        /// <param name="response">The response from the controller.</param>
+        /// <param name="data">SOme useful data that could be send from the controller.</param>
+        /// <returns></returns>
+        Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data);
     }
 }

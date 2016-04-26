@@ -1,9 +1,4 @@
-﻿
-SELECT *
-FROM [CalendarResource];
-
-SELECT *
-FROM [CalendarCollection];
-/*
-DELETE FROM [User]
-WHERE 1=1;*/
+﻿SELECT PrincipalStringIdentifier, Name, Value
+FROM [Principal]
+INNER JOIN [Property]
+ON Principal.PrincipalId=Property.PricipalId;

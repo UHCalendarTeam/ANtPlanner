@@ -1,10 +1,10 @@
 {
   "authors": [ "UHCalendarTeam" ],
-    "dependencies": {
-        "DataLayer": "1.0.0-*",
-        "ICalendar": "1.0.0-rc2-*",
-        "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
+  "dependencies": {
+    "DataLayer": "1.0.0-*",
+    "ICalendar": "1.0.0-rc2-*",
+    "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
         "Microsoft.CSharp": "4.0.1-beta-*",
         "System.Collections": "4.0.11-beta-*",
         "System.IO": "4.0.11-beta-*",
@@ -12,8 +12,9 @@
         "System.Reflection": "4.1.0-beta-*",
         "System.Runtime": "4.0.21-beta-*",
         "System.Threading": "4.0.11-beta-*",
-        "TreeForXml": "1.0.3"
-    },
+    "TreeForXml": "1.0.3",
+    "ACL": "1.0.0-*"
+  },
  
   "description": "CalDAV Library",
   "frameworks": {

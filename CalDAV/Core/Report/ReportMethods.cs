@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
@@ -13,15 +16,15 @@ namespace CalDAV.Core
     ///     THis class contain the logic for processing a
     ///     REPORT Request.
     /// </summary>
-    public class CalDavReport : IReportMethods
+    public class CollectionReport : ICollectionReport
     {
-        public CalDavReport(string userEmail, string collectionName)
+        public CollectionReport(string userEmail, string collectionName)
         {
             UserEmail = userEmail;
             CollectionName = collectionName;
         }
 
-        public CalDavReport()
+        public CollectionReport()
         {
         }
 
@@ -41,19 +44,25 @@ namespace CalDAV.Core
         /// <param name="headerValues">The neccessary properties and values of the header</param>
         /// <param name="body">The string representation of the body</param>
         /// <returns></returns>
-        public string ProcessRequest(Dictionary<string, string> headerValues, string body)
+        public async Task ProcessRequest(HttpContext httpContext)
         {
+           
+            // var node = xmlBody.Children.First();
+            var xmlBody = XmlTreeStructure.Parse(new StreamReader(httpContext.Request.Body).ReadToEnd());
+
+            ///take the target url that is the identifier of the collection
+            var urlId = httpContext.Request.GetRealUrl();
+
             //take the first node of the xml and process the request
             //by the name of the first node
-            // var node = xmlBody.Children.First();
-            var xmlBody = XmlTreeStructure.Parse(body);
-         
             switch (xmlBody.NodeName)
             {
                 case "calendar-query":
-                    return CalendarQuery(xmlBody,  headerValues["url"]);
+                    await CalendarQuery(xmlBody,  urlId, httpContext);
+                    break;
                 case "calendar-multiget":
-                    return CalendarMultiget(xmlBody);
+                    await CalendarMultiget(xmlBody, httpContext);
+                    break;
                 default:
                     throw new NotImplementedException(
                         $"The REPORT request {xmlBody.NodeName} with ns equal to {xmlBody.MainNamespace} is not implemented yet .");
@@ -71,7 +80,7 @@ namespace CalDAV.Core
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="fs">The FileManagementSystem instance that points to the requested collection.</param>
         /// <returns></returns>
-        public string CalendarQuery(IXMLTreeStructure xmlDoc,  string collectionURl)
+        public async Task CalendarQuery(IXMLTreeStructure xmlDoc,  string collectionURl, HttpContext httpContext)
         {
             IFileSystemManagement fs = new FileSystemManagement();
             /// take the first prop node to know the data that
@@ -92,7 +101,7 @@ namespace CalDAV.Core
 
             ///apply the filters to the calendars
             var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(componentFilter));
-            return ReportResponseBuilder(filteredCalendars, propNode);
+            await ReportResponseBuilder(filteredCalendars, propNode, httpContext);
         }
 
         /// <summary>
@@ -108,10 +117,10 @@ namespace CalDAV.Core
         ///     CALDAV:comp element, calendar object resources will be returned in their entirety.
         /// </param>
         /// <returns>The string representation of the multi-status Xml with the results.</returns>
-        public string ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
-            IXMLTreeStructure calDataNode)
+        public async Task ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
+            IXMLTreeStructure calDataNode, HttpContext httpContext)
         {
-            var mutistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {
@@ -163,9 +172,9 @@ namespace CalDAV.Core
                     responseNode.AddChild(propstatNode);
                 }
 
-                mutistatusNode.AddChild(responseNode);
+                multistatusNode.AddChild(responseNode);
             }
-            return mutistatusNode.ToString();
+            await httpContext.Response.WriteAsync(multistatusNode.ToString());
         }
 
 
@@ -179,7 +188,7 @@ namespace CalDAV.Core
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="storageManagement">The FileManagementSystem instance that points to the requested collection.</param>
         /// <returns></returns>
-        private string CalendarMultiget(IXMLTreeStructure xmlBody)
+        private async Task CalendarMultiget(IXMLTreeStructure xmlBody, HttpContext httpContext)
         {
             /// take the first prop node to know the data that
             /// should ne returned
@@ -201,11 +210,11 @@ namespace CalDAV.Core
 
                 result.Add(href, resourceContent);
             }
-            return ReportResponseBuilder(result
+            await ReportResponseBuilder(result
                 .Select(
                     x =>
                         new KeyValuePair<string, VCalendar>(x.Key,
-                            string.IsNullOrEmpty(x.Value) ? null : VCalendar.Parse(x.Value))), propNode);
+                            string.IsNullOrEmpty(x.Value) ? null : VCalendar.Parse(x.Value))), propNode, httpContext);
         }
 
         /// <summary>
