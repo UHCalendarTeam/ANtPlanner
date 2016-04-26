@@ -26,12 +26,12 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
-            if (calendarResourceId == null && db.CollectionExist(url))
+            if (calendarResourceId == null && !db.CollectionExist(url))
             {
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (db.CalendarResourceExist(url))
+            if (calendarResourceId !=null && !db.CalendarResourceExist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
