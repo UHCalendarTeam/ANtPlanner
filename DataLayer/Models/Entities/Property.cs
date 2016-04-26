@@ -13,6 +13,9 @@ namespace DataLayer.Models.Entities
         {
             Name = name;
             Namespace = nameSpace;
+            IsMutable = true;
+            IsDestroyable = true;
+            IsVisible = true;
         }
 
         public Property()
@@ -78,6 +81,6 @@ namespace DataLayer.Models.Entities
 
 
 
-       
+
     }
 }
