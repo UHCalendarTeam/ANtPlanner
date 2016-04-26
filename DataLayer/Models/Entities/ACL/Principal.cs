@@ -74,11 +74,20 @@ namespace DataLayer.Models.ACL
         ///     this is.
         /// </summary>
         public User User { get; set; }
+
         /// <summary>
-        /// When the principal represents an User this property
-        /// will contain the userEmail. When the principal represents a group
-        /// this property will contain the group name.
+        ///     When the principal represents an User this property
+        ///     will contain the userEmail. When the principal represents a group
+        ///     this property will contain the group name.
         /// </summary>
         public string PrincipalStringIdentifier { get; set; }
+
+        /// <summary>
+        ///     The value of the this property will be
+        ///     use to store the value of the cookie's
+        ///     session so to check if the principal is
+        ///     authenticated.
+        /// </summary>
+        public string SessionId { get; set; }
     }
 }

@@ -177,7 +177,8 @@ namespace CalDAV.Core
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return;
             }
-            response.Body.Write(responseTree.ToString());
+            string stringResp = responseTree.ToString();
+            response.Body.Write(stringResp);
         }
 
         /// <summary>

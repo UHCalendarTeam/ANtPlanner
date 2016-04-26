@@ -95,6 +95,8 @@ namespace CalDav_Services.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
             var body = StreamToString(Request.Body);
+            var cookie = Request.Cookies["AuthId"];
+            var auth = Request.Headers["Authorization"];
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
