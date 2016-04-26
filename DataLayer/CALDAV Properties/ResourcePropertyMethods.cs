@@ -124,15 +124,7 @@ namespace DataLayer
             //if the property did not exist it is created.
             if (property == null)
             {
-                resource.Properties.Add(new Property
-                {
-                    Name = propertyName,
-                    Namespace = nameSpace,
-                    IsDestroyable = true,
-                    IsVisible = false,
-                    IsMutable = true,
-                    Value = propertyValue
-                });
+                resource.Properties.Add(new Property(propertyName, nameSpace));
                 return true;
             }
             //if this property belongs to the fix system properties, it can not be changed.
