@@ -44,7 +44,8 @@ namespace CalDAV.Core
         /// <returns></returns>
         public async Task ProcessRequest(HttpContext httpContext)
         {
-           
+            
+
             // var node = xmlBody.Children.First();
             var xmlBody = XmlTreeStructure.Parse(new StreamReader(httpContext.Request.Body).ReadToEnd());
 
