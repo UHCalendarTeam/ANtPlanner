@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
@@ -6,7 +7,7 @@ using TreeForXml;
 
 namespace CalDAV.Core
 {
-    internal interface IReportMethods
+    public interface ICollectionReport
     {
         string ExpandProperty();
 
@@ -18,7 +19,7 @@ namespace CalDAV.Core
         /// contains the response so can be modified and the request to take
         /// useful data from it.</param>
         /// <returns>The data for the body of the response of the request.</returns>
-        string ProcessRequest(HttpContext context);
+        Task ProcessRequest(HttpContext context);
 
         /// <summary>
         ///     Apply the calendar-query opertation to a
@@ -27,7 +28,7 @@ namespace CalDAV.Core
         /// <param name="xmlBody">The xml send in the body of the request.</param>
         /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>
         /// <returns></returns>
-        string CalendarQuery(IXMLTreeStructure xmlBody, string collectionUrl);
+       Task CalendarQuery(IXMLTreeStructure xmlBody, string collectionUrl, HttpContext httpContext);
 
         /// <summary>
         ///     Take the calendar that passed the filter and
@@ -40,7 +41,7 @@ namespace CalDAV.Core
         ///     response.If the CALDAV:calendar-data XML element doesn't contain any
         ///     CALDAV:comp element, calendar object resources will be returned in their entirety./param>
         ///     <returns>The string representation of the multi-status Xml with the results.</returns>
-        string ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
-            IXMLTreeStructure calendarData);
+        Task ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
+            IXMLTreeStructure calendarData, HttpContext httpContext);
     }
 }

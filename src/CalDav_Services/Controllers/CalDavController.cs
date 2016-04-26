@@ -185,14 +185,14 @@ namespace CalDav_Services.Controllers
 
         //REPORT
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}")]
-        public string Report(string user, string collection)
+        public async Task Report(string user, string collection)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("userEmail", user);
             propertiesAndHeaders.Add("collectionName", collection);
             propertiesAndHeaders.Add("url", GetRealUrl(Request));
-            return CalDavRepository.Report(propertiesAndHeaders, StreamToString(Request.Body));
+            await CalDavRepository.Report(HttpContext);
         }
 
         #endregion
@@ -324,7 +324,7 @@ END:VCALENDAR";
 
         //REPORT api/values/5
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public string Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -333,8 +333,8 @@ END:VCALENDAR";
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CalDavReport report = new CalDavReport();
-            return report.ProcessRequest(propertiesAndHeaders, StreamToString(Request.Body));
+            CollectionReport collectionReport = new CollectionReport();
+            await collectionReport.ProcessRequest(HttpContext);
 
         }
 

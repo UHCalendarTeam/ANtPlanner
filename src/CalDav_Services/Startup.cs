@@ -52,6 +52,8 @@ namespace CalDav_Services
             services.AddSingleton<IFileSystemManagement, FileSystemManagement>();
             services.AddSingleton<IAuthenticate, UhCalendarAuthentication>();
             services.AddSingleton<IACLProfind, ACLProfind>();
+            services.AddSingleton<ICollectionReport, CollectionReport>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?

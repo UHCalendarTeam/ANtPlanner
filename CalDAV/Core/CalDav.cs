@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using ACL.Core;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Method_Extensions;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
 using Microsoft.Net.Http.Headers;
 using TreeForXml;
-using System.Diagnostics.Contracts;
-using ACL.Core;
-using DataLayer.Models.Method_Extensions;
 
 namespace CalDAV.Core
 {
@@ -34,17 +33,22 @@ namespace CalDAV.Core
             {"C", "urn:ietf:params:xml:ns:caldav"}
         };
 
+        private readonly IACLProfind _aclProfind;
+        private readonly ICollectionReport _colectionCollectionReport;
+
         /// <summary>
-        /// DI in the params.
+        ///     DI in the params.
         /// </summary>
         /// <param name="fsManagement"></param>
         /// <param name="_context"></param>
         /// <param name="aclProfind"></param>
-        public CalDav(IFileSystemManagement fsManagement, CalDavContext _context, IACLProfind aclProfind)
+        public CalDav(IFileSystemManagement fsManagement, CalDavContext _context,
+            IACLProfind aclProfind, ICollectionReport collectionCollectionReport)
         {
             StorageManagement = fsManagement;
             db = _context;
             _aclProfind = aclProfind;
+            _colectionCollectionReport = collectionCollectionReport;
         }
 
 
@@ -57,17 +61,62 @@ namespace CalDAV.Core
         private IStartUp StartUp { get; set; }
 
         private CalDavContext db { get; }
+        //TODO: Adriano
+        public async Task Report(HttpContext httpContext)
+        {
+            await _colectionCollectionReport.ProcessRequest(httpContext);
+        }
 
-        private IACLProfind _aclProfind;
+        /// <summary>
+        ///     Extract all property names and property namespace from a prop element of a  propfind body.
+        /// </summary>
+        /// <param name="propFindTree"></param>
+        /// <returns></returns>
+        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(IXMLTreeStructure propFindTree)
+        {
+            var retList = new List<KeyValuePair<string, string>>();
+            IXMLTreeStructure props;
+
+            if (propFindTree.GetChildAtAnyLevel("prop", out props))
+                retList.AddRange(
+                    props.Children.Select(
+                        child =>
+                            new KeyValuePair<string, string>(child.NodeName,
+                                string.IsNullOrEmpty(child.MainNamespace) ? "DAV:" : child.MainNamespace)));
+            return retList;
+        }
+
+        /// <summary>
+        ///     Extract all property names and property namespace from a include element of a  propfind body in the allproperty
+        ///     method.
+        /// </summary>
+        /// <param name="propFindTree"></param>
+        /// <returns></returns>
+        private List<KeyValuePair<string, string>> ExtractIncludePropertiesNameMainNS(XmlTreeStructure propFindTree)
+        {
+            var retList = new List<KeyValuePair<string, string>>();
+            IXMLTreeStructure includes;
+            if (propFindTree.GetChildAtAnyLevel("include", out includes))
+            {
+                retList.AddRange(
+                    includes.Children.Select(
+                        child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
+            }
+            return retList;
+        }
+
         #region PORFIND methods
+
         //TODO: Nacho
         /// <summary>
-        /// This PROFIND is used for the collection and the resources.
+        ///     This PROFIND is used for the collection and the resources.
         /// </summary>
         /// <param name="propertiesAndHeaders">Put here: resourceURL, depth, calendarResourceId</param>
         /// <param name="body">The request body from the client.</param>
-        /// <param name="response">The Response property in the controller. We fill up the response object
-        /// with out response.</param>
+        /// <param name="response">
+        ///     The Response property in the controller. We fill up the response object
+        ///     with out response.
+        /// </param>
         public void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
         {
             #region Extracting Properties
@@ -136,7 +185,7 @@ namespace CalDAV.Core
             //Managing if the body was ok
             if (xmlTree.NodeName != "propfind")
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 return;
             }
 
@@ -146,11 +195,11 @@ namespace CalDAV.Core
             switch (propType.NodeName)
             {
                 case "prop":
-                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
+                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure) xmlTree);
                     PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree);
                     break;
                 case "allprop":
-                    var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure)xmlTree);
+                    var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure) xmlTree);
                     PropFindMethods.AllPropMethod(url, calendarResourceId,
                         depth, additionalProperties, responseTree);
                     break;
@@ -158,68 +207,25 @@ namespace CalDAV.Core
                     PropFindMethods.PropNameMethod(url, calendarResourceId, depth, responseTree);
                     break;
                 default:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return;
             }
             response.Body.Write(responseTree.ToString());
         }
 
         /// <summary>
-        /// This method perfoms a profind on a principal.
+        ///     This method perfoms a profind on a principal.
         /// </summary>
         /// <param name="request">The request from the controller.</param>
         /// <param name="response">The response from the controller.</param>
         /// <param name="data">SOme useful data that could be send from the controller.</param>
         /// <returns></returns>
-        public async Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data = null )
+        public async Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data = null)
         {
-          
             await _aclProfind.Profind(request, response, data);
         }
 
-
-
         #endregion
-        //TODO: Adriano
-        public string Report(Dictionary<string, string> propertiesAndHeaders, string body)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        ///     Extract all property names and property namespace from a prop element of a  propfind body.
-        /// </summary>
-        /// <param name="propFindTree"></param>
-        /// <returns></returns>
-        private List<KeyValuePair<string, string>> ExtractPropertiesNameMainNS(IXMLTreeStructure propFindTree)
-        {
-            var retList = new List<KeyValuePair<string, string>>();
-            IXMLTreeStructure props;
-
-            if (propFindTree.GetChildAtAnyLevel("prop", out props))
-                retList.AddRange(
-                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, string.IsNullOrEmpty(child.MainNamespace) ? "DAV:" : child.MainNamespace)));
-            return retList;
-        }
-
-        /// <summary>
-        ///     Extract all property names and property namespace from a include element of a  propfind body in the allproperty
-        ///     method.
-        /// </summary>
-        /// <param name="propFindTree"></param>
-        /// <returns></returns>
-        private List<KeyValuePair<string, string>> ExtractIncludePropertiesNameMainNS(XmlTreeStructure propFindTree)
-        {
-            var retList = new List<KeyValuePair<string, string>>();
-            IXMLTreeStructure includes;
-            if (propFindTree.GetChildAtAnyLevel("include", out includes))
-            {
-                retList.AddRange(
-                    includes.Children.Select(
-                        child => new KeyValuePair<string, string>(child.NodeName, child.MainNamespace)));
-            }
-            return retList;
-        }
 
         #region MkCalendar Methods
 
@@ -241,14 +247,14 @@ namespace CalDAV.Core
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
 
             //Checking that all precondition pass
-            
+
             //Cheking Preconditions
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             //I create here the collection already but i wait for other comprobations before save the database.
             CreateDefaultCalendar(propertiesAndHeaders);
-            response.StatusCode = (int)HttpStatusCode.Created;
+            response.StatusCode = (int) HttpStatusCode.Created;
 
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
@@ -256,7 +262,7 @@ namespace CalDAV.Core
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    response.StatusCode = (int) HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
                     return;
                     //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
@@ -276,17 +282,15 @@ namespace CalDAV.Core
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    response.StatusCode = (int) HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
 
                     return;
-
                 }
 
 
                 db.SaveChanges();
                 return;
-
             }
 
             //now it is assumed that the body contains a set
@@ -322,7 +326,6 @@ namespace CalDAV.Core
                 response.StatusCode = 207;
                 await response.WriteAsync(multistatus.ToString());
                 return;
-
             }
 
             //Checking Preconditions   
@@ -334,7 +337,7 @@ namespace CalDAV.Core
             }
 
             DeleteCalendarCollection(propertiesAndHeaders, response);
-            response.StatusCode = (int)HttpStatusCode.Forbidden;
+            response.StatusCode = (int) HttpStatusCode.Forbidden;
             await response.WriteAsync("Poscondition Failed");
 
 
@@ -361,7 +364,8 @@ namespace CalDAV.Core
             var principal = db.GetPrincipalByName(principalId);
             var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
+            collection.CreateOrModifyProperty("getctag", NamespacesSimple["C"],
+                new XmlTreeStructure("getctag", Namespaces["C"]) {Value = Guid.NewGuid().ToString()}.ToString(), stack);
             principal.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
@@ -430,7 +434,7 @@ namespace CalDAV.Core
 
             if (xmlTree.NodeName != "propertyupdate")
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 response.Body.Write(@"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
                 return;
             }
@@ -444,7 +448,7 @@ namespace CalDAV.Core
             //propertyupdate must have at least one element
             if (setsAndRemoves.Count == 0)
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 response.Body.Write("propertyupdate must have at least one element");
                 return;
                 //throw new ArgumentException("propertyupdate must have at least one element");
@@ -520,7 +524,7 @@ namespace CalDAV.Core
                 //the error and no more further message changing is needed.
                 if (statMessage != "HTTP/1.1 200 OK")
                     return;
-                ((XmlTreeStructure)status).Value = "HTTP/1.1 424 Failed Dependency";
+                ((XmlTreeStructure) status).Value = "HTTP/1.1 424 Failed Dependency";
             }
         }
 
@@ -643,6 +647,7 @@ namespace CalDAV.Core
         public bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
@@ -662,17 +667,21 @@ namespace CalDAV.Core
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
             }
-            return StorageManagement.DeleteCalendarObjectResource(url); ;
+            return StorageManagement.DeleteCalendarObjectResource(url);
+            ;
         }
 
         public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
+
             #endregion
+
             //The delete method default status code
-            response.StatusCode = (int)HttpStatusCode.NoContent;
+            response.StatusCode = (int) HttpStatusCode.NoContent;
             //If the collection already is gone it is treated as a successful operation.
             if (!StorageManagement.ExistCalendarCollection(url))
                 return true;
@@ -682,7 +691,7 @@ namespace CalDAV.Core
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return false;
             }
 
@@ -700,6 +709,7 @@ namespace CalDAV.Core
             HttpResponse response)
         {
             #region Extracting Properties 
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
@@ -715,7 +725,7 @@ namespace CalDAV.Core
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = (int) HttpStatusCode.NotFound;
                 return;
             }
 
@@ -724,7 +734,7 @@ namespace CalDAV.Core
             var etagProperty = calendarRes.Properties.SingleOrDefault(x => x.Name == "getetag");
             if (etagProperty != null)
             {
-                string etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
+                var etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
                 response.Headers["etag"] = etag;
             }
             responseHeader.ContentType = new MediaTypeHeaderValue("text/calendar");
@@ -745,6 +755,7 @@ namespace CalDAV.Core
             HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
@@ -791,7 +802,7 @@ namespace CalDAV.Core
                         await UpdateCalendarObjectResource(propertiesAndHeaders, response);
                         return;
                     }
-                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                    response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                     return;
                 }
             }
@@ -803,7 +814,7 @@ namespace CalDAV.Core
                     await CreateCalendarObjectResource(propertiesAndHeaders, response);
                     return;
                 }
-                response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
                 return;
             }
 
@@ -827,6 +838,7 @@ namespace CalDAV.Core
             HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
@@ -838,7 +850,6 @@ namespace CalDAV.Core
             #endregion
 
             var iCal = new VCalendar(body);
-
 
 
             //filling the resource
@@ -868,6 +879,7 @@ namespace CalDAV.Core
             HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
@@ -891,7 +903,8 @@ namespace CalDAV.Core
             var prevResource = db.GetCalendarResource(url);
 
             var errorStack = new Stack<string>();
-            prevResource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
+            prevResource.CreateOrModifyPropertyAdmin("getetag", "DAV:",
+                $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
             prevResource.CreateOrModifyPropertyAdmin("getlastmodified", "DAV:",
@@ -925,6 +938,7 @@ namespace CalDAV.Core
             HttpResponse response)
         {
             #region Extracting Properties
+
             string calendarResourceId;
             propertiesAndHeaders.TryGetValue("calendarResourceId", out calendarResourceId);
 
@@ -947,10 +961,11 @@ namespace CalDAV.Core
 
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             var stack = new Stack<string>();
-            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"], (new XmlTreeStructure("getctag", Namespaces["C"]) { Value = Guid.NewGuid().ToString() }).ToString(), stack);
+            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["C"],
+                new XmlTreeStructure("getctag", Namespaces["C"]) {Value = Guid.NewGuid().ToString()}.ToString(), stack);
 
             var calendarComponents =
-                                   iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
+                iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
             var calendarComponent = calendarComponents.FirstOrDefault();
             if (calendarComponent != null)
             {

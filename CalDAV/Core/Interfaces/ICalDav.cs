@@ -34,11 +34,11 @@ namespace CalDAV.Core
 
         /// <summary>
         ///     CalDav HTTP Method REPORT for Calendar Collections
+        ///     Call this method form the controller and will handle
+        ///     the report for the collections.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
         /// <returns></returns>
-        string Report(Dictionary<string, string> propertiesAndHeaders, string body);
+        Task Report(HttpContext context);
 
         /// <summary>
         ///     CalDAV PUT for create a new COR
