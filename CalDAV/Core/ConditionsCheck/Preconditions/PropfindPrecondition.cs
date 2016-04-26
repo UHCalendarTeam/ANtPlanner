@@ -31,7 +31,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (!db.CalendarResourceExist(url))
+            if (calendarResourceId !=null && !db.CalendarResourceExist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
