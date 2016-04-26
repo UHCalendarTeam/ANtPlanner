@@ -180,12 +180,12 @@ namespace DataLayer.Models.Entities
                 IsMutable = true,
                 Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
-            Properties.Add(new Property("getctag", NamespacesSimple["C"])
+            Properties.Add(new Property("getctag", "http://calendarserver.org/ns/")
             {
                 IsVisible = false,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = @"<getctag xmlns=""http://calendarserver.org/ns/"" }>{Guid.NewGuid()}</getctag>"
+                Value = $@"<getctag xmlns=""http://calendarserver.org/ns/"" >{Guid.NewGuid()}</getctag>"
             });
           
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using CalDAV.Core.Method_Extensions;
@@ -31,18 +32,21 @@ namespace CalDAV.Core.ConditionsCheck
 
             var contentSize = propertiesAndHeaders["content-length"];
             var body = propertiesAndHeaders["body"];
-            
-            var iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
-
-            #endregion
-
-            //calendar data is ok
-
-            if (iCalendar == null)
+            VCalendar iCalendar;
+            try
+            {
+                iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
+            }
+            catch (Exception)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return false;
             }
+           
+
+            #endregion
+
+           
 
             //check that resourceId don't exist but the collection does.
             if (!StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/") + 1)))
