@@ -40,7 +40,7 @@ namespace DataLayer.ExtensionMethods
             };
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, SystemProperties._defualtInitialCollectionName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
             
 
@@ -107,14 +107,13 @@ namespace DataLayer.ExtensionMethods
             /// create the DAV:group-membership
             var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
 
-            //create the calendar-home-set
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.Group, group);
+            
 
             //create the displayname
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullname);
 
             ///create the principal the represents the user
-            var principal = new Principal(email, SystemProperties.PrincipalType.Student, calHomeSet, gMembership, displayName);
+            var principal = new Principal(email, SystemProperties.PrincipalType.Student,  gMembership, displayName);
 
             student.Principal = principal;
             principal.User = student;
@@ -129,6 +128,11 @@ namespace DataLayer.ExtensionMethods
             if (collection == null)
                 throw new InvalidDataException("The user group doesnt exit in the system." +
                                                "Check if the user group is valid or create the group collection in the system.");
+
+            //create the calendar-home-set
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.Group, group, collection.Name);
+            //add the property to the principal
+            principal.Properties.Add(calHomeSet);
 
             context.Students.Add(student);
             context.Principals.Add(principal);
@@ -145,7 +149,7 @@ namespace DataLayer.ExtensionMethods
 
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, SystemProperties._defualtInitialCollectionName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
             ///create the principal the represents the user

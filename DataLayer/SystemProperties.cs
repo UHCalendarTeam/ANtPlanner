@@ -72,7 +72,7 @@
             var colUrl = type == PrincipalType.User ? _userCollectionUrl : _groupCollectionUrl;
 
             //add the identifier of the pricipal
-            return $"{colUrl}{principalId}";
+            return $"{colUrl}{principalId}/";
         }
     }
 }

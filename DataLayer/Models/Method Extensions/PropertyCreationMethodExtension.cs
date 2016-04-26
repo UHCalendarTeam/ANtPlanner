@@ -68,13 +68,14 @@ namespace DataLayer
         /// a user or a group </param>
         /// <param name="principalId">If the principal represents a group then send
         /// the name of the group, otherwise send the email of the user</param>
+        /// <param name="calName">THe name of the calendar to be added in the url.</param>
         /// <returns></returns>
-        public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId)
+        public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId, string calName)
         {
             var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
-                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</D:href></C:calendar-home-set>"
+                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}{calName}/</D:href></C:calendar-home-set>"
             };
             return property;
         }
