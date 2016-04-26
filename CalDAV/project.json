@@ -1,10 +1,10 @@
 {
-  "authors": [ "UHCalendarTeam" ],
-  "dependencies": {
-    "DataLayer": "1.0.0-*",
-    "ICalendar": "1.0.0-rc2-*",
-    "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
+    "authors": [ "UHCalendarTeam" ],
+    "dependencies": {
+        "DataLayer": "1.0.0-*",
+        "ICalendar": "1.0.0-rc2-260400",
+        "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
+        "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
         "Microsoft.CSharp": "4.0.1-beta-*",
         "System.Collections": "4.0.11-beta-*",
         "System.IO": "4.0.11-beta-*",
@@ -12,31 +12,31 @@
         "System.Reflection": "4.1.0-beta-*",
         "System.Runtime": "4.0.21-beta-*",
         "System.Threading": "4.0.11-beta-*",
-    "TreeForXml": "1.0.4",
-    "ACL": "1.0.0-*"
-  },
- 
-  "description": "CalDAV Library",
-  "frameworks": {
-    "dnx451": {
+        "TreeForXml": "1.0.4",
+        "ACL": "1.0.0-*"
+    },
 
-      "frameworkAssemblies": {
-        "System.Xml": "4.0.0.0",
-        "System.Xml.Linq": "4.0.0.0"
-      }
+    "description": "CalDAV Library",
+    "frameworks": {
+        "dnx451": {
 
+            "frameworkAssemblies": {
+                "System.Xml": "4.0.0.0",
+                "System.Xml.Linq": "4.0.0.0"
+            }
+
+
+        },
+        "dnxcore50": {
+            "dependencies": {
+                "System.Xml.XDocument": "4.0.10"
+
+            }
+        }
 
     },
-    "dnxcore50": {
-      "dependencies": {
-        "System.Xml.XDocument": "4.0.10"
-
-      }
-    }
-
-  },
-  "licenseUrl": "",
-  "projectUrl": "",
-  "tags": [ "" ],
-  "version": "1.0.0-*"
+    "licenseUrl": "",
+    "projectUrl": "",
+    "tags": [ "" ],
+    "version": "1.0.0-*"
 }

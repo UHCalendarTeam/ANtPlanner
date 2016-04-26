@@ -135,7 +135,7 @@
 //                        {
 //                            Name = "getcontenttype",
 //                            Namespace = NamespacesSimple["D"],
-//                            Value = $"<D:getcontenttype {Namespaces["D"]}>text/icalendar</D:getcontenttype>",
+//                            Value = $"<D:getcontenttype {Namespaces["D"]}>text/</D:getcontenttype>",
 //                            IsVisible = true,
 //                            IsDestroyable = false,
 //                            IsMutable = true

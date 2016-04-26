@@ -682,6 +682,13 @@ namespace CalDAV.Core
                 db.DeleteResource(resource);
                 db.SaveChanges();
 
+                //updating the ctag
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/")+1));
+                var stack = new Stack<string>();
+                collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+
+
                 return StorageManagement.DeleteCalendarObjectResource(url);
             }
             return StorageManagement.DeleteCalendarObjectResource(url);
@@ -920,10 +927,18 @@ namespace CalDAV.Core
             var prevResource = db.GetCalendarResource(url);
 
             var errorStack = new Stack<string>();
+
+            //updating the etag
             prevResource.CreateOrModifyPropertyAdmin("getetag", "DAV:",
                 $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
+            //updating the ctag
+            var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
+            collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), errorStack);
+
+            //updating the lastmodified
             prevResource.CreateOrModifyPropertyAdmin("getlastmodified", "DAV:",
                 $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>", errorStack);
 
