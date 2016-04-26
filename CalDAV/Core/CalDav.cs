@@ -169,10 +169,12 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="request">The request from the controller.</param>
         /// <param name="response">The response from the controller.</param>
+        /// <param name="data">SOme useful data that could be send from the controller.</param>
         /// <returns></returns>
-        public async Task ACLProfind(HttpRequest request, HttpResponse response)
+        public async Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data = null )
         {
-            await _aclProfind.Profind(request, response);
+          
+            await _aclProfind.Profind(request, response, data);
         }
 
 

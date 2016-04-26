@@ -14,10 +14,11 @@ namespace CalDAV.Core
         ///     Process the REPORT request and send back the
         ///     result of the applied operations.
         /// </summary>
-        /// <param name="xmlBody">The xml send in the body of the REPORT request.</param>
-        /// <param name="storageManagement">An instance of the FileSystemManagment of the requested collection.</param>
+        /// <param name="context">Send the HttpContext from the controller. THis
+        /// contains the response so can be modified and the request to take
+        /// useful data from it.</param>
         /// <returns>The data for the body of the response of the request.</returns>
-        string ProcessRequest(Dictionary<string, string> headerValues, string bod);
+        string ProcessRequest(HttpContext context);
 
         /// <summary>
         ///     Apply the calendar-query opertation to a

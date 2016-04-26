@@ -7,7 +7,7 @@ namespace ACL.Core
 {
     public interface IACLProfind
     {
-        Task Profind(HttpRequest request, HttpResponse response);
+        Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data);
 
         Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal);

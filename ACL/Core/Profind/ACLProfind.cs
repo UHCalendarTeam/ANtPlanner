@@ -9,6 +9,7 @@ using ACL.Core.Authentication;
 using DataLayer;
 using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
+using Microsoft.Data.Entity;
 using TreeForXml;
 
 namespace ACL.Core
@@ -20,9 +21,11 @@ namespace ACL.Core
     public class ACLProfind : IACLProfind
     {
         private IAuthenticate _authenticate;
-        public ACLProfind(IAuthenticate authenticate)
+        private CalDavContext _context;
+        public ACLProfind(IAuthenticate authenticate, CalDavContext context)
         {
             _authenticate = authenticate;
+            _context = context;
         }
 
         /// <summary>
@@ -31,21 +34,34 @@ namespace ACL.Core
         /// Initially the client could do a PROFIND over
         /// the server to discover all the user calendars
         /// or could PORFIND directly over a calendar URL. 
-        /// </summary> 
+        /// </summary>
         /// <param name="request">THe HttpRequest from the controller.</param>
-        /// <param name="body">The request's body</param>
         /// <param name="response">The HttpResponse property from the controller.</param>
+        /// <param name="data"></param>
+        /// <param name="body">The request's body</param>
         /// <returns>The request</returns>
-        public async Task Profind(HttpRequest request, HttpResponse response)
+        public async Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data)
         {
             var requestPath = request.Path;
 
             //read the body of the request
             var bodyString = new StreamReader(request.Body).ReadToEnd();
-            var context = new CalDavContext();
 
-            //authenticate the user if exit if not create it in the system
-            var principal = await _authenticate.AuthenticateRequest(request, response);
+            Principal principal;
+
+            //if from the controller comes the principal data, means that the user
+            //exist in the system, so take it
+            if (data != null)
+            {
+                principal =
+                    _context.Principals.Include(p => p.Properties)
+                        .FirstOrDefault(p => p.PrincipalStringIdentifier == data["principalId"]);
+                //TODO: check the user's credentials
+            }
+
+            //authenticate the user if exist, if not create it in the system
+            else
+                principal = await _authenticate.AuthenticateRequest(request, response);
 
 
             IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);

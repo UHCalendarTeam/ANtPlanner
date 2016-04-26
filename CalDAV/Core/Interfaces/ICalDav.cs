@@ -81,7 +81,8 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="request">The request from the controller.</param>
         /// <param name="response">The response from the controller.</param>
+        /// <param name="data">SOme useful data that could be send from the controller.</param>
         /// <returns></returns>
-        Task ACLProfind(HttpRequest request, HttpResponse response);
+        Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data);
     }
 }
