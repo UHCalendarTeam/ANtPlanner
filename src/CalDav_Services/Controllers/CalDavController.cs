@@ -291,20 +291,15 @@ namespace CalDav_Services.Controllers
             CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
         }
 
-#region Collections Reports
+        #region Collections Reports
 
         //REPORT api/values/5
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
-            var url = GetRealUrl(Request);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", GetPrincipalUrlFromUrl(url, collectionName));
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-
+            Response.StatusCode = 207;
             await CalDavRepository.Report(HttpContext);
+            
 
         }
 
@@ -312,12 +307,9 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task Report(string user, string collection)
         {
-            var url = GetRealUrl(Request);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("url", GetRealUrl(Request));
+            Response.StatusCode = 207;
             await CalDavRepository.Report(HttpContext);
+           
         }
 
 #endregion

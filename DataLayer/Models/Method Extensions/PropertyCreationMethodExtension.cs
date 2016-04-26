@@ -86,13 +86,20 @@ namespace DataLayer
         /// <param name="nodeName">The name for the node. ej:displayname</param>
         /// <param name="nodePrefix">The ns prefix of the node. ej: the prefix of DAV: is D, so pass D</param>
         /// <param name="nodeValue">The value for the node. Clean value, dont construct the xml.</param>
+        /// <param name="isDetr">Says if the property can be destroyed</param>
+        /// <param name="isMutable">Says if the property can be modified.</param>
+        /// <param name="isVisible">Says if the property is visible.</param>
         /// <returns></returns>
-        public static Property CreateProperty(string nodeName, string nodePrefix, string nodeValue)
+        public static Property CreateProperty(string nodeName, string nodePrefix, string nodeValue,
+            bool isDetr=true, bool isMutable=true, bool isVisible = true)
         {
             var xmlValue = $"<{nodePrefix}:{nodeName} {Namespaces[nodePrefix]}>{nodeValue}</{nodePrefix}:{nodeName}>";
             return new Property(nodeName, NamespacesSimple[nodePrefix])
             {
-                Value = xmlValue
+                Value = xmlValue,
+                IsMutable = isMutable,
+                IsDestroyable = isDetr,
+                IsVisible = isVisible
             };
         }
 

@@ -50,6 +50,7 @@ namespace DataLayer.ExtensionMethods
 
             user.Principal = principal;
 
+            #region create the collection for the principal
             //create the collection for the user.
             var col =
                 new CalendarCollection(
@@ -59,8 +60,16 @@ namespace DataLayer.ExtensionMethods
                     Principal = principal
                 };
 
+            //add the ACL properties to the collection
+            var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{principal.PrincipalURL}</D:href>",
+                false,false, true);
+
+            col.Properties.Add(ownerProp);
+
             //add the calaendar to the collection of the principal
             principal.CalendarCollections.Add(col);
+
+            #endregion
 
             //create the folder that will contain the 
             //calendars of the user
