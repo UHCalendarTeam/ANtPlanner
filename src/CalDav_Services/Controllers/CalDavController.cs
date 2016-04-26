@@ -185,17 +185,7 @@ namespace CalDav_Services.Controllers
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
-        //REPORT
-        [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public async Task Report(string user, string collection)
-        {
-            var url = GetRealUrl(Request);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("userEmail", user);
-            propertiesAndHeaders.Add("collectionName", collection);
-            propertiesAndHeaders.Add("url", GetRealUrl(Request));
-            await CalDavRepository.Report(HttpContext);
-        }
+       
 
         //OPTIONS
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
@@ -301,6 +291,8 @@ namespace CalDav_Services.Controllers
             CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
         }
 
+#region Collections Reports
+
         //REPORT api/values/5
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
@@ -312,10 +304,23 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CollectionReport collectionReport = new CollectionReport();
-            await collectionReport.ProcessRequest(HttpContext);
+            await CalDavRepository.Report(HttpContext);
 
         }
+
+        //REPORT
+        [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
+        public async Task Report(string user, string collection)
+        {
+            var url = GetRealUrl(Request);
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("userEmail", user);
+            propertiesAndHeaders.Add("collectionName", collection);
+            propertiesAndHeaders.Add("url", GetRealUrl(Request));
+            await CalDavRepository.Report(HttpContext);
+        }
+
+#endregion
 
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public void Options(string groupOrUser, string principalId, string collectionName, string calendarResourceId)

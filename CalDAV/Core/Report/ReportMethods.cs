@@ -8,6 +8,7 @@ using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
+using Microsoft.Data.Entity;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -18,14 +19,11 @@ namespace CalDAV.Core
     /// </summary>
     public class CollectionReport : ICollectionReport
     {
-        public CollectionReport(string userEmail, string collectionName)
-        {
-            UserEmail = userEmail;
-            CollectionName = collectionName;
-        }
+        private CalDavContext _context;
 
-        public CollectionReport()
+        public CollectionReport(CalDavContext context)
         {
+            _context = context;
         }
 
         private string UserEmail { get; set; }
@@ -160,7 +158,7 @@ namespace CalDAV.Core
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                     //that the requested data
-                    var propNode = ProccessPropNode(calDataNode, resource.Value);
+                    var propNode = ProccessPropNode(calDataNode, resource);
 
                     propstatNode.AddChild(propNode);
 
@@ -231,7 +229,7 @@ namespace CalDAV.Core
         /// </param>
         /// <param name="resource">The calendar where to extract the data.</param>
         /// <returns>Return the prop node that contains the requested data</returns>
-        private IXMLTreeStructure ProccessPropNode(IXMLTreeStructure incomPropNode, VCalendar resource)
+        private IXMLTreeStructure ProccessPropNode(IXMLTreeStructure incomPropNode, KeyValuePair<string,VCalendar> resource)
         {
             var outputRoot = new XmlTreeStructure("prop", "DAV:");
 
@@ -243,14 +241,17 @@ namespace CalDAV.Core
                 switch (prop.NodeName)
                 {
                     case "getetag":
-                        //TODO: take the real eTag of the resource in here
-                        currentProp.AddValue("Put the real eTag value here");
+                        //take the getetag property from the target resource
+                        var etag = _context.CalendarResources.Include(cr => cr.Properties)
+                            .FirstOrDefault(cr => cr.Href == resource.Key)
+                            .Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
+                        currentProp.AddValue(etag.PropertyRealValue());
                         break;
 
                     case "calendar-data":
                         ///see if the calendar-data describes pros to take
                         /// if does then take them if not take it all
-                        currentProp.AddValue(prop.Children.Any() ? resource.ToString(prop) : resource.ToString());
+                        currentProp.AddValue(prop.Children.Any() ? resource.Value.ToString(prop) : resource.ToString());
                         break;
                     default:
                         throw new NotImplementedException(
