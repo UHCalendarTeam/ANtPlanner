@@ -886,6 +886,8 @@ namespace CalDAV.Core
             //adding the file
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 
+            response.StatusCode = (int) HttpStatusCode.Created;
+
             //setting the content lenght property.
             var errorStack = new Stack<string>();
             resource.CreateOrModifyPropertyAdmin("getcontentlength", "DAV:",
