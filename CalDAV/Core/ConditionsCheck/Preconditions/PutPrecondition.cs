@@ -37,7 +37,7 @@ namespace CalDAV.Core.ConditionsCheck
             {
                 iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return false;
