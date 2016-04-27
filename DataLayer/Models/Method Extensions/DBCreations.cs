@@ -55,7 +55,7 @@ namespace DataLayer.ExtensionMethods
             var col =
                 new CalendarCollection(
                     $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/",
-                    SystemProperties._defualtInitialCollectionName)
+                    email)
                 {
                     Principal = principal
                 };
