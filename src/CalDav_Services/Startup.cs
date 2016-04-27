@@ -13,17 +13,20 @@ using CalDAV.Core;
 using DataLayer;
 using Microsoft.Data.Entity;
 
+
 namespace CalDav_Services
 {
     public class Startup
     {
         public Startup(IHostingEnvironment env)
         {
+       
             // Set up configuration sources.
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+         
         }
 
         public IConfigurationRoot Configuration { get; set; }
@@ -53,15 +56,16 @@ namespace CalDav_Services
             services.AddSingleton<IAuthenticate, UhCalendarAuthentication>();
             services.AddSingleton<IACLProfind, ACLProfind>();
             services.AddSingleton<ICollectionReport, CollectionReport>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(minLevel: LogLevel.Debug);
+           
             loggerFactory.AddDebug();
 
+           
             app.UseIISPlatformHandler();
 
             app.UseStaticFiles();

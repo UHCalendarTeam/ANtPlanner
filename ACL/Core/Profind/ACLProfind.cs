@@ -43,9 +43,9 @@ namespace ACL.Core
         public async Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data)
         {
             var requestPath = request.Path;
-
+            var streamReader = new StreamReader(request.Body);
             //read the body of the request
-            var bodyString = new StreamReader(request.Body).ReadToEnd();
+            var bodyString = streamReader.ReadToEnd();
 
             Principal principal;
 
@@ -108,8 +108,6 @@ namespace ACL.Core
             var properties = principal.Properties
                 .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
                 .Select(x => XmlTreeStructure.Parse(x.Value));
-            var xdocS = XDocument.Parse(principal.Properties[1].Value).ToString();
-            Console.WriteLine(xdocS);
             //add the properties to the propNode
             foreach (var property in properties)
             {

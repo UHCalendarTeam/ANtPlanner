@@ -53,6 +53,7 @@ namespace ACL.Core.Authentication
             /// if does then check if can authenticate
             if (context.VerifyPassword(username, password))
             {
+                Console.WriteLine($"------Current user {username} is authenticated");
             }
             else
             {
@@ -61,7 +62,7 @@ namespace ACL.Core.Authentication
                 /// TODO: check if is a student or teacher
                 context.CreateUserInSystem(username, "Defaul User", password);
                 await context.SaveChangesAsync();
-
+                Console.WriteLine($"------Created user with username: {username}");
                 #region taking data from the UH api
 
                 /*

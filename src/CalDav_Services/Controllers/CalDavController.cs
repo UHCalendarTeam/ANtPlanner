@@ -35,6 +35,8 @@ namespace CalDav_Services.Controllers
         {
             CalDavRepository = repoCalDav;
             _context = context;
+            string body = "";
+          
         }
 
         #region
@@ -73,6 +75,7 @@ namespace CalDav_Services.Controllers
         public async Task PropFind()
         {
             Response.StatusCode = 207;
+           
             await CalDavRepository.ACLProfind(Request, Response, null);
            
             
@@ -239,6 +242,7 @@ namespace CalDav_Services.Controllers
                 }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
+               
             }
 
 

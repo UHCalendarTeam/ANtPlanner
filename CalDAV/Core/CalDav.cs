@@ -998,6 +998,7 @@ namespace CalDAV.Core
             collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
                 new XmlTreeStructure("getctag", SystemProperties.NamespacesValues["cs"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
 
+            //TODO: take the component with the UID==calendarResourceId
             var calendarComponents =
                 iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
             var calendarComponent = calendarComponents.FirstOrDefault();
