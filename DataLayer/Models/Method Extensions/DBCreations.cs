@@ -39,8 +39,10 @@ namespace DataLayer.ExtensionMethods
                 DisplayName = fullName
             };
 
+            var defaultCalName = email;
+
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, SystemProperties._defualtInitialCollectionName);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, defaultCalName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
             
 
@@ -54,8 +56,8 @@ namespace DataLayer.ExtensionMethods
             //create the collection for the user.
             var col =
                 new CalendarCollection(
-                    $"{SystemProperties._userCollectionUrl}{email}/{SystemProperties._defualtInitialCollectionName}/",
-                    email)
+                    $"{SystemProperties._userCollectionUrl}{email}/{defaultCalName}/",
+                    defaultCalName)
                 {
                     Principal = principal
                 };

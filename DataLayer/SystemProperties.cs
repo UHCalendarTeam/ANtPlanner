@@ -1,4 +1,6 @@
-﻿namespace DataLayer
+﻿using System.Collections.Generic;
+
+namespace DataLayer
 {
     /// <summary>
     ///     Contains some useful properties for the system.
@@ -74,5 +76,26 @@
             //add the identifier of the pricipal
             return $"{_baseUrl}{colUrl}{principalId}/";
         }
+
+
+        /// <summary>
+        /// Contains the full ns (i.e xmlns:...)
+        /// </summary>
+        public static readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
+        {
+            {"D", @"xmlns:D=""DAV:"""},
+            {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
+            {"cs", @"xmlns=""http://calendarserver.org/ns/""" }
+        };
+
+        /// <summary>
+        /// Contains the value of the ns (i.e: DAV:)
+        /// </summary>
+        public static readonly Dictionary<string, string> NamespacesValues = new Dictionary<string, string>
+        {
+            {"D", "DAV:"},
+            {"C", "urn:ietf:params:xml:ns:caldav"},
+            {"cs", @"http://calendarserver.org/ns/" }
+        };
     }
 }
