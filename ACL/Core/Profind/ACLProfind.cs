@@ -49,20 +49,13 @@ namespace ACL.Core
 
             Principal principal;
 
-            //if from the controller comes the principal data, means that the user
-            //exist in the system, so take it
-            //the principalId comes in the Session.
-            if (httpContext.Session.Keys.Any(key=> key == "principalId"))
-            {
-                principal =
-                    _context.Principals.Include(p => p.Properties)
-                        .FirstOrDefault(p => p.PrincipalStringIdentifier == httpContext.Session.GetString("principalId"));
-                //TODO: check the user's credentials
-            }
+            //try to authenticate the request either with the cookies or the user credentials
+            principal = await _authenticate.AuthenticateRequest(httpContext);
 
-            //authenticate the user if exist, if not create it in the system
-            else
-                principal = await _authenticate.AuthenticateRequest(httpContext);
+            //if the principal is null then there is some problem with the authentication
+            //so return
+            if(principal == null)
+                return;
 
             IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);
 
