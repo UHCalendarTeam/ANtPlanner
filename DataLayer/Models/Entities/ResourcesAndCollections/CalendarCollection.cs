@@ -28,7 +28,7 @@ namespace DataLayer.Models.Entities
 
         public CalendarCollection(string url,string name,  params Property[] properties)
         {
-            Url =SystemProperties._baseUrl+ url;
+            Url = url;
             Name = name;          
             CalendarResources = new List<CalendarResource>();
             Properties = new List<Property>();

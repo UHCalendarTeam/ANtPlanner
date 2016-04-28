@@ -361,7 +361,7 @@ namespace CalDav_Services.Controllers
         private string GetRealUrl(HttpRequest request)
         {
             var url = Request.GetEncodedUrl();
-            var host = "http://" + Request.Host.Value;
+            var host = "http://" + Request.Host.Value + "/api/v1/caldav/";
             url = url.Replace(host, "");
             return url;
         }
