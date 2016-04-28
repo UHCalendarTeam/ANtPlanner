@@ -33,8 +33,7 @@ namespace DataLayer.Models.ACL
             PrincipalURL =  userOrGroup != SystemProperties.PrincipalType.Group
                 ? SystemProperties._userPrincipalUrl + pIdentifier + "/"
                 : SystemProperties._groupPrincipalUrl + pIdentifier + "/";
-
-            PrincipalURL = SystemProperties._baseUrl + PrincipalURL;
+           
 
             Properties = new List<Property>(properties);
 

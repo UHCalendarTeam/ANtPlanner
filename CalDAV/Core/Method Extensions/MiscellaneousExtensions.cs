@@ -22,7 +22,7 @@ namespace CalDAV.Core.Method_Extensions
         public static string GetRealUrl(this HttpRequest request)
         {
             var url = request.GetEncodedUrl();
-            var host = "http://" + request.Host.Value ;
+            var host = "http://" + request.Host.Value + SystemProperties._baseUrl;
             url = url.Replace(host, "");
             return url;
         }
