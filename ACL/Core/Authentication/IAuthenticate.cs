@@ -18,6 +18,6 @@ namespace ACL.Core.Authentication
         /// <param name="request">The request from the client. </param>
         /// <returns>Returns a dict with the username, email, group, student or professor.
         /// This data is taken from the response of the authentication api.</returns>
-        Task<Principal> AuthenticateRequest(HttpRequest clientRequest, HttpResponse response);
+        Task<Principal> AuthenticateRequest(HttpContext httpContext);
     }
 }

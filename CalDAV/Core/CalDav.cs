@@ -190,13 +190,10 @@ namespace CalDAV.Core
         /// <summary>
         ///     This method perfoms a profind on a principal.
         /// </summary>
-        /// <param name="request">The request from the controller.</param>
-        /// <param name="response">The response from the controller.</param>
-        /// <param name="data">SOme useful data that could be send from the controller.</param>
         /// <returns></returns>
-        public async Task ACLProfind(HttpRequest request, HttpResponse response, Dictionary<string, string> data = null)
+        public async Task ACLProfind(HttpContext httpContext)
         {
-            await _aclProfind.Profind(request, response, data);
+            await _aclProfind.Profind(httpContext);
         }
 
         /// <summary>

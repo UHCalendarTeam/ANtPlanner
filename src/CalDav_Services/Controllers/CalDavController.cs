@@ -58,7 +58,9 @@ namespace CalDav_Services.Controllers
                 {"groupOrUser", groupOrUser }
             };
             Response.StatusCode = 207;
-            await CalDavRepository.ACLProfind(Request, Response, dict);
+            HttpContext.Session.SetString("principalId", principalId);
+            HttpContext.Session.SetString("groupOrUser", groupOrUser);
+            await CalDavRepository.ACLProfind(HttpContext);
            
             
         }
@@ -76,7 +78,7 @@ namespace CalDav_Services.Controllers
         {
             Response.StatusCode = 207;
            
-            await CalDavRepository.ACLProfind(Request, Response, null);
+            await CalDavRepository.ACLProfind(HttpContext);
            
             
         }

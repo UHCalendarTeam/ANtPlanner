@@ -40,10 +40,10 @@ namespace ACL.Core
         /// <param name="data"></param>
         /// <param name="body">The request's body</param>
         /// <returns>The request</returns>
-        public async Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data)
+        public async Task Profind(HttpContext httpContext)
         {
-            var requestPath = request.Path;
-            var streamReader = new StreamReader(request.Body);
+            var requestPath = httpContext.Request.Path;
+            var streamReader = new StreamReader(httpContext.Request.Body);
             //read the body of the request
             var bodyString = streamReader.ReadToEnd();
 
@@ -51,24 +51,25 @@ namespace ACL.Core
 
             //if from the controller comes the principal data, means that the user
             //exist in the system, so take it
-            if (data != null)
+            //the principalId comes in the Session.
+            if (httpContext.Session.Keys.Any(key=> key == "principalId"))
             {
                 principal =
                     _context.Principals.Include(p => p.Properties)
-                        .FirstOrDefault(p => p.PrincipalStringIdentifier == data["principalId"]);
+                        .FirstOrDefault(p => p.PrincipalStringIdentifier == httpContext.Session.GetString("principalId"));
                 //TODO: check the user's credentials
             }
 
             //authenticate the user if exist, if not create it in the system
             else
-                principal = await _authenticate.AuthenticateRequest(request, response);
+                principal = await _authenticate.AuthenticateRequest(httpContext);
 
             IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);
 
             //take the requested properties
             var reqProperties = ExtractPropertiesNameMainNS(body);
 
-            await BuildResponse(response, requestPath, reqProperties, principal);
+            await BuildResponse(httpContext.Response, requestPath, reqProperties, principal);
         }
 
         /// <summary>
