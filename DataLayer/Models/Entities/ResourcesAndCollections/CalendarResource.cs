@@ -80,7 +80,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
-                Value = $"<D:displayname {Namespaces["D"]}></D:displayname>"
+                Value = $"<D:displayname {Namespaces["D"]}>Test</D:displayname>"
             });
 
             //TODO: Generar Etag en creacion.

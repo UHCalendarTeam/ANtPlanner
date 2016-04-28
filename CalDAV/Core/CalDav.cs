@@ -26,13 +26,15 @@ namespace CalDAV.Core
         private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
             {"D", @"xmlns:D=""DAV:"""},
-            {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""}
+            {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
+            {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
         };
 
         private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
-            {"C", "urn:ietf:params:xml:ns:caldav"}
+            {"C", "urn:ietf:params:xml:ns:caldav"},
+            {"S", "http://calendarserver.org/ns/"}
         };
         #endregion
 
@@ -130,7 +132,7 @@ namespace CalDAV.Core
 
             //checking Precondtions
             PreconditionCheck = new PropfindPrecondition(StorageManagement, db);
-            if(!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             response.StatusCode = 207;
@@ -139,6 +141,7 @@ namespace CalDAV.Core
             var responseTree = new XmlTreeStructure("multistatus", "DAV:");
             responseTree.Namespaces.Add("D", "DAV:");
             responseTree.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            responseTree.Namespaces.Add("S", NamespacesSimple["S"]);
 
             //Tool that contains the methods for propfind.
             PropFindMethods = new CalDavPropfind(db);
@@ -423,7 +426,7 @@ namespace CalDAV.Core
 
             //Checking precondition
             PreconditionCheck = new ProppatchPrecondition(StorageManagement, db);
-            if(!PreconditionCheck.PreconditionsOK(propertiesAndHeaders,response))
+            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             //Creating and filling the root of the xml tree response
@@ -683,10 +686,10 @@ namespace CalDAV.Core
                 db.SaveChanges();
 
                 //updating the ctag
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/")+1));
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
                 var stack = new Stack<string>();
-                collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
-                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+                collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
+                new XmlTreeStructure("getctag", Namespaces["S"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
 
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
@@ -886,7 +889,7 @@ namespace CalDAV.Core
             //adding the file
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 
-            response.StatusCode = (int) HttpStatusCode.Created;
+            response.StatusCode = (int)HttpStatusCode.Created;
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
@@ -931,17 +934,17 @@ namespace CalDAV.Core
             var errorStack = new Stack<string>();
 
             //updating the etag
-            prevResource.CreateOrModifyPropertyAdmin("getetag", "DAV:",
+            prevResource.CreateOrModifyPropertyAdmin("getetag", NamespacesSimple["D"],
                 $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
             //updating the ctag
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
-            collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
-                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), errorStack);
+            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
+                new XmlTreeStructure("getctag", Namespaces["S"]) { Value = Guid.NewGuid().ToString() }.ToString(), errorStack);
 
             //updating the lastmodified
-            prevResource.CreateOrModifyPropertyAdmin("getlastmodified", "DAV:",
+            prevResource.CreateOrModifyPropertyAdmin("getlastmodified", NamespacesSimple["D"],
                 $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>", errorStack);
 
 
@@ -984,20 +987,24 @@ namespace CalDAV.Core
 
             #endregion
 
+            // calculate etag that will notice a change in the resource
             var etag = Guid.NewGuid().ToString();
             response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
 
+            //adding the calculated etag in the getetag property of the resource
             var errorStack = new Stack<string>();
             resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
 
+            //updating the ctag of the collection noticing this way that the collection has changed.
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             var stack = new Stack<string>();
-            collection.CreateOrModifyPropertyAdmin("getctag", "http://calendarserver.org/ns/",
-                new XmlTreeStructure("getctag", SystemProperties.NamespacesValues["cs"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
+                $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack);
 
+            //getting the uid
             var calendarComponents =
                 iCal.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
             var calendarComponent = calendarComponents.FirstOrDefault();
