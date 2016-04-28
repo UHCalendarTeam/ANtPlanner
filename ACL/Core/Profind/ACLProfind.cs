@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using DataLayer;
@@ -121,8 +122,10 @@ namespace ACL.Core
             //have to write it to the response body.
 
             var multiStatus = multistatusNode.ToString();
-
-            await response.WriteAsync(multiStatus);
+            var responseText = multistatusNode.ToString();
+            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            response.ContentLength = responseBytes.Length;
+            await response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
         }
 
         /// <summary>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
@@ -141,7 +143,8 @@ namespace CalDAV.Core
                 ///  nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
-                hrefNode.AddValue(resource.Key);
+                var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
+                hrefNode.AddValue(href);
 
                 ///href is a child pf response
                 responseNode.AddChild(hrefNode);
@@ -175,8 +178,10 @@ namespace CalDAV.Core
 
                 multistatusNode.AddChild(responseNode);
             }
-            var bodyS = multistatusNode.ToString();
-            await httpContext.Response.WriteAsync(bodyS);
+            var responseText = multistatusNode.ToString();
+            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            httpContext.Response.ContentLength = responseBytes.Length;
+            await httpContext.Response.Body.WriteAsync(responseBytes, 0 , responseBytes.Length);
         }
 
 
@@ -244,9 +249,10 @@ namespace CalDAV.Core
                 {
                     case "getetag":
                         //take the getetag property from the target resource
-                        var etag = _context.CalendarResources.Include(cr => cr.Properties)
-                            .FirstOrDefault(cr => cr.Href == resource.Key)
-                            .Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
+                        var href = resource.Key[0] != '/'? "/" + resource.Key : resource.Key;
+                        
+                        var cal = _context.GetCalendarResource(href);
+                        var etag = cal.Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
                         currentProp.AddValue(etag.PropertyRealValue());
                         break;
 

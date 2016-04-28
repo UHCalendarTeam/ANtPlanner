@@ -21,7 +21,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace CalDav_Services.Controllers
 {
-    [Route("api/v1/[controller]")]
+    //[Route("api/v1/[controller]")]
     public class CalDavController : Controller
     {
         //dependency injection
@@ -36,6 +36,7 @@ namespace CalDav_Services.Controllers
             CalDavRepository = repoCalDav;
             _context = context;
             string body = "";
+            
           
         }
 
@@ -51,7 +52,8 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PROPFIND", Route = "principals/{groupOrUser}/{principalId}")]
         public async Task ACLPropFind(string groupOrUser, string principalId)
         {
-            
+            Response.ContentType = @"application/xml; charset=""utf-8""";
+
             var dict = new Dictionary<string, string>()
             {
                 {"principalId", principalId },
@@ -76,6 +78,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PROPFIND", Route = "")]
         public async Task PropFind()
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             Response.StatusCode = 207;
            
             await CalDavRepository.ACLProfind(HttpContext);
@@ -96,6 +99,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/")]
         public void CollectionRootProfind(string groupOrUser, string principalId)
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
@@ -129,6 +133,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void PropFind(string groupOrUser, string principalId, string collectionName)
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
@@ -154,6 +159,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
         public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
 
@@ -171,6 +177,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Proppatch", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void PropPatch(string groupOrUser, string principalId, string collectionName)
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
@@ -182,6 +189,7 @@ namespace CalDav_Services.Controllers
             Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
@@ -266,8 +274,6 @@ namespace CalDav_Services.Controllers
         [HttpGet("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Get(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
-            Response.StatusCode = 401;
-            return;
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
@@ -306,6 +312,7 @@ namespace CalDav_Services.Controllers
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             Response.StatusCode = 207;
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
             
 
@@ -316,6 +323,7 @@ namespace CalDav_Services.Controllers
         public async Task Report(string user, string collection)
         {
             Response.StatusCode = 207;
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
            
         }
@@ -361,7 +369,7 @@ namespace CalDav_Services.Controllers
         private string GetRealUrl(HttpRequest request)
         {
             var url = Request.GetEncodedUrl();
-            var host = "http://" + Request.Host.Value + "/api/v1/caldav/";
+            var host = "http://" + Request.Host.Value + SystemProperties._baseUrl;
             url = url.Replace(host, "");
             return url;
         }

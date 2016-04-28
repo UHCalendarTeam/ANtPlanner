@@ -192,8 +192,10 @@ namespace CalDAV.Core
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return;
             }
-            string stringResp = responseTree.ToString();
-            response.Body.Write(stringResp);
+            var responseText = responseTree.ToString();
+            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            response.ContentLength = responseBytes.Length;
+            response.Body.Write(responseBytes,0,responseBytes.Length);
         }
 
         /// <summary>
@@ -929,7 +931,7 @@ namespace CalDAV.Core
             //Fill the resource
             //var resource = FillResource(propertiesAndHeaders, iCal, response);
 
-            var etag = Guid.NewGuid().ToString();
+            var etag = $"\"{Guid.NewGuid()}\"";
             response.Headers["etag"] = etag;
             //headers.ETag = new EntityTagHeaderValue(etag, false);
 
@@ -996,7 +998,7 @@ namespace CalDAV.Core
             #endregion
 
             // calculate etag that will notice a change in the resource
-            var etag = Guid.NewGuid().ToString();
+            var etag = $"\"{Guid.NewGuid().ToString()}\"";
             response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
