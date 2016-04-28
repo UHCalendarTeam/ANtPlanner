@@ -927,7 +927,7 @@ namespace CalDAV.Core
             //Fill the resource
             //var resource = FillResource(propertiesAndHeaders, iCal, response);
 
-            var etag = Guid.NewGuid().ToString();
+            var etag = $"\"{Guid.NewGuid()}\"";
             response.Headers["etag"] = etag;
             //headers.ETag = new EntityTagHeaderValue(etag, false);
 
@@ -994,7 +994,7 @@ namespace CalDAV.Core
             #endregion
 
             // calculate etag that will notice a change in the resource
-            var etag = Guid.NewGuid().ToString();
+            var etag = $"\"{Guid.NewGuid().ToString()}\"";
             response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);

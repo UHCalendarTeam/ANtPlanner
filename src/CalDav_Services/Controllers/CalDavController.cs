@@ -21,7 +21,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace CalDav_Services.Controllers
 {
-    [Route("api/v1/[controller]")]
+    //[Route("api/v1/[controller]")]
     public class CalDavController : Controller
     {
         //dependency injection
@@ -36,6 +36,7 @@ namespace CalDav_Services.Controllers
             CalDavRepository = repoCalDav;
             _context = context;
             string body = "";
+            
           
         }
 
@@ -361,7 +362,7 @@ namespace CalDav_Services.Controllers
         private string GetRealUrl(HttpRequest request)
         {
             var url = Request.GetEncodedUrl();
-            var host = "http://" + Request.Host.Value + "/api/v1/caldav/";
+            var host = "http://" + Request.Host.Value + SystemProperties._baseUrl;
             url = url.Replace(host, "");
             return url;
         }

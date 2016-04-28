@@ -141,7 +141,8 @@ namespace CalDAV.Core
                 ///  nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
-                hrefNode.AddValue(resource.Key);
+                var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
+                hrefNode.AddValue(href);
 
                 ///href is a child pf response
                 responseNode.AddChild(hrefNode);
@@ -244,9 +245,10 @@ namespace CalDAV.Core
                 {
                     case "getetag":
                         //take the getetag property from the target resource
-                        var etag = _context.CalendarResources.Include(cr => cr.Properties)
-                            .FirstOrDefault(cr => cr.Href == resource.Key)
-                            .Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
+                        var href = resource.Key[0] != '/'? "/" + resource.Key : resource.Key;
+                        
+                        var cal = _context.GetCalendarResource(href);
+                        var etag = cal.Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
                         currentProp.AddValue(etag.PropertyRealValue());
                         break;
 
