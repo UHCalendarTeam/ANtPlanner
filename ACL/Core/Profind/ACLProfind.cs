@@ -1,25 +1,22 @@
-﻿using ACL.Core.Authentication;
-using DataLayer;
-using DataLayer.Models.ACL;
-using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+using ACL.Core.Authentication;
+using DataLayer;
+using DataLayer.Models.ACL;
+using Microsoft.AspNet.Http;
 using TreeForXml;
 
 namespace ACL.Core
 {
     /// <summary>
-    /// Contains the PROFIND method for
-    /// the principals
+    ///     Contains the PROFIND method for
+    ///     the principals
     /// </summary>
     public class ACLProfind : IACLProfind
     {
-        private IAuthenticate _authenticate;
+        private readonly IAuthenticate _authenticate;
         private CalDavContext _context;
 
         public ACLProfind(IAuthenticate authenticate, CalDavContext context)
@@ -29,52 +26,46 @@ namespace ACL.Core
         }
 
         /// <summary>
-        /// Call the method to perform a PROFIND over a
-        /// principal.
-        /// Initially the client could do a PROFIND over
-        /// the server to discover all the user calendars
-        /// or could PORFIND directly over a calendar URL.
+        ///     Call the method to perform a PROFIND over a
+        ///     principal.
+        ///     Initially the client could do a PROFIND over
+        ///     the server to discover all the user calendars
+        ///     or could PORFIND directly over a calendar URL.
         /// </summary>
         /// <param name="request">THe HttpRequest from the controller.</param>
         /// <param name="response">The HttpResponse property from the controller.</param>
         /// <param name="data"></param>
         /// <param name="body">The request's body</param>
         /// <returns>The request</returns>
-        public async Task Profind(HttpRequest request, HttpResponse response, Dictionary<string, string> data)
+        public async Task Profind(HttpContext httpContext)
         {
-            var requestPath = request.Path;
-
+            var requestPath = httpContext.Request.Path;
+            var streamReader = new StreamReader(httpContext.Request.Body);
             //read the body of the request
-            var bodyString = new StreamReader(request.Body).ReadToEnd();
+            var bodyString = streamReader.ReadToEnd();
 
             Principal principal;
 
-            //if from the controller comes the principal data, means that the user
-            //exist in the system, so take it
-            if (data != null)
-            {
-                principal =
-                    _context.Principals.Include(p => p.Properties)
-                        .FirstOrDefault(p => p.PrincipalStringIdentifier == data["principalId"]);
-                //TODO: check the user's credentials
-            }
+            //try to authenticate the request either with the cookies or the user credentials
+            principal = await _authenticate.AuthenticateRequest(httpContext);
 
-            //authenticate the user if exist, if not create it in the system
-            else
-                principal = await _authenticate.AuthenticateRequest(request, response);
+            //if the principal is null then there is some problem with the authentication
+            //so return
+            if (principal == null)
+                return;
 
-            IXMLTreeStructure body = XmlTreeStructure.Parse(bodyString);
+            var body = XmlTreeStructure.Parse(bodyString);
 
             //take the requested properties
             var reqProperties = ExtractPropertiesNameMainNS(body);
 
-            await BuildResponse(response, requestPath, reqProperties, principal);
+            await BuildResponse(httpContext.Response, requestPath, reqProperties, principal);
         }
 
         /// <summary>
-        /// Having the principal and the requested properties
-        /// then proccess the requestedProperties and build the
-        /// response.
+        ///     Having the principal and the requested properties
+        ///     then proccess the requestedProperties and build the
+        ///     response.
         /// </summary>
         /// <param name="response">The HttpResponse from the controller.</param>
         /// <param name="requestedUrl">The principal url if anyurl </param>
@@ -93,7 +84,7 @@ namespace ACL.Core
 
             //create the href node
             var hrefNode = new XmlTreeStructure("href", "DAV:");
-            string url = requestedUrl.Replace("/api/v1/caldav", "");
+            var url = requestedUrl.Replace("/api/v1/caldav", "");
             hrefNode.AddValue(url);
 
             responseNode.AddChild(hrefNode);
@@ -108,8 +99,6 @@ namespace ACL.Core
             var properties = principal.Properties
                 .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
                 .Select(x => XmlTreeStructure.Parse(x.Value));
-            var xdocS = XDocument.Parse(principal.Properties[1].Value).ToString();
-            Console.WriteLine(xdocS);
             //add the properties to the propNode
             foreach (var property in properties)
             {
@@ -131,7 +120,7 @@ namespace ACL.Core
             //here the multistatus xml for the body is built
             //have to write it to the response body.
 
-            string multiStatus = multistatusNode.ToString();
+            var multiStatus = multistatusNode.ToString();
 
             await response.WriteAsync(multiStatus);
         }
@@ -148,7 +137,10 @@ namespace ACL.Core
 
             if (propFindTree.GetChildAtAnyLevel("prop", out props))
                 retList.AddRange(
-                    props.Children.Select(child => new KeyValuePair<string, string>(child.NodeName, string.IsNullOrEmpty(child.MainNamespace) ? "DAV:" : child.MainNamespace)));
+                    props.Children.Select(
+                        child =>
+                            new KeyValuePair<string, string>(child.NodeName,
+                                string.IsNullOrEmpty(child.MainNamespace) ? "DAV:" : child.MainNamespace)));
             return retList;
         }
     }

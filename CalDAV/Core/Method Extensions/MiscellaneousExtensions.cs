@@ -26,5 +26,22 @@ namespace CalDAV.Core.Method_Extensions
             url = url.Replace(host, "");
             return url;
         }
+
+        /// <summary>
+        /// FOr the ACL PROFINDs the principalId is included
+        /// in the url. Takes the principalId from it.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns>Returns the PrincipalStringIdentifier. If the principal represents
+        /// a user then returns the name of the groups, otherwise returns the email.</returns>
+        public static string TakePrincipalIdFromUrl(this HttpContext context)
+        {
+            var url = context.Request.GetRealUrl();
+            var index = url.LastIndexOf("/");
+
+            var output = url.Substring(index + 1);
+            return output;
+
+        }
     }
 }

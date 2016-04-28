@@ -35,6 +35,8 @@ namespace CalDav_Services.Controllers
         {
             CalDavRepository = repoCalDav;
             _context = context;
+            string body = "";
+          
         }
 
         #region
@@ -56,7 +58,9 @@ namespace CalDav_Services.Controllers
                 {"groupOrUser", groupOrUser }
             };
             Response.StatusCode = 207;
-            await CalDavRepository.ACLProfind(Request, Response, dict);
+            HttpContext.Session.SetString("principalId", principalId);
+            HttpContext.Session.SetString("groupOrUser", groupOrUser);
+            await CalDavRepository.ACLProfind(HttpContext);
            
             
         }
@@ -73,7 +77,8 @@ namespace CalDav_Services.Controllers
         public async Task PropFind()
         {
             Response.StatusCode = 207;
-            await CalDavRepository.ACLProfind(Request, Response, null);
+           
+            await CalDavRepository.ACLProfind(HttpContext);
            
             
         }
@@ -239,6 +244,7 @@ namespace CalDav_Services.Controllers
                 }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
+               
             }
 
 
@@ -260,6 +266,8 @@ namespace CalDav_Services.Controllers
         [HttpGet("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Get(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+            Response.StatusCode = 401;
+            return;
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
