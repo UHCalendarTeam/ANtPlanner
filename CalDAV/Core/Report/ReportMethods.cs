@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
@@ -176,8 +178,10 @@ namespace CalDAV.Core
 
                 multistatusNode.AddChild(responseNode);
             }
-            var bodyS = multistatusNode.ToString();
-            await httpContext.Response.WriteAsync(bodyS);
+            var responseText = multistatusNode.ToString();
+            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            httpContext.Response.ContentLength = responseBytes.Length;
+            await httpContext.Response.Body.WriteAsync(responseBytes, 0 , responseBytes.Length);
         }
 
 

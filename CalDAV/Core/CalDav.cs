@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using ACL.Core;
 using CalDAV.Core.ConditionsCheck;
@@ -191,8 +192,10 @@ namespace CalDAV.Core
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return;
             }
-            string stringResp = responseTree.ToString();
-            response.Body.Write(stringResp);
+            var responseText = responseTree.ToString();
+            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            response.ContentLength = responseBytes.Length;
+            response.Body.Write(responseBytes,0,responseBytes.Length);
         }
 
         /// <summary>

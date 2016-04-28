@@ -312,6 +312,7 @@ namespace CalDav_Services.Controllers
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             Response.StatusCode = 207;
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
             
 
@@ -322,6 +323,7 @@ namespace CalDav_Services.Controllers
         public async Task Report(string user, string collection)
         {
             Response.StatusCode = 207;
+            Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
            
         }
