@@ -80,12 +80,20 @@ namespace DataLayer
             return property;
         }
 
-
+        /// <summary>
+        /// Create the DAV:owner property for the collections
+        /// and resources
+        /// </summary>
+        /// <param name="ownerHref">The owner href value.</param>
+        /// <returns></returns>
         public static Property CreateOwner(string ownerHref)
         {
             var property = new Property("owner", "DAV:")
             {
-                Value = $@"<D:owner xmlns:D=""DAV:""><D:href>{ownerHref}</D:href></D:owner>"
+                Value = $@"<D:owner xmlns:D=""DAV:""><D:href>{ownerHref}</D:href></D:owner>",
+                IsVisible = true,
+                IsMutable = false,
+                IsDestroyable = false
             };
             return property;
         }
@@ -111,6 +119,146 @@ namespace DataLayer
                 IsDestroyable = isDetr,
                 IsVisible = isVisible
             };
+        }
+
+        /// <summary>
+        /// Create the protected property DAV:supported-privilege-set
+        /// This is a protected property that identifies the privileges 
+        /// defined for the resource.
+        /// </summary>
+        /// <returns></returns>
+        public static Property CreateSupportedPrivilegeSetForResources()
+        {
+            var property = new Property("supported-privilege-set", "DAV:")
+            {
+                IsDestroyable = false,
+                IsVisible = true,
+                IsMutable = false,
+                Value = @"<D:supported-privilege-set xmlns:D=""DAV:"">
+	<D:supported-privilege>
+		<D:privilege><D:all/></D:privilege>
+		<D:abstract/>
+		<D:description xml:lang=""en"">
+			Any operation
+		</D:description>
+		<D:supported-privilege>
+			<D:privilege><D:read/></D:privilege>
+			<D:description xml:lang=""en"">
+				Read any object
+			</D:description>
+			<D:supported-privilege>
+				<D:privilege><D:read-acl/></D:privilege>
+				<D:abstract/>
+				<D:description xml:lang=""en"">Read ACL</D:description>
+			</D:supported-privilege>
+			<D:supported-privilege>
+				<D:privilege>
+				<D:read-current-user-privilege-set/>
+				</D:privilege>
+				<D:abstract/>
+				<D:description xml:lang=""en"">
+					Read current user privilege set property
+				</D:description>
+			</D:supported-privilege>
+		</D:supported-privilege>
+		<D:supported-privilege>
+			<D:privilege><D:write/></D:privilege>
+			<D:description xml:lang=""en"">
+				Write any object
+			</D:description>
+			<D:supported-privilege>
+				<D:privilege><D:write-acl/></D:privilege>
+				<D:description xml:lang=""en"">
+					Write ACL
+				</D:description>
+				<D:abstract/>
+			</D:supported-privilege>
+			<D:supported-privilege>
+				<D:privilege><D:write-properties/></D:privilege>
+				<D:description xml:lang=""en"">
+					Write properties
+				</D:description>
+			</D:supported-privilege>
+			<D:supported-privilege>
+				<D:privilege><D:write-content/></D:privilege>
+				<D:description xml:lang=""en"">
+				Write resource content
+				</D:description>
+			</D:supported-privilege>
+		</D:supported-privilege>
+		<D:supported-privilege>
+			<D:privilege><D:unlock/></D:privilege>
+			<D:description xml:lang=""en"">
+				Unlock resource
+			</D:description>
+		</D:supported-privilege>
+	</D:supported-privilege>
+</D:supported-privilege-set>"
+            };
+            return property;
+        }
+
+
+        /// <summary>
+        /// Create and add the DAV:acl property.
+        /// </summary>
+        /// <param name="principalUrl">The principalUrl that is the owner of the collection</param>
+        public static Property CreateAclPropertyForUserCollections(string principalUrl)
+        {
+            var aclProperty = new Property("acl", "DAV:")
+            {
+                IsVisible = true,
+                IsMutable = false,
+                IsDestroyable = false,
+                Value = $@"<D:acl xmlns:D=""DAV"">
+	<D:ace>
+		<D:principal>
+			<D:href>{principalUrl}</D:href>
+		</D:principal>
+		<D:grant>
+			<D:privilege><D:write/></D:privilege>
+			<D:privilege><D:read/></D:privilege>
+		</D:grant>		
+	</D:ace>
+</D:acl>"
+            };
+
+            return aclProperty;
+        }
+
+
+        /// <summary>
+        /// Create and add the DAV:acl property.
+        /// </summary>
+        /// <param name="editorUrl">The principalUrl that is editor in the system</param>
+        public static Property CreateAclPropertyForGroupCollections(string editorUrl)
+        {
+            var aclProperty = new Property("acl", "DAV:")
+            {
+                IsVisible = true,
+                IsMutable = false,
+                IsDestroyable = false,
+                Value = $@"<D:acl xmlns:D=""DAV"">
+	<D:ace>
+		<D:principal>
+			<D:href>{editorUrl}</D:href>
+		</D:principal>
+		<D:grant>
+			<D:privilege><D:write/></D:privilege>
+		</D:grant>
+	</D:ace>
+	<D:ace>
+		<D:principal>
+			<D:all/>
+		</D:principal>
+		<D:grant>
+			<D:privilege><D:read/></D:privilege>
+		</D:grant>
+	</D:ace>
+</D:acl>"
+            };
+
+            return aclProperty;
         }
 
         /// <summary>

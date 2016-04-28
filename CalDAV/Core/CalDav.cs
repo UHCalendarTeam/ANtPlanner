@@ -881,7 +881,6 @@ namespace CalDAV.Core
 
             //filling the resource
             var resource = FillResource(propertiesAndHeaders, iCal, response);
-            //TODO: add the owner resource aki
 
             //adding the resource to the db
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
