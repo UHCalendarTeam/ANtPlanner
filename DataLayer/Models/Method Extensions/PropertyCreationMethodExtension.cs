@@ -80,6 +80,16 @@ namespace DataLayer
             return property;
         }
 
+
+        public static Property CreateOwner(string ownerHref)
+        {
+            var property = new Property("owner", "DAV:")
+            {
+                Value = $@"<D:owner xmlns:D=""DAV:""><D:href>{ownerHref}</D:href></D:owner>"
+            };
+            return property;
+        }
+
         /// <summary>
         /// Create a property instance with the given values
         /// </summary>

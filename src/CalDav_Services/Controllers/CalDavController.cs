@@ -26,7 +26,7 @@ namespace CalDav_Services.Controllers
     {
         //dependency injection
         [FromServices]
-        ICalDav CalDavRepository { get; set; }
+        ICalDav CalDavRepository { get; }
 
         CalDavContext _context;
 
@@ -361,7 +361,7 @@ namespace CalDav_Services.Controllers
         private string GetRealUrl(HttpRequest request)
         {
             var url = Request.GetEncodedUrl();
-            var host = "http://" + Request.Host.Value + "/api/v1/caldav/";
+            var host = "http://" + Request.Host.Value;
             url = url.Replace(host, "");
             return url;
         }

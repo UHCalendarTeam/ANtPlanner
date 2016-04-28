@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -24,7 +25,7 @@ namespace CalDAV.Core.Propfind
     ///     y las que se mantienen invariables o muertas en un diccionario statico de donde son
     ///     llamadas.
     /// </summary>
-    public class CalDavPropfind : IPropfindMethods
+    public class CalDavPropfind : IPropfindMethods, IDisposable
     {
         private readonly CalDavContext db;
 
@@ -405,7 +406,7 @@ namespace CalDAV.Core.Propfind
 
             //an href with the corresponding url is added to the response
             var href = new XmlTreeStructure("href", "DAV:");
-            href.AddValue(SystemProperties._baseUrl + url);
+            href.AddValue(url);
 
             treeChild.AddChild(href);
 
@@ -534,5 +535,9 @@ namespace CalDAV.Core.Propfind
 
         #endregion
 
+        public void Dispose()
+        {
+            db.Dispose();
+        }
     }
 }

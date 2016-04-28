@@ -20,7 +20,7 @@ namespace CalDAV.Core
 {
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
-    public class CalDav : ICalDav
+    public class CalDav : ICalDav, IDisposable
     {
         #region Standard Namespace
         private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
@@ -67,7 +67,12 @@ namespace CalDAV.Core
 
         #endregion
 
-        //TODO: Adriano
+        /// <summary>
+        /// Call this method after a client request and 
+        /// will handle the REPORT on collections.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
         public async Task Report(HttpContext httpContext)
         {
             await _colectionCollectionReport.ProcessRequest(httpContext);
@@ -771,7 +776,7 @@ namespace CalDAV.Core
 
         #region PUT resource
 
-        //TODO: Nacho
+        //TODO: Poner esto en la capa de datos
         public async Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders,
             HttpResponse response)
         {
@@ -865,6 +870,7 @@ namespace CalDAV.Core
 
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
+   
 
             var headers = response.GetTypedHeaders();
 
@@ -875,6 +881,7 @@ namespace CalDAV.Core
 
             //filling the resource
             var resource = FillResource(propertiesAndHeaders, iCal, response);
+            //TODO: add the owner resource aki
 
             //adding the resource to the db
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
@@ -976,6 +983,9 @@ namespace CalDAV.Core
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
+            string principalId;
+            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+
 
             //var headers = response.GetTypedHeaders();
 
@@ -985,6 +995,12 @@ namespace CalDAV.Core
             response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
+
+            //add the owner property
+            var principal = db.Principals.FirstOrDefault(p => p.PrincipalStringIdentifier == principalId);
+            var principalUrl = principal == null ? "" : principal.PrincipalURL;
+
+            resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
 
             var errorStack = new Stack<string>();
             resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
@@ -1008,5 +1024,10 @@ namespace CalDAV.Core
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            db.Dispose();
+        }
     }
 }
