@@ -14,14 +14,14 @@ namespace DataLayer.Models.Entities
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
-            {"cs", @"xmlns=""http://calendarserver.org/ns/""" }
+            {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
         };
 
         private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
-            {"cs", @"http://calendarserver.org/ns/" }
+            {"S", "http://calendarserver.org/ns/" }
         };
 
         public CalendarCollection() { }
@@ -182,12 +182,12 @@ namespace DataLayer.Models.Entities
                 IsMutable = true,
                 Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
-            Properties.Add(new Property("getctag", NamespacesSimple["cs"])
+            Properties.Add(new Property("getctag", NamespacesSimple["S"])
             {
-                IsVisible = false,
+                IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $@"<getctag {Namespaces["cs"]} >{Guid.NewGuid()}</getctag>"
+                Value = $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
             });
           
 
