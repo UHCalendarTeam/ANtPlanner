@@ -42,6 +42,8 @@ namespace ACL.Core.Authentication
             var username = "";
             var password = "";
             var authorizationGranted = false;
+            Principal principal;
+            string cookieValue;
 
             ///take the creadentials from the request
 
@@ -106,18 +108,21 @@ namespace ACL.Core.Authentication
                     return null;
                 }
                 //take the cookie that the client send us in the request
-                var cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
-
-                var principalStringId = httpContext.Session.GetString("principalId");
-                //if the session doesnt have the principalId means somethind is wrong
-                if (string.IsNullOrEmpty(principalStringId))
+                cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
+                var principalStringId = "";
+                try
+                {
+                    principalStringId = httpContext.Session.GetString("principalId");
+                }
+                    //if the session doesnt have the principalId means somethind is wrong
+                catch
                 {
                     httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                     return null;
                 }
 
                 //take the principal from our system
-                var principal =
+                principal =
                     _context.Principals.FirstOrDefaultAsync(p => p.PrincipalStringIdentifier == principalStringId)
                         .Result;
                 //check if the cookies match
@@ -132,10 +137,17 @@ namespace ACL.Core.Authentication
 
             #endregion
 
-            return
+            //set the cookie for the response.
+            cookieValue = Guid.NewGuid().ToString();
+            httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
+            principal=
                 await
                     _context.Principals.Include(p => p.Properties)
                         .FirstOrDefaultAsync(x => x.PrincipalStringIdentifier == username);
+            principal.SessionId = cookieValue;
+            await _context.SaveChangesAsync();
+
+            return await Task.FromResult(principal);
         }
 
 
