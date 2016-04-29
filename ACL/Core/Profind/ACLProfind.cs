@@ -76,7 +76,6 @@ namespace ACL.Core
         public async Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal)
         {
-
             //if the principal is not authenticated then set in the response statusCode
             if (principal == null)
                 response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -148,9 +147,9 @@ namespace ACL.Core
 
             //here the multistatus xml for the body is built
             //have to write it to the response body.
-            
+
             var responseText = multistatusNode.ToString();
-            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            var responseBytes = Encoding.UTF8.GetBytes(responseText);
             response.ContentLength = responseBytes.Length;
             await response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
         }

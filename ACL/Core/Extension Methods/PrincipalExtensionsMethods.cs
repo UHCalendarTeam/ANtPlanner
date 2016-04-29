@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using TreeForXml;
@@ -19,7 +20,36 @@ namespace ACL.Core.Extension_Method
         /// <returns>Return an I</returns>
         public static IXMLTreeStructure GetCurrentUserPermissions(this Principal principal, Property property)
         {
-            return null;
+            var pUrl = principal.PrincipalURL;
+            var aclP = XDocument.Parse(property.Value).Root;
+            IEnumerable<XElement> principalGrantPermissions=null;
+            XNamespace davNs = "DAV:";
+            XName aceName = "ace";
+
+            //take the permission for the principal if any
+            var descendants = aclP.Descendants();
+            var aces = descendants.Where(x => x.Name.LocalName == "ace");
+            var principalAce = aces.FirstOrDefault(ace => ace.Descendants()
+                                    .FirstOrDefault(x=>x.Name.LocalName == "href").Value == pUrl);
+            if(principalAce != null)
+                principalGrantPermissions = principalAce.Descendants()
+                                    .FirstOrDefault(x => x.Name.LocalName == "grant").Elements();
+
+            //take the permission for all users if any
+
+            var output = new XElement("current-user-privilege-set", new XAttribute(XNamespace.Xmlns+"D", "DAV:"));
+
+
+            //add the permission to the response
+            if(principalGrantPermissions != null)
+                foreach (var permission in principalGrantPermissions)
+                {
+                    output.Add(permission);
+                }
+            var outputStr = output.ToString();
+            var xmlTree = XmlTreeStructure.Parse(outputStr);
+            return xmlTree;
+
         }
 
 

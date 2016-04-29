@@ -214,16 +214,16 @@ namespace DataLayer
                 IsVisible = true,
                 IsMutable = false,
                 IsDestroyable = false,
-                Value = $@"<D:acl xmlns:D=""DAV"">
-	<D:ace>
-		<D:principal>
-			<D:href>{principalUrl}</D:href>
-		</D:principal>
-		<D:grant>
-			<D:privilege><D:write/></D:privilege>
-			<D:privilege><D:read/></D:privilege>
-		</D:grant>		
-	</D:ace>
+                Value = $@"<D:acl xmlns:D=""DAV:"">
+<D:ace>
+<D:principal>
+<D:href>{principalUrl}</D:href>
+</D:principal>
+<D:grant>
+<D:privilege><D:write></D:write></D:privilege>
+<D:privilege><D:read></D:read></D:privilege>
+</D:grant>		
+</D:ace>
 </D:acl>"
             };
 
