@@ -18,7 +18,7 @@ namespace ACL.Core.Extension_Method
         /// <param name="principal">The principal that wants to know his permissions.</param>
         /// <param name="property">The resource or collection's DAV:acl property</param>
         /// <returns>Return an I</returns>
-        public static IXMLTreeStructure GetCurrentUserPermissions(this Principal principal, Property property)
+        public static XmlTreeStructure GetCurrentUserPermissions(this Principal principal, Property property)
         {
             var pUrl = principal.PrincipalURL;
             var aclP = XDocument.Parse(property.Value).Root;
@@ -47,7 +47,7 @@ namespace ACL.Core.Extension_Method
                     output.Add(permission);
                 }
             var outputStr = output.ToString();
-            var xmlTree = XmlTreeStructure.Parse(outputStr);
+            XmlTreeStructure xmlTree = XmlTreeStructure.Parse(outputStr) as XmlTreeStructure;
             return xmlTree;
 
         }

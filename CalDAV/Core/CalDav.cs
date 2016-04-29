@@ -178,7 +178,11 @@ namespace CalDAV.Core
             {
                 case "prop":
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
-                    PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree);
+
+                    //take the principalId from the properties
+                    var principalId = propertiesAndHeaders["principalId"];
+                    var principal = db.Principals.FirstOrDefault(p => p.PrincipalStringIdentifier == principalId);
+                    PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
                     var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure)xmlTree);

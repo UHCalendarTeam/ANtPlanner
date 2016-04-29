@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataLayer;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.AspNet.Http;
 using TreeForXml;
+using ACL.Core.Extension_Method;
 
 namespace CalDAV.Core.Propfind
 {
@@ -90,14 +93,14 @@ namespace CalDAV.Core.Propfind
         }
 
         public void PropMethod(string url, string calendarResourceId,  int? depth,
-            List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree)
+            List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal)
         {
             //error flag
             var errorOcurred = false;
 
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
-            var primaryResponse = PropFillTree(url, calendarResourceId, propertiesReq);
+            var primaryResponse = PropFillTree(url, calendarResourceId, propertiesReq, principal);
 
             //The response body is added to the result xml tree.
             multistatusTree.AddChild(primaryResponse);
@@ -117,7 +120,7 @@ namespace CalDAV.Core.Propfind
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
-                    var resourceResponse = PropFillTree(url + calendarResource.Name, calendarResource.Name, propertiesReq);
+                    var resourceResponse = PropFillTree(url + calendarResource.Name, calendarResource.Name, propertiesReq, principal);
                     multistatusTree.AddChild(resourceResponse);
 
                     //error check
@@ -395,7 +398,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="propertiesNameNamespace">List of requested properties (key=name; value=namespace)</param>
         /// <returns></returns>
         private XmlTreeStructure PropFillTree(string url, string calendarResourceId,
-            List<KeyValuePair<string, string>> propertiesNameNamespace)
+            List<KeyValuePair<string, string>> propertiesNameNamespace, Principal principal)
         {
             //a "response xml element is added for each collection or resource"
             #region Adding the response of the collection or resource.
@@ -425,6 +428,10 @@ namespace CalDAV.Core.Propfind
             var propertiesWrong = new List<XmlTreeStructure>();
             var errorStack = new Stack<string>();
 
+            //the current-user-privilege-set is generated per request
+            //it needs the DAV:acl property and the principalID
+            Property aclProperty = null;
+
             //It take the list of requested properties and tries to get the corresponding property from db.
             //The methods are called for a resource or a collection accordingly its circumstances.
             //The properties are stored inside the propertiesCol. Where if the value is null it means that the collection could not be 
@@ -433,20 +440,43 @@ namespace CalDAV.Core.Propfind
             {
                 collection = db.GetCollection(url);
                 if (propertiesNameNamespace != null)
+                {
                     foreach (var property in propertiesNameNamespace)
                     {
                         propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value, errorStack));
                     }
+                    //take the acl property
+                    aclProperty = collection.Properties.FirstOrDefault(x => x.Name == "acl");
+                }
             }
             else
             {
                 resource = db.GetCalendarResource(url);
                 if (propertiesNameNamespace != null)
+                {
                     foreach (var property in propertiesNameNamespace)
                     {
                         propertiesCol.Add(resource.ResolveProperty(property.Key, property.Value, errorStack));
                     }
+                    //take the acl property
+                    aclProperty = resource.Properties.FirstOrDefault(x => x.Name == "acl");
+                }
             }
+            //after take the additional properties this have to be deleted from the reqProperties
+            List<KeyValuePair<string, string>> deleteAfter = new List<KeyValuePair<string, string>>();
+
+            ///add the additional properties that are generated per request
+            foreach (var pair in propertiesNameNamespace)
+            {
+                switch (pair.Key)
+                {
+                    case "current-user-privilege-set":
+                        propertiesCol.RemoveAll(x => x.NodeName == pair.Key);
+                        propertiesCol.Add(principal.GetCurrentUserPermissions(aclProperty));
+                        break;
+                }
+            }
+            
 
             //Here, properties are divided between recovered and error recovering
             foreach (var propTree in propertiesCol)
