@@ -23,7 +23,7 @@ namespace DataLayer
         public static XmlTreeStructure ResolveProperty(this CalendarResource resource, string propertyName,
             string mainNs, Stack<string> errorStack)
         {
-            var property = resource.Properties.SingleOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
+            var property = string.IsNullOrEmpty(mainNs)?resource.Properties.SingleOrDefault(p => p.Name == propertyName) : resource.Properties.SingleOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
             IXMLTreeStructure prop;
             if (property != null)
                 prop = property.Value == null

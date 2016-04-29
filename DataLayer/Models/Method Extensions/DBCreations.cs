@@ -64,7 +64,7 @@ namespace DataLayer.ExtensionMethods
 
             //add the ACL properties to the collection
             var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{principal.PrincipalURL}</D:href>",
-                false,false, true);
+                false, false, true);
 
             col.Properties.Add(ownerProp);
             col.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL));

@@ -769,7 +769,8 @@ namespace CalDAV.Core
                 var etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
                 response.Headers["etag"] = etag;
             }
-            responseHeader.ContentType = new MediaTypeHeaderValue("text/calendar");
+            responseHeader.ContentType = new MediaTypeHeaderValue(@"text/calendar; charset=""utf-8""");
+            response.ContentType = @"text/calendar; charset=""utf-8""";
             await response.WriteAsync(resourceBody.Result);
         }
 
