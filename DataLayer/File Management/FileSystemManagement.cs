@@ -42,18 +42,11 @@ namespace DataLayer
             if (!Directory.Exists(colPath))
                 return false;
 
-
-            //Parse the iCalendar Object
-            //Construimos el objeto pa verificar que esta bien
-            var iCalendar = VCalendar.Parse(body);
-            if (iCalendar == null)
-                return false;
-
             //Write to Disk the toString of the object, so it splits the lines
             //
             using (var writer = File.CreateText(path))
             {
-                await writer.WriteAsync(iCalendar.ToString());
+                await writer.WriteAsync(body);
             }
 
             return true;
