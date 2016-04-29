@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DataLayer.Models.ACL;
 using TreeForXml;
 
 namespace CalDAV.Core.Propfind
@@ -24,8 +25,9 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="propertiesReq">List with all the properties to retrieve</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
+        /// <param name="principalIdS">The email of the principal. Its needed for the DAV:current-user-privilege-set property</param>
         /// <returns></returns>
-        void PropMethod(string url, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree);
+        void PropMethod(string url, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);
 
         /// <summary>
         ///     Returns the name of all the properties of a collection.

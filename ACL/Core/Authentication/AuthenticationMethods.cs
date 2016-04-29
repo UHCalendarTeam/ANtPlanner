@@ -69,7 +69,7 @@ namespace ACL.Core.Authentication
                     //if the username and password doesnt match then return 401 - Unauthorized
                     else
                     {
-                        httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                       // httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         return null;
                     }
                 }
@@ -104,7 +104,7 @@ namespace ACL.Core.Authentication
                     |  Authorization header then the client needs to request
                     |   the credential to the user. So send a 401
                     */
-                    await SetUnauthorizedRequest(httpContext);
+                   // await SetUnauthorizedRequest(httpContext);
                     return null;
                 }
                 //take the cookie that the client send us in the request
@@ -117,7 +117,7 @@ namespace ACL.Core.Authentication
                     //if the session doesnt have the principalId means somethind is wrong
                 catch
                 {
-                    httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                   // httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                     return null;
                 }
 

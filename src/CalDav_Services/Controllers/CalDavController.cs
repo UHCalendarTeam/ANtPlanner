@@ -137,6 +137,7 @@ namespace CalDav_Services.Controllers
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
+            propertiesAndHeaders["principalId"] = principalId;
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
@@ -166,6 +167,8 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("url", url);
 
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
+
+            propertiesAndHeaders["principalId"] = principalId;
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))

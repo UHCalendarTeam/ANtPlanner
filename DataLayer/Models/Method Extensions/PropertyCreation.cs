@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity.Scaffolding.Internal;
+using TreeForXml;
 
 namespace DataLayer
 {
@@ -200,7 +202,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create and add the DAV:acl property.
+        /// Create the DAV:acl property.
+        /// THis is the default acl property for the collections  
+        /// that its owner is a user.
         /// </summary>
         /// <param name="principalUrl">The principalUrl that is the owner of the collection</param>
         public static Property CreateAclPropertyForUserCollections(string principalUrl)
@@ -210,16 +214,16 @@ namespace DataLayer
                 IsVisible = true,
                 IsMutable = false,
                 IsDestroyable = false,
-                Value = $@"<D:acl xmlns:D=""DAV"">
-	<D:ace>
-		<D:principal>
-			<D:href>{principalUrl}</D:href>
-		</D:principal>
-		<D:grant>
-			<D:privilege><D:write/></D:privilege>
-			<D:privilege><D:read/></D:privilege>
-		</D:grant>		
-	</D:ace>
+                Value = $@"<D:acl xmlns:D=""DAV:"">
+<D:ace>
+<D:principal>
+<D:href>{principalUrl}</D:href>
+</D:principal>
+<D:grant>
+<D:privilege><D:write></D:write></D:privilege>
+<D:privilege><D:read></D:read></D:privilege>
+</D:grant>		
+</D:ace>
 </D:acl>"
             };
 
@@ -228,7 +232,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create and add the DAV:acl property.
+        /// Create the DAV:acl property.
+        /// THis is the default acl property for 
+        /// the collections  that its owner is a group.
         /// </summary>
         /// <param name="editorUrl">The principalUrl that is editor in the system</param>
         public static Property CreateAclPropertyForGroupCollections(string editorUrl)
@@ -267,6 +273,38 @@ namespace DataLayer
             var colorProp = new Property();
             return colorProp;
         }
+
+        /// <summary>
+        /// Create the DAV:current-user-principal.
+        /// If not principalUrl is provided means that the 
+        /// user is not authenticated.
+        /// </summary>
+        /// <param name="principal">The current principal url, or nothing if the principal is not
+        /// authenticated.</param>
+        /// <returns></returns>
+        public static IXMLTreeStructure CreateCurrentUserPrincipal(Principal principal)
+        {
+            var output = new XmlTreeStructure("current-user-principal", "DAV:");
+
+            IXMLTreeStructure href;
+            //if not principal URL is provided means that
+            //the principal is not authenticated.
+            if (principal != null)
+                href = new XmlTreeStructure("href", "DAV:")
+                {
+                    Value = principal.PrincipalURL
+                };
+            
+            else
+                href = new XmlTreeStructure("unauthenticated", "DAV:");
+            output.AddChild(href);
+            return href;
+        }
+
+
+
+
+        
 
         /// <summary>
         /// Add a single node to this property

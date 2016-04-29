@@ -40,9 +40,7 @@ namespace DataLayer.Models.ACL
             CalendarCollections = new List<CalendarCollection>();
 
             PrincipalStringIdentifier = pIdentifier;
-
-            ///add the property current-user-principal
-            Properties.Add(PropertyCreation.CreateProperty("current-user-principal", "D", PrincipalURL));
+            
         }
 
         /// <summary>
