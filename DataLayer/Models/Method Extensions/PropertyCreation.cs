@@ -261,6 +261,13 @@ namespace DataLayer
             return aclProperty;
         }
 
+        //TODO: terminar esta propiedad.
+        public static Property CreateColorPropertyForCalendarCollections(string colorCode)
+        {
+            var colorProp = new Property();
+            return colorProp;
+        }
+
         /// <summary>
         /// Add a single node to this property
         /// </summary>

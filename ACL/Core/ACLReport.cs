@@ -151,7 +151,7 @@ namespace ACL.Core
             Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
         {
             ///build the root of the xml
-            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {
@@ -220,7 +220,7 @@ namespace ACL.Core
         private async Task ReturnError(HttpResponse response, string errorMessage, int errorCode, string href)
         {
             ///build the root of the xml
-            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {

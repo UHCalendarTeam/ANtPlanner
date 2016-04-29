@@ -195,7 +195,7 @@ namespace CalDAV.Core
             var responseText = responseTree.ToString();
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             response.ContentLength = responseBytes.Length;
-            response.Body.Write(responseBytes,0,responseBytes.Length);
+            response.Body.Write(responseBytes, 0, responseBytes.Length);
         }
 
         /// <summary>
@@ -676,22 +676,57 @@ namespace CalDAV.Core
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
+            string ifmatch;
+            var ifMatchEtags = new List<string>();
+            propertiesAndHeaders.TryGetValue("If-Match", out ifmatch);
+            if (ifmatch != null)
+                ifMatchEtags = ifmatch.Split(',').ToList();
+
             #endregion
 
             ///if the collection doesnt exist in the user folder
             /// the can't do anything
-            if (!StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/") + 1)))
+
+            var collectionUrl = url.Remove(url.LastIndexOf("/") + 1);
+            if (!StorageManagement.ExistCalendarCollection(collectionUrl) && !db.CollectionExist(collectionUrl))
                 return true;
 
             var resource =
                 db.GetCalendarResource(url);
+
+            if (ifMatchEtags.Count > 0)
+            {
+                if (resource != null)
+                {
+                    var resourceEtag =
+                        XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag").Value).Value;
+                    if (resourceEtag!=null && ifMatchEtags.Contains(resourceEtag))
+                    {
+                        response.StatusCode = (int) HttpStatusCode.NoContent;
+                        db.DeleteResource(resource);
+                        db.SaveChanges();
+
+                        //updating the ctag
+                        var collection = db.GetCollection(collectionUrl);
+                        var stack = new Stack<string>();
+                        collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
+                        $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack);
+
+
+                        return StorageManagement.DeleteCalendarObjectResource(url);
+                    }
+                }    
+            }
+
+
             if (resource != null)
             {
+                response.StatusCode = (int)HttpStatusCode.NoContent;
                 db.DeleteResource(resource);
                 db.SaveChanges();
 
                 //updating the ctag
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
+                var collection = db.GetCollection(collectionUrl);
                 var stack = new Stack<string>();
                 collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
                 $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack);
@@ -699,8 +734,8 @@ namespace CalDAV.Core
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
             }
+
             return StorageManagement.DeleteCalendarObjectResource(url);
-            ;
         }
 
         public bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
@@ -877,7 +912,7 @@ namespace CalDAV.Core
 
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
-   
+
 
             var headers = response.GetTypedHeaders();
 
@@ -964,6 +999,9 @@ namespace CalDAV.Core
                 $"<D:getcontentlength {Namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack);
 
+            //the response for this methos is NO CONTENT
+            response.StatusCode = (int)HttpStatusCode.NoContent;
+
             //Adding to the dataBase
             db.CalendarResources.Update(prevResource);
             db.SaveChanges();
@@ -1010,7 +1048,7 @@ namespace CalDAV.Core
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
-	     //adding the calculated etag in the getetag property of the resource
+            //adding the calculated etag in the getetag property of the resource
             var errorStack = new Stack<string>();
             resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",
                 errorStack);
