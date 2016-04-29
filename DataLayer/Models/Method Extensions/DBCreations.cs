@@ -67,6 +67,7 @@ namespace DataLayer.ExtensionMethods
                 false,false, true);
 
             col.Properties.Add(ownerProp);
+            col.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL));
 
             //add the calaendar to the collection of the principal
             principal.CalendarCollections.Add(col);

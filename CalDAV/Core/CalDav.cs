@@ -1007,6 +1007,8 @@ namespace CalDAV.Core
             var principalUrl = principal == null ? "" : principal.PrincipalURL;
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
+            resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));
+            resource.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
 	     //adding the calculated etag in the getetag property of the resource
             var errorStack = new Stack<string>();
             resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {Namespaces["D"]}>{etag}</D:getetag>",

@@ -189,6 +189,7 @@ namespace DataLayer.Models.Entities
                 IsMutable = false,
                 Value = $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
             });
+            Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
           
 
 
