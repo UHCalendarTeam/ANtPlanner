@@ -694,7 +694,7 @@ namespace CalDAV.Core
                 var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
                 var stack = new Stack<string>();
                 collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
-                new XmlTreeStructure("getctag", Namespaces["S"]) { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+                $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack);
 
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
@@ -948,7 +948,7 @@ namespace CalDAV.Core
             //updating the ctag
             var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
             collection.CreateOrModifyPropertyAdmin("getctag", NamespacesSimple["S"],
-                new XmlTreeStructure("getctag", Namespaces["S"]) { Value = Guid.NewGuid().ToString() }.ToString(), errorStack);
+                $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", errorStack);
 
             //updating the lastmodified
             prevResource.CreateOrModifyPropertyAdmin("getlastmodified", NamespacesSimple["D"],
@@ -998,7 +998,7 @@ namespace CalDAV.Core
             #endregion
 
             // calculate etag that will notice a change in the resource
-            var etag = $"\"{Guid.NewGuid().ToString()}\"";
+            var etag = $"\"{Guid.NewGuid()}\"";
             response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
