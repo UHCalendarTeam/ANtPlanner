@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity.Scaffolding.Internal;
+using TreeForXml;
 
 namespace DataLayer
 {
@@ -200,7 +201,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create and add the DAV:acl property.
+        /// Create the DAV:acl property.
+        /// THis is the default acl property for the collections  
+        /// that its owner is a user.
         /// </summary>
         /// <param name="principalUrl">The principalUrl that is the owner of the collection</param>
         public static Property CreateAclPropertyForUserCollections(string principalUrl)
@@ -228,7 +231,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create and add the DAV:acl property.
+        /// Create the DAV:acl property.
+        /// THis is the default acl property for 
+        /// the collections  that its owner is a group.
         /// </summary>
         /// <param name="editorUrl">The principalUrl that is editor in the system</param>
         public static Property CreateAclPropertyForGroupCollections(string editorUrl)
@@ -260,6 +265,38 @@ namespace DataLayer
 
             return aclProperty;
         }
+
+        /// <summary>
+        /// Create the DAV:current-user-principal.
+        /// If not principalUrl is provided means that the 
+        /// user is not authenticated.
+        /// </summary>
+        /// <param name="principalUrl">The current principal url, or nothing if the principal is not
+        /// authenticated.</param>
+        /// <returns></returns>
+        public static IXMLTreeStructure CreateCurrentUserPrincipal(string principalUrl = "")
+        {
+            var output = new XmlTreeStructure("current-user-principal", "DAV:");
+
+            IXMLTreeStructure href;
+            //if not principal URL is provided means that
+            //the principal is not authenticated.
+            if (principalUrl != "")
+                href = new XmlTreeStructure("href", "DAV:")
+                {
+                    Value = principalUrl
+                };
+            
+            else
+                href = new XmlTreeStructure("unauthenticated", "DAV:");
+            output.AddChild(href);
+            return href;
+        }
+
+
+
+
+        
 
         /// <summary>
         /// Add a single node to this property

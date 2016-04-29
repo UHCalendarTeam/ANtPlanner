@@ -151,7 +151,7 @@ namespace ACL.Core
             Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
         {
             ///build the root of the xml
-            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {

@@ -121,7 +121,7 @@ namespace CalDAV.Core
         public async Task ReportResponseBuilder(IEnumerable<KeyValuePair<string, VCalendar>> resources,
             IXMLTreeStructure calDataNode, HttpContext httpContext)
         {
-            var multistatusNode = new XmlTreeStructure("multi-status", "DAV:")
+            var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
                 {
