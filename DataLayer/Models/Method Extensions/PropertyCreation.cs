@@ -267,6 +267,13 @@ namespace DataLayer
             return aclProperty;
         }
 
+        //TODO: terminar esta propiedad.
+        public static Property CreateColorPropertyForCalendarCollections(string colorCode)
+        {
+            var colorProp = new Property();
+            return colorProp;
+        }
+
         /// <summary>
         /// Create the DAV:current-user-principal.
         /// If not principalUrl is provided means that the 

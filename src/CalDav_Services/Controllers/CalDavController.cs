@@ -293,6 +293,12 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("url", url);
 
+            var ifmatch = Request.Headers["If-Match"];
+            if (ifmatch.Count > 0)
+            {
+                propertiesAndHeaders.Add("If-Match", ifmatch.ToString());
+            }
+
             CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
