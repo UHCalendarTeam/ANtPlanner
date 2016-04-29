@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity.Scaffolding.Internal;
 using TreeForXml;
@@ -271,20 +272,20 @@ namespace DataLayer
         /// If not principalUrl is provided means that the 
         /// user is not authenticated.
         /// </summary>
-        /// <param name="principalUrl">The current principal url, or nothing if the principal is not
+        /// <param name="principal">The current principal url, or nothing if the principal is not
         /// authenticated.</param>
         /// <returns></returns>
-        public static IXMLTreeStructure CreateCurrentUserPrincipal(string principalUrl = "")
+        public static IXMLTreeStructure CreateCurrentUserPrincipal(Principal principal)
         {
             var output = new XmlTreeStructure("current-user-principal", "DAV:");
 
             IXMLTreeStructure href;
             //if not principal URL is provided means that
             //the principal is not authenticated.
-            if (principalUrl != "")
+            if (principal != null)
                 href = new XmlTreeStructure("href", "DAV:")
                 {
-                    Value = principalUrl
+                    Value = principal.PrincipalURL
                 };
             
             else

@@ -52,8 +52,8 @@ namespace ACL.Core
 
             //if the principal is null then there is some problem with the authentication
             //so return
-            if (principal == null)
-                return;
+            //if (principal == null)
+            //    return;
 
             var body = XmlTreeStructure.Parse(bodyString);
 
@@ -70,23 +70,29 @@ namespace ACL.Core
         /// </summary>
         /// <param name="response">The HttpResponse from the controller.</param>
         /// <param name="requestedUrl">The principal url if anyurl </param>
-        /// <param name="reqUrlreqProperties">The requested properties.</param>
+        /// <param name="reqProperties">Contains the requested properties for the principal. key=name, Value = ns</param>
         /// <param name="principal">The instance of the pricipal that is requested</param>
         /// <returns>The final response to return. Has the body with the response and the</returns>
         public async Task BuildResponse(HttpResponse response, string requestedUrl,
             List<KeyValuePair<string, string>> reqProperties, Principal principal)
         {
+
+            //if the principal is not authenticated then set in the response statusCode
+            if (principal == null)
+                response.StatusCode = StatusCodes.Status401Unauthorized;
+
             var multistatusNode = new XmlTreeStructure("multistatus", "DAV:");
             multistatusNode.Namespaces.Add("D", "DAV:");
             multistatusNode.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            IEnumerable<IXMLTreeStructure> properties = null;
 
             //create the response node.
             var responseNode = new XmlTreeStructure("response", "DAV:");
 
             //create the href node
             var hrefNode = new XmlTreeStructure("href", "DAV:");
-            var url = requestedUrl.Replace("/api/v1/caldav", "");
-            hrefNode.AddValue(url);
+            //var url = requestedUrl.Replace(SystemProperties._baseUrl , "");
+            hrefNode.AddValue(requestedUrl);
 
             responseNode.AddChild(hrefNode);
 
@@ -95,15 +101,37 @@ namespace ACL.Core
 
             var propNode = new XmlTreeStructure("prop", "DAV:");
 
-            //add the requested properties to the propNode
-            //if the properties exist in the principal
-            var properties = principal.Properties
-                .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
-                .Select(x => XmlTreeStructure.Parse(x.Value));
-            //add the properties to the propNode
-            foreach (var property in properties)
+            //check this because the principal could not be authenticated
+            if (principal != null)
             {
-                propNode.AddChild(property);
+                //add the requested properties to the propNode
+                //if the properties exist in the principal
+                properties = principal.Properties
+                    .Where(p => reqProperties.Contains(new KeyValuePair<string, string>(p.Name, p.Namespace)))
+                    .Select(x => XmlTreeStructure.Parse(x.Value));
+            }
+
+            //check the properties that are generated per request
+            //and are not contained in the principal's properties
+            foreach (var reqProperty in reqProperties)
+            {
+                //here the additional properties for the principal that
+                //are created per request
+                switch (reqProperty.Key)
+                {
+                    case "current-user-principal":
+                        propNode.AddChild(PropertyCreation.CreateCurrentUserPrincipal(principal));
+                        break;
+                }
+            }
+
+            if (properties != null)
+            {
+                //add the properties to the propNode
+                foreach (var property in properties)
+                {
+                    propNode.AddChild(property);
+                }
             }
 
             var statusNode = new XmlTreeStructure("status", "DAV:")
@@ -120,8 +148,7 @@ namespace ACL.Core
 
             //here the multistatus xml for the body is built
             //have to write it to the response body.
-
-            var multiStatus = multistatusNode.ToString();
+            
             var responseText = multistatusNode.ToString();
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             response.ContentLength = responseBytes.Length;
