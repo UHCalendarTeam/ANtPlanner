@@ -201,7 +201,11 @@ namespace CalDav_Services.Controllers
             CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
-       
+        [AcceptVerbs("Options", Route = "/")]
+        public void Options()
+        {
+            Response.Headers["Allow"] = "GET, PUT, PROPFIND, REPORT, PROPATCH";
+        }
 
         //OPTIONS
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
