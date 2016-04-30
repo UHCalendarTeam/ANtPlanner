@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using DataLayer.Models.Entities;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -21,7 +20,7 @@ namespace CalDAV.Core
     /// </summary>
     public class CollectionReport : ICollectionReport
     {
-        private CalDavContext _context;
+        private readonly CalDavContext _context;
 
         public CollectionReport(CalDavContext context)
         {
@@ -38,8 +37,8 @@ namespace CalDAV.Core
         }
 
         /// <summary>
-        /// Process the report depending on the values of the header 
-        /// and the body.
+        ///     Process the report depending on the values of the header
+        ///     and the body.
         /// </summary>
         /// <param name="headerValues">The neccessary properties and values of the header</param>
         /// <param name="body">The string representation of the body</param>
@@ -59,7 +58,7 @@ namespace CalDAV.Core
             switch (xmlBody.NodeName)
             {
                 case "calendar-query":
-                    await CalendarQuery(xmlBody,  urlId, httpContext);
+                    await CalendarQuery(xmlBody, urlId, httpContext);
                     break;
                 case "calendar-multiget":
                     await CalendarMultiget(xmlBody, httpContext);
@@ -81,7 +80,7 @@ namespace CalDAV.Core
         /// <param name="xmlDoc">The body of the request.</param>
         /// <param name="fs">The FileManagementSystem instance that points to the requested collection.</param>
         /// <returns></returns>
-        public async Task CalendarQuery(IXMLTreeStructure xmlDoc,  string collectionURl, HttpContext httpContext)
+        public async Task CalendarQuery(IXMLTreeStructure xmlDoc, string collectionURl, HttpContext httpContext)
         {
             IFileSystemManagement fs = new FileSystemManagement();
             /// take the first prop node to know the data that
@@ -95,7 +94,7 @@ namespace CalDAV.Core
 
 
             Dictionary<string, string> userResources;
-          
+
             fs.GetAllCalendarObjectResource(collectionURl, out userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
@@ -162,26 +161,22 @@ namespace CalDAV.Core
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                     //that the requested data
-                    var propNode = ProccessPropNode(calDataNode, resource);
+                    var propStats = ProccessPropNode(calDataNode, resource);
 
-                    propstatNode.AddChild(propNode);
 
-                    ///adding the status node
-                    /// TODO: check the status!!
-                    statusNode = new XmlTreeStructure("status", "DAV:");
-                    statusNode.AddValue("HTTP/1.1 200 OK");
-
-                    propstatNode.AddChild(statusNode);
-
-                    responseNode.AddChild(propstatNode);
+                    foreach (var propStat in propStats)
+                    {
+                         responseNode.AddChild(propStat);
+                    }
+                   
                 }
 
                 multistatusNode.AddChild(responseNode);
             }
             var responseText = multistatusNode.ToString();
-            byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            var responseBytes = Encoding.UTF8.GetBytes(responseText);
             httpContext.Response.ContentLength = responseBytes.Length;
-            await httpContext.Response.Body.WriteAsync(responseBytes, 0 , responseBytes.Length);
+            await httpContext.Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
         }
 
 
@@ -236,39 +231,107 @@ namespace CalDAV.Core
         /// </param>
         /// <param name="resource">The calendar where to extract the data.</param>
         /// <returns>Return the prop node that contains the requested data</returns>
-        private IXMLTreeStructure ProccessPropNode(IXMLTreeStructure incomPropNode, KeyValuePair<string,VCalendar> resource)
+        private List<IXMLTreeStructure> ProccessPropNode(IXMLTreeStructure incomPropNode,
+            KeyValuePair<string, VCalendar> resource)
         {
-            var outputRoot = new XmlTreeStructure("prop", "DAV:");
+            var output = new List<IXMLTreeStructure>();
+
+            var resPropertiesOk = new List<XmlTreeStructure>();
+            var resPropertiesNotExist = new List<XmlTreeStructure>();
+
+            var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
+            var calResource = _context.GetCalendarResource(href);
 
             foreach (var prop in incomPropNode.Children)
             {
                 //create an instance of a XMlTreeStrucure with the same name and
                 //ns that the requested
-                var currentProp = new XmlTreeStructure(prop.NodeName, prop.MainNamespace);
+                var currentPropNode = new XmlTreeStructure(prop.NodeName, prop.MainNamespace);
                 switch (prop.NodeName)
                 {
-                    case "getetag":
-                        //take the getetag property from the target resource
-                        var href = resource.Key[0] != '/'? "/" + resource.Key : resource.Key;
-                        
-                        var cal = _context.GetCalendarResource(href);
-                        var etag = cal.Properties.FirstOrDefault(p => p.Name == "getetag" && p.Namespace == "DAV:");
-                        currentProp.AddValue(etag.PropertyRealValue());
-                        break;
-
+                    //if the requested prop is calendar data then take the content of the
+                    //resource
                     case "calendar-data":
                         ///see if the calendar-data describes pros to take
                         /// if does then take them if not take it all
-                        currentProp.AddValue(prop.Children.Any() ? resource.Value.ToString(prop) : resource.Value.ToString());
+                        currentPropNode.AddValue(prop.Children.Any()
+                            ? resource.Value.ToString(prop)
+                            : resource.Value.ToString());
                         break;
+                    //if not try to take the property from the resource's properties
                     default:
-                        throw new NotImplementedException(
-                            $"The requested property with name {prop.NodeName} is not implemented.");
+                        var currentProperty = calResource.Properties.FirstOrDefault(p => p.Name == prop.NodeName);
+                        currentPropNode.AddValue(currentProperty != null ? currentProperty.PropertyRealValue():"");
+                        if(currentProperty != null)
+                            resPropertiesOk.Add(currentPropNode);
+                        else 
+                            resPropertiesNotExist.Add(currentPropNode);
+                        break;
                 }
-                outputRoot.AddChild(currentProp);
+               
+            }
+            #region Adding nested propOK
+            //This procedure has been explained in another method.
+            //Here the retrieve properties are grouped.
+
+            var propstatOK = new XmlTreeStructure("propstat", "DAV:");
+            var propOk = new XmlTreeStructure("prop", "DAV:");
+
+            //Here i add all properties to the prop. 
+            foreach (var property in resPropertiesOk)
+            {
+                propOk.AddChild(property);
             }
 
-            return outputRoot;
+            propstatOK.AddChild(propOk);
+            #endregion
+
+            #region Adding nested status OK
+
+            var statusOK = new XmlTreeStructure("status", "DAV:");
+            statusOK.AddValue("HTTP/1.1 200 OK");
+            propstatOK.AddChild(statusOK);
+
+            #endregion
+
+            #region Adding nested propWrong
+            //Here the properties that could not be retrieved are grouped.
+            var propstatWrong = new XmlTreeStructure("propstat", "DAV:");
+            var propWrong = new XmlTreeStructure("prop", "DAV:");
+
+            //Here i add all properties to the prop. 
+            foreach (var property in resPropertiesNotExist)
+            {
+                propWrong.AddChild(property);
+            }
+
+            propstatWrong.AddChild(propWrong);
+            #endregion
+
+            #region Adding nested status Not Found
+
+            var statusWrong = new XmlTreeStructure("status", "DAV:");
+            statusWrong.AddValue("HTTP/1.1 400 Not Found");
+            propstatWrong.AddChild(statusWrong);
+
+            #endregion
+
+            #region Adding responseDescription when wrong
+            //Here i add an description for explain the errors.
+            //This should be aplied in all method with an similar structure but for the moment is only used here.
+            //However this is not required. 
+            var responseDescrpWrong = new XmlTreeStructure("responsedescription", "DAV:");
+            responseDescrpWrong.AddValue("The properties doesn't  exist");
+            propstatWrong.AddChild(responseDescrpWrong);
+
+            #endregion
+
+            if(resPropertiesOk.Any())
+                 output.Add(propstatOK);
+            if(resPropertiesNotExist.Any())
+                 output.Add(propstatWrong);
+
+            return output;
         }
     }
 }
