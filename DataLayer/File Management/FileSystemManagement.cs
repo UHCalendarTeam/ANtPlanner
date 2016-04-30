@@ -19,6 +19,7 @@ namespace DataLayer
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
+           
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }

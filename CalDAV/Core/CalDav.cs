@@ -289,9 +289,7 @@ namespace CalDAV.Core
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
                     return;
-                    //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
                 }
-
 
                 db.SaveChanges();
                 return;
@@ -802,13 +800,13 @@ namespace CalDAV.Core
 
             var resourceBody = StorageManagement.GetCalendarObjectResource(url);
 
-            var etagProperty = calendarRes.Properties.SingleOrDefault(x => x.Name == "getetag");
+            var etagProperty = calendarRes.Properties.FirstOrDefault(x => x.Name == "getetag");
             if (etagProperty != null)
             {
                 var etag = XmlTreeStructure.Parse(etagProperty.Value).Value;
                 response.Headers["etag"] = etag;
             }
-            responseHeader.ContentType = new MediaTypeHeaderValue(@"text/calendar; charset=""utf-8""");
+            
             response.ContentType = @"text/calendar; charset=""utf-8""";
             await response.WriteAsync(resourceBody.Result);
         }

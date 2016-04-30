@@ -28,7 +28,7 @@ namespace CalDAV.Core.Propfind
     ///     y las que se mantienen invariables o muertas en un diccionario statico de donde son
     ///     llamadas.
     /// </summary>
-    public class CalDavPropfind : IPropfindMethods, IDisposable
+    public class CalDavPropfind : IPropfindMethods
     {
         private readonly CalDavContext db;
 
@@ -562,12 +562,7 @@ namespace CalDAV.Core.Propfind
 
             #endregion
         }
-
         #endregion
 
-        public void Dispose()
-        {
-            db.Dispose();
-        }
     }
 }
