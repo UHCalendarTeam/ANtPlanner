@@ -18,12 +18,10 @@ namespace ACL.Core
     public class ACLProfind : IACLProfind
     {
         private readonly IAuthenticate _authenticate;
-        private CalDavContext _context;
 
-        public ACLProfind(IAuthenticate authenticate, CalDavContext context)
+        public ACLProfind(IAuthenticate authenticate)
         {
             _authenticate = authenticate;
-            _context = context;
         }
 
         /// <summary>
@@ -33,10 +31,7 @@ namespace ACL.Core
         ///     the server to discover all the user calendars
         ///     or could PORFIND directly over a calendar URL.
         /// </summary>
-        /// <param name="request">THe HttpRequest from the controller.</param>
-        /// <param name="response">The HttpResponse property from the controller.</param>
-        /// <param name="data"></param>
-        /// <param name="body">The request's body</param>
+        /// <param name="httpContext"></param>
         /// <returns>The request</returns>
         public async Task Profind(HttpContext httpContext)
         {
@@ -45,10 +40,8 @@ namespace ACL.Core
             //read the body of the request
             var bodyString = streamReader.ReadToEnd();
 
-            Principal principal;
-
             //try to authenticate the request either with the cookies or the user credentials
-            principal = await _authenticate.AuthenticateRequest(httpContext);
+            var principal = await _authenticate.AuthenticateRequest(httpContext);
 
             //if the principal is null then there is some problem with the authentication
             //so return
@@ -138,7 +131,7 @@ namespace ACL.Core
                 Value = "HTTP/1.1 200 OK"
             };
 
-            ///add the propNOde and the status node to the propStatNode
+            //add the propNOde and the status node to the propStatNode
             propstatNode.AddChild(propNode).AddChild(statusNode);
 
             responseNode.AddChild(propstatNode);

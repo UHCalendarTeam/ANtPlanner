@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ACL.Core;
+﻿using ACL.Core;
 using ACL.Core.Authentication;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;

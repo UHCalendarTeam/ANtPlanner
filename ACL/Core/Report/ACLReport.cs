@@ -16,9 +16,9 @@ namespace ACL.Core
     {
         public async Task ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
         {
-            ///check the depth of the header
-            /// This report is only defined when the Depth header has value "0";
-            /// other values result in a 400 (Bad Request) error response.
+            //check the depth of the header
+            // This report is only defined when the Depth header has value "0";
+            // other values result in a 400 (Bad Request) error response.
             if (request.Headers.ContainsKey("Depth"))
             {
                 var depth = request.Headers["Depth"];
@@ -36,7 +36,7 @@ namespace ACL.Core
 
             response = null;
             //take the string representation of the body
-            string bodyStr = request.Body.ToString();
+            var bodyStr = request.Body.ToString();
             var xmlbody = XmlTreeStructure.Parse(bodyStr);
 
             switch (xmlbody.NodeName)
@@ -61,18 +61,18 @@ namespace ACL.Core
 
         public async Task AclPrincipalPropSet(IXMLTreeStructure body, CalDavContext context, HttpResponse response)
         {
-            ///take the requested properties from the body
-            /// of the request
+            //take the requested properties from the body
+            // of the request
             IXMLTreeStructure propNode;
 
-            ///first take the node container of the property names
+            //first take the node container of the property names
             body.GetChildAtAnyLevel("prop", out propNode);
 
-            ///take the children of the node, these are the proeprties
+            //take the children of the node, these are the proeprties
             var requestedProperties = propNode.Children.Select(x =>
             new KeyValuePair<string, string>(x.NodeName, x.MainNamespace));
 
-            string colUrl = "";
+            var colUrl = "";
 
             //Take the resource with the href == to the given url
             //TODO: should the href property be store in a property?
@@ -84,12 +84,12 @@ namespace ACL.Core
             var aclProperty = resource.Properties.First(x => x.Name == "acl");
             var aclXmlProperty = XDocument.Parse(aclProperty.Value);
 
-            ///take the href of the principals of the property
+            //take the href of the principals of the property
             var principalsURLs = aclXmlProperty.Elements("principal").Select(x => x.Descendants("href").FirstOrDefault());
 
-            Dictionary<Principal, IEnumerable<Property>> principals = new Dictionary<Principal, IEnumerable<Property>>();
+            var principals = new Dictionary<Principal, IEnumerable<Property>>();
 
-            ///take all the principals with its url equal to the givens
+            //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
                 var principal = context.Principals.FirstOrDefault(principal1 => principal1.PrincipalURL == pUrl.Value);
@@ -97,7 +97,7 @@ namespace ACL.Core
                     principals.Add(principal, null);
             }
 
-            ///take the requested properties from the principals
+            //take the requested properties from the principals
             foreach (var principal in principals)
             {
                 principals[principal.Key] = principal.Key.TakeProperties(requestedProperties);
@@ -117,7 +117,7 @@ namespace ACL.Core
         /// <returns></returns>
         public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href, CalDavContext context, HttpResponse response)
         {
-            ///take the collection with the given href
+            //take the collection with the given href
             var col = context.CalendarCollections.FirstOrDefault(x => x.Url == href);
 
             //if the collection doesnt exit then return an error
@@ -126,7 +126,7 @@ namespace ACL.Core
                 await ReturnError(response, "Not Found", 404, href);
             }
 
-            ///take all the resources from the collection.
+            //take all the resources from the collection.
             //var colResources = col.CalendarResources.Where(x=>x.)
         }
 
@@ -150,7 +150,7 @@ namespace ACL.Core
         public async Task WriteBody(HttpResponse response,
             Dictionary<Principal, IEnumerable<Property>> principalsAndProperties)
         {
-            ///build the root of the xml
+            //build the root of the xml
             var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
@@ -167,16 +167,16 @@ namespace ACL.Core
             {
                 IXMLTreeStructure statusNode;
 
-                ///each returned resource has is own response and href nodes
+                //each returned resource has is own response and href nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
                 hrefNode.AddValue(pp.Key.PrincipalURL);
 
-                ///href is a child pf response
+                //href is a child pf response
                 responseNode.AddChild(hrefNode);
 
-                ///if the resource is null it was not foound so
-                /// add an error status
+                //if the resource is null it was not foound so
+                // add an error status
                 if (pp.Value == null)
                 {
                     statusNode = new XmlTreeStructure("status", "DAV:");
@@ -187,15 +187,15 @@ namespace ACL.Core
                 {
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
                     var propNode = new XmlTreeStructure("prop", "DAV:");
-                    ///add the properties to the prop node.
+                    //add the properties to the prop node.
                     foreach (var property in pp.Value)
                     {
                         propNode.AddChild(XmlTreeStructure.Parse(property.Value));
                     }
 
                     propstatNode.AddChild(propNode);
-                    ///adding the status node
-                    /// TODO: check the status!!
+                    //adding the status node
+                    // TODO: check the status!!
                     statusNode = new XmlTreeStructure("status", "DAV:");
                     statusNode.AddValue("HTTP/1.1 200 OK");
 
@@ -219,7 +219,7 @@ namespace ACL.Core
         /// <returns></returns>
         private async Task ReturnError(HttpResponse response, string errorMessage, int errorCode, string href)
         {
-            ///build the root of the xml
+            //build the root of the xml
             var multistatusNode = new XmlTreeStructure("multistatus", "DAV:")
             {
                 Namespaces = new Dictionary<string, string>
@@ -229,17 +229,15 @@ namespace ACL.Core
                 }
             };
 
-            IXMLTreeStructure statusNode;
-
-            ///each returned resource has is own response and href nodes
+            //each returned resource has is own response and href nodes
             var responseNode = new XmlTreeStructure("response", "DAV:");
             var hrefNode = new XmlTreeStructure("href", "DAV:");
             hrefNode.AddValue(href);
 
-            ///href is a child pf response
+            //href is a child pf response
             responseNode.AddChild(hrefNode);
 
-            statusNode = new XmlTreeStructure("status", "DAV:");
+            IXMLTreeStructure statusNode = new XmlTreeStructure("status", "DAV:");
             statusNode.AddValue($"HTTP/1.1 {errorCode} {errorMessage}");
             responseNode.AddChild(statusNode);
 

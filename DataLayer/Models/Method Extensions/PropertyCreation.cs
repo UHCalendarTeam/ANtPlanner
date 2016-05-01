@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using Microsoft.Data.Entity.Scaffolding.Internal;
 using TreeForXml;
 
 namespace DataLayer
@@ -306,14 +300,14 @@ namespace DataLayer
 
         
 
-        /// <summary>
-        /// Add a single node to this property
-        /// </summary>
-        /// <param name="property"></param>
-        /// <param name="nodeValue"></param>
-        /// <param name="nodeName"></param>
-        /// <param name="ns"></param>
-        /// <returns></returns>
+        // <summary>
+        // Add a single node to this property
+        // </summary>
+        // <param name="property"></param>
+        // <param name="nodeValue"></param>
+        // <param name="nodeName"></param>
+        // <param name="ns"></param>
+        // <returns></returns>
         //public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
         //{
         //    var xml = XDocument.Parse(property.Value);

@@ -28,7 +28,7 @@ namespace DataLayer.ExtensionMethods
         public static User CreateUserInSystem(this CalDavContext context, string email, string fullName,
             string password)
         {
-            ///create the core passHasher
+            //create the core passHasher
             var passHasher = new PasswordHasher<User>();
 
 
@@ -46,7 +46,7 @@ namespace DataLayer.ExtensionMethods
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
             
 
-            ///create the principal the represents the user
+            //create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName, calHomeSet);
 
@@ -64,7 +64,7 @@ namespace DataLayer.ExtensionMethods
 
             //add the ACL properties to the collection
             var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{principal.PrincipalURL}</D:href>",
-                false, false, true);
+                false, false);
 
             col.Properties.Add(ownerProp);
             col.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL));
@@ -78,9 +78,9 @@ namespace DataLayer.ExtensionMethods
             //calendars of the user
             new FileSystemManagement().AddCalendarCollectionFolder(col.Url);
 
-            ///hass the user password 
-            /// the instance of the user has to be pass but is not used
-            /// so it need to be updated
+            //hass the user password 
+            // the instance of the user has to be pass but is not used
+            // so it need to be updated
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
@@ -114,9 +114,9 @@ namespace DataLayer.ExtensionMethods
 
             student.Password = student.PasswordHasher(password);
 
-            ///create the necessary properties for the students
-            /// 
-            /// create the DAV:group-membership
+            //create the necessary properties for the students
+            // 
+            // create the DAV:group-membership
             var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
 
             
@@ -124,7 +124,7 @@ namespace DataLayer.ExtensionMethods
             //create the displayname
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullname);
 
-            ///create the principal the represents the user
+            //create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.Student,  gMembership, displayName);
 
             student.Principal = principal;
@@ -164,7 +164,7 @@ namespace DataLayer.ExtensionMethods
             var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, SystemProperties._defualtInitialCollectionName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
-            ///create the principal the represents the user
+            //create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName, calHomeSet);
 

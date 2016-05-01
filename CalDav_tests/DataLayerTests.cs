@@ -38,7 +38,7 @@ namespace CalDav_tests
             var user = context.CreateUserInSystem(_email, _fullName, _password);
             
             context.SaveChanges();
-            Assert.True(context.Users.Count()>0);
+            Assert.True(context.Users.Any());
 
             var dbUser = context.Users.FirstOrDefault(x => x.Email == _email);
             

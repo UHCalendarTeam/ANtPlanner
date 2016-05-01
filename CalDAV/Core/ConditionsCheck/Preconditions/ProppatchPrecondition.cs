@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using DataLayer;
 using Microsoft.AspNet.Http;
 
@@ -10,14 +7,15 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
 {
     public class ProppatchPrecondition : IPrecondition
     {
-        private CalDavContext db { get; set; }
-        private IFileSystemManagement fs { get; set; }
+        public IFileSystemManagement Manager { get; set; }
+        private CalDavContext db { get; }
 
         public ProppatchPrecondition(IFileSystemManagement manager, CalDavContext context)
         {
+            Manager = manager;
             db = context;
-            fs = manager;
         }
+
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             string calendarResourceId;

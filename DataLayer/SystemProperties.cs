@@ -97,7 +97,7 @@ namespace DataLayer
         /// <returns>The url where to find the calendars of the principal.</returns>
         public static string BuildHomeSetUrl(PrincipalType type, string principalId)
         {
-            ///take the beginning of the url depending of the king of principal
+            //take the beginning of the url depending of the king of principal
             var colUrl = type == PrincipalType.User ? _userCollectionUrl : _groupCollectionUrl;
 
             //add the identifier of the pricipal

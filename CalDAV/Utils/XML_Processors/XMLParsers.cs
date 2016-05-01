@@ -11,7 +11,7 @@ namespace CalDAV.Utils.XML_Processors
         {
             var xml = XDocument.Parse(doc);
             XNamespace ns = "DAV:";
-            var properties = xml.Root.Element(ns + "set").Element(ns + "prop").Elements()
+            var properties = xml.Root?.Element(ns + "set")?.Element(ns + "prop")?.Elements()
                 .ToDictionary(x => x.Name.LocalName, x =>
                 {
                     if (x.Descendants().Any())

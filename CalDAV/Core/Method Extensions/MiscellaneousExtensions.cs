@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using DataLayer;
 using Microsoft.AspNet.Http;
@@ -37,7 +38,7 @@ namespace CalDAV.Core.Method_Extensions
         public static string TakePrincipalIdFromUrl(this HttpContext context)
         {
             var url = context.Request.GetRealUrl();
-            var index = url.LastIndexOf("/");
+            var index = url.LastIndexOf("/", StringComparison.Ordinal);
 
             var output = url.Substring(index + 1);
             return output;

@@ -5,10 +5,7 @@ using System.Net;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
-using ICalendar.ComponentProperties;
-using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity.ChangeTracking.Internal;
 using TreeForXml;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -37,7 +34,7 @@ namespace CalDAV.Core.ConditionsCheck
             {
                 iCalendar = new VCalendar(body); //lo que no estoy seguro que en el body solo haya el iCal string
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return false;
@@ -49,7 +46,7 @@ namespace CalDAV.Core.ConditionsCheck
            
 
             //check that resourceId don't exist but the collection does.
-            if (!StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/") + 1)))
+            if (!StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
@@ -61,9 +58,9 @@ namespace CalDAV.Core.ConditionsCheck
             if (!StorageManagement.ExistCalendarObjectResource(url))
             {
                 var component = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
-                var uid = component.FirstOrDefault().Properties["UID"].StringValue;
+                var uid = component.FirstOrDefault()?.Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid == calendarresource.Uid)
@@ -253,11 +250,11 @@ Method prop must not be present
             //for that i need that the controller has as request header content-size available 
             if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
             {
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/") + 1));
+                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 //here the max-resource-property of the collection is called.
                 var maxSize = collection.Properties.FirstOrDefault(p => p.Name == "max-resource-size" && p.Namespace == "urn:ietf:params:xml:ns:caldav");
                 int maxSizeInt;
-                if (int.TryParse(XmlTreeStructure.Parse(maxSize.Value).Value, out maxSizeInt) && contentSizeInt > maxSizeInt)
+                if (int.TryParse(XmlTreeStructure.Parse(maxSize?.Value).Value, out maxSizeInt) && contentSizeInt > maxSizeInt)
                 {
                     response.StatusCode = (int)HttpStatusCode.Conflict;
                     response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>

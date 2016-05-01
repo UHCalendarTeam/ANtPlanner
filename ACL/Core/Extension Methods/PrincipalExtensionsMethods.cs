@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
@@ -23,17 +21,16 @@ namespace ACL.Core.Extension_Method
             var pUrl = principal.PrincipalURL;
             var aclP = XDocument.Parse(property.Value).Root;
             IEnumerable<XElement> principalGrantPermissions=null;
-            XNamespace davNs = "DAV:";
             XName aceName = "ace";
 
             //take the permission for the principal if any
-            var descendants = aclP.Descendants();
-            var aces = descendants.Where(x => x.Name.LocalName == "ace");
+            var descendants = aclP?.Descendants();
+            var aces = descendants.Where(x => x.Name.LocalName == aceName);
             var principalAce = aces.FirstOrDefault(ace => ace.Descendants()
-                                    .FirstOrDefault(x=>x.Name.LocalName == "href").Value == pUrl);
+                                    .FirstOrDefault(x=>x.Name.LocalName == "href")?.Value == pUrl);
             if(principalAce != null)
                 principalGrantPermissions = principalAce.Descendants()
-                                    .FirstOrDefault(x => x.Name.LocalName == "grant").Elements();
+                                    .FirstOrDefault(x => x.Name.LocalName == "grant")?.Elements();
 
             //take the permission for all users if any
 
@@ -47,7 +44,7 @@ namespace ACL.Core.Extension_Method
                     output.Add(permission);
                 }
             var outputStr = output.ToString();
-            XmlTreeStructure xmlTree = XmlTreeStructure.Parse(outputStr) as XmlTreeStructure;
+            var xmlTree = XmlTreeStructure.Parse(outputStr) as XmlTreeStructure;
             return xmlTree;
 
         }

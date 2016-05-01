@@ -79,9 +79,6 @@ namespace CalDAV.Core
         /// <summary>
         ///     This method perfoms a profind on a principal.
         /// </summary>
-        /// <param name="request">The request from the controller.</param>
-        /// <param name="response">The response from the controller.</param>
-        /// <param name="data">SOme useful data that could be send from the controller.</param>
         /// <param name="httpContext">
         ///     This contains the Request from the client, the response to be sended back and useful
         ///     data in the Session.

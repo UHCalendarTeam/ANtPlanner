@@ -43,7 +43,7 @@ namespace DataLayer.Models.Entities
         public string Email { get; set; }
       
         ///     Contains the user fullName.
-        /// </summary>
+        /// 
         public string DisplayName { get; set; }
 
         /// <summary>

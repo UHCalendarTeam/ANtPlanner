@@ -21,10 +21,10 @@ namespace DataLayer
         {
            
         }
+
         /// <summary>
         /// inject the configuration of the app to be accessible in the DataLayer
         /// </summary>
-        /// <param name="config"></param>
         public CalDavContext()
         {
             

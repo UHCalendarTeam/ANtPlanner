@@ -136,7 +136,7 @@ namespace CalDAV.Core
             //status correspondiente y un xml "status" que tiene el mensaje del estado de dicho "propstat". 
 
             //checking Precondtions
-            PreconditionCheck = new PropfindPrecondition(StorageManagement, db);
+            PreconditionCheck = new PropfindPrecondition(db);
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 

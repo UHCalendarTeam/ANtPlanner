@@ -60,6 +60,7 @@ namespace ACL.Interfaces
         /// <summary>
         ///     Add a member to the group.
         /// </summary>
+        /// <param name="principal"></param>
         /// <param name="member">The member to be add.</param>
         /// <returns>True if successful operation, false otherwise.</returns>
         bool AddGroupMember(Principal principal, string member);

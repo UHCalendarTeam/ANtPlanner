@@ -10,14 +10,14 @@ namespace DataLayer.Models.Entities
     /// </summary>
     public class CalendarCollection
     {
-        private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
+        private readonly Dictionary<string, string> _namespaces = new Dictionary<string, string>
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
             {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
         };
 
-        private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
+        private readonly Dictionary<string, string> _namespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
@@ -78,116 +78,116 @@ namespace DataLayer.Models.Entities
 
         private void InitializeStandardCollectionProperties(string name)
         {
-            Properties.Add(new Property("calendar-timezone", NamespacesSimple["C"])
+            Properties.Add(new Property("calendar-timezone", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:calendar-timezone {Namespaces["C"]}>LaHabana/Cuba</C:calendar-timezone>"
+                Value = $"<C:calendar-timezone {_namespaces["C"]}>LaHabana/Cuba</C:calendar-timezone>"
             });
 
-            Properties.Add(new Property("max-resource-size", NamespacesSimple["C"])
+            Properties.Add(new Property("max-resource-size", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:max-resource-size {Namespaces["C"]}>102400</C:max-resource-size>"
+                Value = $"<C:max-resource-size {_namespaces["C"]}>102400</C:max-resource-size>"
             });
 
 
-            Properties.Add(new Property("min-date-time", NamespacesSimple["C"])
+            Properties.Add(new Property("min-date-time", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:min-date-time {Namespaces["C"]}>{this.MinDateTime()}</C:min-date-time>"
+                Value = $"<C:min-date-time {_namespaces["C"]}>{this.MinDateTime()}</C:min-date-time>"
             });
 
-            Properties.Add(new Property("max-date-time", NamespacesSimple["C"])
+            Properties.Add(new Property("max-date-time", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:max-date-time {Namespaces["C"]}>{this.MaxDateTime()}</C:max-date-time>"
+                Value = $"<C:max-date-time {_namespaces["C"]}>{this.MaxDateTime()}</C:max-date-time>"
             });
 
 
-            Properties.Add(new Property("max-instances", NamespacesSimple["C"])
+            Properties.Add(new Property("max-instances", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:max-instances {Namespaces["C"]}>10</C:max-instances>"
+                Value = $"<C:max-instances {_namespaces["C"]}>10</C:max-instances>"
             });
 
 
-            Properties.Add(new Property("getcontentlength", NamespacesSimple["D"])
+            Properties.Add(new Property("getcontentlength", _namespacesSimple["D"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<D:getcontentlength {Namespaces["D"]}>0</D:getcontentlength>"
+                Value = $"<D:getcontentlength {_namespaces["D"]}>0</D:getcontentlength>"
             });
 
 
-            Properties.Add(new Property("supported-calendar-component-set", NamespacesSimple["C"])
+            Properties.Add(new Property("supported-calendar-component-set", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
                 Value =
-                    $@"<C:supported-calendar-component-set {Namespaces["C"]
+                    $@"<C:supported-calendar-component-set {_namespaces["C"]
                         }><C:comp name=""VEVENT""/><C:comp name=""VTODO""/></C:supported-calendar-component-set>"
             });
 
-            Properties.Add(new Property("supported-calendar-data", NamespacesSimple["C"])
+            Properties.Add(new Property("supported-calendar-data", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
                 Value =
-                    $@"<C:supported-calendar-data {Namespaces["C"]
+                    $@"<C:supported-calendar-data {_namespaces["C"]
                         }><C:comp name=""VEVENT""/><C:comp name=""VTODO""/></C:supported-calendar-data>"
             });
 
-            Properties.Add(new Property("calendar-description", NamespacesSimple["C"])
+            Properties.Add(new Property("calendar-description", _namespacesSimple["C"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
-                Value = $"<C:calendar-description {Namespaces["C"]}>No Description Available</C:calendar-description>"
+                Value = $"<C:calendar-description {_namespaces["C"]}>No Description Available</C:calendar-description>"
             });
 
-            Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
+            Properties.Add(new Property("resourcetype", _namespacesSimple["D"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
                 Value =
-                    $"<D:resourcetype {Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>"
+                    $"<D:resourcetype {_namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>"
             });
 
-            Properties.Add(new Property("displayname", NamespacesSimple["D"])
+            Properties.Add(new Property("displayname", _namespacesSimple["D"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
-                Value = string.IsNullOrEmpty(name) ? null : $"<D:displayname {Namespaces["D"]}>{name}</D:displayname>"
+                Value = string.IsNullOrEmpty(name) ? null : $"<D:displayname {_namespaces["D"]}>{name}</D:displayname>"
             });
 
-            Properties.Add(new Property("creationdate", NamespacesSimple["D"])
+            Properties.Add(new Property("creationdate", _namespacesSimple["D"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = true,
-                Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
+                Value = $"<D:creationdate {_namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
-            Properties.Add(new Property("getctag", NamespacesSimple["S"])
+            Properties.Add(new Property("getctag", _namespacesSimple["S"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $@"<S:getctag {Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
+                Value = $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
             });
             Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
           

@@ -231,8 +231,7 @@ namespace CalDav_tests
 
             "FREQ=WEEKLY;COUNT=10;WKST=SU;BYDAY=TU,TH".ToRecur(out recur);
 
-            recurs = new List<Recur>();
-            recurs.Add(recur);
+            recurs = new List<Recur> {recur};
             dts = startTime.Value.ExpandTime(recurs).ToList();
             Assert.Equal(10, dts.Count());
             foreach (var dt in expected)
@@ -1074,7 +1073,7 @@ namespace CalDav_tests
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
                 daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
-            var interval = recur.Interval != null ? recur.Interval.Value : 1;
+            var interval = recur.Interval ?? 1;
             for (var year = dt.Value.Year; year < dt.Value.Year + 10; year += interval)
                 for (var month = 1; month < 13; month++)
                     for (var day = 1; day <= cal.GetDaysInMonth(year, month); day++)

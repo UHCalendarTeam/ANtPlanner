@@ -25,7 +25,6 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="propertiesReq">List with all the properties to retrieve</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
-        /// <param name="principalIdS">The email of the principal. Its needed for the DAV:current-user-privilege-set property</param>
         /// <returns></returns>
         void PropMethod(string url, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);
 

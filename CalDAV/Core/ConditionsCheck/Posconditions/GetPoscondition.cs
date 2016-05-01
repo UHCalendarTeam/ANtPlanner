@@ -8,6 +8,12 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class GetPoscondition : IPoscondition
     {
+        public GetPoscondition(DbContext db, IFileSystemManagement fs)
+        {
+            Db = db;
+            Fs = fs;
+        }
+
         public IFileSystemManagement Fs { get; }
         public DbContext Db { get; }
 

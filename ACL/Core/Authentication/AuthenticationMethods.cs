@@ -32,35 +32,30 @@ namespace ACL.Core.Authentication
         ///     If dont then take the user data from UH apis and create the user in the
         ///     system with this data.
         /// </summary>
-        /// <param name="clientRequest">
-        ///     THe request from the client. THe authentication
-        ///     credential are taken from it.
-        /// </param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
         public async Task<Principal> AuthenticateRequest(HttpContext httpContext)
         {
             var username = "";
-            var password = "";
-            var authorizationGranted = false;
             Principal principal;
             string cookieValue;
 
-            ///take the creadentials from the request
+            //take the creadentials from the request
 
             #region take the authorization header and proccess it
 
             string authHeader = httpContext.Request.Headers["Authorization"];
-            ///check if has the authorization header and is basic
+            //check if has the authorization header and is basic
             if (!string.IsNullOrEmpty(authHeader))
             {
                 var credentials = TakeCreadential(authHeader).Result;
                 username = credentials.Key;
-                password = credentials.Value;
+                var password = credentials.Value;
 
-                ///check if the user exist in our DB
+                //check if the user exist in our DB
                 if (_context.Principals.Any(p => p.PrincipalStringIdentifier == username))
                 {
-                    /// if does then check if can authenticate
+                    // if does then check if can authenticate
                     if (_context.VerifyPassword(username, password))
                     {
                         Console.WriteLine($"------Current user {username} is authenticated");
@@ -78,9 +73,9 @@ namespace ACL.Core.Authentication
                 //TODO: change this if dont want the new user automatic creation behavior
                 else
                 {
-                    ///Temporaly if the WCF services doesnt work we are gonna create
-                    /// the users automatically in the system.
-                    /// TODO: check if is a student or teacher
+                    //Temporaly if the WCF services doesnt work we are gonna create
+                    // the users automatically in the system.
+                    // TODO: check if is a student or teacher
 
                     _context.CreateUserInSystem(username, username, password);
                     await _context.SaveChangesAsync();
@@ -94,9 +89,9 @@ namespace ACL.Core.Authentication
             //ckeck the session cookies.
             else
             {
-                ///if the request doens't comes with a authorization header
-                /// then check if has the cookie provided by us
-                /// 
+                //if the request doens't comes with a authorization header
+                // then check if has the cookie provided by us
+                // 
                 if (!httpContext.Request.Cookies.ContainsKey(SystemProperties._cookieSessionName))
                 {
                     /*
@@ -109,7 +104,7 @@ namespace ACL.Core.Authentication
                 }
                 //take the cookie that the client send us in the request
                 cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
-                var principalStringId = "";
+                string principalStringId;
                 try
                 {
                     principalStringId = httpContext.Session.GetString("principalId");
@@ -129,7 +124,7 @@ namespace ACL.Core.Authentication
                 var principalSesison = principal.SessionId;
                 if (!VerifySessionCookies(principalSesison, cookieValue))
                 {
-                    ///if the cookies doesnt match then send back 401
+                    //if the cookies doesnt match then send back 401
                     await SetUnauthorizedRequest(httpContext);
                     return null;
                 }
@@ -206,11 +201,11 @@ namespace ACL.Core.Authentication
 
     //call the user(student) creation method in the DataLayer
     */
-            ///TODO: take the useful data from the content
-            ///check if the user is in the system
-            /// if not create it with all his stuffs
-            /// send the data back
-            ///put the data in the output
+            //TODO: take the useful data from the content
+            //check if the user is in the system
+            // if not create it with all his stuffs
+            // send the data back
+            //put the data in the output
 
             //create the token and shit
 
@@ -227,16 +222,7 @@ namespace ACL.Core.Authentication
         /// <returns></returns>
         public async Task<KeyValuePair<string, string>> TakeCreadential(string authHeader)
         {
-            KeyValuePair<string, string> credentials;
-            if (authHeader.StartsWith("Basic"))
-            {
-                credentials = TakeCredentionFromBasic(authHeader).Result;
-            }
-            else
-            {
-                //Handle what happens if that isn't the case
-                credentials = TakeCredentionFromDigest(authHeader).Result;
-            }
+            var credentials = authHeader.StartsWith("Basic") ? await TakeCredentionFromBasic(authHeader) : await TakeCredentionFromDigest(authHeader);
             return credentials;
         }
 

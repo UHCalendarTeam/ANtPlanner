@@ -34,7 +34,7 @@ namespace CalDAV.Core.Method_Extensions
         /// <returns></returns>
         private static IEnumerable<DateTime> ApplyFrequency(this DateTime dateTime, Recur rule)
         {
-            ///limit the COunt and Ultil if are not specified
+            //limit the COunt and Ultil if are not specified
             var count = rule.Count ?? 1000;
             var until = rule.Until ?? dateTime.AddYears(10);
 
@@ -448,7 +448,7 @@ namespace CalDAV.Core.Method_Extensions
         {
             if (rule.BySetPos == null)
                 return dateTimes;
-            throw new NotImplementedException($"THe rule isnt implemented yet :(.");
+            throw new NotImplementedException("THe rule isnt implemented yet :(.");
         }
 
 
@@ -465,16 +465,16 @@ namespace CalDAV.Core.Method_Extensions
             var output = new List<DateTime>(7);
             var cal = CultureInfo.InvariantCulture.Calendar;
 
-            ///set the initial date to the first day in the year 
-            ///add it days so it fall in the given week
+            //set the initial date to the first day in the year 
+            //add it days so it fall in the given week
             var startDT = new DateTime(dt.Year, 1, 1, dt.Hour, dt.Minute, dt.Second)
                 .AddDays((weekNum - 1)*7);
 
             var currentDT = startDT;
             var currentWeekNum = cal.GetWeekOfYear(currentDT, CalendarWeekRule.FirstFourDayWeek, dw);
 
-            ///if dindt fall in the given week then
-            ///add days till that happens
+            //if dindt fall in the given week then
+            //add days till that happens
             if (currentWeekNum < weekNum)
                 while (currentWeekNum < weekNum)
                 {
@@ -586,8 +586,8 @@ namespace CalDAV.Core.Method_Extensions
                     }
 
 
-                    ///if is negative and the occurrence of the DayOfWeek value
-                    ///match with one of the specified in BYDAY
+                    //if is negative and the occurrence of the DayOfWeek value
+                    //match with one of the specified in BYDAY
                     else if (dateTime.DayOfWeek == wDay.DayOfWeek &&
                              daysOfWeekCount[dateTime.DayOfWeek] - dayOfWeekOcurrence[dateTime] + 1 ==
                              wDay.OrdDay.Value*-1)

@@ -1,8 +1,6 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 
 namespace DataLayer
@@ -16,7 +14,7 @@ namespace DataLayer
         /// </summary>
         public static void SeedDb_Fs()
         {
-            ///create the core passHasher
+            //create the core passHasher
             var passHasher = new PasswordHasher<User>();
             using (var db = new CalDavContext())
             {

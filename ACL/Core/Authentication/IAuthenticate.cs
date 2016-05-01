@@ -15,7 +15,7 @@ namespace ACL.Core.Authentication
         /// create a WebRequest to take the data from the
         /// Universith authentication api.
         /// </summary>
-        /// <param name="request">The request from the client. </param>
+        /// <param name="httpContext"></param>
         /// <returns>Returns a dict with the username, email, group, student or professor.
         /// This data is taken from the response of the authentication api.</returns>
         Task<Principal> AuthenticateRequest(HttpContext httpContext);

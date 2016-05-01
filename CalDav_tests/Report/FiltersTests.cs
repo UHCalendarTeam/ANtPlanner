@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using CalDAV.Core.Method_Extensions;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
@@ -487,7 +486,7 @@ END:VCALENDAR";
         [Fact]
         public void TestingStuffs()
         {
-            var temp = TimeZoneInfo.GetSystemTimeZones();
+           
         }
     }
 }

@@ -27,24 +27,23 @@ namespace CalDAV.Core.Method_Extensions
         public static bool FilterResource(this VCalendar calendar, IXMLTreeStructure filterTree)
         {
             //first get the component in the calendar where to apply the filter.
-            IXMLTreeStructure filtersContainer = null;
-            ICalendarComponent component = null;
+            IXMLTreeStructure filtersContainer;
+            ICalendarComponent component;
 
-            ///take the first node with "comp-filter" name,
-            /// this is the node with name="VCALENDAR"
+            //take the first node with "comp-filter" name,
+            // this is the node with name="VCALENDAR"
             filterTree.GetChildAtAnyLevel("comp-filter", out filterTree);
 
-            ///get the component and filter in the position of the first component
-            /// required by the filter that is a child of VCALENDAR
+            //get the component and filter in the position of the first component
+            // required by the filter that is a child of VCALENDAR
             if (!ComponentSeeker(calendar, filterTree, out filtersContainer, out component))
                 return false; //if the container doesn't have the requested comp then return false;
-            var result = true;
             foreach (var filter in filtersContainer.Children)
             {
                 switch (filter.NodeName)
                 {
                     case "prop-filter":
-                        result = component.PropertyFilter(filter);
+                        var result = component.PropertyFilter(filter);
                         if (!result)
                             return false;
                         break;
@@ -74,21 +73,21 @@ namespace CalDAV.Core.Method_Extensions
             var propName = filter.Attributes["name"];
             //if the comp doesn't has the desired prop return false
 
-            ///iterate over the filters, if one is false then
-            ///returns false
-            IComponentProperty propValue;
+            //iterate over the filters, if one is false then
+            //returns false
 
-            ///this is gonna be use for the ATTENDEE and RRULE
-            /// properties
-            List<IComponentProperty> propMultiValues;
+            //this is gonna be use for the ATTENDEE and RRULE
+            // properties
             foreach (var propFilter in filter.Children)
             {
                 var result = false;
+                IComponentProperty propValue;
+                List<IComponentProperty> propMultiValues;
                 switch (propFilter.NodeName)
                 {
                     case "text-match":
-                        ///have to check this line in each of the cases because the
-                        ///"is not defined"
+                        //have to check this line in each of the cases because the
+                        //"is not defined"
                         if (component.Properties.TryGetValue(propName, out propValue))
                             result = propValue.StringValue.TextMatchFilter(propFilter);
                         else if (component.MultipleValuesProperties.TryGetValue(propName, out propMultiValues))
@@ -108,12 +107,12 @@ namespace CalDAV.Core.Method_Extensions
                         break;
 
                     case "is-not-defined":
-                        ///if the component has a single prop with the given na,e
-                        /// return false
+                        //if the component has a single prop with the given na,e
+                        // return false
                         if (component.Properties.ContainsKey(propName))
                             return false;
-                        ///else if contains a multiple property with the given name
-                        /// returns false
+                        //else if contains a multiple property with the given name
+                        // returns false
                         if (component.GetMultipleCompProperties(propName) != null)
                             return false;
                         break;
@@ -130,8 +129,8 @@ namespace CalDAV.Core.Method_Extensions
         ///     Apply a filter to the param of the property with name
         ///     equal the given param
         /// </summary>
-        /// <param name="component">The component where to apply the filters.</param>
-        /// <param name="filter">Filters container.</param>
+        /// <param name="property"></param>
+        /// <param name="filters"></param>
         /// <returns>True if the param pass the filters, false otherwise.</returns>
         private static bool ParamFilter(this IComponentProperty property, IXMLTreeStructure filters)
         {
@@ -182,8 +181,8 @@ namespace CalDAV.Core.Method_Extensions
                     return negateCond ? !result : result;
 
                 case "i;ascii-casemap":
-                    var propValueAscii = propertyValue.Select(x => (int) x).ToArray();
-                    var filterValueAscii = filter.Value.Select(x => (int) x).ToArray();
+                    var propValueAscii = propertyValue.Select(x => (int)x).ToArray();
+                    var filterValueAscii = filter.Value.Select(x => (int)x).ToArray();
                     result = ApplyTextFilter(propValueAscii, filterValueAscii);
                     return negateCond ? !result : result;
 
@@ -229,17 +228,13 @@ namespace CalDAV.Core.Method_Extensions
         public static Dictionary<string, VCalendar> TimeFilter(this Dictionary<string, VCalendar> resources,
             DateTime start, DateTime end, IXMLTreeStructure filter)
         {
-            var output = new Dictionary<string, VCalendar>();
 
             foreach (var resource in resources)
             {
-                ICalendarComponent comp = null;
-                IXMLTreeStructure compNode = null;
-                compNode = filter.GetChild("comp-filter");
+                var compNode = filter.GetChild("comp-filter");
                 var compName = compNode.Attributes["name"];
                 if (resource.Value.CalendarComponents.ContainsKey(compName))
                 {
-                    comp = resource.Value.CalendarComponents[compName].First();
                 }
                 else
                     continue;
@@ -260,7 +255,7 @@ namespace CalDAV.Core.Method_Extensions
             DateTime? start;
             DateTime? end;
 
-            ///get the start and time attributes of the filter.
+            //get the start and time attributes of the filter.
             if (filter.Attributes.ContainsKey("start"))
                 filter.Attributes["start"].ToDateTime(out start);
             else //if not then assign infinite
@@ -271,18 +266,18 @@ namespace CalDAV.Core.Method_Extensions
             else //if not then assign -infinite
                 end = DateTime.MaxValue;
 
-            ///Get the DTSTART of the component.
+            //Get the DTSTART of the component.
             var compDTSTART = component.GetComponentProperty("DTSTART") == null
                 ? DateTime.MaxValue
-                : ((IValue<DateTime>) component.GetComponentProperty("DTSTART")).Value;
+                : ((IValue<DateTime>)component.GetComponentProperty("DTSTART")).Value;
 
-            ///if the component contains RRULES then expand the dts
+            //if the component contains RRULES then expand the dts
             IEnumerable<DateTime> expandedDates = null;
             if (component.MultipleValuesProperties.ContainsKey("RRULE"))
                 expandedDates = compDTSTART.ExpandTime(component.GetMultipleCompProperties("RRULE").Select(
-                    x => ((IValue<Recur>) x).Value).ToList());
+                    x => ((IValue<Recur>)x).Value).ToList());
             if (expandedDates == null)
-                expandedDates = new List<DateTime> {compDTSTART};
+                expandedDates = new List<DateTime> { compDTSTART };
 
             if (component is VEvent)
                 return component.ApplyTimeFilterToVEVENT(start.Value, end.Value, expandedDates);
@@ -312,29 +307,29 @@ namespace CalDAV.Core.Method_Extensions
         {
             var DURATION = component.GetComponentProperty("DURATION") == null
                 ? null
-                : ((IValue<DurationType>) component.GetComponentProperty("DURATION")).Value;
+                : ((IValue<DurationType>)component.GetComponentProperty("DURATION")).Value;
             var DUE = component.GetComponentProperty("DUE") == null
                 ? null
-                : ((IValue<Due>) component.GetComponentProperty("DUE")).Value;
-            ;
+                : ((IValue<Due>)component.GetComponentProperty("DUE")).Value;
+
             var COMPLETED = component.GetComponentProperty("COMPLETED") == null
                 ? null
-                : ((IValue<Completed>) component.GetComponentProperty("COMPLETED")).Value;
-            ;
+                : ((IValue<Completed>)component.GetComponentProperty("COMPLETED")).Value;
+
             var CREATED = component.GetComponentProperty("CREATED") == null
                 ? null
-                : ((IValue<Created>) component.GetComponentProperty("Created")).Value;
-            ;
+                : ((IValue<Created>)component.GetComponentProperty("Created")).Value;
 
-            ///VTODO has the DTSTART property? Y
+
+            //VTODO has the DTSTART property? Y
             if (expandedDates.Any())
             {
                 foreach (var DTSTART in expandedDates)
                 {
-                    /// VTODO has the DURATION property? Y
-                    /// VTODO has the DUE property? N
-                    ///  VTODO has the COMPLETED property? *
-                    /// VTODO has the CREATED property? *
+                    // VTODO has the DURATION property? Y
+                    // VTODO has the DUE property? N
+                    //  VTODO has the COMPLETED property? *
+                    // VTODO has the CREATED property? *
                     if (DURATION != null && DUE == null)
                     {
                         var DTSTARTplusDURATION = DTSTART.AddDuration(DURATION);
@@ -343,10 +338,10 @@ namespace CalDAV.Core.Method_Extensions
                             return true;
                     }
 
-                    /// VTODO has the DURATION property? N
-                    /// VTODO has the DUE property? Y
-                    ///  VTODO has the COMPLETED property? *
-                    /// VTODO has the CREATED property? *
+                    // VTODO has the DURATION property? N
+                    // VTODO has the DUE property? Y
+                    //  VTODO has the COMPLETED property? *
+                    // VTODO has the CREATED property? *
                     else if (DUE != null)
                     {
                         if ((start < DUE.Value || start <= DTSTART) &&
@@ -354,31 +349,31 @@ namespace CalDAV.Core.Method_Extensions
                             return true;
                     }
 
-                    /// VTODO has the DURATION property? N
-                    /// VTODO has the DUE property? N
-                    ///  VTODO has the COMPLETED property? *
-                    /// VTODO has the CREATED property? *
+                    // VTODO has the DURATION property? N
+                    // VTODO has the DUE property? N
+                    //  VTODO has the COMPLETED property? *
+                    // VTODO has the CREATED property? *
                     if (DUE == null && DURATION == null)
                         if (start <= DTSTART && end > DTSTART)
                             return true;
                 }
             }
 
-            ///VTODO has the DTSTART property? N
+            //VTODO has the DTSTART property? N
             else
             {
-                /// VTODO has the DURATION property? N
-                /// VTODO has the DUE property? Y
-                ///  VTODO has the COMPLETED property? *
-                /// VTODO has the CREATED property? *
+                // VTODO has the DURATION property? N
+                // VTODO has the DUE property? Y
+                //  VTODO has the COMPLETED property? *
+                // VTODO has the CREATED property? *
                 if (DUE != null && DURATION == null)
                     if (start < DUE.Value && end >= DUE.Value)
                         return true;
 
-                /// VTODO has the DURATION property? N
-                /// VTODO has the DUE property? N
-                ///  VTODO has the COMPLETED property? Y
-                /// VTODO has the CREATED property? Y
+                // VTODO has the DURATION property? N
+                // VTODO has the DUE property? N
+                //  VTODO has the COMPLETED property? Y
+                // VTODO has the CREATED property? Y
                 if (COMPLETED != null && CREATED != null)
                 {
                     if ((start <= CREATED.Value || start <= COMPLETED.Value)
@@ -386,28 +381,28 @@ namespace CalDAV.Core.Method_Extensions
                         return true;
                 }
 
-                /// VTODO has the DURATION property? N
-                /// VTODO has the DUE property? N
-                ///  VTODO has the COMPLETED property? Y
-                /// VTODO has the CREATED property? N
+                // VTODO has the DURATION property? N
+                // VTODO has the DUE property? N
+                //  VTODO has the COMPLETED property? Y
+                // VTODO has the CREATED property? N
                 else if (COMPLETED != null && CREATED == null)
                 {
                     if (start <= COMPLETED.Value && end >= COMPLETED.Value)
                         return true;
                 }
 
-                /// VTODO has the DURATION property? N
-                /// VTODO has the DUE property? N
-                ///  VTODO has the COMPLETED property? N
-                /// VTODO has the CREATED property? Y
+                // VTODO has the DURATION property? N
+                // VTODO has the DUE property? N
+                //  VTODO has the COMPLETED property? N
+                // VTODO has the CREATED property? Y
                 else if (COMPLETED == null && CREATED != null)
                     if (end > CREATED.Value)
                         return true;
             }
-            /// VTODO has the DURATION property? N
-            /// VTODO has the DUE property? N
-            ///  VTODO has the COMPLETED property? N
-            /// VTODO has the CREATED property? N
+            // VTODO has the DURATION property? N
+            // VTODO has the DUE property? N
+            //  VTODO has the COMPLETED property? N
+            // VTODO has the CREATED property? N
             return true;
         }
 
@@ -427,35 +422,35 @@ namespace CalDAV.Core.Method_Extensions
             var compEndTimeProp = component.GetComponentProperty("DTEND");
             foreach (var DTSTART in expandedDates)
             {
-                ///VEVENT has the DTEND property? Y
-                /// VEVENT has the DURATION property? N
-                /// DURATION property value is greater than 0 seconds? N
-                /// DTSTART property is a DATE-TIME value? *
+                //VEVENT has the DTEND property? Y
+                // VEVENT has the DURATION property? N
+                // DURATION property value is greater than 0 seconds? N
+                // DTSTART property is a DATE-TIME value? *
                 if (compEndTimeProp != null)
                 {
-                    var DTEND = ((IValue<DateTime>) compEndTimeProp).Value;
+                    var DTEND = ((IValue<DateTime>)compEndTimeProp).Value;
                     if (start < DTEND && end > DTSTART)
                         return true;
                 }
 
                 var durationProp = component.GetComponentProperty("DURATION");
 
-                ///VEVENT has the DTEND property? N
-                /// VEVENT has the DURATION property? Y
+                //VEVENT has the DTEND property? N
+                // VEVENT has the DURATION property? Y
                 if (durationProp != null)
                 {
-                    var DURATION = ((IValue<DurationType>) durationProp).Value;
+                    var DURATION = ((IValue<DurationType>)durationProp).Value;
                     var DTSTARTplusDURATION = DTSTART.AddDuration(DURATION);
 
-                    /// DURATION property value is greater than 0 seconds? Y
-                    /// DTSTART property is a DATE-TIME value? *
+                    // DURATION property value is greater than 0 seconds? Y
+                    // DTSTART property is a DATE-TIME value? *
                     if (DURATION.IsPositive)
                     {
                         if (start < DTSTARTplusDURATION && end > DTSTART)
                             return true;
                     }
-                    /// DURATION property value is greater than 0 seconds? N
-                    /// DTSTART property is a DATE-TIME value? *
+                    // DURATION property value is greater than 0 seconds? N
+                    // DTSTART property is a DATE-TIME value? *
                     else
                     {
                         if (start <= DTSTART && end > DTSTART)
@@ -463,17 +458,17 @@ namespace CalDAV.Core.Method_Extensions
                     }
                 }
 
-                ///VEVENT has the DTEND property? N
-                /// VEVENT has the DURATION property? N
-                /// DURATION property value is greater than 0 seconds? N
-                /// DTSTART property is a DATE-TIME value? Y
+                //VEVENT has the DTEND property? N
+                // VEVENT has the DURATION property? N
+                // DURATION property value is greater than 0 seconds? N
+                // DTSTART property is a DATE-TIME value? Y
                 if (start <= DTSTART && end > DTSTART)
                     return true;
 
-                ///VEVENT has the DTEND property? N
-                /// VEVENT has the DURATION property? N
-                /// DURATION property value is greater than 0 seconds? N
-                /// DTSTART property is a DATE-TIME value? N
+                //VEVENT has the DTEND property? N
+                // VEVENT has the DURATION property? N
+                // DURATION property value is greater than 0 seconds? N
+                // DTSTART property is a DATE-TIME value? N
                 if (start < DTSTART.AddDays(1) && end > DTSTART)
                     return true;
             }
@@ -488,44 +483,43 @@ namespace CalDAV.Core.Method_Extensions
         /// <param name="component">THe VTODO</param>
         /// <param name="start">The start time of the filter</param>
         /// <param name="end">The end datetime of the filter</param>
-        /// <param name="expandedDates">The expaned dts by the RRULEs if any.</param>
         /// <returns>True if pass the filter, false otherwise.</returns>
         private static bool ApplyTimeFilterToVFREEBUSY(this ICalendarComponent component, DateTime start, DateTime end)
         {
             var DTSTART = component.GetComponentProperty("DTSTART") == null
                 ? DateTime.MinValue
-                : ((IValue<DateTime>) component.GetComponentProperty("DTSTART")).Value;
+                : ((IValue<DateTime>)component.GetComponentProperty("DTSTART")).Value;
             var DTEND = component.GetComponentProperty("DTEND") == null
                 ? DateTime.MaxValue
-                : ((IValue<DateTime>) component.GetComponentProperty("DTEND")).Value;
+                : ((IValue<DateTime>)component.GetComponentProperty("DTEND")).Value;
 
-            ///VFREEBUSY has both the DTSTART and DTEND properties? Y
-            /// VFREEBUSY has the FREEBUSY property? *
+            //VFREEBUSY has both the DTSTART and DTEND properties? Y
+            // VFREEBUSY has the FREEBUSY property? *
             if (DTSTART != DateTime.MinValue && DTEND != DateTime.MaxValue)
                 return start <= DTEND && end > DTSTART;
 
-            ///VFREEBUSY has both the DTSTART and DTEND properties? N
-            /// VFREEBUSY has the FREEBUSY property? Y
+            //VFREEBUSY has both the DTSTART and DTEND properties? N
+            // VFREEBUSY has the FREEBUSY property? Y
             if (component.MultipleValuesProperties.ContainsKey("FREEBUSY"))
             {
-                ///take the freebusy properties
+                //take the freebusy properties
                 var freeBProp = component.MultipleValuesProperties["FREEBUSY"]
-                    .Select(x => ((IValue<Period>) x).Value);
+                    .Select(x => ((IValue<Period>)x).Value);
 
                 if (freeBProp.Any(period => start < period.End.Value && end > period.Start.Value))
                     return true;
             }
 
-            ///VFREEBUSY has both the DTSTART and DTEND properties? N
-            /// VFREEBUSY has the FREEBUSY property? N
+            //VFREEBUSY has both the DTSTART and DTEND properties? N
+            // VFREEBUSY has the FREEBUSY property? N
             return false;
         }
 
         private static bool ApplyTimeFilterToVALARM(this ICalendarComponent component, DateTime start, DateTime end)
         {
-            ///TODO: send the container of the VALARM because the trigger 
-            /// expands the DTSTART
-            var trigger = ((Trigger) component.Properties["TRIGGER"]).Value;
+            //TODO: send the container of the VALARM because the trigger 
+            // expands the DTSTART
+            var trigger = ((Trigger)component.Properties["TRIGGER"]).Value;
 
             DateTime? triggerTime = null;
             //if the trigger define a trigger-time the use it to compare
@@ -551,9 +545,9 @@ namespace CalDAV.Core.Method_Extensions
         {
             if (duration.Weeks != null)
                 if (duration.IsPositive)
-                    return dtStart.AddDays(7*duration.Weeks.Value);
+                    return dtStart.AddDays(7 * duration.Weeks.Value);
                 else
-                    return dtStart.Subtract(new TimeSpan(7*duration.Weeks.Value, 0, 0, 0));
+                    return dtStart.Subtract(new TimeSpan(7 * duration.Weeks.Value, 0, 0, 0));
             var durationSpan = new TimeSpan(
                 duration.Days ?? 0,
                 duration.Hours ?? 0,
@@ -586,7 +580,7 @@ namespace CalDAV.Core.Method_Extensions
                 if (compNode == null)
                     //if the filter doesn't has a child with comp-filter name
                     //and the name of the current container is the same
-                    if (((ICalendarObject) container).Name == treeStructure.Attributes["name"])
+                    if (((ICalendarObject)container).Name == treeStructure.Attributes["name"])
                     {
                         filter = treeStructure;
                         component = container as ICalendarComponent;

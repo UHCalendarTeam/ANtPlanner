@@ -91,7 +91,7 @@ namespace ACL.Core
 
             var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
 
-            ///return the result of the password verification
+            //return the result of the password verification
             return result != PasswordVerificationResult.Failed;
         }
     }
