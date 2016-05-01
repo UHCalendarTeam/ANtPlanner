@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ACL.Core;
 using ACL.Core.Authentication;
+using CalDav_Services.Extensions;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -52,23 +53,27 @@ namespace CalDav_Services
             services.AddMvc();
 
             services.AddScoped<ICalDav, CalDav>();
-            services.AddSingleton<IFileSystemManagement, FileSystemManagement>();
-            services.AddSingleton<IAuthenticate, UhCalendarAuthentication>();
-            services.AddSingleton<IACLProfind, ACLProfind>();
-            services.AddSingleton<ICollectionReport, CollectionReport>();
+            services.AddScoped<IFileSystemManagement, FileSystemManagement>();
+            services.AddScoped<IAuthenticate, UhCalendarAuthentication>();
+            services.AddScoped<IACLProfind, ACLProfind>();
+            services.AddScoped<ICollectionReport, CollectionReport>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Warning;
+            loggerFactory.MinimumLevel = LogLevel.Information;
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
+            //use the authentication middleware
+          
 
             app.UseIISPlatformHandler();
 
             app.UseStaticFiles();
+
+            app.UseAuthorization();
 
             app.UseCors("AllowAllOrigins");
 
