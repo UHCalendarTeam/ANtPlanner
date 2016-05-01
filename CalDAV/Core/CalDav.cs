@@ -806,7 +806,6 @@ namespace CalDAV.Core
                 response.Headers["etag"] = etag;
             }
             
-            response.ContentType = @"text/calendar; charset=""utf-8""";
             await response.WriteAsync(resourceBody.Result);
         }
 

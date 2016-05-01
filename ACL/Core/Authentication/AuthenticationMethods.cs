@@ -64,7 +64,7 @@ namespace ACL.Core.Authentication
                     //if the username and password doesnt match then return 401 - Unauthorized
                     else
                     {
-                       // httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await SetUnauthorizedRequest(httpContext);
                         return null;
                     }
                 }
@@ -99,7 +99,7 @@ namespace ACL.Core.Authentication
                     |  Authorization header then the client needs to request
                     |   the credential to the user. So send a 401
                     */
-                   // await SetUnauthorizedRequest(httpContext);
+                    await SetUnauthorizedRequest(httpContext);
                     return null;
                 }
                 //take the cookie that the client send us in the request
@@ -112,7 +112,7 @@ namespace ACL.Core.Authentication
                     //if the session doesnt have the principalId means somethind is wrong
                 catch
                 {
-                   // httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    await SetUnauthorizedRequest(httpContext);
                     return null;
                 }
 
@@ -216,7 +216,7 @@ namespace ACL.Core.Authentication
 
         /// <summary>
         ///     Take the user credential from the Authorization header.
-        ///     Checks if the credential are from basic or digest.
+        ///     Checks if the credential is basic or digest.
         /// </summary>
         /// <param name="authHeader">The header with the credentials</param>
         /// <returns></returns>
@@ -270,8 +270,7 @@ namespace ACL.Core.Authentication
         private async Task SetUnauthorizedRequest(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            //TODO: write something in the body
-            await Task.FromResult(0);
+            httpContext.Response.Headers["WWW-Authenticate"] = "Basic realm=\"UHCalendar\"";
         }
 
         #endregion
