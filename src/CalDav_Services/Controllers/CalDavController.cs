@@ -28,13 +28,10 @@ namespace CalDav_Services.Controllers
         [FromServices]
         ICalDav CalDavRepository { get; }
 
-        CalDavContext _context;
-
         //Constructor
-        public CalDavController(ICalDav repoCalDav, CalDavContext context)
+        public CalDavController(ICalDav repoCalDav)
         {
             CalDavRepository = repoCalDav;
-            _context = context;
             string body = "";
             
           
@@ -99,6 +96,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/")]
         public void CollectionRootProfind(string groupOrUser, string principalId)
         {
+            
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -133,6 +131,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void PropFind(string groupOrUser, string principalId, string collectionName)
         {
+            
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -204,6 +203,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Options", Route = "/")]
         public void Options()
         {
+          
             Response.Headers["Allow"] = "GET, PUT, PROPFIND, REPORT, PROPATCH";
         }
 
@@ -211,7 +211,8 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void Options(string groupOrUser, string principalId, string collectionName)
         {
-            Response.Headers["Allow"] = "GET, PUT, PROPFIND";
+           
+            Response.Headers["Allow"] = "GET, PUT, PROPFIND, REPORT, PROPATCH";
         }
 
         #endregion
@@ -324,6 +325,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+          
             Response.StatusCode = 207;
             Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
@@ -346,6 +348,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public void Options(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
+           
             Response.Headers["Allow"] = "GET, PUT, PROPFIND";
         }
 

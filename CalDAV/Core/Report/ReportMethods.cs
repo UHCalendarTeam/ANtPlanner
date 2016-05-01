@@ -257,6 +257,7 @@ namespace CalDAV.Core
                         currentPropNode.AddValue(prop.Children.Any()
                             ? resource.Value.ToString(prop)
                             : resource.Value.ToString());
+                        resPropertiesOk.Add(currentPropNode);
                         break;
                     //if not try to take the property from the resource's properties
                     default:
