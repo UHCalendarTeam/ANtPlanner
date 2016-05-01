@@ -94,9 +94,9 @@ namespace CalDAV.Core
             xmlDoc.GetChildAtAnyLevel("filter", out componentFilter);
 
 
-            Dictionary<string, string> userResources;
+            Dictionary<string, string> userResources = new Dictionary<string, string>();
           
-            fs.GetAllCalendarObjectResource(collectionURl, out userResources);
+            fs.GetAllCalendarObjectResource(collectionURl, userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));
 

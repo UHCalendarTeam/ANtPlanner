@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
@@ -19,7 +20,7 @@ namespace DataLayer
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
-           
+
             var dirInfo = Directory.CreateDirectory(path);
             return dirInfo.Exists;
         }
@@ -93,14 +94,11 @@ namespace DataLayer
             return File.Exists(path);
         }
 
-        public IEnumerable<VCalendar> GetAllCalendarObjectResource(string url)
+        public async Task<IEnumerable<VCalendar>> GetAllCalendarObjectResource(string url)
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
             var calendarObjectResources = new List<VCalendar>();
-
-            string body;
-            VCalendar iCalendar;
 
             if (!Directory.Exists(path))
                 return null;
@@ -109,10 +107,10 @@ namespace DataLayer
 
             foreach (var file in filesPath)
             {
-                body = GetCalendarObjectResource(file).Result;
+                var body = await GetCalendarObjectResource(file);
                 if (body != null)
                 {
-                    iCalendar = new VCalendar(body);
+                    var iCalendar = new VCalendar(body);
                     calendarObjectResources.Add(iCalendar);
                 }
             }
@@ -124,11 +122,9 @@ namespace DataLayer
         /// </summary>
         /// <param name="url"></param>
         /// <param name="calendarObjectResources"></param>
-        /// <param name="userId"></param>
-        /// <param name="userCollectionId"></param>
         /// <returns></returns>
-        public bool GetAllCalendarObjectResource(string url,
-            out Dictionary<string, string> calendarObjectResources)
+        public async Task<bool> GetAllCalendarObjectResource(string url,
+            Dictionary<string, string> calendarObjectResources)
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
@@ -139,11 +135,11 @@ namespace DataLayer
 
             foreach (var file in filesPath)
             {
-                var lstIndex = file.LastIndexOf("\\");
+                var lstIndex = file.LastIndexOf("\\", StringComparison.Ordinal);
                 var fileName = file.Substring(lstIndex + 1);
-                var temp = GetCalendarObjectResource(file);
+                var temp = await GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(url + fileName, temp.Result);
+                    calendarObjectResources.Add(url + fileName, temp);
             }
             return true;
         }

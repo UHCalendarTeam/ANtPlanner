@@ -33,7 +33,7 @@ namespace DataLayer
         /// <param name="userEmail">Email of the collection owner.</param>
         /// <param name="calendarCollectionName">Name of the Calendar Collection</param>
         /// <returns></returns>
-        bool GetAllCalendarObjectResource(string collectionUrl, out Dictionary<string, string> calendarObjectResources);
+        Task<bool> GetAllCalendarObjectResource(string collectionUrl, Dictionary<string, string> calendarObjectResources);
 
         /// <summary>
         ///     Returns all iCalendar Objects contained in the collection.
@@ -42,7 +42,7 @@ namespace DataLayer
         /// <param name="userEmail"></param>
         /// <param name="calendarCollectionName"></param>
         /// <returns></returns>
-        IEnumerable<VCalendar> GetAllCalendarObjectResource(string collectionUrl);
+        Task<IEnumerable<VCalendar>> GetAllCalendarObjectResource(string collectionUrl);
 
         /// <summary>
         ///     Deletes the folder which represent the calendar collection and all the COR contained in it.
