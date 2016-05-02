@@ -28,13 +28,13 @@ namespace DataLayer.Repositories
         IList<Property> GetAllProperties(TPk url);
 
         /// <summary>
-        /// Returns the properties that match the given 
-        /// properties name and namespace for the given url;
+        /// Returns the property that match the given 
+        /// property name and namespace for the given url;
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="propertiesNameandNs"></param>
+        /// <param name="propertyNameandNs"></param>
         /// <returns></returns>
-        IList<Property> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
+        Property GetProperty(TPk url, KeyValuePair<string, string> propertyNameandNs);
 
         /// <summary>
         /// Returns all the properties
