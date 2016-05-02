@@ -52,14 +52,14 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
-        bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         ///     CalDav & WebDav Method for delete a Collection
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
-        bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method Get for a COR
