@@ -1,4 +1,5 @@
-﻿using DataLayer.Models.ACL;
+﻿using System;
+using DataLayer.Models.ACL;
 using Microsoft.AspNet.Http;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace ACL.Core.Authentication
     /// Defines the methods for the communication between the
     /// client and the UH's authentication api.
     /// </summary>
-    public interface IAuthenticate
+    public interface IAuthenticate :IDisposable
     {
         /// <summary>
         /// Take the request from the client and

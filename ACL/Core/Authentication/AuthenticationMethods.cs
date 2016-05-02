@@ -11,7 +11,7 @@ using Microsoft.Data.Entity;
 
 namespace ACL.Core.Authentication
 {
-    public class UhCalendarAuthentication : IAuthenticate, IDisposable
+    public class UhCalendarAuthentication : IAuthenticate
     {
         private readonly CalDavContext _context;
 
@@ -277,7 +277,7 @@ namespace ACL.Core.Authentication
 
         public void Dispose()
         {
-            _context.Dispose();
+            //_context.Dispose();
         }
     }
 }
