@@ -30,7 +30,7 @@ namespace CalDAV.Core
         /// <param name="Body"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        void PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
+        Task PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method REPORT for Calendar Collections

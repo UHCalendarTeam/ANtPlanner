@@ -288,18 +288,19 @@ namespace CalDAV.Core
             CreateDefaultCalendar(propertiesAndHeaders);
             response.StatusCode = (int)HttpStatusCode.Created;
 
+
+
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
-                    DeleteCalendarCollection(propertiesAndHeaders, response);
+                    await DeleteCalendarCollection(propertiesAndHeaders, response);
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
                     return;
                 }
-
-                db.SaveChanges();
+                await _collectionRespository.SaveChangeAsync();
                 return;
             }
 
@@ -311,15 +312,13 @@ namespace CalDAV.Core
             {
                 if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
-                    DeleteCalendarCollection(propertiesAndHeaders, response);
+                    await DeleteCalendarCollection(propertiesAndHeaders, response);
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
 
                     return;
                 }
-
-
-                db.SaveChanges();
+                await _collectionRespository.SaveChangeAsync();
                 return;
             }
 
@@ -344,11 +343,11 @@ namespace CalDAV.Core
             #endregion
 
             //Check if any error occurred during body processing.
-            var hasError = BuiltResponseForSet(url, null, false, setTree, responseTree);
+            var hasError =await BuiltResponseForSet(url, null, false, setTree, responseTree);
 
             if (hasError)
             {
-                DeleteCalendarCollection(propertiesAndHeaders, response);
+                await DeleteCalendarCollection(propertiesAndHeaders, response);
                 response.ContentType = "application/xml";
 
                 ChangeToDependencyError(responseTree);
@@ -361,17 +360,14 @@ namespace CalDAV.Core
             //Checking Preconditions   
             if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
             {
-                db.SaveChanges();
+                await _collectionRespository.SaveChangeAsync(); 
                 return;
                 // return createdMessage;
             }
 
-            DeleteCalendarCollection(propertiesAndHeaders, response);
+            await DeleteCalendarCollection(propertiesAndHeaders, response);
             response.StatusCode = (int)HttpStatusCode.Forbidden;
             await response.WriteAsync("Poscondition Failed");
-
-
-            //return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.Forbidden, "Poscondition Failed");
         }
 
         private void CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders)
@@ -391,16 +387,15 @@ namespace CalDAV.Core
 
             //Adding the collection to the database
 
-            var principal = db.GetPrincipalByName(principalId);
+            var principal = _principalRepository.GetByIdentifier(principalId);
             var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
-            collection.CreateOrModifyProperty("getctag", "http://calendarserver.org/ns/",
-                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack);
+            _collectionRespository.CreateOrModifyProperty(url,"getctag", "http://calendarserver.org/ns/",
+                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""") { Value = Guid.NewGuid().ToString() }.ToString(), stack,true);
             principal.CalendarCollections.Add(collection);
 
             //Adding the collection folder.
             StorageManagement.AddCalendarCollectionFolder(url);
-            db.SaveChanges();
         }
 
         #endregion
@@ -408,7 +403,7 @@ namespace CalDAV.Core
         #region Proppatch
 
         //TODO:Nacho
-        public void PropPatch(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
+        public async Task PropPatch(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
         {
             #region Docummentation
 
@@ -469,7 +464,7 @@ namespace CalDAV.Core
 
             if (xmlTree.NodeName != "propertyupdate")
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 response.Body.Write(@"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
                 return;
             }
@@ -483,7 +478,7 @@ namespace CalDAV.Core
             //propertyupdate must have at least one element
             if (setsAndRemoves.Count == 0)
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = (int) HttpStatusCode.BadRequest;
                 response.Body.Write("propertyupdate must have at least one element");
                 return;
                 //throw new ArgumentException("propertyupdate must have at least one element");
@@ -516,30 +511,29 @@ namespace CalDAV.Core
             //Here it is garanted that if an error occured during the processing of the operations
             //The changes will not be stored in db thanks to a rollback.
 
-            using (db)
-            {
-                //For each set and remove try to execute the operation if something fails 
-                //put the Failed Dependency Error to every property before and after the error
-                //even if the operation for the property was succesfully changed.
-                foreach (var setOrRemove in setsAndRemoves)
-                {
-                    if (setOrRemove.NodeName == "set")
-                        hasError = BuiltResponseForSet(url, calendarResourceId, hasError,
-                            setOrRemove, responseTree);
-                    else
-                        hasError = BuiltResponseForRemove(url, calendarResourceId, hasError,
-                            setOrRemove, responseTree);
-                }
 
-                if (hasError)
-                {
-                    ChangeToDependencyError(responseTree);
-                }
+            //For each set and remove try to execute the operation if something fails 
+            //put the Failed Dependency Error to every property before and after the error
+            //even if the operation for the property was succesfully changed.
+            foreach (var setOrRemove in setsAndRemoves)
+            {
+                if (setOrRemove.NodeName == "set")
+                    hasError =await BuiltResponseForSet(url, calendarResourceId, hasError,
+                        setOrRemove, responseTree);
                 else
-                {
-                    db.SaveChanges();
-                }
+                    hasError = await BuiltResponseForRemove(url, calendarResourceId, hasError,
+                        setOrRemove, responseTree);
             }
+
+            if (hasError)
+            {
+                ChangeToDependencyError(responseTree);
+            }
+            else
+            {
+                await _collectionRespository.SaveChangeAsync();
+            }
+
             response.StatusCode = 207;
             response.Body.Write(multistatus.ToString());
         }
@@ -563,15 +557,15 @@ namespace CalDAV.Core
             }
         }
 
-        private bool BuiltResponseForRemove(string url, string calendarResourceId,
+        private async Task<bool> BuiltResponseForRemove(string url, string calendarResourceId,
             bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db.GetCalendarResource(url);
+                resource = await _resourceRespository.Get(url);
             else
-                collection = db.GetCollection(url);
+                collection = await _collectionRespository.Get(url);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
@@ -613,15 +607,15 @@ namespace CalDAV.Core
             return errorOccurred;
         }
 
-        private bool BuiltResponseForSet(string url, string calendarResourceId,
+        private async Task<bool> BuiltResponseForSet(string url, string calendarResourceId,
             bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
             if (calendarResourceId != null)
-                resource = db.GetCalendarResource(url);
+                resource = await _resourceRespository.Get(url);
             else
-                collection = db.GetCollection(url);
+                collection = await _collectionRespository.Get(url);
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
@@ -795,7 +789,7 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes = db.GetCalendarResource(url);
+            var calendarRes = await _resourceRespository.Get(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
