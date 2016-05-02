@@ -39,7 +39,7 @@ namespace CalDav_Services
 
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=false";
             // Add framework services.
             services.AddEntityFramework()
                .AddSqlServer()
@@ -50,10 +50,10 @@ namespace CalDav_Services
 
             services.AddScoped<ICalDav, CalDav>();
             services.AddScoped<IFileSystemManagement, FileSystemManagement>();
-            services.AddScoped<IAuthenticate, UhCalendarAuthentication>();
+            services.AddTransient<IAuthenticate, UhCalendarAuthentication>();
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
-            services.AddScoped<CalDavContext>();
+            services.AddTransient<CalDavContext>();
 
         }
 
@@ -73,9 +73,12 @@ namespace CalDav_Services
 
             app.UseAuthorization();
 
+
             app.UseCors("AllowAllOrigins");
 
             app.UseMvc();
+
+           
         }
 
         // Entry point for the application.
