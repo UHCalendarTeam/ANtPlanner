@@ -12,7 +12,6 @@ using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Method_Extensions;
 using DataLayer.Repositories;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
