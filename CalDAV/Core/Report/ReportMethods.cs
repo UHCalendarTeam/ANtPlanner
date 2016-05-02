@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
 using TreeForXml;
@@ -20,11 +21,11 @@ namespace CalDAV.Core
     /// </summary>
     public class CollectionReport : ICollectionReport
     {
-        private readonly CalDavContext _context;
+        public readonly ResourceRespository _resourceRepository;
 
-        public CollectionReport(CalDavContext context)
+        public CollectionReport(IRepository<CalendarResource, string> resRepository)
         {
-            _context = context;
+            _resourceRepository = resRepository as ResourceRespository;
         }
 
         public string ExpandProperty()
@@ -155,7 +156,7 @@ namespace CalDAV.Core
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                     //that the requested data
-                    var propStats = ProccessPropNode(calDataNode, resource);
+                    var propStats = await ProccessPropNode(calDataNode, resource);
 
 
                     foreach (var propStat in propStats)
@@ -223,7 +224,7 @@ namespace CalDAV.Core
         /// </param>
         /// <param name="resource">The calendar where to extract the data.</param>
         /// <returns>Return the prop node that contains the requested data</returns>
-        private List<IXMLTreeStructure> ProccessPropNode(IXMLTreeStructure incomPropNode,
+        private async Task<List<IXMLTreeStructure>> ProccessPropNode(IXMLTreeStructure incomPropNode,
             KeyValuePair<string, VCalendar> resource)
         {
             var output = new List<IXMLTreeStructure>();
@@ -232,7 +233,7 @@ namespace CalDAV.Core
             var resPropertiesNotExist = new List<XmlTreeStructure>();
 
             var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
-            var calResource = _context.GetCalendarResource(href);
+            var calResource =await _resourceRepository.Get(href);
 
             foreach (var prop in incomPropNode.Children)
             {

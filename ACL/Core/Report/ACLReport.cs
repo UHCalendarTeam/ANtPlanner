@@ -8,13 +8,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using DataLayer.Repositories;
 using TreeForXml;
 
 namespace ACL.Core
 {
     public class ACLReport : IReportMethods
     {
-        public async Task ProcessRequest(HttpRequest request, CalDavContext context, HttpResponse response)
+        private readonly PrincipalRepository _principalRepository;
+        private readonly CollectionRepository _collectionRepository;
+        private readonly ResourceRespository _resourceRepository;
+
+        public ACLReport(IRepository<Principal, string> prinRepository,IRepository<CalendarCollection, string> colRepository,
+            IRepository<CalendarResource, string> resRepository )
+        {
+            _principalRepository = prinRepository as PrincipalRepository;
+            _collectionRepository = _collectionRepository as CollectionRepository;
+            _resourceRepository = resRepository as ResourceRespository;
+        }
+
+        public async Task ProcessRequest(HttpRequest request, HttpResponse response)
         {
             //check the depth of the header
             // This report is only defined when the Depth header has value "0";
@@ -42,15 +55,15 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                    await AclPrincipalPropSet(xmlbody, context, response);
+                    await AclPrincipalPropSet(xmlbody,  response);
                     break;
 
                 case "principal-match":
-                    await PrincipalMatch(xmlbody, userEmail, href, context, response);
+                    await PrincipalMatch(xmlbody, userEmail, href,  response);
                     break;
 
                 case "principal-property-search":
-                    await PrincipalPropertySearch(xmlbody, request, context, response);
+                    await PrincipalPropertySearch(xmlbody, request, response);
                     break;
 
                 case "principal-search-property-set":
@@ -59,7 +72,7 @@ namespace ACL.Core
             }
         }
 
-        public async Task AclPrincipalPropSet(IXMLTreeStructure body, CalDavContext context, HttpResponse response)
+        public async Task AclPrincipalPropSet(IXMLTreeStructure body, HttpResponse response)
         {
             //take the requested properties from the body
             // of the request
@@ -76,7 +89,7 @@ namespace ACL.Core
 
             //Take the resource with the href == to the given url
             //TODO: should the href property be store in a property?
-            var resource = context.CalendarResources.FirstOrDefault(x => x.Href == colUrl);
+            var resource = await _resourceRepository.Get(colUrl);
 
             //take the string representation of the acl property
             //this property is stored in xml format so is needed to
@@ -92,7 +105,7 @@ namespace ACL.Core
             //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
-                var principal = context.Principals.FirstOrDefault(principal1 => principal1.PrincipalURL == pUrl.Value);
+                var principal = await _principalRepository.Get(pUrl.Value);
                 if (principal != null)
                     principals.Add(principal, null);
             }
@@ -115,10 +128,10 @@ namespace ACL.Core
         ///     of the resource with the email of the given principal.
         /// </summary>
         /// <returns></returns>
-        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href, CalDavContext context, HttpResponse response)
+        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href,HttpResponse response)
         {
             //take the collection with the given href
-            var col = context.CalendarCollections.FirstOrDefault(x => x.Url == href);
+            var col = await _collectionRepository.Get(href);
 
             //if the collection doesnt exit then return an error
             if (col == null)
@@ -130,7 +143,7 @@ namespace ACL.Core
             //var colResources = col.CalendarResources.Where(x=>x.)
         }
 
-        public async Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, CalDavContext context, HttpResponse response)
+        public async Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, HttpResponse response)
         {
             throw new NotImplementedException();
         }
