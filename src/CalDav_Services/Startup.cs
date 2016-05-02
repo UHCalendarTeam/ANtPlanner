@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CalDAV.Core;
 using DataLayer;
+using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.Data.Entity;
 
 
@@ -54,6 +57,10 @@ namespace CalDav_Services
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
             services.AddScoped<CalDavContext>();
+            services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
+            services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
+            services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+
 
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
@@ -13,15 +14,15 @@ namespace ACL.Core.Authentication
 {
     public class UhCalendarAuthentication : IAuthenticate
     {
-        private readonly CalDavContext _context;
+        private readonly PrincipalRepository _principalRepository;
 
         /// <summary>
         ///     Injects an instance of CaldavContext
         /// </summary>
         /// <param name="context"></param>
-        public UhCalendarAuthentication(CalDavContext context)
+        public UhCalendarAuthentication(IRepository<Principal, string> principalRepository)
         {
-            _context = context;
+            _principalRepository = principalRepository as PrincipalRepository;
         }
 
 
@@ -37,7 +38,7 @@ namespace ACL.Core.Authentication
         public async Task<Principal> AuthenticateRequest(HttpContext httpContext)
         {
             var username = "";
-            Principal principal;
+            Principal principal = null;
             string cookieValue;
 
             //take the creadentials from the request
@@ -53,10 +54,10 @@ namespace ACL.Core.Authentication
                 var password = credentials.Value;
 
                 //check if the user exist in our DB
-                if (_context.Principals.Any(p => p.PrincipalStringIdentifier == username))
+                if (_principalRepository.ExistByStringIs(username).Result)
                 {
                     // if does then check if can authenticate
-                    if (_context.VerifyPassword(username, password))
+                    if (_principalRepository.VerifyPassword(username, password))
                     {
                         Console.WriteLine($"------Current user {username} is authenticated");
                     }
@@ -77,8 +78,8 @@ namespace ACL.Core.Authentication
                     // the users automatically in the system.
                     // TODO: check if is a student or teacher
 
-                    _context.CreateUserInSystem(username, username, password);
-                    await _context.SaveChangesAsync();
+                   principal = _principalRepository.CreateUserInSystem(username, username, password);
+                   
                     Console.WriteLine($"------Created user with username: {username}");
 
                     //TODO: change to this when work the WCF service
@@ -117,9 +118,7 @@ namespace ACL.Core.Authentication
                 }
 
                 //take the principal from our system
-                principal =
-                    _context.Principals.FirstOrDefaultAsync(p => p.PrincipalStringIdentifier == principalStringId)
-                        .Result;
+                principal = _principalRepository.GetByIdentifier(principalStringId);
                 //check if the cookies match
                 var principalSesison = principal.SessionId;
                 if (!VerifySessionCookies(principalSesison, cookieValue))
@@ -135,12 +134,7 @@ namespace ACL.Core.Authentication
             //set the cookie for the response.
             cookieValue = Guid.NewGuid().ToString();
             httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
-            principal=
-                await
-                    _context.Principals.Include(p => p.Properties)
-                        .FirstOrDefaultAsync(x => x.PrincipalStringIdentifier == username);
-            principal.SessionId = cookieValue;
-            await _context.SaveChangesAsync();
+            await _principalRepository.SetCookie(username, cookieValue);
 
             return await Task.FromResult(principal);
         }
