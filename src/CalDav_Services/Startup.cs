@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CalDAV.Core;
 using DataLayer;
+using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.Data.Entity;
 
 
@@ -50,10 +53,14 @@ namespace CalDav_Services
 
             services.AddScoped<ICalDav, CalDav>();
             services.AddScoped<IFileSystemManagement, FileSystemManagement>();
-            services.AddTransient<IAuthenticate, UhCalendarAuthentication>();
+            services.AddScoped<IAuthenticate, UhCalendarAuthentication>();
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
-            services.AddTransient<CalDavContext>();
+            services.AddScoped<CalDavContext>();
+            services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
+            services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
+            services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+
 
         }
 
@@ -73,12 +80,9 @@ namespace CalDav_Services
 
             app.UseAuthorization();
 
-
             app.UseCors("AllowAllOrigins");
 
             app.UseMvc();
-
-           
         }
 
         // Entry point for the application.

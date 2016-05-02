@@ -383,5 +383,10 @@ namespace DataLayer.Repositories
             principal.SessionId = cookieValue;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }

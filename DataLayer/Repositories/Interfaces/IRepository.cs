@@ -62,7 +62,7 @@ namespace DataLayer.Repositories
         /// <returns></returns>
         bool CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
 
+        Task<int> SaveChangeAsync();
 
-        
     }
 }

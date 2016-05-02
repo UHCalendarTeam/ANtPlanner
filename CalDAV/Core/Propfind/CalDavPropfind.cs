@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using TreeForXml;
 using ACL.Core.Extension_Method;
+using DataLayer.Repositories;
 
 namespace CalDAV.Core.Propfind
 {
@@ -27,15 +29,17 @@ namespace CalDAV.Core.Propfind
     /// </summary>
     public class CalDavPropfind : IPropfindMethods
     {
-        private readonly CalDavContext db;
+        private readonly CollectionRepository _collectionRepository;
+        private readonly ResourceRespository _resourceRespository;
 
-        public CalDavPropfind(CalDavContext context)
+        public CalDavPropfind(IRepository<CalendarCollection, string> collectionRepository, IRepository<CalendarResource, string> resourceRepository)
         {
-            db = context;
+            _collectionRepository = collectionRepository as CollectionRepository;
+            _resourceRespository = resourceRepository as ResourceRespository;
         }
 
 
-        public void AllPropMethod(string url, string calendarResourceId,  int? depth,
+        public async Task AllPropMethod(string url, string calendarResourceId,  int? depth,
             List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree)
         {
             //error flag
@@ -58,7 +62,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = db.GetCollection(url);
+                var collection = await _collectionRepository.Get(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -86,7 +90,7 @@ namespace CalDAV.Core.Propfind
             #endregion
         }
 
-        public void PropMethod(string url, string calendarResourceId,  int? depth,
+        public async Task PropMethod(string url, string calendarResourceId,  int? depth,
             List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal)
         {
             //error flag
@@ -109,7 +113,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = db.GetCollection(url);
+                var collection = await _collectionRepository.Get(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -133,7 +137,7 @@ namespace CalDAV.Core.Propfind
             #endregion
         }
 
-        public void PropNameMethod(string url, string calendarResourceId, int? depth,
+        public async Task PropNameMethod(string url, string calendarResourceId, int? depth,
             XmlTreeStructure multistatusTree)
         {
             //Here it is created the response body for the collection or resource
@@ -150,7 +154,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = db.GetCollection(url);
+                var collection = await _collectionRepository.Get(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -211,12 +215,12 @@ namespace CalDAV.Core.Propfind
             //will find the object in the database and get from there all names of properties.
             if (calendarResourceId == null)
             {
-                var collection = db.GetCollection(url);
+                var collection = _collectionRepository.Get(url).Result;
                 properties = collection.GetAllPropertyNames();
             }
             else
             {
-                var resource = db.GetCalendarResource(url);
+                var resource = _resourceRespository.Get(url).Result;
                 properties = resource.GetAllPropertyNames();
             }
 
@@ -278,7 +282,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null)
             {
-                var collection = db.GetCollection(url);
+                var collection = _collectionRepository.Get(url).Result;
                 propertiesCol = collection.GetAllVisibleProperties(errorStack);
                 //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
@@ -289,7 +293,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                var resource = db.GetCalendarResource(url);
+                var resource = _resourceRespository.Get(url).Result;
                 propertiesCol = resource.GetAllVisibleProperties(errorStack);
                 //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
@@ -430,7 +434,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = db.GetCollection(url);
+                collection = _collectionRepository.Get(url).Result;
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var property in propertiesNameNamespace)
@@ -443,7 +447,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = db.GetCalendarResource(url);
+                resource = _resourceRespository.Get(url).Result;
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var property in propertiesNameNamespace)

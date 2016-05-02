@@ -124,10 +124,15 @@ namespace DataLayer.Repositories
 
             return true;
         }
-
+        
         public Task<bool> ExistByStringIs(string identifier)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
 
         public void Dispose()
