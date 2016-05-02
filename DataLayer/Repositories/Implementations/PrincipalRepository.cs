@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
-using Newtonsoft.Json.Serialization;
 
-namespace DataLayer.Repositories.Implementations
+namespace DataLayer.Repositories
 {
-    public class PrincipalRepository : IRepository<Principal, string>
+    public class PrincipalRepository : IRepository<Principal, string>, IDisposable
     {
         private readonly CalDavContext _context;
 
@@ -18,6 +17,10 @@ namespace DataLayer.Repositories.Implementations
             _context = context;
         }
 
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
 
 
         public async Task<IList<Principal>> GetAll()
@@ -27,13 +30,13 @@ namespace DataLayer.Repositories.Implementations
 
         public async Task<Principal> Get(string url)
         {
-            return await _context.Principals.Include(p =>p.Properties)
+            return await _context.Principals.Include(p => p.Properties)
                 .FirstOrDefaultAsync(p => p.PrincipalURL == url);
         }
 
-         public async Task Add(Principal entity)
+        public async Task Add(Principal entity)
         {
-           _context.Principals.Add(entity);
+            _context.Principals.Add(entity);
             await _context.SaveChangesAsync();
         }
 
@@ -41,7 +44,6 @@ namespace DataLayer.Repositories.Implementations
         {
             _context.Remove(entity);
             await _context.SaveChangesAsync();
-
         }
 
         public async Task Remove(string url)
@@ -64,16 +66,21 @@ namespace DataLayer.Repositories.Implementations
         {
             var principal = Get(url);
 
-            return principal.Result?.Properties.Where(x=>x.IsVisible).ToList();
+            return principal.Result?.Properties.Where(x => x.IsVisible).ToList();
         }
 
-        public IList<Property> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
+        public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
             var principal = Get(url).Result;
+            Property property;
 
-            var properties = principal.Properties.Where(
-                prop => propertiesNameandNs.Contains(new KeyValuePair<string, string>(prop.Name, prop.Namespace)));
-            return properties == null ? null : properties.ToList();
+            if (string.IsNullOrEmpty(propertyNameandNs.Value))
+                property = principal.Properties.FirstOrDefault(
+                    prop => prop.Name == propertyNameandNs.Key && prop.Namespace == propertyNameandNs.Value);
+            else
+                property = principal.Properties.FirstOrDefault(
+                    prop => prop.Name == propertyNameandNs.Key);
+            return property;
         }
 
         public IList<KeyValuePair<string, string>> GetAllPropname(string url)
@@ -82,10 +89,10 @@ namespace DataLayer.Repositories.Implementations
             return
                 principal.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList();
-
         }
 
-        public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
+            Stack<string> errorStack)
         {
             var principal = Get(url).Result;
             var property =
@@ -94,12 +101,14 @@ namespace DataLayer.Repositories.Implementations
 
             if (property == null)
                 return;
-            principal.Properties.Remove(property);
-            await _context.SaveChangesAsync();
-
+            if (property.IsDestroyable)
+            {
+                principal.Properties.Remove(property);
+            }
         }
 
-        public async Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+        public async Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+            Stack<string> errorStack,
             bool adminPrivilege)
         {
             var principal = Get(url).Result;
@@ -122,8 +131,6 @@ namespace DataLayer.Repositories.Implementations
                     propperty.Value = propValue;
                 }
             }
-
-           await _context.SaveChangesAsync();
         }
     }
 }

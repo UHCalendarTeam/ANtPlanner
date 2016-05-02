@@ -34,7 +34,7 @@ namespace DataLayer.Repositories
         /// <param name="url"></param>
         /// <param name="propertiesNameandNs"></param>
         /// <returns></returns>
-        IList<Property> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
+        Property GetProperty(TPk url, KeyValuePair<string, string> propertyNameandNs);
 
         /// <summary>
         /// Returns all the properties
