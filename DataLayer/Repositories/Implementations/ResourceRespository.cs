@@ -7,7 +7,7 @@ using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
 {
-    public class ResourceRespository: IRepository<CalendarResource, string>, IDisposable
+    public class ResourceRespository : IRepository<CalendarResource, string>, IDisposable
     {
         private readonly CalDavContext _context;
 
@@ -17,13 +17,13 @@ namespace DataLayer.Repositories
         }
         public async Task<IList<CalendarResource>> GetAll()
         {
-           return await _context.CalendarResources.ToListAsync();
+            return await _context.CalendarResources.ToListAsync();
         }
 
         public async Task<CalendarResource> Get(string url)
         {
-           return await _context.CalendarResources.Include(r=>r.Properties)
-                .FirstOrDefaultAsync(r => r.Href == url);
+            return await _context.CalendarResources.Include(r => r.Properties)
+                 .FirstOrDefaultAsync(r => r.Href == url);
         }
 
         public async Task Add(CalendarResource entity)
@@ -43,17 +43,17 @@ namespace DataLayer.Repositories
         public async Task Remove(string url)
         {
             var resource = _context.CalendarResources.FirstOrDefaultAsync(r => r.Href == url).Result;
-           await Remove(resource);
+            await Remove(resource);
         }
 
         public async Task<int> Count()
         {
-           return  await _context.CalendarResources.CountAsync();
+            return await _context.CalendarResources.CountAsync();
         }
 
         public async Task<bool> Exist(string url)
         {
-           return await _context.CalendarResources.AnyAsync(r => r.Href == url);
+            return await _context.CalendarResources.AnyAsync(r => r.Href == url);
         }
 
         public IList<Property> GetAllProperties(string url)
@@ -99,6 +99,7 @@ namespace DataLayer.Repositories
         }
 
         public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+            bool adminPrivilege)
         {
             var resource = Get(url).Result;
 

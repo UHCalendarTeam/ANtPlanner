@@ -92,6 +92,7 @@ namespace DataLayer.Repositories
         }
 
         public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
+            Stack<string> errorStack)
         {
             var principal = Get(url).Result;
             var property =
@@ -108,7 +109,9 @@ namespace DataLayer.Repositories
 
         }
 
-        public   bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, bool adminPrivilege)
+        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+            Stack<string> errorStack,
+            bool adminPrivilege)
         {
             var principal = Get(url).Result;
             var propperty =
@@ -132,11 +135,5 @@ namespace DataLayer.Repositories
             }
             return true;
         }
-
-        Task<IList<Principal>> IRepository<Principal, string>.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-       
     }
 }
