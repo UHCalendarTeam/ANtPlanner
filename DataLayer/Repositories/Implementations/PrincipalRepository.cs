@@ -135,5 +135,10 @@ namespace DataLayer.Repositories
             }
             return true;
         }
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }

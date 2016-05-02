@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DataLayer;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
@@ -8,7 +9,6 @@ namespace CalDAV.Core.ConditionsCheck
     internal interface IPoscondition
     {
         IFileSystemManagement Fs { get; }
-        DbContext Db { get; }
 
         /// <summary>
         ///     Checks that all postconditions passed.

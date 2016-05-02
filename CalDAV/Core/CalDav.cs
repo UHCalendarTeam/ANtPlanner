@@ -10,8 +10,10 @@ using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
 using DataLayer;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Method_Extensions;
+using DataLayer.Repositories;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
@@ -41,31 +43,38 @@ namespace CalDAV.Core
 
         private readonly IACLProfind _aclProfind;
         private readonly ICollectionReport _colectionCollectionReport;
+        private readonly CollectionRepository _collectionRespository;
+        private readonly ResourceRespository _resourceRespository;
+        private readonly PrincipalRepository _principalRepository;
+
 
         /// <summary>
         ///     DI in the params.
         /// </summary>
         /// <param name="fsManagement"></param>
-        /// <param name="context"></param>
         /// <param name="aclProfind"></param>
         /// <param name="collectionCollectionReport"></param>
-        public CalDav(IFileSystemManagement fsManagement, CalDavContext context,
-            IACLProfind aclProfind, ICollectionReport collectionCollectionReport)
+        /// <param name="collectionRespository"></param>
+        /// <param name="resourceRespository"></param>
+        /// <param name="principalRepository"></param>
+        public CalDav(IFileSystemManagement fsManagement, IACLProfind aclProfind, ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
+                string> collectionRespository, IRepository<CalendarResource, string> resourceRespository, IRepository<Principal, string> principalRepository)
         {
             StorageManagement = fsManagement;
-            db = context;
             _aclProfind = aclProfind;
             _colectionCollectionReport = collectionCollectionReport;
+            _collectionRespository = collectionRespository as CollectionRepository;
+            _principalRepository = principalRepository as PrincipalRepository;
+            _resourceRespository = resourceRespository as ResourceRespository;
         }
 
         #region Dependencies
         private IFileSystemManagement StorageManagement { get; }
-
         private IPropfindMethods PropFindMethods { get; set; }
         private IPrecondition PreconditionCheck { get; set; }
         private IPoscondition PosconditionCheck { get; set; }
 
-        private CalDavContext db { get; }
+        //private CalDavContext db { get; }
 
         #endregion
 
@@ -149,7 +158,7 @@ namespace CalDAV.Core
             responseTree.Namespaces.Add("S", _namespacesSimple["S"]);
 
             //Tool that contains the methods for propfind.
-            PropFindMethods = new CalDavPropfind(db);
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
 
             //if the body is empty assume that is an allprop request.          
             if (string.IsNullOrEmpty(body))
