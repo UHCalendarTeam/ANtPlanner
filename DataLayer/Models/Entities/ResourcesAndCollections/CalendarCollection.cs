@@ -100,7 +100,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:min-date-time {_namespaces["C"]}>{this.MinDateTime()}</C:min-date-time>"
+                Value = $"<C:min-date-time {_namespaces["C"]}>{SystemProperties.MinDateTime()}</C:min-date-time>"
             });
 
             Properties.Add(new Property("max-date-time", _namespacesSimple["C"])
@@ -108,7 +108,7 @@ namespace DataLayer.Models.Entities
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $"<C:max-date-time {_namespaces["C"]}>{this.MaxDateTime()}</C:max-date-time>"
+                Value = $"<C:max-date-time {_namespaces["C"]}>{SystemProperties.MaxDateTime()}</C:max-date-time>"
             });
 
 

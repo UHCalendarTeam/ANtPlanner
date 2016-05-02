@@ -592,8 +592,10 @@ namespace CalDAV.Core
                 {
                     //Try to remove the specified property, gets an error message from the stack in case of problems.
                     errorOccurred =
-                        !(resource?.RemoveProperty(property.NodeName, property.MainNamespace, errorStack) ??
-                          collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack));
+                        !(calendarResourceId !=null ?_resourceRespository.RemoveProperty(url, new KeyValuePair<string, string>(property.NodeName, property.MainNamespace), errorStack): 
+                          _collectionRespository.RemoveProperty(url,
+                              new KeyValuePair<string, string>(property.NodeName, property.MainNamespace), errorStack));
+                          //collection.RemoveProperty(property.NodeName, property.MainNamespace, errorStack));
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
@@ -640,10 +642,12 @@ namespace CalDAV.Core
                     //Try to modify the specified property if it exist, if not try to create it
                     //gets an error message from the stack in case of problems.
                     errorOccurred =
-                        !(resource?.CreateOrModifyProperty(property.NodeName, property.MainNamespace,
-                            GetValueFromRealProperty(property), errorStack) ??
-                          collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace,
-                              GetValueFromRealProperty(property), errorStack));
+                        !(calendarResourceId!=null? _resourceRespository.CreateOrModifyProperty(url, property.NodeName, property.MainNamespace,
+                            GetValueFromRealProperty(property), errorStack, false) :
+                          _collectionRespository.CreateOrModifyProperty(url, property.NodeName, property.MainNamespace,
+                              GetValueFromRealProperty(property), errorStack, false));
+                          //collection.CreateOrModifyProperty(property.NodeName, property.MainNamespace,
+                          //    GetValueFromRealProperty(property), errorStack));
                     if (errorOccurred && errorStack.Count > 0)
                         stat.Value = errorStack.Pop();
                     else
@@ -934,9 +938,9 @@ namespace CalDAV.Core
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
-            resource.CreateOrModifyPropertyAdmin("getcontentlength", "DAV:",
+            _resourceRespository.CreateOrModifyProperty(url,"getcontentlength", "DAV:",
                 $"<D:getcontentlength {_namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
-                errorStack);
+                errorStack, true);
             await _collectionRespository.SaveChangeAsync();
         }
 
@@ -1042,8 +1046,8 @@ namespace CalDAV.Core
             resource.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
             //adding the calculated etag in the getetag property of the resource
             var errorStack = new Stack<string>();
-            resource.CreateOrModifyPropertyAdmin("getetag", "DAV:", $"<D:getetag {_namespaces["D"]}>{etag}</D:getetag>",
-                errorStack);
+            _resourceRespository.CreateOrModifyProperty(url,"getetag", "DAV:", $"<D:getetag {_namespaces["D"]}>{etag}</D:getetag>",
+                errorStack, true);
 
             //updating the ctag of the collection noticing this way that the collection has changed.
             var collection = _collectionRespository.Get(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));

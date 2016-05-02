@@ -215,13 +215,13 @@ namespace CalDAV.Core.Propfind
             //will find the object in the database and get from there all names of properties.
             if (calendarResourceId == null)
             {
-                var collection = _collectionRepository.Get(url).Result;
-                properties = collection.GetAllPropertyNames();
+                //var collection = _collectionRepository.Get(url).Result;
+                properties = _collectionRepository.GetAllPropname(url).Select(p => new XmlTreeStructure(p.Key, p.Value)).ToList();
+                //properties = collection.GetAllPropertyNames();
             }
             else
             {
-                var resource = _resourceRespository.Get(url).Result;
-                properties = resource.GetAllPropertyNames();
+                properties = _resourceRespository.GetAllPropname(url).Select(p => new XmlTreeStructure(p.Key, p.Value)).ToList();
             }
 
             //Here i add all properties to the prop. 
@@ -272,7 +272,7 @@ namespace CalDAV.Core.Propfind
 
             #region Selecting properties
 
-            List<XmlTreeStructure> propertiesCol;
+            List<XmlTreeStructure> propertiesCol = new List<XmlTreeStructure>();
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
             var errorStack = new Stack<string>();
@@ -282,9 +282,18 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null)
             {
-                var collection = _collectionRepository.Get(url).Result;
+                var properties = _collectionRepository.GetAllProperties(url);
 
-                propertiesCol = collection.GetAllVisibleProperties(errorStack);
+                foreach (var property in properties)
+                {
+                    //TODO: Check that the property is accessible beyond its visibility.
+                    var tempTree = property.Value == null
+                        ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+
+                    propertiesCol.Add((XmlTreeStructure)tempTree);
+                }
+                
                 //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
                     foreach (var addProperty in additionalProperties)
@@ -307,13 +316,36 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                var resource = _resourceRespository.Get(url).Result;
-                propertiesCol = resource.GetAllVisibleProperties(errorStack);
+                var properties = _resourceRespository.GetAllProperties(url);
+
+                foreach (var property in properties)
+                {
+                    //TODO: Check that the property is accessible beyond its visibility.
+                    var tempTree = property.Value == null
+                        ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+
+                    propertiesCol.Add((XmlTreeStructure)tempTree);
+                }
+
                 //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
-                    foreach (var property in additionalProperties)
+                    foreach (var addProperty in additionalProperties)
                     {
-                        propertiesCol.Add(resource.ResolveProperty(property.Key, property.Value, errorStack));
+                        //gets the property from database
+                        var property = _resourceRespository.GetProperty(url, addProperty);
+                        //Builds the xmlTreeExtructure checking that if the value is null thats because 
+                        //the property was not found.
+                        IXMLTreeStructure prop;
+                        if (property != null)
+                            prop = property.Value == null
+                                ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+                        else
+                        {
+                            prop = new XmlTreeStructure(addProperty.Key, addProperty.Value);
+                        }
+                        propertiesCol.Add((XmlTreeStructure)prop);
                     }
             }
 
@@ -477,9 +509,22 @@ namespace CalDAV.Core.Propfind
                 resource = _resourceRespository.Get(url).Result;
                 if (propertiesNameNamespace != null)
                 {
-                    foreach (var property in propertiesNameNamespace)
+                    foreach (var addProperty in propertiesNameNamespace)
                     {
-                        propertiesCol.Add(resource.ResolveProperty(property.Key, property.Value, errorStack));
+                        //gets the property from database
+                        var property = _resourceRespository.GetProperty(url, addProperty);
+                        //Builds the xmlTreeExtructure checking that if the value is null thats because 
+                        //the property was not found.
+                        IXMLTreeStructure prop;
+                        if (property != null)
+                            prop = property.Value == null
+                                ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+                        else
+                        {
+                            prop = new XmlTreeStructure(addProperty.Key, addProperty.Value);
+                        }
+                        propertiesCol.Add((XmlTreeStructure)prop);
                     }
                     //take the acl property
                     aclProperty = resource.Properties.FirstOrDefault(x => x.Name == "acl");

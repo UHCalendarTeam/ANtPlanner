@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using DataLayer.Models.Entities;
 
 namespace DataLayer
 {
@@ -102,6 +104,27 @@ namespace DataLayer
 
             //add the identifier of the pricipal
             return $"{_baseUrl}{colUrl}{principalId}/";
+        }
+
+        //This two methods will give me a month up and down from NOW
+        public static string MinDateTime()
+        {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
+            return
+                new DateTime(DateTime.Now.Year, thisMonth - 1 == 0 ? 12 : thisMonth - 1, thisDay > 28 ? 28 : thisDay)
+                    .ToUniversalTime()
+                    .ToString("yyyyMMddTHHmmssZ");
+        }
+
+        public static string MaxDateTime()
+        {
+            var thisMonth = DateTime.Now.Month;
+            var thisDay = DateTime.Now.Day;
+            return
+                new DateTime(DateTime.Now.Year, thisMonth + 1 == 13 ? 1 : thisMonth + 1, thisDay > 28 ? 28 : thisDay)
+                    .ToUniversalTime()
+                    .ToString("yyyyMMddTHHmmssZ");
         }
     }
 }
