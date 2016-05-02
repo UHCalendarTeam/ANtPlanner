@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
+using Newtonsoft.Json.Serialization;
 
 namespace DataLayer.Repositories.Implementations
 {
@@ -42,14 +43,15 @@ namespace DataLayer.Repositories.Implementations
 
         }
 
-        public Task Remove(string url)
+        public async Task Remove(string url)
         {
-            throw new NotImplementedException();
+            var principal = _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
+            await Remove(principal.Result);
         }
 
-        public int Count()
+        public Task<int> Count()
         {
-            throw new NotImplementedException();
+            return _context.Principals.CountAsync();
         }
 
         public async Task<bool> Exist(string url)
@@ -57,9 +59,11 @@ namespace DataLayer.Repositories.Implementations
             return await _context.Principals.AnyAsync(p => p.PrincipalURL == url);
         }
 
-        public Task<IList<Property>> GetAllProperties(string url)
+        public IList<Property> GetAllProperties(string url)
         {
-            throw new NotImplementedException();
+            var principal = Get(url);
+
+            return principal.Result?.Properties.ToList();
         }
 
         public Task<IList<Property>> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
