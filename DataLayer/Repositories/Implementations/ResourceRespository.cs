@@ -72,13 +72,12 @@ namespace DataLayer.Repositories
             var resource = Get(url).Result;
         }
 
-        public Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
             throw new NotImplementedException();
         }
 
-        public Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
-            bool adminPrivilege)
+        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
         {
             throw new NotImplementedException();
         }

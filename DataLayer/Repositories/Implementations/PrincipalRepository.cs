@@ -91,8 +91,7 @@ namespace DataLayer.Repositories
                     .ToList();
         }
 
-        public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
-            Stack<string> errorStack)
+        public async bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
             var principal = Get(url).Result;
             var property =
@@ -107,9 +106,7 @@ namespace DataLayer.Repositories
             }
         }
 
-        public async Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
-            Stack<string> errorStack,
-            bool adminPrivilege)
+        public async bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
         {
             var principal = Get(url).Result;
             var propperty =
@@ -137,20 +134,6 @@ namespace DataLayer.Repositories
         {
             throw new NotImplementedException();
         }
-
-        Task<IList<Property>> IRepository<Principal, string>.GetAllProperties(string url)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IList<Property>> IRepository<Principal, string>.GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IList<KeyValuePair<string, string>>> IRepository<Principal, string>.GetAllPropname(string url)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

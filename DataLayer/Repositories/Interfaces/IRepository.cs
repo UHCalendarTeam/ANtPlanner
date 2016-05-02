@@ -48,7 +48,7 @@ namespace DataLayer.Repositories
         /// <param name="url">The object's identifier</param>
         /// <param name="propertyNameNs">The property name and namespace.</param>
         /// <param name="errorStack">The error stack.</param>
-        Task RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
+        bool RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
 
         /// <summary>
         /// Create a modify a property
@@ -60,6 +60,6 @@ namespace DataLayer.Repositories
         /// <param name="errorStack"></param>
         /// <param name="adminPrivilege"></param>
         /// <returns></returns>
-        Task CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
+        bool CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
     }
 }

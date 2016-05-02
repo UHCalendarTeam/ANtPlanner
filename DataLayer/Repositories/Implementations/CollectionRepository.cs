@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 
-namespace DataLayer.Repositories.Implementations
+namespace DataLayer.Repositories
 {
-    public class CollectionRepository:IRepository<CalendarCollection, string>, IDisposable
+    public class CollectionRepository : IRepository<CalendarCollection, string>, IDisposable
     {
         private readonly CalDavContext _context;
 
@@ -46,7 +46,7 @@ namespace DataLayer.Repositories.Implementations
             await Remove(collection);
         }
 
-        public async  Task<int> Count()
+        public async Task<int> Count()
         {
             return await _context.CalendarCollections.CountAsync();
         }
@@ -66,37 +66,36 @@ namespace DataLayer.Repositories.Implementations
         public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
             var collection = Get(url).Result;
-                
+
             var property = string.IsNullOrEmpty(propertyNameandNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
 
             return property;
         }
 
-        public  IList<KeyValuePair<string, string>> GetAllPropname(string url)
+        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
         {
             var collection = Get(url).Result;
             return collection?.Properties.Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace)).ToList();
         }
 
-        public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public  bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var collection = await Get(url);
-            var property =
-                collection.Properties.FirstOrDefault(
-                    p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
-            
-            if (property!=null && !property.IsDestroyable)
+            var collection =  Get(url).Result;
+            var property = string.IsNullOrEmpty(propertyNameNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
+            if (property == null)
+                return true;
+            if (!property.IsDestroyable)
             {
                 errorStack.Push("HTTP/1.1 403 Forbidden");
-                return;
+                return false;
             }
-            collection.Properties.Remove(property);
+            collection?.Properties.Remove(property);
+            return true;
         }
 
-        public async Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
-            bool adminPrivilege)
+        public  bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
         {
-            var collection = await Get(url);
+            var collection =  Get(url).Result;
             //get the property
             var property =
                 collection.Properties
@@ -113,18 +112,18 @@ namespace DataLayer.Repositories.Implementations
                     IsMutable = true,
                     Value = propValue
                 });
-                return;
+                return true;
             }
             //if this property belongs to the fix system properties, it can not be changed. Only the server can.
             if (!property.IsMutable && !adminPrivilege)
             {
                 errorStack.Push("HTTP/1.1 403 Forbidden");
-                return;
+                return false;
             }
-
 
             //if all previous conditions don't pass then the value of the property is changed.
             property.Value = propValue;
+            return true;
         }
 
         public void Dispose()
