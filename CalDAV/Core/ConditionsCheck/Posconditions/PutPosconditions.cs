@@ -9,7 +9,7 @@ namespace CalDAV.Core.ConditionsCheck
     public class PutPosconditions : IPoscondition
     {
         public IFileSystemManagement Fs { get; }
-        public DbContext Db { get; }
+     
 
         public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
