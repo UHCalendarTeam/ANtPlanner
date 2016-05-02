@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
 using TreeForXml;
@@ -12,15 +14,17 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class PutPrecondition : IPrecondition
     {
-        public PutPrecondition(IFileSystemManagement manager, CalDavContext context)
+        public PutPrecondition(IFileSystemManagement manager, IRepository<CalendarCollection, string> collectionRepository, IRepository<CalendarResource, string> resourceRepository)
         {
-            db = context;
+            _collectionRepository = collectionRepository as CollectionRepository;
+            _resourceRespository = resourceRepository as ResourceRespository;
             StorageManagement = manager;
         }
 
-        private IFileSystemManagement StorageManagement { get; }
+        private readonly CollectionRepository _collectionRepository;
+        private readonly ResourceRespository _resourceRespository;
 
-        private CalDavContext db { get; }
+        private IFileSystemManagement StorageManagement { get; }
 
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
@@ -60,7 +64,7 @@ namespace CalDAV.Core.ConditionsCheck
                 var component = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
                 var uid = component.FirstOrDefault()?.Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                var collection = _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)).Result;
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid == calendarresource.Uid)
@@ -87,7 +91,7 @@ namespace CalDAV.Core.ConditionsCheck
                 {
                     var uid = calendarComponent.Properties["UID"].StringValue;
 
-                    var resource = db.GetCalendarResource(url);
+                    var resource = _resourceRespository.Get(url).Result;
 
                     if (resource.Uid != null && resource.Uid != uid)
                     {
@@ -250,7 +254,7 @@ Method prop must not be present
             //for that i need that the controller has as request header content-size available 
             if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
             {
-                var collection = db.GetCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                var collection = _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)).Result;
                 //here the max-resource-property of the collection is called.
                 var maxSize = collection.Properties.FirstOrDefault(p => p.Name == "max-resource-size" && p.Namespace == "urn:ietf:params:xml:ns:caldav");
                 int maxSizeInt;

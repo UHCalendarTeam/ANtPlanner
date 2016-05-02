@@ -2,6 +2,8 @@
 using System.Net;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 using TreeForXml;
 
@@ -9,14 +11,16 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class MKCalendarPrecondition : IPrecondition
     {
-        public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement, CalDavContext context)
+        public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement, IRepository<CalendarCollection, string> collectionRepository)
         {
             fs = fileSystemManagement;
-            db = context;
+            _collectionRepository = collectionRepository as CollectionRepository;
         }
 
         public IFileSystemManagement fs { get; }
-        public CalDavContext db { get; }
+
+        private readonly CollectionRepository _collectionRepository;
+
 
         public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
@@ -26,14 +30,14 @@ namespace CalDAV.Core.ConditionsCheck
 
             #endregion
 
-            if (fs.ExistCalendarCollection(url) || db.CollectionExist(url))
+            if (fs.ExistCalendarCollection(url) || _collectionRepository.Exist(url).Result)
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
   <resource-must-be-null/>  
 </error>");
-                
+
                 return false;
             }
 
@@ -42,13 +46,13 @@ namespace CalDAV.Core.ConditionsCheck
                 var bodyTree = XmlTreeStructure.Parse(body);
                 if (bodyTree == null)
                 {
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
                     response.Body.Write("Wrong Body");
                     return false;
                 }
                 if (bodyTree.NodeName != "mkcalendar")
                 {
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
                     response.Body.Write("Wrong Body");
 
                     return false;

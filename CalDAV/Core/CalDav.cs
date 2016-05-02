@@ -145,7 +145,7 @@ namespace CalDAV.Core
             //status correspondiente y un xml "status" que tiene el mensaje del estado de dicho "propstat". 
 
             //checking Precondtions
-            PreconditionCheck = new PropfindPrecondition(db);
+            PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository);
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
@@ -275,8 +275,8 @@ namespace CalDAV.Core
 
             propertiesAndHeaders.Add("body", body);
 
-            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, db);
-            PosconditionCheck = new MKCalendarPosCondition(StorageManagement, db);
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository);
+            PosconditionCheck = new MKCalendarPosCondition(StorageManagement, _collectionRespository);
 
             //Checking that all precondition pass
 
@@ -440,7 +440,7 @@ namespace CalDAV.Core
             #endregion
 
             //Checking precondition
-            PreconditionCheck = new ProppatchPrecondition(StorageManagement, db);
+            PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository);
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
@@ -856,7 +856,7 @@ namespace CalDAV.Core
 
             //CheckAllPreconditions
 
-            PreconditionCheck = new PutPrecondition(StorageManagement, db);
+            PreconditionCheck = new PutPrecondition(StorageManagement, _collectionRespository, _resourceRespository);
             if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
