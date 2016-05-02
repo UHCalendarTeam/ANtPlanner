@@ -8,8 +8,8 @@ namespace DataLayer.Repositories
 {
     public interface IRepository<TEnt, in TPk> where TEnt : class
     {
-        IList<TEnt> GetAll();
-        TEnt Get(TPk url);
+        Task<IList<TEnt>> GetAll();
+        Task<TEnt> Get(TPk url);
         void Add(TEnt entity);
         void Remove(TEnt entity);
 
@@ -25,7 +25,7 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        IList<Property> GetAllProperties(TPk url);
+        Task<IList<Property>> GetAllProperties(TPk url);
 
         /// <summary>
         /// Returns the properties that match the given 
@@ -34,13 +34,13 @@ namespace DataLayer.Repositories
         /// <param name="url"></param>
         /// <param name="propertiesNameandNs"></param>
         /// <returns></returns>
-        IList<Property> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
+        Task<IList<Property>> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
 
         /// <summary>
         /// Returns all the properties
         /// </summary>
         /// <returns></returns>
-        IList<KeyValuePair<string, string>> GetAllPropname(TPk url);
+        Task<IList<KeyValuePair<string, string>>> GetAllPropname(TPk url);
 
         /// <summary>
         /// Remove a property with the given name and namespace.

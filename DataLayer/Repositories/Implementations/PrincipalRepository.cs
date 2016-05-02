@@ -4,19 +4,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories.Implementations
 {
     public class PrincipalRepository : IRepository<Principal, string>
     {
-        public IList<Principal> GetAll()
+        private readonly CalDavContext _context;
+
+        public PrincipalRepository(CalDavContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Principal Get(string url)
+
+
+        public IList<Principal> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.Principals.ToList();
+        }
+
+        public async Task<Principal> Get(string url)
+        {
+            return await _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
         }
 
         public void Add(Principal entity)
