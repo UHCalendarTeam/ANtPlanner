@@ -7,7 +7,7 @@ using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
 {
-    public class ResourceRespository: IRepository<CalendarResource, string>
+    public class ResourceRespository: IRepository<CalendarResource, string>, IDisposable
     {
         private readonly CalDavContext _context;
 
@@ -122,6 +122,11 @@ namespace DataLayer.Repositories
             }
 
             return true;
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }
