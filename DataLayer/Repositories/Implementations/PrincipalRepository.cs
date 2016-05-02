@@ -110,7 +110,7 @@ namespace DataLayer.Repositories
 
         }
 
-        public   bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
             Stack<string> errorStack,
             bool adminPrivilege)
         {
