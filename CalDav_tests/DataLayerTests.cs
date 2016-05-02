@@ -10,6 +10,7 @@ using DataLayer;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +36,11 @@ namespace CalDav_tests
         {
             var context = new CalDavContext(new DbContextOptions<CalDavContext>());
 
-            var user = context.CreateUserInSystem(_email, _fullName, _password);
+            var prinRepository = new PrincipalRepository(context);
+
+            var user = prinRepository.CreateUserInSystem(_email, _fullName, _password);
+
+            Assert.NotNull(user);
             
             context.SaveChanges();
             Assert.True(context.Users.Any());
@@ -43,6 +48,8 @@ namespace CalDav_tests
             var dbUser = context.Users.FirstOrDefault(x => x.Email == _email);
             
             Assert.NotNull(dbUser);
+
+            Assert.True(prinRepository.ExistByStringIs(_email).Result);
 
         }
 
@@ -56,13 +63,12 @@ namespace CalDav_tests
         {
             using (var context = new CalDavContext())
             {
-                var users = context.Users;
-                var user = users.FirstOrDefault(x => x.Email == _email);
+                var prinRepository = new PrincipalRepository(context);
+           
 
-                var result = context.VerifyPassword(_email, _password);
+                var result = prinRepository.VerifyPassword(_email, _password);
 
                 Assert.True(result);
-                
             }
         }
 
@@ -75,7 +81,8 @@ namespace CalDav_tests
 
             using (var context = new CalDavContext())
             {
-                context.CreateStudentInSystem("unittest4@gmail.com", "Student1", _password, _career, _group, _year);
+                var prinRepository = new PrincipalRepository(context);
+                prinRepository.CreateStudentInSystem("unittest4@gmail.com", "Student1", _password, _career, _group, _year);
                 context.SaveChanges();
                 var user = context.Students.FirstOrDefaultAsync(x => x.Email == _email && x.Career == _career);
                
@@ -170,8 +177,9 @@ namespace CalDav_tests
         public void UnitTest9()
         {
             var context = new CalDavContext(new DbContextOptions<CalDavContext>());
+            var prinRepository = new PrincipalRepository(context);
 
-            var user = context.CreateWorkerInSystem("worker1@gmail.com", "worker", "UnitTest9 worker", _faculty,"Weboo");
+            var user = prinRepository.CreateWorkerInSystem("worker1@gmail.com", "worker", "UnitTest9 worker", _faculty,"Weboo");
 
             context.SaveChanges();
             Assert.True(context.Workers.Count() > 0);
