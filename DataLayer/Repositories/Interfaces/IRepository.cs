@@ -10,14 +10,14 @@ namespace DataLayer.Repositories
     {
         Task<IList<TEnt>> GetAll();
         Task<TEnt> Get(TPk url);
-        void Add(TEnt entity);
-        void Remove(TEnt entity);
+        Task Add(TEnt entity);
+        Task Remove(TEnt entity);
 
-        void Remove(TPk url);
+        Task Remove(TPk url);
 
         int Count();
 
-        bool Exist(TPk url);
+        Task<bool> Exist(TPk url);
 
         /// <summary>
         /// Returns all the visible properties 
@@ -48,7 +48,7 @@ namespace DataLayer.Repositories
         /// <param name="url">The object's identifier</param>
         /// <param name="propertyNameNs">The property name and namespace.</param>
         /// <param name="errorStack">The error stack.</param>
-        bool RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
+        Task RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
 
         /// <summary>
         /// Create a modify a property
@@ -60,6 +60,6 @@ namespace DataLayer.Repositories
         /// <param name="errorStack"></param>
         /// <param name="adminPrivilege"></param>
         /// <returns></returns>
-        bool CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
+        Task CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
     }
 }

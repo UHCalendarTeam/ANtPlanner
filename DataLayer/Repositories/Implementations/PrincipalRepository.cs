@@ -19,9 +19,9 @@ namespace DataLayer.Repositories.Implementations
 
 
 
-        public IList<Principal> GetAll()
+        public async Task<IList<Principal>> GetAll()
         {
-            return _context.Principals.ToList();
+            return await _context.Principals.ToListAsync();
         }
 
         public async Task<Principal> Get(string url)
@@ -29,17 +29,20 @@ namespace DataLayer.Repositories.Implementations
             return await _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
         }
 
-        public void Add(Principal entity)
+         public async Task Add(Principal entity)
         {
-            throw new NotImplementedException();
+           _context.Principals.Add(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public void Remove(Principal entity)
+        public async Task Remove(Principal entity)
         {
-            throw new NotImplementedException();
+            _context.Remove(entity);
+            await _context.SaveChangesAsync();
+
         }
 
-        public void Remove(string url)
+        public Task Remove(string url)
         {
             throw new NotImplementedException();
         }
@@ -49,32 +52,32 @@ namespace DataLayer.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public bool Exist(string url)
+        public async Task<bool> Exist(string url)
+        {
+            return await _context.Principals.AnyAsync(p => p.PrincipalURL == url);
+        }
+
+        public Task<IList<Property>> GetAllProperties(string url)
         {
             throw new NotImplementedException();
         }
 
-        public IList<Property> GetAllProperties(string url)
+        public Task<IList<Property>> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
         {
             throw new NotImplementedException();
         }
 
-        public IList<Property> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
+        public Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
             throw new NotImplementedException();
         }
 
-        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
+        public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
             throw new NotImplementedException();
         }
 
-        public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+        public Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
             throw new NotImplementedException();
