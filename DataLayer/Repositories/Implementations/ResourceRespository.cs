@@ -17,7 +17,7 @@ namespace DataLayer.Repositories
         }
         public async Task<IList<CalendarResource>> GetAll()
         {
-            await _context.CalendarResources.ToListAsync();
+           return await _context.CalendarResources.ToListAsync();
         }
 
         public async Task<CalendarResource> Get(string url)
@@ -65,21 +65,63 @@ namespace DataLayer.Repositories
         public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
             var resource = Get(url).Result;
+            Property property;
+
+            if (string.IsNullOrEmpty(propertyNameandNs.Value))
+                property = resource.Properties.FirstOrDefault(
+                    prop => prop.Name == propertyNameandNs.Key && prop.Namespace == propertyNameandNs.Value);
+            else
+                property = resource.Properties.FirstOrDefault(
+                    prop => prop.Name == propertyNameandNs.Key);
+            return property;
         }
 
         public IList<KeyValuePair<string, string>> GetAllPropname(string url)
         {
             var resource = Get(url).Result;
+            return
+                resource.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                    .ToList();
         }
 
         public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            var resource = Get(url).Result;
+            var property = GetProperty(url, propertyNameNs);
+
+            if (property == null)
+                return false;
+            if (property.IsDestroyable)
+            {
+                resource.Properties.Remove(property);
+            }
+            return true;
         }
 
-        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
+        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
         {
-            throw new NotImplementedException();
+            var resource = Get(url).Result;
+
+            var propperty = GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
+
+            //if the property is null then create it
+            if (propperty == null)
+            {
+                var prop = new Property(propName, propNs)
+                {
+                    Value = propValue
+                };
+                resource.Properties.Add(prop);
+            }
+            else
+            {
+                if (propperty.IsMutable || adminPrivilege)
+                {
+                    propperty.Value = propValue;
+                }
+            }
+
+            return true;
         }
     }
 }

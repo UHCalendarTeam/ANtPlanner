@@ -91,7 +91,7 @@ namespace DataLayer.Repositories
                     .ToList();
         }
 
-        public async bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
         {
             var principal = Get(url).Result;
             var property =
@@ -99,14 +99,16 @@ namespace DataLayer.Repositories
                     prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
 
             if (property == null)
-                return;
+                return false;
             if (property.IsDestroyable)
             {
                 principal.Properties.Remove(property);
             }
+            return true;
+
         }
 
-        public async bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
+        public   bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
         {
             var principal = Get(url).Result;
             var propperty =
@@ -128,6 +130,7 @@ namespace DataLayer.Repositories
                     propperty.Value = propValue;
                 }
             }
+            return true;
         }
 
         Task<IList<Principal>> IRepository<Principal, string>.GetAll()
