@@ -108,7 +108,7 @@ namespace DataLayer.Repositories
 
         }
 
-        public   bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+        public   bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, bool adminPrivilege)
         {
             var principal = Get(url).Result;
             var propperty =
