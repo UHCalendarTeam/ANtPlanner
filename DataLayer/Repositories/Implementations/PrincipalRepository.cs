@@ -27,7 +27,8 @@ namespace DataLayer.Repositories.Implementations
 
         public async Task<Principal> Get(string url)
         {
-            return await _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
+            return await _context.Principals.Include(p =>p.Properties)
+                .FirstOrDefaultAsync(p => p.PrincipalURL == url);
         }
 
          public async Task Add(Principal entity)
@@ -63,28 +64,66 @@ namespace DataLayer.Repositories.Implementations
         {
             var principal = Get(url);
 
-            return principal.Result?.Properties.ToList();
+            return principal.Result?.Properties.Where(x=>x.IsVisible).ToList();
         }
 
-        public Task<IList<Property>> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
+        public IList<Property> GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
         {
-            throw new NotImplementedException();
+            var principal = Get(url).Result;
+
+            var properties = principal.Properties.Where(
+                prop => propertiesNameandNs.Contains(new KeyValuePair<string, string>(prop.Name, prop.Namespace)));
+            return properties == null ? null : properties.ToList();
         }
 
-        public Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
+        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
         {
-            throw new NotImplementedException();
+            var principal = Get(url).Result;
+            return
+                principal.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                    .ToList();
+
         }
 
         public async Task RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            throw new NotImplementedException();
+            var principal = Get(url).Result;
+            var property =
+                principal.Properties.FirstOrDefault(
+                    prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
+
+            if (property == null)
+                return;
+            principal.Properties.Remove(property);
+            await _context.SaveChangesAsync();
+
         }
 
-        public Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+        public async Task CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-            throw new NotImplementedException();
+            var principal = Get(url).Result;
+            var propperty =
+                principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
+
+            //if the property is null then create it
+            if (propperty == null)
+            {
+                var prop = new Property(propName, propNs)
+                {
+                    Value = propValue
+                };
+                principal.Properties.Add(prop);
+            }
+            else
+            {
+                if (propperty.IsMutable || adminPrivilege)
+                {
+                    propperty.Value = propValue;
+                }
+            }
+
+           await _context.SaveChangesAsync();
         }
     }
 }
