@@ -63,12 +63,6 @@ namespace DataLayer.Repositories
         bool CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
 
 
-        /// <summary>
-        /// Check if a principal with the given identifier exist.
-        /// Implements this only in the PrincipalRepository
-        /// </summary>
-        /// <param name="identifier"></param>
-        /// <returns></returns>
-        bool ExistByStringIs(string identifier);
+        
     }
 }

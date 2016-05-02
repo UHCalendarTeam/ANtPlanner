@@ -125,6 +125,11 @@ namespace DataLayer.Repositories
             return true;
         }
 
+        public Task<bool> ExistByStringIs(string identifier)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             _context.Dispose();
