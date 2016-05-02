@@ -79,5 +79,25 @@ namespace DataLayer.Repositories.Implementations
         {
             throw new NotImplementedException();
         }
+
+        Task<IList<Principal>> IRepository<Principal, string>.GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IList<Property>> IRepository<Principal, string>.GetAllProperties(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IList<Property>> IRepository<Principal, string>.GetProperties(string url, List<KeyValuePair<string, string>> propertiesNameandNs)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IList<KeyValuePair<string, string>>> IRepository<Principal, string>.GetAllPropname(string url)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
