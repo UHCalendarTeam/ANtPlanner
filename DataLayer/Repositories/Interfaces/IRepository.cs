@@ -15,7 +15,7 @@ namespace DataLayer.Repositories
 
         Task Remove(TPk url);
 
-        int Count();
+        Task<int> Count();
 
         Task<bool> Exist(TPk url);
 
@@ -25,7 +25,7 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        Task<IList<Property>> GetAllProperties(TPk url);
+        IList<Property> GetAllProperties(TPk url);
 
         /// <summary>
         /// Returns the properties that match the given 
@@ -34,13 +34,13 @@ namespace DataLayer.Repositories
         /// <param name="url"></param>
         /// <param name="propertiesNameandNs"></param>
         /// <returns></returns>
-        Task<IList<Property>> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
+        IList<Property> GetProperties(TPk url, List<KeyValuePair<string, string>> propertiesNameandNs);
 
         /// <summary>
         /// Returns all the properties
         /// </summary>
         /// <returns></returns>
-        Task<IList<KeyValuePair<string, string>>> GetAllPropname(TPk url);
+        IList<KeyValuePair<string, string>> GetAllPropname(TPk url);
 
         /// <summary>
         /// Remove a property with the given name and namespace.
