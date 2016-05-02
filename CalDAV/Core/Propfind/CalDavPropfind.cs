@@ -283,12 +283,26 @@ namespace CalDAV.Core.Propfind
             if (calendarResourceId == null)
             {
                 var collection = _collectionRepository.Get(url).Result;
+
                 propertiesCol = collection.GetAllVisibleProperties(errorStack);
                 //looking for additional properties
                 if (additionalProperties != null && additionalProperties.Count > 0)
-                    foreach (var property in additionalProperties)
+                    foreach (var addProperty in additionalProperties)
                     {
-                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value, errorStack));
+                        //gets the property from database
+                        var property = _collectionRepository.GetProperty(url, addProperty);
+                        //Builds the xmlTreeExtructure checking that if the value is null thats because 
+                        //the property was not found.
+                        IXMLTreeStructure prop;
+                        if (property != null)
+                            prop = property.Value == null
+                                ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+                        else
+                        {
+                            prop = new XmlTreeStructure(addProperty.Key, addProperty.Value);
+                        }
+                        propertiesCol.Add((XmlTreeStructure)prop);
                     }
             }
             else
@@ -437,9 +451,22 @@ namespace CalDAV.Core.Propfind
                 collection = _collectionRepository.Get(url).Result;
                 if (propertiesNameNamespace != null)
                 {
-                    foreach (var property in propertiesNameNamespace)
+                    foreach (var addProperty in propertiesNameNamespace)
                     {
-                        propertiesCol.Add(collection.ResolveProperty(property.Key, property.Value, errorStack));
+                        //gets the property from database
+                        var property = _collectionRepository.GetProperty(url, addProperty);
+                        //Builds the xmlTreeExtructure checking that if the value is null thats because 
+                        //the property was not found.
+                        IXMLTreeStructure prop;
+                        if (property != null)
+                            prop = property.Value == null
+                                ? new XmlTreeStructure(property.Name, property.Namespace) { Value = "" }
+                                : XmlTreeStructure.Parse(property.Value);
+                        else
+                        {
+                            prop = new XmlTreeStructure(addProperty.Key, addProperty.Value);
+                        }
+                        propertiesCol.Add((XmlTreeStructure)prop);
                     }
                     //take the acl property
                     aclProperty = collection.Properties.FirstOrDefault(x => x.Name == "acl");

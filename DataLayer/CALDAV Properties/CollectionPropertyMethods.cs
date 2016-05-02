@@ -42,26 +42,26 @@ namespace DataLayer
         /// <param name="mainNs">Main Namespace</param>
         /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
-        public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName,
-            string mainNs, Stack<string> errorStack)
-        {
+        //public static XmlTreeStructure ResolveProperty(this CalendarCollection collection, string propertyName,
+        //    string mainNs, Stack<string> errorStack)
+        //{
             
 
 
 
-            var property = string.IsNullOrEmpty(mainNs)?collection.Properties.FirstOrDefault(p => p.Name == propertyName): collection.Properties.FirstOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
-            IXMLTreeStructure prop;
-            if (property != null)
-                prop = property.Value == null
-                    ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
-                    : XmlTreeStructure.Parse(property.Value);
-            else
-            {
-                prop = new XmlTreeStructure(propertyName, mainNs);
-            }
+        //    var property = string.IsNullOrEmpty(mainNs)?collection.Properties.FirstOrDefault(p => p.Name == propertyName): collection.Properties.FirstOrDefault(p => p.Name == propertyName && p.Namespace == mainNs);
+        //    IXMLTreeStructure prop;
+        //    if (property != null)
+        //        prop = property.Value == null
+        //            ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
+        //            : XmlTreeStructure.Parse(property.Value);
+        //    else
+        //    {
+        //        prop = new XmlTreeStructure(propertyName, mainNs);
+        //    }
 
-            return (XmlTreeStructure) prop;
-        }
+        //    return (XmlTreeStructure) prop;
+        //}
 
         /// <summary>
         ///     Returns all the properties of a collection that must be returned for
@@ -70,23 +70,23 @@ namespace DataLayer
         /// <param name="collection"></param>
         /// <param name="errorStack">Stores the stack of errors</param>
         /// <returns></returns>
-        public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection,
-            Stack<string> errorStack)
-        {
-            var list = new List<XmlTreeStructure>();
+        //public static List<XmlTreeStructure> GetAllVisibleProperties(this CalendarCollection collection,
+        //    Stack<string> errorStack)
+        //{
+        //    var list = new List<XmlTreeStructure>();
 
-            foreach (var property in collection.Properties.Where(prop => prop.IsVisible))
-            {
-                //TODO: Check that the property is accessible beyond its visibility.
-                var tempTree = property.Value == null
-                    ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
-                    : XmlTreeStructure.Parse(property.Value);
+        //    foreach (var property in collection.Properties.Where(prop => prop.IsVisible))
+        //    {
+        //        //TODO: Check that the property is accessible beyond its visibility.
+        //        var tempTree = property.Value == null
+        //            ? new XmlTreeStructure(property.Name, property.Namespace) { Value = ""}
+        //            : XmlTreeStructure.Parse(property.Value);
 
-                list.Add((XmlTreeStructure) tempTree);
-            }
+        //        list.Add((XmlTreeStructure) tempTree);
+        //    }
 
-            return list;
-        }
+        //    return list;
+        //}
 
         /// <summary>
         ///     Returns the Name of all collection properties.
