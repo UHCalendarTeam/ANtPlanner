@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 using Microsoft.Data.Entity;
 
@@ -13,15 +14,15 @@ namespace ACL.Core.Authentication
 {
     public class UhCalendarAuthentication : IAuthenticate
     {
-        private readonly CalDavContext _context;
+        private readonly IRepository<Principal, string> _principalRepository;
 
         /// <summary>
         ///     Injects an instance of CaldavContext
         /// </summary>
         /// <param name="context"></param>
-        public UhCalendarAuthentication(CalDavContext context)
+        public UhCalendarAuthentication(IRepository<Principal, string> principalRepository)
         {
-            _context = context;
+            _principalRepository = principalRepository
         }
 
 
@@ -53,7 +54,7 @@ namespace ACL.Core.Authentication
                 var password = credentials.Value;
 
                 //check if the user exist in our DB
-                if (_context.Principals.Any(p => p.PrincipalStringIdentifier == username))
+                if (_principalRepository.Exist())
                 {
                     // if does then check if can authenticate
                     if (_context.VerifyPassword(username, password))

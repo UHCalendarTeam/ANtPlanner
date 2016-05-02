@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
+using DataLayer.Repositories;
 
 namespace DataLayer.Repositories
 {
@@ -134,6 +135,11 @@ namespace DataLayer.Repositories
                 }
             }
             return true;
+        }
+
+        public bool ExistByStringIs(string identifier)
+        {
+            throw new NotImplementedException();
         }
     }
 }
