@@ -81,11 +81,11 @@ namespace CalDav_Services
            
             app.UseIISPlatformHandler();
 
-            app.UseStaticFiles();
+            //app.UseStaticFiles();
 
             
 
-            app.UseCors("AllowAllOrigins");
+            //app.UseCors("AllowAllOrigins");
 
 
             //use the authentication middleware
