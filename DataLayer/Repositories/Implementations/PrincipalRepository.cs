@@ -21,7 +21,7 @@ namespace DataLayer.Repositories
             _context = context;
         }
 
-       
+
 
 
         public async Task<IList<Principal>> GetAll()
@@ -35,11 +35,11 @@ namespace DataLayer.Repositories
                 .FirstOrDefault(p => p.PrincipalURL == url));
         }
 
-     
-        public async Task Add(Principal entity)
+
+        public void Add(Principal entity)
         {
             _context.Principals.Add(entity);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
 
         public async Task Remove(Principal entity)
@@ -87,7 +87,7 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var principal =await Get(url);
+            var principal = await Get(url);
             return
                await Task.FromResult(principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList());
@@ -115,7 +115,7 @@ namespace DataLayer.Repositories
             Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var principal =await Get(url);
+            var principal = await Get(url);
             var propperty =
                 principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
 
@@ -152,7 +152,7 @@ namespace DataLayer.Repositories
         /// <returns></returns>
         public async Task<bool> VerifyPassword(string userEmail, string password = "")
         {
-            var principal =await GetByIdentifier(userEmail);
+            var principal = await GetByIdentifier(userEmail);
 
             //if the user doenst exit return false
             if (principal == null)
@@ -170,14 +170,14 @@ namespace DataLayer.Repositories
 
         public async Task<Principal> GetByIdentifier(string identifier)
         {
-            return await Task.FromResult(_context.Principals.Include(p => p.User).Include(p=>p.Properties)
+            return await Task.FromResult(_context.Principals.Include(p => p.User).Include(p => p.Properties)
                 .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier));
         }
 
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-            
+
             return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
         }
 
@@ -194,7 +194,7 @@ namespace DataLayer.Repositories
         ///     The instance of the new User. Have to change the changes with the
         ///     returned object.
         /// </returns>
-        public  Principal CreateUserInSystem(string email, string fullName,
+        public Principal CreateUserInSystem(string email, string fullName,
             string password)
         {
             //create the core passHasher
@@ -278,7 +278,7 @@ namespace DataLayer.Repositories
         ///     A new instance of the student. The changes has to be saved
         ///     in the returned object.
         /// </returns>
-        public Student CreateStudentInSystem( string email, string fullname,
+        public Student CreateStudentInSystem(string email, string fullname,
             string password, string career, string group, int year)
         {
             var student = new Student(fullname, email, password, career, group, year);
@@ -326,7 +326,7 @@ namespace DataLayer.Repositories
         }
 
 
-        public  Worker CreateWorkerInSystem(string email, string password,
+        public Worker CreateWorkerInSystem(string email, string password,
             string fullName, string faculty, string department)
         {
             var worker = new Worker(fullName, email, password, department, faculty);
@@ -362,14 +362,14 @@ namespace DataLayer.Repositories
             //add the user and its principal to the context
             _context.Workers.Add(worker);
             _context.Principals.Add(principal);
-           _context.CalendarCollections.Add(col);
+            _context.CalendarCollections.Add(col);
 
             _context.SaveChanges();
             return worker;
         }
 
 
-        public  Principal CreateGroup( string pUrl, string groupName)
+        public Principal CreateGroup(string pUrl, string groupName)
         {
             throw new NotImplementedException();
         }
@@ -377,7 +377,7 @@ namespace DataLayer.Repositories
 
         public async Task SetCookie(string principalEmail, string cookieValue)
         {
-            var principal =await GetByIdentifier(principalEmail);
+            var principal = await GetByIdentifier(principalEmail);
             if (principal == null)
                 return;
 

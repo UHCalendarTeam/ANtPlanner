@@ -30,10 +30,10 @@ namespace DataLayer.Repositories
                 Include(r => r.CalendarResources).ThenInclude(rp => rp.Properties).FirstOrDefaultAsync(c => c.Url == url);
         }
 
-        public async Task Add(CalendarCollection entity)
+        public void Add(CalendarCollection entity)
         {
             _context.CalendarCollections.Add(entity);
-            await _context.SaveChangesAsync();
+            // await _context.SaveChangesAsync();
         }
 
         public async Task Remove(CalendarCollection entity)
@@ -60,14 +60,14 @@ namespace DataLayer.Repositories
 
         public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var collection =await Get(url);
+            var collection = await Get(url);
 
             return collection?.Properties.Where(p => p.IsVisible).ToList();
         }
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var collection =await Get(url);
+            var collection = await Get(url);
 
             var property = string.IsNullOrEmpty(propertyNameandNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
 
@@ -76,13 +76,13 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var collection =await Get(url);
+            var collection = await Get(url);
             return collection?.Properties.ToList().Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace)).ToList();
         }
 
-        public async  Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var collection =await  Get(url);
+            var collection = await Get(url);
             var property = string.IsNullOrEmpty(propertyNameNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
             if (property == null)
                 return true;
@@ -95,9 +95,9 @@ namespace DataLayer.Repositories
             return true;
         }
 
-        public async  Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
+        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
         {
-            var collection =await  Get(url);
+            var collection = await Get(url);
             //get the property
             var property =
                 collection.Properties
@@ -127,8 +127,8 @@ namespace DataLayer.Repositories
             property.Value = propValue;
             return true;
         }
-        
-         public bool ExistByStringIs(string identifier)
+
+        public bool ExistByStringIs(string identifier)
         {
             throw new NotImplementedException();
         }
@@ -136,9 +136,9 @@ namespace DataLayer.Repositories
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();
-        }        
-        
+        }
 
-       
+
+
     }
 }
