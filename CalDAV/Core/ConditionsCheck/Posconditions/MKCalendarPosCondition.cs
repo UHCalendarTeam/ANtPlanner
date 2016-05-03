@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -21,7 +22,7 @@ namespace CalDAV.Core.ConditionsCheck
         public IFileSystemManagement Fs { get; }
         private readonly CollectionRepository _collectionRepository;
 
-        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
             string url;
@@ -29,17 +30,17 @@ namespace CalDAV.Core.ConditionsCheck
 
             #endregion
 
-            if (!Fs.ExistCalendarCollection(url) || _collectionRepository.Exist(url).Result)
+            if (!Fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))
             {
                 response.StatusCode = (int) HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns:D='DAV:' xmlns:C='urn:ietf:params:xml:ns:caldav'>
   <C:initialize-calendar-collection/>  
 </error>");
-                return false;
+                return await Task.FromResult(false);
             }
 
-            return true;
+            return await Task.FromResult(true);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
@@ -19,7 +20,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
         private readonly ResourceRespository _resourceRespository;
 
 
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             string calendarResourceId;
             propertiesAndHeaders.TryGetValue("calendarResourceID", out calendarResourceId);
@@ -27,12 +28,12 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
-            if (calendarResourceId == null && !_collectionRepository.Exist(url).Result)
+            if (calendarResourceId == null &&! await _collectionRepository.Exist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
             }
-            if (calendarResourceId != null && !_resourceRespository.Exist(url).Result)
+            if (calendarResourceId != null && !await _resourceRespository.Exist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
