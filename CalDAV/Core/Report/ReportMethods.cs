@@ -201,7 +201,7 @@ namespace CalDAV.Core
             {
                 var fs = new FileSystemManagement();
 
-                var resourceContent = fs.GetCalendarObjectResource(href).Result;
+                var resourceContent =await fs.GetCalendarObjectResource(href);
 
                 result.Add(href, resourceContent);
             }

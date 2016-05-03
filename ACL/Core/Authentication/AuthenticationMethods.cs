@@ -49,7 +49,7 @@ namespace ACL.Core.Authentication
             //check if has the authorization header and is basic
             if (!string.IsNullOrEmpty(authHeader))
             {
-                var credentials = TakeCreadential(authHeader).Result;
+                var credentials =await TakeCreadential(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
 
@@ -269,8 +269,8 @@ namespace ACL.Core.Authentication
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            httpContext.Response.Headers["WWW-Authenticate"] = "Basic realm=\"UHCalendar\"";
-            
+            httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
+
         }
 
         #endregion

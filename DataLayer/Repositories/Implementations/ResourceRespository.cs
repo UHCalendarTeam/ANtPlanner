@@ -42,7 +42,7 @@ namespace DataLayer.Repositories
 
         public async Task Remove(string url)
         {
-            var resource = _context.CalendarResources.FirstOrDefaultAsync(r => r.Href == url).Result;
+            var resource = await _context.CalendarResources.FirstOrDefaultAsync(r => r.Href == url);
             await Remove(resource);
         }
 
@@ -130,22 +130,20 @@ namespace DataLayer.Repositories
 
             return await Task.FromResult(true);
         }
-
-        public async Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs,
-            string propValue, Stack<string> errorStack,
+         public async Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-
-            var prop = new Property(propName, propNs)
-            {
-                Value = propValue
-            };
-            resource.Properties.Add(prop);
-
+           
+                var prop = new Property(propName, propNs)
+                {
+                    Value = propValue
+                };
+                resource.Properties.Add(prop);
+        
 
             return await Task.FromResult(true);
         }
-
+        
         public Task<bool> ExistByStringIs(string identifier)
         {
             throw new NotImplementedException();

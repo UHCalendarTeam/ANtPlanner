@@ -790,7 +790,7 @@ namespace CalDAV.Core
                 return;
             }
 
-            var resourceBody = StorageManagement.GetCalendarObjectResource(url);
+            var resourceBody =await StorageManagement.GetCalendarObjectResource(url);
 
             var etagProperty = calendarRes.Properties.FirstOrDefault(x => x.Name == "getetag");
             if (etagProperty != null)
@@ -799,7 +799,7 @@ namespace CalDAV.Core
                 response.Headers["etag"] = etag;
             }
             
-            await response.WriteAsync(resourceBody.Result);
+            await response.WriteAsync(resourceBody);
         }
 
         public string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders)
