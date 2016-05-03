@@ -564,10 +564,7 @@ namespace CalDAV.Core
         {
             CalendarResource resource = null;
             CalendarCollection collection = null;
-            if (calendarResourceId != null)
-                resource = await _resourceRespository.Get(url);
-            else
-                collection = await _collectionRespository.Get(url);
+          
 
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
