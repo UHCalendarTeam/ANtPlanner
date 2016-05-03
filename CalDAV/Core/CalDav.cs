@@ -187,7 +187,7 @@ namespace CalDAV.Core
 
                     //take the principalId from the properties
                     var principalId = propertiesAndHeaders["principalId"];
-                    var principal = await _principalRepository.GetByIdentifier(principalId);
+                    var principal =  _principalRepository.GetByIdentifier(principalId);
                     await PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -385,7 +385,7 @@ namespace CalDAV.Core
 
             //Adding the collection to the database
 
-            var principal = await _principalRepository.GetByIdentifier(principalId);
+            var principal =  _principalRepository.GetByIdentifier(principalId);
             var collection = new CalendarCollection(url, collectionName);
             var stack = new Stack<string>();
             await _collectionRespository.CreateOrModifyProperty(url, "getctag", "http://calendarserver.org/ns/",
@@ -1028,7 +1028,7 @@ namespace CalDAV.Core
             var resource = new CalendarResource(url, calendarResourceId);
 
             //add the owner property           
-            var principal = await _principalRepository.GetByIdentifier(principalId);
+            var principal = _principalRepository.GetByIdentifier(principalId);
             var principalUrl = principal == null ? "" : principal.PrincipalURL;
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));

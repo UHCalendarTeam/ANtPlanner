@@ -150,7 +150,7 @@ namespace DataLayer.Repositories
         /// <param name="userEmail">The user email (this is out username)</param>
         /// <param name="password">The provided password.</param>
         /// <returns></returns>
-        public async Task<bool> VerifyPassword(Principal principal, string password = "")
+        public bool VerifyPassword(Principal principal, string password = "")
         {
             //if the user doenst exit return false
             if (principal == null)
@@ -161,15 +161,24 @@ namespace DataLayer.Repositories
             var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
 
             //return the result of the password verification
-            return await Task.FromResult(result != PasswordVerificationResult.Failed);
+            return result != PasswordVerificationResult.Failed;
 
         }
 
 
-        public async Task<Principal> GetByIdentifier(string identifier)
+        public async Task<Principal> GetByIdentifierAsync(string identifier)
         {
             return await _context.Principals.Include(p => p.User).Include(p=>p.Properties)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
+        }
+
+        public Principal GetByIdentifier(string identifier)
+        {
+            using (var context = new CalDavContext())
+            {
+                return context.Principals.Include(p => p.User).Include(p => p.Properties)
+                    .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
+            }
         }
 
         /// <summary>
@@ -385,7 +394,7 @@ namespace DataLayer.Repositories
 
         public async Task SetCookie(string principalEmail, string cookieValue)
         {
-            var principal = await GetByIdentifier(principalEmail);
+            var principal =  GetByIdentifier(principalEmail);
             if (principal == null)
                 return;
 

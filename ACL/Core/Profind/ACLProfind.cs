@@ -41,7 +41,7 @@ namespace ACL.Core
             var bodyString = streamReader.ReadToEnd();
 
             //try to authenticate the request either with the cookies or the user credentials
-            var principal = await _authenticate.AuthenticateRequest(httpContext);
+            var principal = _authenticate.AuthenticateRequest(httpContext);
 
             //if the principal is null then there is some problem with the authentication
             //so return
