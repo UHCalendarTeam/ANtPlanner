@@ -32,7 +32,7 @@ namespace CalDav_tests
         /// Create a user in the DB
         /// </summary>
         [Fact]
-        public void UnitTest1()
+        public async  Task UnitTest1()
         {
             var context = new CalDavContext(new DbContextOptions<CalDavContext>());
 
@@ -49,7 +49,7 @@ namespace CalDav_tests
             
             Assert.NotNull(dbUser);
 
-            //Assert.True(prinRepository.ExistByStringIs(_email).Result);
+            Assert.True(await prinRepository.ExistByStringIs(_email));
 
         }
 
