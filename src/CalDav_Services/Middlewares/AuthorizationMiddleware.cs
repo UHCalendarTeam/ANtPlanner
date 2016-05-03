@@ -28,18 +28,18 @@ namespace CalDav_Services.Middlewares
         }
 
 
-        public async Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
         {
             _logger.LogInformation("Handling authorization in resource: " + context.Request.Path);
-            var principal =await _authenticate.AuthenticateRequest(context);
+            var principal = _authenticate.AuthenticateRequest(context);
             if (principal == null)
             {
                 _logger.LogInformation("The client doesn't have enough privileges.");
-                return;
+                return null;
             }
             //context.Session.SetString("principalId", principal.PrincipalURL);
             _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
-            await _next.Invoke(context);
+            return  _next(context);
             _logger.LogInformation("Finished handling request.");
         }
 

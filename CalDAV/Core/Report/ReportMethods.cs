@@ -233,7 +233,7 @@ namespace CalDAV.Core
             var resPropertiesNotExist = new List<XmlTreeStructure>();
 
             var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
-            var calResource =await _resourceRepository.Get(href);
+            var calResource = _resourceRepository.Get(href);
 
             foreach (var prop in incomPropNode.Children)
             {

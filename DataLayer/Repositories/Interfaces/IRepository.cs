@@ -9,7 +9,8 @@ namespace DataLayer.Repositories
     public interface IRepository<TEnt, in TPk> where TEnt : class
     {
         Task<IList<TEnt>> GetAll();
-        Task<TEnt> Get(TPk url);
+        TEnt Get(TPk url);
+        Task<TEnt> GetAsync(TPk url);
         void Add(TEnt entity);
         Task Remove(TEnt entity);
 

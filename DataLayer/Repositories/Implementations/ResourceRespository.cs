@@ -20,10 +20,15 @@ namespace DataLayer.Repositories
             return await Task.FromResult(_context.CalendarResources.ToList());
         }
 
-        public async Task<CalendarResource> Get(string url)
+        public CalendarResource Get(string url)
         {
             return _context.CalendarResources.Include(r => r.Properties)
                  .FirstOrDefault(r => r.Href == url);
+        }
+        public async Task<CalendarResource> GetAsync(string url)
+        {
+            return await _context.CalendarResources.Include(r => r.Properties)
+                 .FirstOrDefaultAsync(r => r.Href == url);
         }
 
         public void Add(CalendarResource entity)
@@ -58,14 +63,14 @@ namespace DataLayer.Repositories
 
         public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var resource =await Get(url);
+            var resource = Get(url);
             return await Task.FromResult(resource?.Properties.ToList());
             
         }
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var resource = await Get(url);
+            var resource =  Get(url);
             Property property;
 
             if (resource == null)
@@ -82,7 +87,7 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var resource = await Get(url);
+            var resource =  Get(url);
             return
               await Task.FromResult(resource.Properties.ToList().Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList());
@@ -90,7 +95,7 @@ namespace DataLayer.Repositories
 
         public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var resource =await Get(url);
+            var resource = Get(url);
             var property =await GetProperty(url, propertyNameNs);
 
             if (property == null)
@@ -105,7 +110,7 @@ namespace DataLayer.Repositories
         public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var resource =await Get(url);
+            var resource = Get(url);
 
 
 

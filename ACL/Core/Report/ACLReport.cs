@@ -89,7 +89,7 @@ namespace ACL.Core
 
             //Take the resource with the href == to the given url
             //TODO: should the href property be store in a property?
-            var resource = await _resourceRepository.Get(colUrl);
+            var resource = await _resourceRepository.GetAsync(colUrl);
 
             //take the string representation of the acl property
             //this property is stored in xml format so is needed to
@@ -105,7 +105,7 @@ namespace ACL.Core
             //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
-                var principal = await _principalRepository.Get(pUrl.Value);
+                var principal =  _principalRepository.Get(pUrl.Value);
                 if (principal != null)
                     principals.Add(principal, null);
             }
@@ -131,7 +131,7 @@ namespace ACL.Core
         public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href,HttpResponse response)
         {
             //take the collection with the given href
-            var col = await _collectionRepository.Get(href);
+            var col =  _collectionRepository.Get(href);
 
             //if the collection doesnt exit then return an error
             if (col == null)
