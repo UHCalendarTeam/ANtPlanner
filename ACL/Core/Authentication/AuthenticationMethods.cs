@@ -49,7 +49,7 @@ namespace ACL.Core.Authentication
             //check if has the authorization header and is basic
             if (!string.IsNullOrEmpty(authHeader))
             {
-                var credentials = TakeCreadential(authHeader).Result;
+                var credentials =  await TakeCreadential(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
 

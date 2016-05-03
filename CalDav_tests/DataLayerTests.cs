@@ -49,7 +49,7 @@ namespace CalDav_tests
             
             Assert.NotNull(dbUser);
 
-            Assert.True(prinRepository.ExistByStringIs(_email).Result);
+            //Assert.True(prinRepository.ExistByStringIs(_email).Result);
 
         }
 

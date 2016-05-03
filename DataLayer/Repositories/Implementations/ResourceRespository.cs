@@ -42,7 +42,7 @@ namespace DataLayer.Repositories
 
         public async Task Remove(string url)
         {
-            var resource = _context.CalendarResources.FirstOrDefaultAsync(r => r.Href == url).Result;
+            var resource = await _context.CalendarResources.FirstOrDefaultAsync(r => r.Href == url);
             await Remove(resource);
         }
 

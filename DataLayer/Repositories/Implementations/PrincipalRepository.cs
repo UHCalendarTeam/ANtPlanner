@@ -50,8 +50,8 @@ namespace DataLayer.Repositories
 
         public async Task Remove(string url)
         {
-            var principal = _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
-            await Remove(principal.Result);
+            var principal = await _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
+            await Remove(principal);
         }
 
         public Task<int> Count()
