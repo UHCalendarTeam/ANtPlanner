@@ -177,7 +177,7 @@ namespace DataLayer.Repositories
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-            return await Task.FromResult(_context.Principals.Any(p => p.PrincipalStringIdentifier == identifier));
+            return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
         }
 
 
