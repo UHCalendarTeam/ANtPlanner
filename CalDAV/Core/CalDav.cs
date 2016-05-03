@@ -941,7 +941,7 @@ namespace CalDAV.Core
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
-            await _resourceRespository.CreateOrModifyProperty(url,"getcontentlength", "DAV:",
+            await _resourceRespository.CreatePropertyForResource(resource,"getcontentlength", "DAV:",
                 $"<D:getcontentlength {_namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack, true);
             await _collectionRespository.SaveChangeAsync();
@@ -1047,9 +1047,12 @@ namespace CalDAV.Core
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
+
+           // await _resourceRespository.Add(resource);
+
             //adding the calculated etag in the getetag property of the resource
             var errorStack = new Stack<string>();
-            await _resourceRespository.CreateOrModifyProperty(url,"getetag", "DAV:", $"<D:getetag {_namespaces["D"]}>{etag}</D:getetag>",
+            await _resourceRespository.CreatePropertyForResource(resource,"getetag", "DAV:", $"<D:getetag {_namespaces["D"]}>{etag}</D:getetag>",
                 errorStack, true);
 
             //updating the ctag of the collection noticing this way that the collection has changed.

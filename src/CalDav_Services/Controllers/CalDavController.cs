@@ -53,8 +53,8 @@ namespace CalDav_Services.Controllers
                 {"groupOrUser", groupOrUser }
             };
             Response.StatusCode = 207;
-            HttpContext.Session.SetString("principalId", principalId);
-            HttpContext.Session.SetString("groupOrUser", groupOrUser);
+            //HttpContext.Session.SetString("principalId", principalId);
+            //HttpContext.Session.SetString("groupOrUser", groupOrUser);
             await CalDavRepository.ACLProfind(HttpContext);
            
             
@@ -68,7 +68,7 @@ namespace CalDav_Services.Controllers
         /// to remember the user.
         /// </summary>
         /// <returns></returns>
-        [AcceptVerbs("PROPFIND", Route = "")]
+        [AcceptVerbs("PROPFIND", Route = "/")]
         public async Task PropFind()
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
@@ -98,8 +98,6 @@ namespace CalDav_Services.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
             var body = StreamToString(Request.Body);
-            var cookie = Request.Cookies["AuthId"];
-            var auth = Request.Headers["Authorization"];
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
