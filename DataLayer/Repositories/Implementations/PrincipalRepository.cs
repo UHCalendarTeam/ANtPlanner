@@ -31,7 +31,7 @@ namespace DataLayer.Repositories
 
         public async Task<Principal> Get(string url)
         {
-            return await Task.FromResult(_context.Principals.Include(p => p.Properties.ToList())
+            return await Task.FromResult(_context.Principals.Include(p => p.Properties)
                 .FirstOrDefault(p => p.PrincipalURL == url));
         }
 
@@ -177,7 +177,7 @@ namespace DataLayer.Repositories
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-            return await Task.FromResult(_context.Principals.Any(p => p.PrincipalStringIdentifier == identifier));
+            return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
         }
 
 

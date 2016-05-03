@@ -22,14 +22,14 @@ namespace DataLayer.Repositories
 
         public async Task<CalendarResource> Get(string url)
         {
-            return await Task.FromResult(_context.CalendarResources.Include(r => r.Properties.ToList())
-                 .FirstOrDefault(r => r.Href == url));
+            return _context.CalendarResources.Include(r => r.Properties)
+                 .FirstOrDefault(r => r.Href == url);
         }
 
         public async Task Add(CalendarResource entity)
         {
             _context.CalendarResources.Add(entity);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
         }
 
         public async Task Remove(CalendarResource entity)
@@ -68,13 +68,16 @@ namespace DataLayer.Repositories
             var resource = await Get(url);
             Property property;
 
+            if (resource == null)
+                return null;
+
             if (string.IsNullOrEmpty(propertyNameandNs.Value))
                 property = resource.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameandNs.Key && prop.Namespace == propertyNameandNs.Value);
             else
                 property = resource.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameandNs.Key);
-            return await Task.FromResult(property);
+            return property;
         }
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
@@ -104,6 +107,8 @@ namespace DataLayer.Repositories
         {
             var resource =await Get(url);
 
+
+
             var propperty =await GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
 
             //if the property is null then create it
@@ -125,7 +130,22 @@ namespace DataLayer.Repositories
 
             return await Task.FromResult(true);
         }
-        
+
+        public async Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs,
+            string propValue, Stack<string> errorStack,
+            bool adminPrivilege)
+        {
+
+            var prop = new Property(propName, propNs)
+            {
+                Value = propValue
+            };
+            resource.Properties.Add(prop);
+
+
+            return await Task.FromResult(true);
+        }
+
         public Task<bool> ExistByStringIs(string identifier)
         {
             throw new NotImplementedException();
