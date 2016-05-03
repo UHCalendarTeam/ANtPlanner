@@ -292,7 +292,7 @@ namespace DataLayer
             else
                 href = new XmlTreeStructure("unauthenticated", "DAV:");
             output.AddChild(href);
-            return href;
+            return output;
         }
 
 

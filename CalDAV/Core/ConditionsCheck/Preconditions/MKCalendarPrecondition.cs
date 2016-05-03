@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -22,7 +23,7 @@ namespace CalDAV.Core.ConditionsCheck
         private readonly CollectionRepository _collectionRepository;
 
 
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
             var body = propertiesAndHeaders["body"];
@@ -30,7 +31,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             #endregion
 
-            if (fs.ExistCalendarCollection(url) || _collectionRepository.Exist(url).Result)
+            if (fs.ExistCalendarCollection(url) ||await _collectionRepository.Exist(url))
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>

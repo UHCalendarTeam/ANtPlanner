@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
@@ -20,7 +21,7 @@ namespace CalDAV.Core.ConditionsCheck
 
         private readonly ResourceRespository _resourceRespository;
 
-        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             throw new NotImplementedException();
         }

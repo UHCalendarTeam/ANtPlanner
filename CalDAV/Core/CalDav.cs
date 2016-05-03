@@ -145,7 +145,7 @@ namespace CalDAV.Core
 
             //checking Precondtions
             PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (! await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             response.StatusCode = 207;
@@ -163,7 +163,7 @@ namespace CalDAV.Core
             {
                 await PropFindMethods.AllPropMethod(url, calendarResourceId, depth, null, responseTree);
 
-                response.Body.Write(responseTree.ToString());
+                 response.Body.Write(responseTree.ToString());
                 return;
             }
 
@@ -279,7 +279,7 @@ namespace CalDAV.Core
             //Checking that all precondition pass
 
             //Cheking Preconditions
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             //I create here the collection already but i wait for other comprobations before save the database.
@@ -291,7 +291,7 @@ namespace CalDAV.Core
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
-                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+                if (! await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     await DeleteCalendarCollection(propertiesAndHeaders, response);
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
@@ -308,7 +308,7 @@ namespace CalDAV.Core
             //if it does not have set property it is treated as a empty body.
             if (mkCalendarTree.Children.Count == 0)
             {
-                if (!PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+                if (!await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     await DeleteCalendarCollection(propertiesAndHeaders, response);
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
@@ -356,7 +356,7 @@ namespace CalDAV.Core
             }
 
             //Checking Preconditions   
-            if (PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+            if (await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
             {
                 await _collectionRespository.SaveChangeAsync(); 
                 return;
@@ -437,7 +437,7 @@ namespace CalDAV.Core
 
             //Checking precondition
             PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
             //Creating and filling the root of the xml tree response
@@ -844,10 +844,10 @@ namespace CalDAV.Core
             //CheckAllPreconditions
 
             PreconditionCheck = new PutPrecondition(StorageManagement, _collectionRespository, _resourceRespository);
-            if (!PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
-            var resourceExist = _resourceRespository.Exist(url).Result;
+            var resourceExist = await _resourceRespository.Exist(url);
             //If the ifmatch is included i look for the etag in the resource, but first the resource has to exist.
             //If all is ok and the if-match etag matches the etag in the resource then i update the resource.
             //If the if-match dont match then i set that the precondition failed.

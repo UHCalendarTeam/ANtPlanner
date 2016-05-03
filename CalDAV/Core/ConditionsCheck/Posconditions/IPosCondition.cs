@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
@@ -16,6 +17,6 @@ namespace CalDAV.Core.ConditionsCheck
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
     }
 }

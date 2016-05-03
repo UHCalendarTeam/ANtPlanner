@@ -103,7 +103,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            await CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
+           await CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
@@ -219,11 +219,13 @@ namespace CalDav_Services.Controllers
         public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalId", principalId);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-            propertiesAndHeaders.Add("body", StreamToString(Request.Body));
+            var propertiesAndHeaders = new Dictionary<string, string>
+            {
+                {"principalId", principalId},
+                {"url", url},
+                {"calendarResourceId", calendarResourceId},
+                {"body", StreamToString(Request.Body)}
+            };
 
             var headers = Request.GetTypedHeaders();
 

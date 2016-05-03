@@ -480,7 +480,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = _collectionRepository.Get(url).Result;
+                collection = await _collectionRepository.Get(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
@@ -506,7 +506,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = _resourceRespository.Get(url).Result;
+                resource = await _resourceRespository.Get(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)

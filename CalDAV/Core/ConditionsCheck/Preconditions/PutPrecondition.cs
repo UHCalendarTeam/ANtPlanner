@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -26,7 +27,7 @@ namespace CalDAV.Core.ConditionsCheck
 
         private IFileSystemManagement StorageManagement { get; }
 
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
             var url = propertiesAndHeaders["url"];
@@ -64,7 +65,7 @@ namespace CalDAV.Core.ConditionsCheck
                 var component = iCalendar.CalendarComponents.FirstOrDefault(comp => comp.Key != "VTIMEZONE").Value;
                 var uid = component.FirstOrDefault()?.Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
-                var collection = _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)).Result;
+                var collection = await _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid == calendarresource.Uid)
@@ -91,7 +92,7 @@ namespace CalDAV.Core.ConditionsCheck
                 {
                     var uid = calendarComponent.Properties["UID"].StringValue;
 
-                    var resource = _resourceRespository.Get(url).Result;
+                    var resource = await _resourceRespository.Get(url);
 
                     if (resource.Uid != null && resource.Uid != uid)
                     {
@@ -254,7 +255,7 @@ Method prop must not be present
             //for that i need that the controller has as request header content-size available 
             if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
             {
-                var collection = _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)).Result;
+                var collection = await _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 //here the max-resource-property of the collection is called.
                 var maxSize = collection.Properties.FirstOrDefault(p => p.Name == "max-resource-size" && p.Namespace == "urn:ietf:params:xml:ns:caldav");
                 int maxSizeInt;
@@ -282,7 +283,7 @@ Content size exceeds max size allowed.
             //TODO: Checking that the number of recurring instances is less-equal
             //than the max-instances property value.
 
-            return true;
+            return await Task.FromResult(true);
         }
     }
 }

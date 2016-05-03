@@ -17,13 +17,13 @@ namespace DataLayer.Repositories
         }
         public async Task<IList<CalendarResource>> GetAll()
         {
-            return await _context.CalendarResources.ToListAsync();
+            return await Task.FromResult(_context.CalendarResources.ToList());
         }
 
         public async Task<CalendarResource> Get(string url)
         {
-            return await _context.CalendarResources.Include(r => r.Properties)
-                 .FirstOrDefaultAsync(r => r.Href == url);
+            return await Task.FromResult(_context.CalendarResources.Include(r => r.Properties.ToList())
+                 .FirstOrDefault(r => r.Href == url));
         }
 
         public async Task Add(CalendarResource entity)
@@ -48,7 +48,7 @@ namespace DataLayer.Repositories
 
         public async Task<int> Count()
         {
-            return await _context.CalendarResources.CountAsync();
+            return await Task.FromResult(_context.CalendarResources.Count());
         }
 
         public async Task<bool> Exist(string url)
@@ -59,7 +59,7 @@ namespace DataLayer.Repositories
         public async Task<IList<Property>> GetAllProperties(string url)
         {
             var resource =await Get(url);
-            return resource?.Properties.ToList();
+            return await Task.FromResult(resource?.Properties.ToList());
             
         }
 
@@ -81,8 +81,8 @@ namespace DataLayer.Repositories
         {
             var resource = await Get(url);
             return
-                resource.Properties.ToList().Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
-                    .ToList();
+              await Task.FromResult(resource.Properties.ToList().Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                    .ToList());
         }
 
         public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)

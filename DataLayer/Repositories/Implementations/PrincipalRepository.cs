@@ -31,8 +31,8 @@ namespace DataLayer.Repositories
 
         public async Task<Principal> Get(string url)
         {
-            return await _context.Principals.Include(p => p.Properties)
-                .FirstOrDefaultAsync(p => p.PrincipalURL == url);
+            return await Task.FromResult(_context.Principals.Include(p => p.Properties.ToList())
+                .FirstOrDefault(p => p.PrincipalURL == url));
         }
 
      
@@ -61,14 +61,14 @@ namespace DataLayer.Repositories
 
         public async Task<bool> Exist(string url)
         {
-            return await _context.Principals.AnyAsync(p => p.PrincipalURL == url);
+            return await Task.FromResult(_context.Principals.Any(p => p.PrincipalURL == url));
         }
 
         public async Task<IList<Property>> GetAllProperties(string url)
         {
             var principal = await Get(url);
 
-            return principal?.Properties.Where(x => x.IsVisible).ToList();
+            return await Task.FromResult(principal?.Properties.Where(x => x.IsVisible).ToList());
         }
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
@@ -82,15 +82,15 @@ namespace DataLayer.Repositories
             else
                 property = principal.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameandNs.Key);
-            return property;
+            return await Task.FromResult(property);
         }
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
             var principal =await Get(url);
             return
-                principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
-                    .ToList();
+               await Task.FromResult(principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                    .ToList());
         }
 
         public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
@@ -107,7 +107,7 @@ namespace DataLayer.Repositories
             {
                 principal.Properties.Remove(property);
             }
-            return true;
+            return await Task.FromResult(true);
 
         }
 
@@ -135,7 +135,7 @@ namespace DataLayer.Repositories
                     propperty.Value = propValue;
                 }
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
         public async Task<int> SaveChangesAsync()
@@ -163,21 +163,21 @@ namespace DataLayer.Repositories
             var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
 
             //return the result of the password verification
-            return result != PasswordVerificationResult.Failed;
+            return await Task.FromResult(result != PasswordVerificationResult.Failed);
 
         }
 
 
         public async Task<Principal> GetByIdentifier(string identifier)
         {
-            return await _context.Principals.Include(p => p.User).Include(p=>p.Properties)
-                .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
+            return await Task.FromResult(_context.Principals.Include(p => p.User).Include(p=>p.Properties)
+                .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier));
         }
 
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-            return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
+            return await Task.FromResult(_context.Principals.Any(p => p.PrincipalStringIdentifier == identifier));
         }
 
 
