@@ -150,7 +150,6 @@ namespace CalDAV.Core
 
             response.StatusCode = 207;
             response.ContentType = "application/xml";
-
             var responseTree = new XmlTreeStructure("multistatus", "DAV:");
             responseTree.Namespaces.Add("D", "DAV:");
             responseTree.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
@@ -562,10 +561,7 @@ namespace CalDAV.Core
         private async Task<bool> BuiltResponseForRemove(string url, string calendarResourceId,
             bool errorOccurred, IXMLTreeStructure removeTree, IXMLTreeStructure response)
         {
-            CalendarResource resource = null;
-            CalendarCollection collection = null;
-          
-
+            
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
             var prop = removeTree.GetChild("prop");
@@ -611,13 +607,7 @@ namespace CalDAV.Core
         private async Task<bool> BuiltResponseForSet(string url, string calendarResourceId,
             bool errorOccurred, IXMLTreeStructure setTree, IXMLTreeStructure response)
         {
-            CalendarResource resource = null;
-            CalendarCollection collection = null;
-            if (calendarResourceId != null)
-                resource = await _resourceRespository.Get(url);
-            else
-                collection = await _collectionRespository.Get(url);
-
+           
             //For each property it is tried to remove, if not possible change the error occured to true and
             //continue setting dependency error to the rest. 
             var prop = setTree.GetChild("prop");

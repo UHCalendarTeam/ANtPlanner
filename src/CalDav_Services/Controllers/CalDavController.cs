@@ -56,8 +56,8 @@ namespace CalDav_Services.Controllers
             HttpContext.Session.SetString("principalId", principalId);
             HttpContext.Session.SetString("groupOrUser", groupOrUser);
             await CalDavRepository.ACLProfind(HttpContext);
-           
-            
+
+
         }
 
         /// <summary>
@@ -73,10 +73,8 @@ namespace CalDav_Services.Controllers
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             Response.StatusCode = 207;
-           
+
             await CalDavRepository.ACLProfind(HttpContext);
-           
-            
         }
 
         #endregion
@@ -90,9 +88,9 @@ namespace CalDav_Services.Controllers
         /// <param name="groupOrUser">If the principals represents a user or a group</param>
         /// <param name="principalId">If user then the email, otherwise the name of the group.</param>
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/")]
-        public void CollectionRootProfind(string groupOrUser, string principalId)
+        public async Task CollectionRootProfind(string groupOrUser, string principalId)
         {
-            
+
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -105,7 +103,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
+            await CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
@@ -125,9 +123,9 @@ namespace CalDav_Services.Controllers
 
         //PROPFIND COLLECTIONS
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName)
+        public async Task PropFind(string groupOrUser, string principalId, string collectionName)
         {
-            
+
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -138,7 +136,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
         ///TODO: annadir un PROFIND q tenga la ruta "collections/{usersOrGroups}/principalId"
         /// por aki es donde el cliente realiza el primer PROFIND sobre una coleccion para coger los 
@@ -153,7 +151,7 @@ namespace CalDav_Services.Controllers
 
         //PROPFIND RESOURCES
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
+        public async Task PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
@@ -169,23 +167,23 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         [AcceptVerbs("Proppatch", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public void PropPatch(string groupOrUser, string principalId, string collectionName)
+        public async Task PropPatch(string groupOrUser, string principalId, string collectionName)
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
 
-            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         [AcceptVerbs("Proppatch",
             Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public void PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        public async Task PropPatch(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
@@ -193,13 +191,13 @@ namespace CalDav_Services.Controllers
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
 
-            CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         [AcceptVerbs("Options", Route = "/")]
         public void Options()
         {
-          
+
             Response.Headers["Allow"] = "GET, PUT, PROPFIND, REPORT, PROPATCH";
         }
 
@@ -207,7 +205,7 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public void Options(string groupOrUser, string principalId, string collectionName)
         {
-           
+
             Response.Headers["Allow"] = "GET, PUT, PROPFIND, REPORT, PROPATCH";
         }
 
@@ -256,7 +254,7 @@ namespace CalDav_Services.Controllers
                 }
 
                 await CalDavRepository.AddCalendarObjectResource(propertiesAndHeaders, Response);
-               
+
             }
 
 
@@ -272,7 +270,7 @@ namespace CalDav_Services.Controllers
             return res.Remove(res.Length - 1);
         }
 
-       
+
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name
         [HttpGet("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
@@ -287,7 +285,7 @@ namespace CalDav_Services.Controllers
 
         // DELETE api/values/5
         [HttpDelete("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
-        public void Delete(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
+        public async Task Delete(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -300,19 +298,19 @@ namespace CalDav_Services.Controllers
                 propertiesAndHeaders.Add("If-Match", ifmatch.ToString());
             }
 
-            CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
+            await CalDavRepository.DeleteCalendarObjectResource(propertiesAndHeaders, Response);
         }
 
         // DELETE api/values/
         [HttpDelete("collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public void Delete(string groupOrUser, string principalId, string collectionName)
+        public async Task Delete(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("principalId", principalId);
             propertiesAndHeaders.Add("url", url);
 
-            CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
+            await CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
         }
 
         #region Collections Reports
@@ -321,11 +319,11 @@ namespace CalDav_Services.Controllers
         [AcceptVerbs("Report", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Report(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
-          
+
             Response.StatusCode = 207;
             Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
-            
+
 
         }
 
@@ -336,15 +334,15 @@ namespace CalDav_Services.Controllers
             Response.StatusCode = 207;
             Response.ContentType = @"application/xml; charset=""utf-8""";
             await CalDavRepository.Report(HttpContext);
-           
+
         }
 
-#endregion
+        #endregion
 
         [AcceptVerbs("Options", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public void Options(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
-           
+
             Response.Headers["Allow"] = "GET, PUT, PROPFIND";
         }
 
