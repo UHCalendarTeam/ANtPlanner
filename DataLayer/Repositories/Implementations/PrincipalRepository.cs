@@ -29,7 +29,13 @@ namespace DataLayer.Repositories
             return await _context.Principals.ToListAsync();
         }
 
-        public async Task<Principal> Get(string url)
+        public Principal Get(string url)
+        {
+            return  _context.Principals.Include(p => p.Properties)
+                .FirstOrDefault(p => p.PrincipalURL == url);
+        }
+
+        public async Task<Principal> GetAsync(string url)
         {
             return await Task.FromResult(_context.Principals.Include(p => p.Properties)
                 .FirstOrDefault(p => p.PrincipalURL == url));
@@ -66,14 +72,14 @@ namespace DataLayer.Repositories
 
         public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var principal = await Get(url);
+            var principal = await GetAsync(url);
 
-            return await Task.FromResult(principal?.Properties.Where(x => x.IsVisible).ToList());
+            return principal?.Properties.Where(x => x.IsVisible).ToList();
         }
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var principal = await Get(url);
+            var principal =  Get(url);
             Property property;
 
             if (string.IsNullOrEmpty(propertyNameandNs.Value))
@@ -87,7 +93,7 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var principal = await Get(url);
+            var principal =  Get(url);
             return
                await Task.FromResult(principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList());
@@ -96,7 +102,7 @@ namespace DataLayer.Repositories
         public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
             Stack<string> errorStack)
         {
-            var principal = await Get(url);
+            var principal =  Get(url);
             var property =
                 principal.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
@@ -115,7 +121,7 @@ namespace DataLayer.Repositories
             Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var principal = await Get(url);
+            var principal =  Get(url);
             var propperty =
                 principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
 

@@ -14,6 +14,7 @@ using DataLayer.Repositories;
 using Microsoft.Data.Entity;
 
 
+
 namespace CalDav_Services
 {
     public class Startup
@@ -42,21 +43,25 @@ namespace CalDav_Services
 
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=True";
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
             // Add framework services.
             services.AddEntityFramework()
                .AddSqlServer()
                .AddDbContext<CalDavContext>(options =>
                    options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
-
+            
             services.AddMvc();
+
+            
+
+            
 
             services.AddScoped<ICalDav, CalDav>();
             services.AddScoped<IFileSystemManagement, FileSystemManagement>();
-            services.AddScoped<IAuthenticate, UhCalendarAuthentication>();
+            services.AddTransient<IAuthenticate, UhCalendarAuthentication>();
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
-            //services.AddTransient<CalDavContext>();
+            //services.AddScoped<CalDavContext>();
             services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
             services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
             services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
@@ -67,13 +72,13 @@ namespace CalDav_Services
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Error;
+            loggerFactory.MinimumLevel = LogLevel.Verbose;
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
-            //use the authentication middleware
-          
+           
 
+           
             app.UseIISPlatformHandler();
 
             app.UseStaticFiles();
@@ -82,6 +87,8 @@ namespace CalDav_Services
 
             app.UseCors("AllowAllOrigins");
 
+
+            //use the authentication middleware
             app.UseAuthorization();
 
             app.UseMvc();

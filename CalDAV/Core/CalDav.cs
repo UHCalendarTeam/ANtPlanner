@@ -689,7 +689,7 @@ namespace CalDAV.Core
                 return true;
 
             var resource =
-                await _resourceRespository.Get(url);
+                 _resourceRespository.Get(url);
 
             if (ifMatchEtags.Count > 0)
             {
@@ -748,7 +748,7 @@ namespace CalDAV.Core
                 return true;
 
             //The collection is retrieve and if something unexpected happened an internal error is reflected.
-            var collection = await _collectionRespository.Get(url);
+            var collection =  _collectionRespository.Get(url);
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
@@ -782,7 +782,7 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes = await _resourceRespository.Get(url);
+            var calendarRes =  _resourceRespository.Get(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
@@ -855,7 +855,7 @@ namespace CalDAV.Core
             {
                 if (resourceExist)
                 {
-                    var resource = await _resourceRespository.Get(url);
+                    var resource =  _resourceRespository.Get(url);
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value).Value;
                     if (ifMatchEtags.Contains(resourceEtag))
@@ -918,7 +918,7 @@ namespace CalDAV.Core
             var resource = await FillResource(propertiesAndHeaders, iCal, response);
 
             //adding the resource to the db
-            var collection = await _collectionRespository.Get(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+            var collection =  _collectionRespository.Get(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
             collection.CalendarResources.Add(resource);
 
             //adding the file
