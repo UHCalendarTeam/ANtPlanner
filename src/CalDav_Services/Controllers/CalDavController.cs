@@ -90,7 +90,7 @@ namespace CalDav_Services.Controllers
         /// <param name="groupOrUser">If the principals represents a user or a group</param>
         /// <param name="principalId">If user then the email, otherwise the name of the group.</param>
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/")]
-        public void CollectionRootProfind(string groupOrUser, string principalId)
+        public async Task CollectionRootProfind(string groupOrUser, string principalId)
         {
             
             Response.ContentType = @"application/xml; charset=""utf-8""";
@@ -105,7 +105,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
+           await CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
@@ -125,7 +125,7 @@ namespace CalDav_Services.Controllers
 
         //PROPFIND COLLECTIONS
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName)
+        public async Task PropFind(string groupOrUser, string principalId, string collectionName)
         {
             
             Response.ContentType = @"application/xml; charset=""utf-8""";
@@ -138,7 +138,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
         ///TODO: annadir un PROFIND q tenga la ruta "collections/{usersOrGroups}/principalId"
         /// por aki es donde el cliente realiza el primer PROFIND sobre una coleccion para coger los 
@@ -153,7 +153,7 @@ namespace CalDav_Services.Controllers
 
         //PROPFIND RESOURCES
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResource}")]
-        public void PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
+        public async Task PropFind(string groupOrUser, string principalId, string collectionName, string calendarResource)
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
@@ -169,7 +169,7 @@ namespace CalDav_Services.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
+            await CalDavRepository.PropFind(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
 
         [AcceptVerbs("Proppatch", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
@@ -221,11 +221,13 @@ namespace CalDav_Services.Controllers
         public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalId", principalId);
-            propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
-            propertiesAndHeaders.Add("body", StreamToString(Request.Body));
+            var propertiesAndHeaders = new Dictionary<string, string>
+            {
+                {"principalId", principalId},
+                {"url", url},
+                {"calendarResourceId", calendarResourceId},
+                {"body", StreamToString(Request.Body)}
+            };
 
             var headers = Request.GetTypedHeaders();
 

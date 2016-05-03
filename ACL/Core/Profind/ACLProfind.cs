@@ -114,6 +114,12 @@ namespace ACL.Core
                     case "current-user-principal":
                         propNode.AddChild(PropertyCreation.CreateCurrentUserPrincipal(principal));
                         break;
+                    case "principal-URL":
+                        propNode.AddChild(new XmlTreeStructure("principal-URL", "DAV:")
+                        {
+                            Value = principal.PrincipalURL
+                        });
+                        break;
                 }
             }
 

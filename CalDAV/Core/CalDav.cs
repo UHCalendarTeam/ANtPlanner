@@ -164,7 +164,7 @@ namespace CalDAV.Core
             {
                 await PropFindMethods.AllPropMethod(url, calendarResourceId, depth, null, responseTree);
 
-                response.Body.Write(responseTree.ToString());
+                 response.Body.Write(responseTree.ToString());
                 return;
             }
 
