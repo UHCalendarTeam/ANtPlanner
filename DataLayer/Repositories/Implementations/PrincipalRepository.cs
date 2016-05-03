@@ -150,10 +150,8 @@ namespace DataLayer.Repositories
         /// <param name="userEmail">The user email (this is out username)</param>
         /// <param name="password">The provided password.</param>
         /// <returns></returns>
-        public async Task<bool> VerifyPassword(string userEmail, string password = "")
+        public async Task<bool> VerifyPassword(Principal principal, string password = "")
         {
-            var principal =await GetByIdentifier(userEmail);
-
             //if the user doenst exit return false
             if (principal == null)
                 return false;
@@ -170,8 +168,18 @@ namespace DataLayer.Repositories
 
         public async Task<Principal> GetByIdentifier(string identifier)
         {
-            return await Task.FromResult(_context.Principals.Include(p => p.User).Include(p=>p.Properties)
-                .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier));
+            return await _context.Principals.Include(p => p.User).Include(p=>p.Properties)
+                .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
+        }
+
+        /// <summary>
+        /// Get a principal with the given cookie value
+        /// </summary>
+        /// <param name="cookieValue"></param>
+        /// <returns></returns>
+        public async Task<Principal> GetByCookie(string cookieValue)
+        {
+           return await _context.Principals.FirstOrDefaultAsync(p => p.SessionId == cookieValue);
         }
 
 

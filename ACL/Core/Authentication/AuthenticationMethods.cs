@@ -52,18 +52,13 @@ namespace ACL.Core.Authentication
                 var credentials =await TakeCreadential(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
-
+                principal =await _principalRepository.GetByIdentifier(username);
                 //check if the user exist in our DB
-                if (await _principalRepository.ExistByStringIs(username))
+                if (principal != null)
                 {
                     // if does then check if can authenticate
-                    if (await _principalRepository.VerifyPassword(username, password))
-                    {
-                        Console.WriteLine($"------Current user {username} is authenticated");
-                    }
-
                     //if the username and password doesnt match then return 401 - Unauthorized
-                    else
+                    if (!await _principalRepository.VerifyPassword(principal, password))
                     {
                         await SetUnauthorizedRequest(httpContext);
                         return null;
@@ -80,7 +75,7 @@ namespace ACL.Core.Authentication
 
                    principal =  _principalRepository.CreateUserInSystem(username, username, password);
                    
-                    Console.WriteLine($"------Created user with username: {username}");
+                   Console.WriteLine($"------Created user with username: {username}");
 
                     //TODO: change to this when work the WCF service
                     //var userData = GetUserDataFromUhApi(username);
@@ -105,35 +100,20 @@ namespace ACL.Core.Authentication
                 }
                 //take the cookie that the client send us in the request
                 cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
-                string principalStringId;
-                try
-                {
-                    principalStringId = httpContext.Session.GetString("principalId");
-                }
-                    //if the session doesnt have the principalId means somethind is wrong
-                catch
+                
+                principal =await _principalRepository.GetByCookie(cookieValue);
+                if(principal == null)
                 {
                     await SetUnauthorizedRequest(httpContext);
                     return null;
                 }
-
-                //take the principal from our system
-                principal =await _principalRepository.GetByIdentifier(principalStringId);
-                //check if the cookies match
-                var principalSesison = principal.SessionId;
-                if (!VerifySessionCookies(principalSesison, cookieValue))
-                {
-                    //if the cookies doesnt match then send back 401
-                    await SetUnauthorizedRequest(httpContext);
-                    return null;
-                }
+                
             }
 
             #endregion
 
             //set the cookie for the response.
             cookieValue = Guid.NewGuid().ToString();
-            principal =await _principalRepository.GetByIdentifier(username);
             httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
             await _principalRepository.SetCookie(username, cookieValue);
 
