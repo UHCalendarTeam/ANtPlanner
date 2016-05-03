@@ -12,7 +12,7 @@ using Microsoft.AspNet.Identity;
 
 namespace DataLayer.Repositories
 {
-    public class PrincipalRepository : IRepository<Principal, string>, IDisposable
+    public class PrincipalRepository : IRepository<Principal, string>
     {
         private readonly CalDavContext _context;
 
@@ -21,10 +21,7 @@ namespace DataLayer.Repositories
             _context = context;
         }
 
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
+       
 
 
         public async Task<IList<Principal>> GetAll()
@@ -67,16 +64,16 @@ namespace DataLayer.Repositories
             return await _context.Principals.AnyAsync(p => p.PrincipalURL == url);
         }
 
-        public IList<Property> GetAllProperties(string url)
+        public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var principal = Get(url);
+            var principal = await Get(url);
 
-            return principal.Result?.Properties.Where(x => x.IsVisible).ToList();
+            return principal?.Properties.Where(x => x.IsVisible).ToList();
         }
 
-        public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
+        public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var principal = Get(url).Result;
+            var principal = await Get(url);
             Property property;
 
             if (string.IsNullOrEmpty(propertyNameandNs.Value))
@@ -88,18 +85,18 @@ namespace DataLayer.Repositories
             return property;
         }
 
-        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
+        public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var principal = Get(url).Result;
+            var principal =await Get(url);
             return
-                principal.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList();
         }
 
-        public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
+        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
             Stack<string> errorStack)
         {
-            var principal = Get(url).Result;
+            var principal = await Get(url);
             var property =
                 principal.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
@@ -114,11 +111,11 @@ namespace DataLayer.Repositories
 
         }
 
-        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
             Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var principal = Get(url).Result;
+            var principal =await Get(url);
             var propperty =
                 principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
 
@@ -153,9 +150,9 @@ namespace DataLayer.Repositories
         /// <param name="userEmail">The user email (this is out username)</param>
         /// <param name="password">The provided password.</param>
         /// <returns></returns>
-        public bool VerifyPassword(string userEmail, string password = "")
+        public async Task<bool> VerifyPassword(string userEmail, string password = "")
         {
-            var principal = GetByIdentifier(userEmail);
+            var principal =await GetByIdentifier(userEmail);
 
             //if the user doenst exit return false
             if (principal == null)
@@ -171,10 +168,10 @@ namespace DataLayer.Repositories
         }
 
 
-        public Principal GetByIdentifier(string identifier)
+        public async Task<Principal> GetByIdentifier(string identifier)
         {
-            return _context.Principals.Include(p => p.User).Include(p=>p.Properties)
-                .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
+            return await _context.Principals.Include(p => p.User).Include(p=>p.Properties)
+                .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
 
@@ -260,7 +257,7 @@ namespace DataLayer.Repositories
             _context.Principals.Add(principal);
             _context.CalendarCollections.Add(col);
 
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return principal;
         }
@@ -322,6 +319,8 @@ namespace DataLayer.Repositories
             _context.Students.Add(student);
             _context.Principals.Add(principal);
 
+            _context.SaveChanges();
+
             return student;
         }
 
@@ -364,6 +363,7 @@ namespace DataLayer.Repositories
             _context.Principals.Add(principal);
            _context.CalendarCollections.Add(col);
 
+            _context.SaveChanges();
             return worker;
         }
 
@@ -376,7 +376,7 @@ namespace DataLayer.Repositories
 
         public async Task SetCookie(string principalEmail, string cookieValue)
         {
-            var principal = GetByIdentifier(principalEmail);
+            var principal =await GetByIdentifier(principalEmail);
             if (principal == null)
                 return;
 

@@ -12,7 +12,6 @@ using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.Extensions.Primitives;
-using DataLayer;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Abstractions;
 using Microsoft.AspNet.Identity;
@@ -32,9 +31,6 @@ namespace CalDav_Services.Controllers
         public CalDavController(ICalDav repoCalDav)
         {
             CalDavRepository = repoCalDav;
-            string body = "";
-            
-          
         }
 
         #region
@@ -360,22 +356,22 @@ namespace CalDav_Services.Controllers
             return reader.ReadToEnd();
         }
 
-        [AcceptVerbs("Initialize")]
-        public void InitialiseDb()
-        {
-            Response.StatusCode = (int)HttpStatusCode.NoContent;
-            var fs = new FileSystemManagement();
-            SqlMock.RecreateDb();
+        //[AcceptVerbs("Initialize")]
+        //public void InitialiseDb()
+        //{
+        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
+        //    var fs = new FileSystemManagement();
+        //    SqlMock.RecreateDb();
 
-            SqlMock.SeedDb_Fs();
-        }
+        //    SqlMock.SeedDb_Fs();
+        //}
 
-        [AcceptVerbs("Destroy")]
-        public void DestroyDb()
-        {
-            Response.StatusCode = (int)HttpStatusCode.NoContent;
-            SqlMock.RecreateDb();
-        }
+        //[AcceptVerbs("Destroy")]
+        //public void DestroyDb()
+        //{
+        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
+        //    SqlMock.RecreateDb();
+        //}
 
         private string GetPrincipalUrlFromUrl(string url, string collectionName)
         {

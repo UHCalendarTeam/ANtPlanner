@@ -21,7 +21,7 @@ namespace CalDAV.Core
         /// <param name="body"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        Task PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method PROPPATCH

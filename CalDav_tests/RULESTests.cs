@@ -508,7 +508,6 @@ namespace CalDav_tests
                 startTime.Value,
                 startTime.Value.AddDays(13)
             };
-            DateTime? otherDT;
 
             /*"19971029T090000".ToDateTime(out otherDT);
             expected.Add(otherDT.Value);
@@ -760,8 +759,7 @@ namespace CalDav_tests
             {
                 startTime.Value
             };
-            DateTime? otherDT;
-
+           
             expected.Add(expected.First().AddDays(100 - 1));
             expected.Add(expected.First().AddDays(200 - 1));
 
@@ -958,7 +956,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
 
             for (var year = 1997; year < 2000; year++)
@@ -993,7 +990,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
 
             for (var year = 1998; year < 2001; year++)
@@ -1030,7 +1026,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             var daysOfWeek = recur.ByDays.Select(x => x.DayOfWeek);
             for (var year = dt.Value.Year; year < dt.Value.Year + 10; year++)
@@ -1068,7 +1063,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
@@ -1114,7 +1108,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
@@ -1151,7 +1144,6 @@ namespace CalDav_tests
             var expected = new List<DateTime>();
             DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
-            IEnumerable<DayOfWeek> daysOfWeek = null;
 
             "19970902T090000".ToDateTime(out otherDT);
             expected.Add(otherDT.Value);
@@ -1183,7 +1175,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
@@ -1219,7 +1210,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)
@@ -1254,7 +1244,6 @@ namespace CalDav_tests
 
             recurs.Add(recur);
             var expected = new List<DateTime>();
-            DateTime? otherDT;
             var cal = CultureInfo.InvariantCulture.Calendar;
             IEnumerable<DayOfWeek> daysOfWeek = null;
             if (recur.ByDays != null)

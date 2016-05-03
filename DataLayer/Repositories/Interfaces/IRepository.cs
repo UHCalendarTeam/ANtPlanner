@@ -25,7 +25,7 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        IList<Property> GetAllProperties(TPk url);
+        Task<IList<Property>> GetAllProperties(TPk url);
 
         /// <summary>
         /// Returns the property that match the given 
@@ -34,13 +34,13 @@ namespace DataLayer.Repositories
         /// <param name="url"></param>
         /// <param name="propertyNameandNs"></param>
         /// <returns></returns>
-        Property GetProperty(TPk url, KeyValuePair<string, string> propertyNameandNs);
+        Task<Property> GetProperty(TPk url, KeyValuePair<string, string> propertyNameandNs);
 
         /// <summary>
         /// Returns all the properties
         /// </summary>
         /// <returns></returns>
-        IList<KeyValuePair<string, string>> GetAllPropname(TPk url);
+        Task<IList<KeyValuePair<string, string>>> GetAllPropname(TPk url);
 
         /// <summary>
         /// Remove a property with the given name and namespace.
@@ -48,7 +48,7 @@ namespace DataLayer.Repositories
         /// <param name="url">The object's identifier</param>
         /// <param name="propertyNameNs">The property name and namespace.</param>
         /// <param name="errorStack">The error stack.</param>
-        bool RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
+        Task<bool> RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack );
 
         /// <summary>
         /// Create a modify a property
@@ -60,7 +60,7 @@ namespace DataLayer.Repositories
         /// <param name="errorStack"></param>
         /// <param name="adminPrivilege"></param>
         /// <returns></returns>
-        bool CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
+        Task<bool> CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege);
 
         Task<int> SaveChangeAsync();
 

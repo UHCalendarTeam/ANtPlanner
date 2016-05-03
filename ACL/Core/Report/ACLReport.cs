@@ -143,12 +143,16 @@ namespace ACL.Core
             //var colResources = col.CalendarResources.Where(x=>x.)
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, HttpResponse response)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             throw new NotImplementedException();
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task PrincipalSearchPropertySet(HttpResponse response)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             throw new NotImplementedException();
         }

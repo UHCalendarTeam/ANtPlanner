@@ -9,7 +9,7 @@ namespace ACL.Core.Authentication
     /// Defines the methods for the communication between the
     /// client and the UH's authentication api.
     /// </summary>
-    public interface IAuthenticate :IDisposable
+    public interface IAuthenticate
     {
         /// <summary>
         /// Take the request from the client and

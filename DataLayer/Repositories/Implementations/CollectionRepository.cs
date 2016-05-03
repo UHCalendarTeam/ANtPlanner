@@ -7,7 +7,7 @@ using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
 {
-    public class CollectionRepository : IRepository<CalendarCollection, string>, IDisposable
+    public class CollectionRepository : IRepository<CalendarCollection, string>
     {
         private readonly CalDavContext _context;
 
@@ -17,7 +17,9 @@ namespace DataLayer.Repositories
         }
 
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IList<CalendarCollection>> GetAll()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             throw new NotImplementedException();
         }
@@ -56,31 +58,31 @@ namespace DataLayer.Repositories
             return await _context.CalendarCollections.AnyAsync(c => c.Url == url);
         }
 
-        public IList<Property> GetAllProperties(string url)
+        public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var collection = Get(url).Result;
+            var collection =await Get(url);
 
             return collection?.Properties.Where(p => p.IsVisible).ToList();
         }
 
-        public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
+        public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var collection = Get(url).Result;
+            var collection =await Get(url);
 
             var property = string.IsNullOrEmpty(propertyNameandNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
 
             return property;
         }
 
-        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
+        public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var collection = Get(url).Result;
-            return collection?.Properties.Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace)).ToList();
+            var collection =await Get(url);
+            return collection?.Properties.ToList().Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace)).ToList();
         }
 
-        public  bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async  Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var collection =  Get(url).Result;
+            var collection =await  Get(url);
             var property = string.IsNullOrEmpty(propertyNameNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
             if (property == null)
                 return true;
@@ -93,9 +95,9 @@ namespace DataLayer.Repositories
             return true;
         }
 
-        public  bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
+        public async  Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
         {
-            var collection =  Get(url).Result;
+            var collection =await  Get(url);
             //get the property
             var property =
                 collection.Properties
@@ -137,9 +139,6 @@ namespace DataLayer.Repositories
         }        
         
 
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
+       
     }
 }

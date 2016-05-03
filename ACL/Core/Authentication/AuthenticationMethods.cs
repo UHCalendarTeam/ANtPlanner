@@ -54,10 +54,10 @@ namespace ACL.Core.Authentication
                 var password = credentials.Value;
 
                 //check if the user exist in our DB
-                if (_principalRepository.ExistByStringIs(username).Result)
+                if (await _principalRepository.ExistByStringIs(username))
                 {
                     // if does then check if can authenticate
-                    if (_principalRepository.VerifyPassword(username, password))
+                    if (await _principalRepository.VerifyPassword(username, password))
                     {
                         Console.WriteLine($"------Current user {username} is authenticated");
                     }
@@ -78,7 +78,7 @@ namespace ACL.Core.Authentication
                     // the users automatically in the system.
                     // TODO: check if is a student or teacher
 
-                   principal = _principalRepository.CreateUserInSystem(username, username, password);
+                   principal =  _principalRepository.CreateUserInSystem(username, username, password);
                    
                     Console.WriteLine($"------Created user with username: {username}");
 
@@ -118,7 +118,7 @@ namespace ACL.Core.Authentication
                 }
 
                 //take the principal from our system
-                principal = _principalRepository.GetByIdentifier(principalStringId);
+                principal =await _principalRepository.GetByIdentifier(principalStringId);
                 //check if the cookies match
                 var principalSesison = principal.SessionId;
                 if (!VerifySessionCookies(principalSesison, cookieValue))
@@ -133,6 +133,7 @@ namespace ACL.Core.Authentication
 
             //set the cookie for the response.
             cookieValue = Guid.NewGuid().ToString();
+            principal =await _principalRepository.GetByIdentifier(username);
             httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
             await _principalRepository.SetCookie(username, cookieValue);
 
@@ -240,9 +241,10 @@ namespace ACL.Core.Authentication
 
             var username = usernamePassword.Substring(0, seperatorIndex);
             var password = usernamePassword.Substring(seperatorIndex + 1);
-            return new KeyValuePair<string, string>(username, password);
+            return await Task.FromResult(new KeyValuePair<string, string>(username, password));
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
         ///     Take the credential from the Digest authorization
         ///     that comes in the request from the client.
@@ -250,11 +252,13 @@ namespace ACL.Core.Authentication
         /// <param name="digestAuthorizationString"></param>
         /// <returns>The username and password</returns>
         private async Task<KeyValuePair<string, string>> TakeCredentionFromDigest(string digestAuthorizationString)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //TODO: implement this
             throw new NotImplementedException("The Digest Authorization is not supported in UhCalendar system.");
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
         ///     Set in the response the 401 - Unauthorized
         ///     and add a message to the response body.
@@ -262,16 +266,15 @@ namespace ACL.Core.Authentication
         /// <param name="httpContext"></param>
         /// <returns></returns>
         private async Task SetUnauthorizedRequest(HttpContext httpContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
             httpContext.Response.Headers["WWW-Authenticate"] = "Basic realm=\"UHCalendar\"";
+            
         }
 
         #endregion
 
-        public void Dispose()
-        {
-            //_context.Dispose();
-        }
+       
     }
 }

@@ -59,14 +59,14 @@ namespace CalDav_tests
         /// Testing the password verification
         /// </summary>
         [Fact]
-        public void UnitTest3()
+        public async Task UnitTest3()
         {
             using (var context = new CalDavContext())
             {
                 var prinRepository = new PrincipalRepository(context);
            
 
-                var result = prinRepository.VerifyPassword(_email, _password);
+                var result = await prinRepository.VerifyPassword(_email, _password);
 
                 Assert.True(result);
             }
@@ -192,11 +192,11 @@ namespace CalDav_tests
         }
 
 
-        [Fact]
-        public void UnitTest10()
-        {
-            DataLayer.SqlMock.SeedDb_Fs();
-        }
+        //[Fact]
+        //public void UnitTest10()
+        //{
+        //    DataLayer.SqlMock.SeedDb_Fs();
+        //}
 
        
     }

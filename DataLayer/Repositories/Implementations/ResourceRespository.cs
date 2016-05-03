@@ -7,7 +7,7 @@ using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
 {
-    public class ResourceRespository : IRepository<CalendarResource, string>, IDisposable
+    public class ResourceRespository : IRepository<CalendarResource, string>
     {
         private readonly CalDavContext _context;
 
@@ -53,18 +53,19 @@ namespace DataLayer.Repositories
 
         public async Task<bool> Exist(string url)
         {
-            return await _context.CalendarResources.AnyAsync(r => r.Href == url);
+            return await Task.FromResult(_context.CalendarResources.Any(r => r.Href == url));
         }
 
-        public IList<Property> GetAllProperties(string url)
+        public async Task<IList<Property>> GetAllProperties(string url)
         {
-            var resource = Get(url).Result;
+            var resource =await Get(url);
             return resource?.Properties.ToList();
+            
         }
 
-        public Property GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
+        public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var resource = Get(url).Result;
+            var resource = await Get(url);
             Property property;
 
             if (string.IsNullOrEmpty(propertyNameandNs.Value))
@@ -73,37 +74,37 @@ namespace DataLayer.Repositories
             else
                 property = resource.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameandNs.Key);
-            return property;
+            return await Task.FromResult(property);
         }
 
-        public IList<KeyValuePair<string, string>> GetAllPropname(string url)
+        public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var resource = Get(url).Result;
+            var resource = await Get(url);
             return
-                resource.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                resource.Properties.ToList().Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
                     .ToList();
         }
 
-        public bool RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var resource = Get(url).Result;
-            var property = GetProperty(url, propertyNameNs);
+            var resource =await Get(url);
+            var property =await GetProperty(url, propertyNameNs);
 
             if (property == null)
-                return false;
+                return await Task.FromResult(false);
             if (property.IsDestroyable)
             {
                 resource.Properties.Remove(property);
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
-        public bool CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var resource = Get(url).Result;
+            var resource =await Get(url);
 
-            var propperty = GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
+            var propperty =await GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
 
             //if the property is null then create it
             if (propperty == null)
@@ -122,7 +123,7 @@ namespace DataLayer.Repositories
                 }
             }
 
-            return true;
+            return await Task.FromResult(true);
         }
         
         public Task<bool> ExistByStringIs(string identifier)
@@ -135,9 +136,6 @@ namespace DataLayer.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
+       
     }
 }

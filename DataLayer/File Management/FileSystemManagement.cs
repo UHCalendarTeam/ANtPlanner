@@ -128,7 +128,6 @@ namespace DataLayer
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
-            calendarObjectResources = new Dictionary<string, string>();
             if (!Directory.Exists(path))
                 return false;
             var filesPath = Directory.EnumerateFiles(path);

@@ -14,7 +14,7 @@ namespace CalDav_Services.Middlewares
     /// Till now the only authentication schema that the system
     /// supports is Basic.
     /// </summary>
-    public class AuthorizationMiddleware:IDisposable
+    public class AuthorizationMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
@@ -43,9 +43,6 @@ namespace CalDav_Services.Middlewares
             _logger.LogInformation("Finished handling request.");
         }
 
-        public void Dispose()
-        {
-            _authenticate.Dispose();
-        }
+     
     }
 }
