@@ -26,7 +26,7 @@ namespace DataLayer.Repositories
                  .FirstOrDefault(r => r.Href == url);
         }
 
-        public async Task Add(CalendarResource entity)
+        public void Add(CalendarResource entity)
         {
             _context.CalendarResources.Add(entity);
             //await _context.SaveChangesAsync();

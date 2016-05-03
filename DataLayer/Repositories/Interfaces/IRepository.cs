@@ -10,7 +10,7 @@ namespace DataLayer.Repositories
     {
         Task<IList<TEnt>> GetAll();
         Task<TEnt> Get(TPk url);
-        Task Add(TEnt entity);
+        void Add(TEnt entity);
         Task Remove(TEnt entity);
 
         Task Remove(TPk url);
