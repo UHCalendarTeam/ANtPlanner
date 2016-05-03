@@ -163,7 +163,7 @@ namespace CalDAV.Core
             {
                 await PropFindMethods.AllPropMethod(url, calendarResourceId, depth, null, responseTree);
 
-                 response.Body.Write(responseTree.ToString());
+                await response.WriteAsync(responseTree.ToString());
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace CalDAV.Core
             var responseText = responseTree.ToString();
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             response.ContentLength = responseBytes.Length;
-            response.Body.Write(responseBytes, 0, responseBytes.Length);
+            await response.WriteAsync(responseText);
         }
 
         /// <summary>
