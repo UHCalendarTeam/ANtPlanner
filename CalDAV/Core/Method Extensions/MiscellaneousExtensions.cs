@@ -16,7 +16,7 @@ namespace CalDAV.Core.Method_Extensions
         }
 
         /// <summary>
-        /// Remove the base url from the requested url. (i.e:http://...com/api/v1/caldav/)
+        ///     Remove the base url from the requested url. (i.e:http://...com/api/v1/caldav/)
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -29,12 +29,14 @@ namespace CalDAV.Core.Method_Extensions
         }
 
         /// <summary>
-        /// FOr the ACL PROFINDs the principalId is included
-        /// in the url. Takes the principalId from it.
+        ///     FOr the ACL PROFINDs the principalId is included
+        ///     in the url. Takes the principalId from it.
         /// </summary>
         /// <param name="context"></param>
-        /// <returns>Returns the PrincipalStringIdentifier. If the principal represents
-        /// a user then returns the name of the groups, otherwise returns the email.</returns>
+        /// <returns>
+        ///     Returns the PrincipalStringIdentifier. If the principal represents
+        ///     a user then returns the name of the groups, otherwise returns the email.
+        /// </returns>
         public static string TakePrincipalIdFromUrl(this HttpContext context)
         {
             var url = context.Request.GetRealUrl();
@@ -42,7 +44,6 @@ namespace CalDAV.Core.Method_Extensions
 
             var output = url.Substring(index + 1);
             return output;
-
         }
     }
 }

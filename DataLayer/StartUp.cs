@@ -70,7 +70,7 @@
 //                    }
 //                    //Calendardescription = calendarDescription==""?"This is a desfault calendar collection. Should provide the calendar description":calendarDescription,
 //                    //Displayname = calDisplayName
-                    
+
 //                    //TODO: take the other properties from the class that is gonna contain the 
 //                    //custom properties of the collections
 //                };
@@ -82,3 +82,4 @@
 //        }
 //    }
 //}
+

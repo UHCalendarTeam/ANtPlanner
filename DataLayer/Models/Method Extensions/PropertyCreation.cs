@@ -6,12 +6,11 @@ using TreeForXml;
 namespace DataLayer
 {
     /// <summary>
-    /// Contains useful methods for the creation 
-    /// of different properties
+    ///     Contains useful methods for the creation
+    ///     of different properties
     /// </summary>
     public static class PropertyCreation
     {
-
         private static readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
             {"D", @"xmlns:D=""DAV:"""},
@@ -26,7 +25,7 @@ namespace DataLayer
 
         /// <summary>
         ///     Create and return a DAV:group-membership property.
-        ///  This protected property identifies the groups in 
+        ///     This protected property identifies the groups in
         ///     which the principal is directly a member.
         /// </summary>
         /// <param name="groupHref"></param>
@@ -57,16 +56,21 @@ namespace DataLayer
         }
 
         /// <summary>
-        ///  Create the c:calendar-home-set property
+        ///     Create the c:calendar-home-set property
         ///     THis property says where to find the principal's calendars.
         /// </summary>
-        /// <param name="pType">Says if the principal is gonna represents
-        /// a user or a group </param>
-        /// <param name="principalId">If the principal represents a group then send
-        /// the name of the group, otherwise send the email of the user</param>
+        /// <param name="pType">
+        ///     Says if the principal is gonna represents
+        ///     a user or a group
+        /// </param>
+        /// <param name="principalId">
+        ///     If the principal represents a group then send
+        ///     the name of the group, otherwise send the email of the user
+        /// </param>
         /// <param name="calName">THe name of the calendar to be added in the url.</param>
         /// <returns></returns>
-        public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId, string calName)
+        public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId,
+            string calName)
         {
             var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
@@ -77,8 +81,8 @@ namespace DataLayer
         }
 
         /// <summary>
-        /// Create the DAV:owner property for the collections
-        /// and resources
+        ///     Create the DAV:owner property for the collections
+        ///     and resources
         /// </summary>
         /// <param name="ownerHref">The owner href value.</param>
         /// <returns></returns>
@@ -95,7 +99,7 @@ namespace DataLayer
         }
 
         /// <summary>
-        /// Create a property instance with the given values
+        ///     Create a property instance with the given values
         /// </summary>
         /// <param name="nodeName">The name for the node. ej:displayname</param>
         /// <param name="nodePrefix">The ns prefix of the node. ej: the prefix of DAV: is D, so pass D</param>
@@ -105,7 +109,7 @@ namespace DataLayer
         /// <param name="isVisible">Says if the property is visible.</param>
         /// <returns></returns>
         public static Property CreateProperty(string nodeName, string nodePrefix, string nodeValue,
-            bool isDetr=true, bool isMutable=true, bool isVisible = true)
+            bool isDetr = true, bool isMutable = true, bool isVisible = true)
         {
             var xmlValue = $"<{nodePrefix}:{nodeName} {Namespaces[nodePrefix]}>{nodeValue}</{nodePrefix}:{nodeName}>";
             return new Property(nodeName, NamespacesSimple[nodePrefix])
@@ -118,9 +122,9 @@ namespace DataLayer
         }
 
         /// <summary>
-        /// Create the protected property DAV:supported-privilege-set
-        /// This is a protected property that identifies the privileges 
-        /// defined for the resource.
+        ///     Create the protected property DAV:supported-privilege-set
+        ///     This is a protected property that identifies the privileges
+        ///     defined for the resource.
         /// </summary>
         /// <returns></returns>
         public static Property CreateSupportedPrivilegeSetForResources()
@@ -196,9 +200,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create the DAV:acl property.
-        /// THis is the default acl property for the collections  
-        /// that its owner is a user.
+        ///     Create the DAV:acl property.
+        ///     THis is the default acl property for the collections
+        ///     that its owner is a user.
         /// </summary>
         /// <param name="principalUrl">The principalUrl that is the owner of the collection</param>
         public static Property CreateAclPropertyForUserCollections(string principalUrl)
@@ -208,10 +212,12 @@ namespace DataLayer
                 IsVisible = true,
                 IsMutable = false,
                 IsDestroyable = false,
-                Value = $@"<D:acl xmlns:D=""DAV:"">
+                Value =
+                    $@"<D:acl xmlns:D=""DAV:"">
 <D:ace>
 <D:principal>
-<D:href>{principalUrl}</D:href>
+<D:href>{principalUrl
+                        }</D:href>
 </D:principal>
 <D:grant>
 <D:privilege><D:write></D:write></D:privilege>
@@ -226,9 +232,9 @@ namespace DataLayer
 
 
         /// <summary>
-        /// Create the DAV:acl property.
-        /// THis is the default acl property for 
-        /// the collections  that its owner is a group.
+        ///     Create the DAV:acl property.
+        ///     THis is the default acl property for
+        ///     the collections  that its owner is a group.
         /// </summary>
         /// <param name="editorUrl">The principalUrl that is editor in the system</param>
         public static Property CreateAclPropertyForGroupCollections(string editorUrl)
@@ -238,10 +244,12 @@ namespace DataLayer
                 IsVisible = true,
                 IsMutable = false,
                 IsDestroyable = false,
-                Value = $@"<D:acl xmlns:D=""DAV"">
+                Value =
+                    $@"<D:acl xmlns:D=""DAV"">
 	<D:ace>
 		<D:principal>
-			<D:href>{editorUrl}</D:href>
+			<D:href>{editorUrl
+                        }</D:href>
 		</D:principal>
 		<D:grant>
 			<D:privilege><D:write/></D:privilege>
@@ -269,12 +277,14 @@ namespace DataLayer
         }
 
         /// <summary>
-        /// Create the DAV:current-user-principal.
-        /// If not principalUrl is provided means that the 
-        /// user is not authenticated.
+        ///     Create the DAV:current-user-principal.
+        ///     If not principalUrl is provided means that the
+        ///     user is not authenticated.
         /// </summary>
-        /// <param name="principal">The current principal url, or nothing if the principal is not
-        /// authenticated.</param>
+        /// <param name="principal">
+        ///     The current principal url, or nothing if the principal is not
+        ///     authenticated.
+        /// </param>
         /// <returns></returns>
         public static IXMLTreeStructure CreateCurrentUserPrincipal(Principal principal)
         {
@@ -288,29 +298,26 @@ namespace DataLayer
                 {
                     Value = principal.PrincipalURL
                 };
-            
+
             else
                 href = new XmlTreeStructure("unauthenticated", "DAV:");
             output.AddChild(href);
-            return href;
+            return output;
         }
 
+        //}
+        //    var xml = XDocument.Parse(property.Value);
+        //{
+        //public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
+        // <returns></returns>
+        // <param name="ns"></param>
+        // <param name="nodeName"></param>
+        // <param name="nodeValue"></param>
+        // <param name="property"></param>
+        // </summary>
+        // Add a single node to this property
 
-
-
-        
 
         // <summary>
-        // Add a single node to this property
-        // </summary>
-        // <param name="property"></param>
-        // <param name="nodeValue"></param>
-        // <param name="nodeName"></param>
-        // <param name="ns"></param>
-        // <returns></returns>
-        //public static bool AddNodeToProperty(this Property property, string nodeValue,string nodeName, string ns)
-        //{
-        //    var xml = XDocument.Parse(property.Value);
-        //}
     }
 }

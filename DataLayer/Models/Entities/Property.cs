@@ -78,9 +78,5 @@ namespace DataLayer.Models.Entities
         public Principal Principal { get; set; }
 
         #endregion
-
-
-
-
     }
 }

@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
 {
     public class GetPoscondition : IPoscondition
     {
-        public GetPoscondition(DbContext db, IFileSystemManagement fs)
+        private readonly ResourceRespository _resourceRespository;
+
+        public GetPoscondition(IRepository<CalendarResource, string> resourceRepository, IFileSystemManagement fs)
         {
-            Db = db;
+            _resourceRespository = resourceRepository as ResourceRespository;
             Fs = fs;
         }
 
         public IFileSystemManagement Fs { get; }
-        public DbContext Db { get; }
 
-        public bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             throw new NotImplementedException();
         }

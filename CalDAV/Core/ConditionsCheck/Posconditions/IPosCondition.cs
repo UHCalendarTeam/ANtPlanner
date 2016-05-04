@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
 {
     internal interface IPoscondition
     {
         IFileSystemManagement Fs { get; }
-        DbContext Db { get; }
 
         /// <summary>
         ///     Checks that all postconditions passed.
@@ -16,6 +15,6 @@ namespace CalDAV.Core.ConditionsCheck
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        bool PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 
 namespace CalDAV.Core.ConditionsCheck
@@ -11,6 +12,6 @@ namespace CalDAV.Core.ConditionsCheck
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
     }
 }

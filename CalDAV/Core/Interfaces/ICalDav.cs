@@ -21,7 +21,7 @@ namespace CalDAV.Core
         /// <param name="body"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        void PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        Task PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method PROPPATCH
@@ -30,7 +30,7 @@ namespace CalDAV.Core
         /// <param name="Body"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        void PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
+        Task PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method REPORT for Calendar Collections
@@ -52,14 +52,14 @@ namespace CalDAV.Core
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
-        bool DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         ///     CalDav & WebDav Method for delete a Collection
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
         /// <param name="response"></param>
-        bool DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
 
         /// <summary>
         ///     CalDav HTTP Method Get for a COR

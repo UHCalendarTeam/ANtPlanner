@@ -1,19 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using DataLayer;
+using System.Threading.Tasks;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 
 namespace CalDAV.Core.ConditionsCheck.Preconditions
 {
-    public class PropfindPrecondition:IPrecondition
+    public class PropfindPrecondition : IPrecondition
     {
-        private CalDavContext db { get; }
+        private readonly CollectionRepository _collectionRepository;
+        private readonly ResourceRespository _resourceRespository;
 
-        public PropfindPrecondition(CalDavContext context)
+        public PropfindPrecondition(IRepository<CalendarCollection, string> collectionRepository,
+            IRepository<CalendarResource, string> resourceRepository)
         {
-            db = context;
+            _collectionRepository = collectionRepository as CollectionRepository;
+            _resourceRespository = resourceRepository as ResourceRespository;
         }
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+
+
+        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             string calendarResourceId;
             propertiesAndHeaders.TryGetValue("calendarResourceID", out calendarResourceId);
@@ -21,14 +28,14 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
-            if (calendarResourceId == null && !db.CollectionExist(url))
+            if (calendarResourceId == null && !await _collectionRepository.Exist(url))
             {
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (calendarResourceId !=null && !db.CalendarResourceExist(url))
+            if (calendarResourceId != null && !await _resourceRespository.Exist(url))
             {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
             return true;

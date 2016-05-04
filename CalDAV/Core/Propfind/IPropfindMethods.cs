@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using TreeForXml;
 
@@ -15,7 +16,8 @@ namespace CalDAV.Core.Propfind
         /// <param name="aditionalProperties">Properties contained in the include xml if any</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void AllPropMethod(string url, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree);
+        Task AllPropMethod(string url, string calendarResourceId, int? depth,
+            List<KeyValuePair<string, string>> aditionalProperties, XmlTreeStructure multistatusTree);
 
         /// <summary>
         ///     Returns the value of the specified properties.
@@ -26,7 +28,8 @@ namespace CalDAV.Core.Propfind
         /// <param name="propertiesReq">List with all the properties to retrieve</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void PropMethod(string url, string calendarResourceId, int? depth, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);
+        Task PropMethod(string url, string calendarResourceId, int? depth,
+            List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);
 
         /// <summary>
         ///     Returns the name of all the properties of a collection.
@@ -36,6 +39,6 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
-        void PropNameMethod(string url, string calendarResourceId,  int? depth, XmlTreeStructure multistatusTree);
+        Task PropNameMethod(string url, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
     }
 }

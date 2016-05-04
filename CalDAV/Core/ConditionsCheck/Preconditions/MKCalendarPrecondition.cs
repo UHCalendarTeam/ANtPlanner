@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 using TreeForXml;
 
@@ -9,31 +12,35 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class MKCalendarPrecondition : IPrecondition
     {
-        public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement, CalDavContext context)
+        private readonly CollectionRepository _collectionRepository;
+
+        public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement,
+            IRepository<CalendarCollection, string> collectionRepository)
         {
             fs = fileSystemManagement;
-            db = context;
+            _collectionRepository = collectionRepository as CollectionRepository;
         }
 
         public IFileSystemManagement fs { get; }
-        public CalDavContext db { get; }
 
-        public bool PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+
+        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             var body = propertiesAndHeaders["body"];
             var url = propertiesAndHeaders["url"];
 
             #endregion
 
-            if (fs.ExistCalendarCollection(url) || db.CollectionExist(url))
+            if (fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))
             {
-                response.StatusCode = (int)HttpStatusCode.Forbidden;
+                response.StatusCode = (int) HttpStatusCode.Forbidden;
                 response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
   <resource-must-be-null/>  
 </error>");
-                
+
                 return false;
             }
 

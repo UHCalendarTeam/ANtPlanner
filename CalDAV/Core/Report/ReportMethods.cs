@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
+using DataLayer.Repositories;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
 using TreeForXml;
@@ -20,11 +20,11 @@ namespace CalDAV.Core
     /// </summary>
     public class CollectionReport : ICollectionReport
     {
-        private readonly CalDavContext _context;
+        public readonly ResourceRespository _resourceRepository;
 
-        public CollectionReport(CalDavContext context)
+        public CollectionReport(IRepository<CalendarResource, string> resRepository)
         {
-            _context = context;
+            _resourceRepository = resRepository as ResourceRespository;
         }
 
         public string ExpandProperty()
@@ -155,14 +155,13 @@ namespace CalDAV.Core
                     var propstatNode = new XmlTreeStructure("propstat", "DAV:");
 
                     //that the requested data
-                    var propStats = ProccessPropNode(calDataNode, resource);
+                    var propStats = await ProccessPropNode(calDataNode, resource);
 
 
                     foreach (var propStat in propStats)
                     {
-                         responseNode.AddChild(propStat);
+                        responseNode.AddChild(propStat);
                     }
-                   
                 }
 
                 multistatusNode.AddChild(responseNode);
@@ -200,7 +199,7 @@ namespace CalDAV.Core
             {
                 var fs = new FileSystemManagement();
 
-                var resourceContent = fs.GetCalendarObjectResource(href).Result;
+                var resourceContent = await fs.GetCalendarObjectResource(href);
 
                 result.Add(href, resourceContent);
             }
@@ -223,7 +222,7 @@ namespace CalDAV.Core
         /// </param>
         /// <param name="resource">The calendar where to extract the data.</param>
         /// <returns>Return the prop node that contains the requested data</returns>
-        private List<IXMLTreeStructure> ProccessPropNode(IXMLTreeStructure incomPropNode,
+        private async Task<List<IXMLTreeStructure>> ProccessPropNode(IXMLTreeStructure incomPropNode,
             KeyValuePair<string, VCalendar> resource)
         {
             var output = new List<IXMLTreeStructure>();
@@ -232,7 +231,7 @@ namespace CalDAV.Core
             var resPropertiesNotExist = new List<XmlTreeStructure>();
 
             var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
-            var calResource = _context.GetCalendarResource(href);
+            var calResource = _resourceRepository.Get(href);
 
             foreach (var prop in incomPropNode.Children)
             {
@@ -254,16 +253,17 @@ namespace CalDAV.Core
                     //if not try to take the property from the resource's properties
                     default:
                         var currentProperty = calResource.Properties.FirstOrDefault(p => p.Name == prop.NodeName);
-                        currentPropNode.AddValue(currentProperty != null ? currentProperty.PropertyRealValue():"");
-                        if(currentProperty != null)
+                        currentPropNode.AddValue(currentProperty != null ? currentProperty.PropertyRealValue() : "");
+                        if (currentProperty != null)
                             resPropertiesOk.Add(currentPropNode);
-                        else 
+                        else
                             resPropertiesNotExist.Add(currentPropNode);
                         break;
                 }
-               
             }
+
             #region Adding nested propOK
+
             //This procedure has been explained in another method.
             //Here the retrieve properties are grouped.
 
@@ -277,6 +277,7 @@ namespace CalDAV.Core
             }
 
             propstatOK.AddChild(propOk);
+
             #endregion
 
             #region Adding nested status OK
@@ -288,6 +289,7 @@ namespace CalDAV.Core
             #endregion
 
             #region Adding nested propWrong
+
             //Here the properties that could not be retrieved are grouped.
             var propstatWrong = new XmlTreeStructure("propstat", "DAV:");
             var propWrong = new XmlTreeStructure("prop", "DAV:");
@@ -299,6 +301,7 @@ namespace CalDAV.Core
             }
 
             propstatWrong.AddChild(propWrong);
+
             #endregion
 
             #region Adding nested status Not Found
@@ -310,6 +313,7 @@ namespace CalDAV.Core
             #endregion
 
             #region Adding responseDescription when wrong
+
             //Here i add an description for explain the errors.
             //This should be aplied in all method with an similar structure but for the moment is only used here.
             //However this is not required. 
@@ -319,10 +323,10 @@ namespace CalDAV.Core
 
             #endregion
 
-            if(resPropertiesOk.Any())
-                 output.Add(propstatOK);
-            if(resPropertiesNotExist.Any())
-                 output.Add(propstatWrong);
+            if (resPropertiesOk.Any())
+                output.Add(propstatOK);
+            if (resPropertiesNotExist.Any())
+                output.Add(propstatWrong);
 
             return output;
         }

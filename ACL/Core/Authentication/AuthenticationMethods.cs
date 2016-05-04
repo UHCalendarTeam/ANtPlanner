@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DataLayer;
-using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
+using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 
 namespace ACL.Core.Authentication
 {
-    public class UhCalendarAuthentication : IAuthenticate, IDisposable
+    public class UhCalendarAuthentication : IAuthenticate
     {
-        private readonly CalDavContext _context;
+        private readonly PrincipalRepository _principalRepository;
 
         /// <summary>
         ///     Injects an instance of CaldavContext
         /// </summary>
         /// <param name="context"></param>
-        public UhCalendarAuthentication(CalDavContext context)
+        public UhCalendarAuthentication(IRepository<Principal, string> principalRepository)
         {
-            _context = context;
+            _principalRepository = principalRepository as PrincipalRepository;
         }
 
 
@@ -34,115 +31,186 @@ namespace ACL.Core.Authentication
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        public async Task<Principal> AuthenticateRequest(HttpContext httpContext)
+        public async Task<Principal> AuthenticateRequestAsync(HttpContext httpContext)
         {
             var username = "";
-            Principal principal;
+            Principal principal = null;
             string cookieValue;
 
             //take the creadentials from the request
-
-            #region take the authorization header and proccess it
-
             string authHeader = httpContext.Request.Headers["Authorization"];
-            //check if has the authorization header and is basic
+
             if (!string.IsNullOrEmpty(authHeader))
             {
-                var credentials = TakeCreadential(authHeader).Result;
+                var credentials = TakeCreadential(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
-
+                principal = _principalRepository.GetByIdentifier(username);
                 //check if the user exist in our DB
-                if (_context.Principals.Any(p => p.PrincipalStringIdentifier == username))
+                if (principal != null)
                 {
                     // if does then check if can authenticate
-                    if (_context.VerifyPassword(username, password))
-                    {
-                        Console.WriteLine($"------Current user {username} is authenticated");
-                    }
-
                     //if the username and password doesnt match then return 401 - Unauthorized
-                    else
+                    if (!_principalRepository.VerifyPassword(principal, password))
                     {
-                        await SetUnauthorizedRequest(httpContext);
+                        SetUnauthorizedRequest(httpContext);
                         return null;
                     }
                 }
 
                 //if the user is new in our system then create him
                 //TODO: change this if dont want the new user automatic creation behavior
-                else
-                {
-                    //Temporaly if the WCF services doesnt work we are gonna create
-                    // the users automatically in the system.
-                    // TODO: check if is a student or teacher
 
-                    _context.CreateUserInSystem(username, username, password);
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine($"------Created user with username: {username}");
+                //Temporaly if the WCF services doesnt work we are gonna create
+                // the users automatically in the system.
+                // TODO: check if is a student or teacher
 
-                    //TODO: change to this when work the WCF service
-                    //var userData = GetUserDataFromUhApi(username);
-                }
+                principal = _principalRepository.CreateUserInSystem(username, username, password);
+
+                Console.WriteLine($"------Created user with username: {username}");
+
+
+                //TODO: change to this when work the WCF service
+                //var userData = GetUserDataFromUhApi(username);
             }
+
+            if (principal != null)
+                return principal;
+
+            #region checking cookies
+
             //if the request doesn't have an Authorization header then
             //ckeck the session cookies.
-            else
-            {
-                //if the request doens't comes with a authorization header
-                // then check if has the cookie provided by us
-                // 
-                if (!httpContext.Request.Cookies.ContainsKey(SystemProperties._cookieSessionName))
-                {
-                    /*
-                    |   if the request neither contains the session cookie nor the
-                    |  Authorization header then the client needs to request
-                    |   the credential to the user. So send a 401
-                    */
-                    await SetUnauthorizedRequest(httpContext);
-                    return null;
-                }
-                //take the cookie that the client send us in the request
-                cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
-                string principalStringId;
-                try
-                {
-                    principalStringId = httpContext.Session.GetString("principalId");
-                }
-                    //if the session doesnt have the principalId means somethind is wrong
-                catch
-                {
-                    await SetUnauthorizedRequest(httpContext);
-                    return null;
-                }
+            //else
+            //{
+            //    //if the request doens't comes with a authorization header
+            //    // then check if has the cookie provided by us
+            //    // 
+            //    if (!httpContext.Request.Cookies.ContainsKey(SystemProperties._cookieSessionName))
+            //    {
+            //        /*
+            //        |   if the request neither contains the session cookie nor the
+            //        |  Authorization header then the client needs to request
+            //        |   the credential to the user. So send a 401
+            //        */
+            //        await SetUnauthorizedRequest(httpContext);
+            //        return null;
+            //    }
+            //    //take the cookie that the client send us in the request
+            //    cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
 
-                //take the principal from our system
-                principal =
-                    _context.Principals.FirstOrDefaultAsync(p => p.PrincipalStringIdentifier == principalStringId)
-                        .Result;
-                //check if the cookies match
-                var principalSesison = principal.SessionId;
-                if (!VerifySessionCookies(principalSesison, cookieValue))
-                {
-                    //if the cookies doesnt match then send back 401
-                    await SetUnauthorizedRequest(httpContext);
-                    return null;
-                }
-            }
+            //    principal =await _principalRepository.GetByCookie(cookieValue);
+            //    if(principal == null)
+            //    {
+            //        await SetUnauthorizedRequest(httpContext);
+            //        return null;
+            //    }
+
+            //}
+
+
+            //set the cookie for the response.
+            //cookieValue = Guid.NewGuid().ToString();
+            //httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
+            //await _principalRepository.SetCookie(username, cookieValue);
 
             #endregion
 
-            //set the cookie for the response.
-            cookieValue = Guid.NewGuid().ToString();
-            httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
-            principal=
-                await
-                    _context.Principals.Include(p => p.Properties)
-                        .FirstOrDefaultAsync(x => x.PrincipalStringIdentifier == username);
-            principal.SessionId = cookieValue;
-            await _context.SaveChangesAsync();
+            SetUnauthorizedRequest(httpContext);
+            return null;
+            //return await Task.FromResult(principal);
+        }
 
-            return await Task.FromResult(principal);
+        /// <summary>
+        ///     Takes the necessary content from the UH's authentication API response.
+        ///     Check if the user exist in the system, if does then check if the authentication
+        ///     credential are OK.
+        ///     If dont then take the user data from UH apis and create the user in the
+        ///     system with this data.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        public Principal AuthenticateRequest(HttpContext httpContext)
+        {
+            Principal principal = null;
+            string cookieValue;
+
+            //take the creadentials from the request
+            string authHeader = httpContext.Request.Headers["Authorization"];
+
+            if (!string.IsNullOrEmpty(authHeader))
+            {
+                var credentials = TakeCreadential(authHeader);
+                var username = credentials.Key;
+                var password = credentials.Value;
+                principal = _principalRepository.GetByIdentifier(username);
+                //check if the user exist in our DB
+                if (principal != null)
+                {
+                    // if does then check if can authenticate
+                    //if the username and password doesnt match then return 401 - Unauthorized
+                    if (!_principalRepository.VerifyPassword(principal, password))
+                    {
+                        SetUnauthorizedRequest(httpContext);
+                        return null;
+                    }
+                }
+                else
+                {
+                    principal = _principalRepository.CreateUserInSystem(username, username, password);
+
+                    Console.WriteLine($"------Created user with username: {username}");
+                }
+
+                //TODO: change to this when work the WCF service
+                //var userData = GetUserDataFromUhApi(username);
+            }
+
+            if (principal != null)
+                return principal;
+
+            #region checking cookies
+
+            //if the request doesn't have an Authorization header then
+            //ckeck the session cookies.
+            //else
+            //{
+            //    //if the request doens't comes with a authorization header
+            //    // then check if has the cookie provided by us
+            //    // 
+            //    if (!httpContext.Request.Cookies.ContainsKey(SystemProperties._cookieSessionName))
+            //    {
+            //        /*
+            //        |   if the request neither contains the session cookie nor the
+            //        |  Authorization header then the client needs to request
+            //        |   the credential to the user. So send a 401
+            //        */
+            //        await SetUnauthorizedRequest(httpContext);
+            //        return null;
+            //    }
+            //    //take the cookie that the client send us in the request
+            //    cookieValue = httpContext.Request.Cookies[SystemProperties._cookieSessionName];
+
+            //    principal =await _principalRepository.GetByCookie(cookieValue);
+            //    if(principal == null)
+            //    {
+            //        await SetUnauthorizedRequest(httpContext);
+            //        return null;
+            //    }
+
+            //}
+
+
+            //set the cookie for the response.
+            //cookieValue = Guid.NewGuid().ToString();
+            //httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
+            //await _principalRepository.SetCookie(username, cookieValue);
+
+            #endregion
+
+            SetUnauthorizedRequest(httpContext);
+            return null;
+            //return await Task.FromResult(principal);
         }
 
 
@@ -220,9 +288,11 @@ namespace ACL.Core.Authentication
         /// </summary>
         /// <param name="authHeader">The header with the credentials</param>
         /// <returns></returns>
-        public async Task<KeyValuePair<string, string>> TakeCreadential(string authHeader)
+        public KeyValuePair<string, string> TakeCreadential(string authHeader)
         {
-            var credentials = authHeader.StartsWith("Basic") ? await TakeCredentionFromBasic(authHeader) : await TakeCredentionFromDigest(authHeader);
+            var credentials = authHeader.StartsWith("Basic")
+                ? TakeCredentionFromBasic(authHeader)
+                : TakeCredentionFromDigest(authHeader);
             return credentials;
         }
 
@@ -236,7 +306,7 @@ namespace ACL.Core.Authentication
         ///     authorization credentials.
         /// </param>
         /// <returns>A KeyValuePair that contains the username and password</returns>
-        private async Task<KeyValuePair<string, string>> TakeCredentionFromBasic(string basicAuthorizationString)
+        private KeyValuePair<string, string> TakeCredentionFromBasic(string basicAuthorizationString)
         {
             var encodedUsernamePassword = basicAuthorizationString.Substring("Basic ".Length).Trim();
             var encoding = Encoding.GetEncoding("iso-8859-1");
@@ -249,17 +319,20 @@ namespace ACL.Core.Authentication
             return new KeyValuePair<string, string>(username, password);
         }
 
+
         /// <summary>
         ///     Take the credential from the Digest authorization
         ///     that comes in the request from the client.
         /// </summary>
         /// <param name="digestAuthorizationString"></param>
         /// <returns>The username and password</returns>
-        private async Task<KeyValuePair<string, string>> TakeCredentionFromDigest(string digestAuthorizationString)
+        private KeyValuePair<string, string> TakeCredentionFromDigest(string digestAuthorizationString)
+
         {
             //TODO: implement this
             throw new NotImplementedException("The Digest Authorization is not supported in UhCalendar system.");
         }
+
 
         /// <summary>
         ///     Set in the response the 401 - Unauthorized
@@ -267,17 +340,12 @@ namespace ACL.Core.Authentication
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        private async Task SetUnauthorizedRequest(HttpContext httpContext)
+        private void SetUnauthorizedRequest(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            httpContext.Response.Headers["WWW-Authenticate"] = "Basic realm=\"UHCalendar\"";
+            httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
         }
 
         #endregion
-
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
     }
 }
