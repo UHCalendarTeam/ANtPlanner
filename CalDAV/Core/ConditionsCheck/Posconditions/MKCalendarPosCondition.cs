@@ -6,25 +6,27 @@ using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 
 namespace CalDAV.Core.ConditionsCheck
 {
     public class MKCalendarPosCondition : IPoscondition
     {
-        public MKCalendarPosCondition(IFileSystemManagement fs, IRepository<CalendarCollection, string> collectionRepository )
+        private readonly CollectionRepository _collectionRepository;
+
+        public MKCalendarPosCondition(IFileSystemManagement fs,
+            IRepository<CalendarCollection, string> collectionRepository)
         {
-           _collectionRepository = collectionRepository as CollectionRepository;
-            
+            _collectionRepository = collectionRepository as CollectionRepository;
+
             Fs = fs;
         }
 
         public IFileSystemManagement Fs { get; }
-        private readonly CollectionRepository _collectionRepository;
 
         public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {
             #region Extracting Properties
+
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 

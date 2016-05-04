@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
@@ -161,9 +160,8 @@ namespace CalDAV.Core
 
                     foreach (var propStat in propStats)
                     {
-                         responseNode.AddChild(propStat);
+                        responseNode.AddChild(propStat);
                     }
-                   
                 }
 
                 multistatusNode.AddChild(responseNode);
@@ -255,16 +253,17 @@ namespace CalDAV.Core
                     //if not try to take the property from the resource's properties
                     default:
                         var currentProperty = calResource.Properties.FirstOrDefault(p => p.Name == prop.NodeName);
-                        currentPropNode.AddValue(currentProperty != null ? currentProperty.PropertyRealValue():"");
-                        if(currentProperty != null)
+                        currentPropNode.AddValue(currentProperty != null ? currentProperty.PropertyRealValue() : "");
+                        if (currentProperty != null)
                             resPropertiesOk.Add(currentPropNode);
-                        else 
+                        else
                             resPropertiesNotExist.Add(currentPropNode);
                         break;
                 }
-               
             }
+
             #region Adding nested propOK
+
             //This procedure has been explained in another method.
             //Here the retrieve properties are grouped.
 
@@ -278,6 +277,7 @@ namespace CalDAV.Core
             }
 
             propstatOK.AddChild(propOk);
+
             #endregion
 
             #region Adding nested status OK
@@ -289,6 +289,7 @@ namespace CalDAV.Core
             #endregion
 
             #region Adding nested propWrong
+
             //Here the properties that could not be retrieved are grouped.
             var propstatWrong = new XmlTreeStructure("propstat", "DAV:");
             var propWrong = new XmlTreeStructure("prop", "DAV:");
@@ -300,6 +301,7 @@ namespace CalDAV.Core
             }
 
             propstatWrong.AddChild(propWrong);
+
             #endregion
 
             #region Adding nested status Not Found
@@ -311,6 +313,7 @@ namespace CalDAV.Core
             #endregion
 
             #region Adding responseDescription when wrong
+
             //Here i add an description for explain the errors.
             //This should be aplied in all method with an similar structure but for the moment is only used here.
             //However this is not required. 
@@ -320,10 +323,10 @@ namespace CalDAV.Core
 
             #endregion
 
-            if(resPropertiesOk.Any())
-                 output.Add(propstatOK);
-            if(resPropertiesNotExist.Any())
-                 output.Add(propstatWrong);
+            if (resPropertiesOk.Any())
+                output.Add(propstatOK);
+            if (resPropertiesNotExist.Any())
+                output.Add(propstatWrong);
 
             return output;
         }

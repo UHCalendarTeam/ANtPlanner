@@ -1,29 +1,29 @@
-﻿using ACL.Interfaces;
-using DataLayer;
-using DataLayer.Models.ACL;
-using DataLayer.Models.Entities;
-using Microsoft.AspNet.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using ACL.Interfaces;
+using DataLayer.Models.ACL;
+using DataLayer.Models.Entities;
 using DataLayer.Repositories;
+using Microsoft.AspNet.Http;
 using TreeForXml;
 
 namespace ACL.Core
 {
     public class ACLReport : IReportMethods
     {
-        private readonly PrincipalRepository _principalRepository;
         private readonly CollectionRepository _collectionRepository;
+        private readonly PrincipalRepository _principalRepository;
         private readonly ResourceRespository _resourceRepository;
 
-        public ACLReport(IRepository<Principal, string> prinRepository,IRepository<CalendarCollection, string> colRepository,
-            IRepository<CalendarResource, string> resRepository )
+        public ACLReport(IRepository<Principal, string> prinRepository,
+            IRepository<CalendarCollection, string> colRepository,
+            IRepository<CalendarResource, string> resRepository)
         {
             _principalRepository = prinRepository as PrincipalRepository;
-            _collectionRepository = _collectionRepository as CollectionRepository;
+            _collectionRepository = _collectionRepository;
             _resourceRepository = resRepository as ResourceRespository;
         }
 
@@ -45,7 +45,7 @@ namespace ACL.Core
             string href = request.Path;
             //TODO: take here the email of the user by calling
             //to the authentication api
-            string userEmail = "";
+            var userEmail = "";
 
             response = null;
             //take the string representation of the body
@@ -55,11 +55,11 @@ namespace ACL.Core
             switch (xmlbody.NodeName)
             {
                 case "acl-principal-prop-set":
-                    await AclPrincipalPropSet(xmlbody,  response);
+                    await AclPrincipalPropSet(xmlbody, response);
                     break;
 
                 case "principal-match":
-                    await PrincipalMatch(xmlbody, userEmail, href,  response);
+                    await PrincipalMatch(xmlbody, userEmail, href, response);
                     break;
 
                 case "principal-property-search":
@@ -83,7 +83,7 @@ namespace ACL.Core
 
             //take the children of the node, these are the proeprties
             var requestedProperties = propNode.Children.Select(x =>
-            new KeyValuePair<string, string>(x.NodeName, x.MainNamespace));
+                new KeyValuePair<string, string>(x.NodeName, x.MainNamespace));
 
             var colUrl = "";
 
@@ -98,14 +98,15 @@ namespace ACL.Core
             var aclXmlProperty = XDocument.Parse(aclProperty.Value);
 
             //take the href of the principals of the property
-            var principalsURLs = aclXmlProperty.Elements("principal").Select(x => x.Descendants("href").FirstOrDefault());
+            var principalsURLs = aclXmlProperty.Elements("principal")
+                .Select(x => x.Descendants("href").FirstOrDefault());
 
             var principals = new Dictionary<Principal, IEnumerable<Property>>();
 
             //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
-                var principal =  _principalRepository.Get(pUrl.Value);
+                var principal = _principalRepository.Get(pUrl.Value);
                 if (principal != null)
                     principals.Add(principal, null);
             }
@@ -128,10 +129,11 @@ namespace ACL.Core
         ///     of the resource with the email of the given principal.
         /// </summary>
         /// <returns></returns>
-        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href,HttpResponse response)
+        public async Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href,
+            HttpResponse response)
         {
             //take the collection with the given href
-            var col =  _collectionRepository.Get(href);
+            var col = _collectionRepository.Get(href);
 
             //if the collection doesnt exit then return an error
             if (col == null)
@@ -158,8 +160,8 @@ namespace ACL.Core
         }
 
         /// <summary>
-        /// Build the xml of the body and write
-        /// its string representation to the HttpRespose.Body
+        ///     Build the xml of the body and write
+        ///     its string representation to the HttpRespose.Body
         /// </summary>
         /// <param name="response">The response of the request.</param>
         /// <param name="principalsAndProperties">The principals with its properties.</param>
@@ -227,7 +229,7 @@ namespace ACL.Core
         }
 
         /// <summary>
-        /// Used to build a response with an error
+        ///     Used to build a response with an error
         /// </summary>
         /// <param name="response">The response that comes from the controller</param>
         /// <param name="errorMessage">The message to put in the error.</param>

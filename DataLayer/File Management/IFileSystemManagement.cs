@@ -9,8 +9,6 @@ namespace DataLayer
         /// <summary>
         ///     Get the Root local directory location.
         /// </summary>
-       // string Root { get; }
-
         /// <summary>
         ///     Creates a new folder which will contain all user calendar collections.
         /// </summary>
@@ -105,8 +103,6 @@ namespace DataLayer
         /// <param name="userId">The desired user.</param>
         /// <param name="collectionId">The desired Collection name.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-       // bool SetUserAndCollection(string userId, string collectionId);
-
         /// <summary>
         ///     Create an instance of this class and check if the collection is valid..
         /// </summary>
@@ -114,8 +110,6 @@ namespace DataLayer
         /// <param name="collectionId">The desired collection.</param>
         /// <param name="fileSystemManagement">The instance of the class.</param>
         /// <returns>True if the collection exist, false otherwise</returns>
-        //bool CreateAndCheck(string userId, string collectionId, out IFileSystemManagement fileSystemManagement);
-
         /// <summary>
         ///     Returns the size of a resource.
         /// </summary>

@@ -15,6 +15,7 @@ namespace DataLayer.Repositories
         {
             _context = context;
         }
+
         public async Task<IList<CalendarResource>> GetAll()
         {
             return await Task.FromResult(_context.CalendarResources.ToList());
@@ -23,12 +24,13 @@ namespace DataLayer.Repositories
         public CalendarResource Get(string url)
         {
             return _context.CalendarResources.Include(r => r.Properties)
-                 .FirstOrDefault(r => r.Href == url);
+                .FirstOrDefault(r => r.Href == url);
         }
+
         public async Task<CalendarResource> GetAsync(string url)
         {
             return await _context.CalendarResources.Include(r => r.Properties)
-                 .FirstOrDefaultAsync(r => r.Href == url);
+                .FirstOrDefaultAsync(r => r.Href == url);
         }
 
         public void Add(CalendarResource entity)
@@ -65,12 +67,11 @@ namespace DataLayer.Repositories
         {
             var resource = Get(url);
             return await Task.FromResult(resource?.Properties.ToList());
-            
         }
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var resource =  Get(url);
+            var resource = Get(url);
             Property property;
 
             if (resource == null)
@@ -87,16 +88,20 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var resource =  Get(url);
+            var resource = Get(url);
             return
-              await Task.FromResult(resource.Properties.ToList().Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
-                    .ToList());
+                await
+                    Task.FromResult(
+                        resource.Properties.ToList()
+                            .Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                            .ToList());
         }
 
-        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
+            Stack<string> errorStack)
         {
             var resource = Get(url);
-            var property =await GetProperty(url, propertyNameNs);
+            var property = await GetProperty(url, propertyNameNs);
 
             if (property == null)
                 return await Task.FromResult(false);
@@ -107,14 +112,14 @@ namespace DataLayer.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack,
+        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+            Stack<string> errorStack,
             bool adminPrivilege)
         {
             var resource = Get(url);
 
 
-
-            var propperty =await GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
+            var propperty = await GetProperty(url, new KeyValuePair<string, string>(propName, propNs));
 
             //if the property is null then create it
             if (propperty == null)
@@ -135,30 +140,29 @@ namespace DataLayer.Repositories
 
             return await Task.FromResult(true);
         }
-         public async Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs, string propValue, Stack<string> errorStack,
-            bool adminPrivilege)
-        {
-           
-                var prop = new Property(propName, propNs)
-                {
-                    Value = propValue
-                };
-                resource.Properties.Add(prop);
-        
-
-            return await Task.FromResult(true);
-        }
-        
-        public Task<bool> ExistByStringIs(string identifier)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();
         }
 
-       
+        public async Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs,
+            string propValue, Stack<string> errorStack,
+            bool adminPrivilege)
+        {
+            var prop = new Property(propName, propNs)
+            {
+                Value = propValue
+            };
+            resource.Properties.Add(prop);
+
+
+            return await Task.FromResult(true);
+        }
+
+        public Task<bool> ExistByStringIs(string identifier)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

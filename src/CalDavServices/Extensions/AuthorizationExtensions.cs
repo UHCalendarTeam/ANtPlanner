@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CalDavServices.Middlewares;
+﻿using CalDavServices.Middlewares;
 using Microsoft.AspNet.Builder;
 
 namespace CalDavServices.Extensions

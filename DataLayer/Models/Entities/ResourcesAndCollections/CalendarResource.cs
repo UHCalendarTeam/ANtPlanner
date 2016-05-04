@@ -9,8 +9,6 @@ namespace DataLayer.Models.Entities
     /// </summary>
     public class CalendarResource
     {
-       
-
         [ScaffoldColumn(false)]
         public int CalendarResourceId { get; set; }
 
@@ -73,7 +71,7 @@ namespace DataLayer.Models.Entities
             });
 
             Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
-            { IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>" });
+            {IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>"});
 
             Properties.Add(new Property("displayname", NamespacesSimple["D"])
             {
@@ -127,7 +125,6 @@ namespace DataLayer.Models.Entities
 
         public CalendarResource()
         {
-
         }
 
         public CalendarResource(string href, string name)

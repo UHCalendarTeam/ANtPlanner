@@ -40,7 +40,7 @@
 //            var user = new User
 //            {
 //                Email = "foo@gmail.com",
-                
+
 //            };
 //            var resources = new List<CalendarResource>
 //            {
@@ -511,3 +511,4 @@
 //        }
 //    }
 //}
+

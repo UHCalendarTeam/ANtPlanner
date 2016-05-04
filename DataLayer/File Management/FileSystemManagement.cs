@@ -157,7 +157,6 @@ namespace DataLayer
             if (url[0] == '/')
                 return url.Substring(1);
             return url;
-
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using DataLayer.Models.ACL;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DataLayer.Models.ACL;
 
 namespace ACL.Interfaces
 {
