@@ -26,13 +26,16 @@ namespace DataLayer.Repositories
 
         public CalendarCollection Get(string url)
         {
-            return  _context.CalendarCollections.Include(p => p.Properties).
+            return _context.CalendarCollections.Include(p => p.Properties).
                 Include(r => r.CalendarResources).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == url);
         }
+
         public async Task<CalendarCollection> GetAsync(string url)
         {
             return await _context.CalendarCollections.Include(p => p.Properties).
-                Include(r => r.CalendarResources).ThenInclude(rp => rp.Properties).FirstOrDefaultAsync(c => c.Url == url);
+                Include(r => r.CalendarResources)
+                .ThenInclude(rp => rp.Properties)
+                .FirstOrDefaultAsync(c => c.Url == url);
         }
 
         public void Add(CalendarCollection entity)
@@ -74,7 +77,10 @@ namespace DataLayer.Repositories
         {
             var collection = await GetAsync(url);
 
-            var property = string.IsNullOrEmpty(propertyNameandNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
+            var property = string.IsNullOrEmpty(propertyNameandNs.Value)
+                ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key)
+                : collection?.Properties.FirstOrDefault(
+                    p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
 
             return property;
         }
@@ -82,13 +88,20 @@ namespace DataLayer.Repositories
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
             var collection = await GetAsync(url);
-            return collection?.Properties.ToList().Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace)).ToList();
+            return
+                collection?.Properties.ToList()
+                    .Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace))
+                    .ToList();
         }
 
-        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
+        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
+            Stack<string> errorStack)
         {
             var collection = await GetAsync(url);
-            var property = string.IsNullOrEmpty(propertyNameNs.Value) ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key) : collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
+            var property = string.IsNullOrEmpty(propertyNameNs.Value)
+                ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key)
+                : collection?.Properties.FirstOrDefault(
+                    p => p.Name == propertyNameNs.Key && p.Namespace == propertyNameNs.Value);
             if (property == null)
                 return true;
             if (!property.IsDestroyable)
@@ -100,7 +113,8 @@ namespace DataLayer.Repositories
             return true;
         }
 
-        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue, Stack<string> errorStack, bool adminPrivilege)
+        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
+            Stack<string> errorStack, bool adminPrivilege)
         {
             var collection = await GetAsync(url);
             //get the property
@@ -133,17 +147,14 @@ namespace DataLayer.Repositories
             return true;
         }
 
-        public bool ExistByStringIs(string identifier)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();
         }
 
-
-
+        public bool ExistByStringIs(string identifier)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

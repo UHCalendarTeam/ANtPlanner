@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DataLayer;
-using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
 
 namespace ACL.Core.Authentication
 {
@@ -43,13 +39,13 @@ namespace ACL.Core.Authentication
 
             //take the creadentials from the request
             string authHeader = httpContext.Request.Headers["Authorization"];
-           
+
             if (!string.IsNullOrEmpty(authHeader))
             {
                 var credentials = TakeCreadential(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
-                principal =  _principalRepository.GetByIdentifier(username);
+                principal = _principalRepository.GetByIdentifier(username);
                 //check if the user exist in our DB
                 if (principal != null)
                 {
@@ -60,7 +56,6 @@ namespace ACL.Core.Authentication
                         SetUnauthorizedRequest(httpContext);
                         return null;
                     }
-                    
                 }
 
                 //if the user is new in our system then create him
@@ -73,17 +68,17 @@ namespace ACL.Core.Authentication
                 principal = _principalRepository.CreateUserInSystem(username, username, password);
 
                 Console.WriteLine($"------Created user with username: {username}");
-               
+
 
                 //TODO: change to this when work the WCF service
                 //var userData = GetUserDataFromUhApi(username);
-
             }
 
             if (principal != null)
                 return principal;
 
             #region checking cookies
+
             //if the request doesn't have an Authorization header then
             //ckeck the session cookies.
             //else
@@ -113,17 +108,19 @@ namespace ACL.Core.Authentication
 
             //}
 
-            
 
             //set the cookie for the response.
             //cookieValue = Guid.NewGuid().ToString();
             //httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
             //await _principalRepository.SetCookie(username, cookieValue);
+
             #endregion
+
             SetUnauthorizedRequest(httpContext);
             return null;
             //return await Task.FromResult(principal);
         }
+
         /// <summary>
         ///     Takes the necessary content from the UH's authentication API response.
         ///     Check if the user exist in the system, if does then check if the authentication
@@ -140,13 +137,13 @@ namespace ACL.Core.Authentication
 
             //take the creadentials from the request
             string authHeader = httpContext.Request.Headers["Authorization"];
-           
+
             if (!string.IsNullOrEmpty(authHeader))
             {
                 var credentials = TakeCreadential(authHeader);
                 var username = credentials.Key;
                 var password = credentials.Value;
-                principal =  _principalRepository.GetByIdentifier(username);
+                principal = _principalRepository.GetByIdentifier(username);
                 //check if the user exist in our DB
                 if (principal != null)
                 {
@@ -157,7 +154,6 @@ namespace ACL.Core.Authentication
                         SetUnauthorizedRequest(httpContext);
                         return null;
                     }
-
                 }
                 else
                 {
@@ -168,13 +164,13 @@ namespace ACL.Core.Authentication
 
                 //TODO: change to this when work the WCF service
                 //var userData = GetUserDataFromUhApi(username);
-
             }
 
             if (principal != null)
                 return principal;
 
             #region checking cookies
+
             //if the request doesn't have an Authorization header then
             //ckeck the session cookies.
             //else
@@ -204,13 +200,14 @@ namespace ACL.Core.Authentication
 
             //}
 
-            
 
             //set the cookie for the response.
             //cookieValue = Guid.NewGuid().ToString();
             //httpContext.Response.Cookies.Append(SystemProperties._cookieSessionName, cookieValue);
             //await _principalRepository.SetCookie(username, cookieValue);
+
             #endregion
+
             SetUnauthorizedRequest(httpContext);
             return null;
             //return await Task.FromResult(principal);
@@ -293,7 +290,9 @@ namespace ACL.Core.Authentication
         /// <returns></returns>
         public KeyValuePair<string, string> TakeCreadential(string authHeader)
         {
-            var credentials = authHeader.StartsWith("Basic") ? TakeCredentionFromBasic(authHeader) :  TakeCredentionFromDigest(authHeader);
+            var credentials = authHeader.StartsWith("Basic")
+                ? TakeCredentionFromBasic(authHeader)
+                : TakeCredentionFromDigest(authHeader);
             return credentials;
         }
 
@@ -345,11 +344,8 @@ namespace ACL.Core.Authentication
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
             httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
-
         }
 
         #endregion
-
-       
     }
 }

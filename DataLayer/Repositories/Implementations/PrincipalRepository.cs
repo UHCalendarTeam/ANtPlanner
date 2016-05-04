@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using Microsoft.Data.Entity;
-using DataLayer.Repositories;
 using Microsoft.AspNet.Identity;
+using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
 {
@@ -22,8 +21,6 @@ namespace DataLayer.Repositories
         }
 
 
-
-
         public async Task<IList<Principal>> GetAll()
         {
             return await _context.Principals.ToListAsync();
@@ -31,7 +28,7 @@ namespace DataLayer.Repositories
 
         public Principal Get(string url)
         {
-            return  _context.Principals.Include(p => p.Properties)
+            return _context.Principals.Include(p => p.Properties)
                 .FirstOrDefault(p => p.PrincipalURL == url);
         }
 
@@ -79,7 +76,7 @@ namespace DataLayer.Repositories
 
         public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
         {
-            var principal =  Get(url);
+            var principal = Get(url);
             Property property;
 
             if (string.IsNullOrEmpty(propertyNameandNs.Value))
@@ -93,16 +90,18 @@ namespace DataLayer.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
         {
-            var principal =  Get(url);
+            var principal = Get(url);
             return
-               await Task.FromResult(principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
-                    .ToList());
+                await
+                    Task.FromResult(
+                        principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
+                            .ToList());
         }
 
         public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
             Stack<string> errorStack)
         {
-            var principal =  Get(url);
+            var principal = Get(url);
             var property =
                 principal.Properties.FirstOrDefault(
                     prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
@@ -114,14 +113,13 @@ namespace DataLayer.Repositories
                 principal.Properties.Remove(property);
             }
             return await Task.FromResult(true);
-
         }
 
         public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
             Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var principal =  Get(url);
+            var principal = Get(url);
             var propperty =
                 principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
 
@@ -142,6 +140,11 @@ namespace DataLayer.Repositories
                 }
             }
             return await Task.FromResult(true);
+        }
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
 
         public async Task<int> SaveChangesAsync()
@@ -168,13 +171,12 @@ namespace DataLayer.Repositories
 
             //return the result of the password verification
             return result != PasswordVerificationResult.Failed;
-
         }
 
 
         public async Task<Principal> GetByIdentifierAsync(string identifier)
         {
-            return await _context.Principals.Include(p => p.User).Include(p=>p.Properties)
+            return await _context.Principals.Include(p => p.User).Include(p => p.Properties)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
@@ -188,22 +190,20 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Get a principal with the given cookie value
+        ///     Get a principal with the given cookie value
         /// </summary>
         /// <param name="cookieValue"></param>
         /// <returns></returns>
         public async Task<Principal> GetByCookie(string cookieValue)
         {
-           return await _context.Principals.FirstOrDefaultAsync(p => p.SessionId == cookieValue);
+            return await _context.Principals.FirstOrDefaultAsync(p => p.SessionId == cookieValue);
         }
 
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-
             return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
         }
-
 
 
         /// <summary>
@@ -234,7 +234,8 @@ namespace DataLayer.Repositories
             var defaultCalName = email;
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, defaultCalName);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
+                defaultCalName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
 
@@ -245,6 +246,7 @@ namespace DataLayer.Repositories
             user.Principal = principal;
 
             #region create the collection for the principal
+
             //create the collection for the user.
             var col =
                 new CalendarCollection(
@@ -314,7 +316,6 @@ namespace DataLayer.Repositories
             var gMembership = PropertyCreation.CreateGroupMembership(SystemProperties._groupPrincipalUrl + group + "/");
 
 
-
             //create the displayname
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullname);
 
@@ -336,7 +337,8 @@ namespace DataLayer.Repositories
                                                "Check if the user group is valid or create the group collection in the system.");
 
             //create the calendar-home-set
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.Group, group, collection.Name);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.Group, group,
+                collection.Name);
             //add the property to the principal
             principal.Properties.Add(calHomeSet);
 
@@ -357,7 +359,8 @@ namespace DataLayer.Repositories
 
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email, SystemProperties._defualtInitialCollectionName);
+            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
+                SystemProperties._defualtInitialCollectionName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
             //create the principal the represents the user
@@ -400,17 +403,12 @@ namespace DataLayer.Repositories
 
         public async Task SetCookie(string principalEmail, string cookieValue)
         {
-            var principal =  GetByIdentifier(principalEmail);
+            var principal = GetByIdentifier(principalEmail);
             if (principal == null)
                 return;
 
             principal.SessionId = cookieValue;
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<int> SaveChangeAsync()
-        {
-            return await _context.SaveChangesAsync();
         }
     }
 }

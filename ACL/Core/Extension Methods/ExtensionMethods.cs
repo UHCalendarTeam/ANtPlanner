@@ -2,10 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using Microsoft.AspNet.Identity;
 
 namespace ACL.Core
 {
@@ -71,7 +69,5 @@ namespace ACL.Core
                 return stringB.ToString();
             });
         }
-
-      
     }
 }

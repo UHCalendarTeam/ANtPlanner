@@ -1,6 +1,5 @@
-﻿using DataLayer;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
-using System.Threading.Tasks;
 using TreeForXml;
 
 namespace ACL.Interfaces
@@ -24,7 +23,7 @@ namespace ACL.Interfaces
         ///     properties specified in the REPORT request body.
         /// </summary>
         /// <returns></returns>
-        Task AclPrincipalPropSet(IXMLTreeStructure body, 
+        Task AclPrincipalPropSet(IXMLTreeStructure body,
             HttpResponse response);
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace ACL.Interfaces
         ///     principals and that match the current user.
         /// </summary>
         /// <returns></returns>
-        Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href, 
+        Task PrincipalMatch(IXMLTreeStructure body, string principalEmail, string href,
             HttpResponse response);
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace ACL.Interfaces
         ///     search criteria specified in the request.
         /// </summary>
         /// <returns></returns>
-        Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request, 
+        Task PrincipalPropertySearch(IXMLTreeStructure body, HttpRequest request,
             HttpResponse response);
 
         /// <summary>

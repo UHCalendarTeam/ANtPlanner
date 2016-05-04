@@ -53,8 +53,7 @@
 //                var collection = db.GetCollection("f.underwood@wh.org", "durtyplans");
 //                Assert.True(collection.Properties.Count < 14);
 //            }
-            
-            
+
 
 //            //var response = new XmlTreeStructure("multistatus", "DAV:");
 //            //response.Namespaces.Add("D", "DAV:");
@@ -118,7 +117,7 @@
 //            var user = new User
 //            {
 //                Email = "foo@gmail.com",
-                
+
 //            };
 //            var resources = new List<CalendarResource>
 //            {
@@ -888,7 +887,7 @@
 //            strBuilder.AppendLine(@"<C:calendar-timezone/>");
 //            strBuilder.AppendLine(@"<getetag/>");
 //            strBuilder.AppendLine(@"<getcontentlanguage/>");
-            
+
 //            strBuilder.AppendLine(@"<C:min-date-time/>");
 //            strBuilder.AppendLine(@"<C:max-date-time/>");
 //            strBuilder.AppendLine(@"<C:max-instances/>");
@@ -988,3 +987,4 @@
 //        #endregion
 //    }
 //}
+

@@ -1,20 +1,19 @@
-﻿using ACL.Interfaces;
-using DataLayer.Models.ACL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ACL.Interfaces;
+using DataLayer.Models.ACL;
 
 namespace ACL.Core
 {
     /// <summary>
-    /// Implementation of the IPrincipalMethods.
-    ///
+    ///     Implementation of the IPrincipalMethods.
     /// </summary>
     public class PrincipalMethods : IPrincipalMethods
     {
         /// <summary>
-        /// Return the DAV:displayname property of
-        /// the given principal
+        ///     Return the DAV:displayname property of
+        ///     the given principal
         /// </summary>
         /// <param name="principal"></param>
         /// <returns></returns>
@@ -30,8 +29,8 @@ namespace ACL.Core
         }
 
         /// <summary>
-        /// Returns the DAV:principal-url property
-        /// of the given principal.
+        ///     Returns the DAV:principal-url property
+        ///     of the given principal.
         /// </summary>
         /// <param name="principal"></param>
         /// <returns></returns>

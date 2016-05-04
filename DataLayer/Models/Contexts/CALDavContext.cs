@@ -3,7 +3,6 @@ using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Scaffolding.Internal.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
@@ -12,22 +11,17 @@ namespace DataLayer
     {
         public readonly IConfigurationRoot Configuration;
 
-      
-
-
 
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
-           
         }
 
         /// <summary>
-        /// inject the configuration of the app to be accessible in the DataLayer
+        ///     inject the configuration of the app to be accessible in the DataLayer
         /// </summary>
         public CalDavContext()
         {
-            
         }
 
         public DbSet<User> Users { get; set; }
@@ -53,13 +47,13 @@ namespace DataLayer
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Principal>()
-                .HasOne(p=>p.User)
-                .WithOne(u=>u.Principal)
-                .HasForeignKey<User>(u=>u.PrincipalId);
+                .HasOne(p => p.User)
+                .WithOne(u => u.Principal)
+                .HasForeignKey<User>(u => u.PrincipalId);
 
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(u => u.Principal)
-                .WithMany(cl=>cl.CalendarCollections)
+                .WithMany(cl => cl.CalendarCollections)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CalendarResource>()
@@ -74,7 +68,6 @@ namespace DataLayer
                 .HasForeignKey(k => k.CalendarCollectionId);
 
 
-
             modelBuilder.Entity<Property>()
                 .HasOne(r => r.CalendarResource)
                 .WithMany(p => p.Properties)
@@ -85,7 +78,6 @@ namespace DataLayer
                 .HasOne(p => p.Principal)
                 .WithMany(pr => pr.Properties)
                 .HasForeignKey(k => k.PricipalId);
-
         }
     }
 }

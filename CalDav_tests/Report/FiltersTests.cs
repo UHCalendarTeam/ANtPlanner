@@ -486,7 +486,6 @@ END:VCALENDAR";
         [Fact]
         public void TestingStuffs()
         {
-           
         }
     }
 }

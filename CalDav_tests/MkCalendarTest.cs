@@ -19,7 +19,7 @@
 //            var db = new CalDavContext();
 //            var user = new User("Frank", "f.underwood@whitehouse.com")
 //            {
-               
+
 //            };
 //            db.Users.Add(user);
 //            db.SaveChanges();
@@ -38,7 +38,7 @@
 //                {"url", "api/v1/caldav/f.underwood/calendars/durtyplans"}
 //            };
 //            HttpResponse response = null;
-            
+
 //            await caldav.MkCalendar(propertiesAndHeader, null, response);
 
 //            Assert.Equal(response.StatusCode, (int)HttpStatusCode.Created);
@@ -168,3 +168,4 @@
 //        }
 //    }
 //}
+

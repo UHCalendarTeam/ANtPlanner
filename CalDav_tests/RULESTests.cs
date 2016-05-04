@@ -759,7 +759,7 @@ namespace CalDav_tests
             {
                 startTime.Value
             };
-           
+
             expected.Add(expected.First().AddDays(100 - 1));
             expected.Add(expected.First().AddDays(200 - 1));
 

@@ -1,5 +1,4 @@
-﻿using DataLayer;
-using DataLayer.Models.Entities;
+﻿using DataLayer.Models.Entities;
 using Xunit;
 
 namespace CalDav_tests
@@ -11,8 +10,7 @@ namespace CalDav_tests
         {
             var user = new User
             {
-                Email = "hohn@noname.com",
-          
+                Email = "hohn@noname.com"
             };
             //var colecction = new CalendarCollection();
 

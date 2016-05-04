@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ACL.Core.Extension_Method;
 using DataLayer;
 using DataLayer.Models.ACL;
-using Xunit;
-using ACL.Core.Extension_Method;
 using TreeForXml;
+using Xunit;
 
 namespace CalDav_tests
 {
@@ -15,7 +11,7 @@ namespace CalDav_tests
         [Fact]
         public void TakingCurrentUserPrivilegeSet()
         {
-            var principal = new Principal()
+            var principal = new Principal
             {
                 PrincipalURL = "principals/users/principal1"
             };

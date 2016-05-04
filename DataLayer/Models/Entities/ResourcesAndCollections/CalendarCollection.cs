@@ -21,15 +21,17 @@ namespace DataLayer.Models.Entities
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
-            {"S", "http://calendarserver.org/ns/" }
+            {"S", "http://calendarserver.org/ns/"}
         };
 
-        public CalendarCollection() { }
+        public CalendarCollection()
+        {
+        }
 
-        public CalendarCollection(string url,string name,  params Property[] properties)
+        public CalendarCollection(string url, string name, params Property[] properties)
         {
             Url = url;
-            Name = name;          
+            Name = name;
             CalendarResources = new List<CalendarResource>();
             Properties = new List<Property>();
             if (properties != null && properties.Length > 0)
@@ -54,12 +56,12 @@ namespace DataLayer.Models.Entities
         public string Url { get; set; }
 
         /// <summary>
-        /// The collection can belongs to a 
+        ///     The collection can belongs to a
         /// </summary>
         public int? PrincipalId { get; set; }
 
         /// <summary>
-        ///     The principal can represent either a 
+        ///     The principal can represent either a
         ///     user or a group. Both have a collection.
         /// </summary>
         public Principal Principal { get; set; }
@@ -74,7 +76,6 @@ namespace DataLayer.Models.Entities
         /// </summary>
         public ICollection<Property> Properties { get; set; }
 
-        
 
         private void InitializeStandardCollectionProperties(string name)
         {
@@ -190,9 +191,6 @@ namespace DataLayer.Models.Entities
                 Value = $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
             });
             Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
-          
-
-
         }
     }
 }

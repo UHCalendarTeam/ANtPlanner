@@ -11,7 +11,6 @@ namespace CalDav_tests
         [Fact]
         public void ParseMKCALENDAR()
         {
-           
             /* var dict =XMLParsers.XMLMKCalendarParser(doc);
              var expectedDict = new Dictionary<string, List<string>>
              {

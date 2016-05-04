@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.ACL;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace DataLayer.Models.Entities
 {
@@ -9,12 +7,10 @@ namespace DataLayer.Models.Entities
     ///     Defines the main properties for the users
     ///     of the system.
     /// </summary>
-    public class User 
+    public class User
     {
-        
         public User()
         {
-           
         }
 
         public User(string displayName, string email)
@@ -41,9 +37,8 @@ namespace DataLayer.Models.Entities
 
         [Required]
         public string Email { get; set; }
-      
-        ///     Contains the user fullName.
-        /// 
+
+        /// Contains the user fullName.
         public string DisplayName { get; set; }
 
         /// <summary>
@@ -53,13 +48,10 @@ namespace DataLayer.Models.Entities
         public string Password { get; set; }
 
         /// <summary>
-        /// Contains the principal that represent the user. 
+        ///     Contains the principal that represent the user.
         /// </summary>
         public Principal Principal { get; set; }
 
         public int? PrincipalId { get; set; }
-        
-
-       
     }
 }

@@ -30,17 +30,16 @@ namespace DataLayer.Models.ACL
         {
             //build the principalUrl depending if the principal represents a user
             //or a group
-            PrincipalURL =  userOrGroup != SystemProperties.PrincipalType.Group
+            PrincipalURL = userOrGroup != SystemProperties.PrincipalType.Group
                 ? SystemProperties._userPrincipalUrl + pIdentifier + "/"
                 : SystemProperties._groupPrincipalUrl + pIdentifier + "/";
-           
+
 
             Properties = new List<Property>(properties);
 
             CalendarCollections = new List<CalendarCollection>();
 
             PrincipalStringIdentifier = pIdentifier;
-            
         }
 
         /// <summary>
