@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{2982C645-B
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDAV", "CalDAV\CalDAV.xproj", "{A1005221-05A4-47C1-8621-42D02C5DC5DF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDavServices", "src\CalDav_Services\CalDavServices.xproj", "{CEFC8B65-ACC7-4463-B270-D1C32F105A91}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CalDavServices", "src\CalDavServices\CalDavServices.xproj", "{CEFC8B65-ACC7-4463-B270-D1C32F105A91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6E276287-EC4A-412C-8510-6245BE434B08}"
 EndProject
