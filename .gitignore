@@ -312,3 +312,21 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+*.orig
+CalDAV/Migrations/20160326164446_InitalDatabase.Designer.cs
+CalDAV/Migrations/20160326171603_MinorChanges.cs
+CalDAV/Migrations/20160326204925_InitalDatabase.cs
+CalDAV/Migrations/20160326204925_InitalDatabase.Designer.cs
+CalDAV/Migrations/CalDavContextModelSnapshot.cs
+CalDAV/Migrations/20160331213942_DesignChanges.cs
+CalDAV/Migrations/20160331213942_DesignChanges.Designer.cs
+CalDAV/Migrations/20160404201014_InitialMigration.cs
+CalDAV/Migrations/20160404201014_InitialMigration.Designer.cs
+src/CalDav_Services/CalDAV/Migrations/20160326045720_ChangingPropNamesForEasyResolve.cs
+src/CalDav_Services/CalDAV/Migrations/20160326045720_ChangingPropNamesForEasyResolve.cs
+DataLayer/Migrations
+
+src/CalDav_Services/collections/users/
+src/CalDav_Services/collections/users/f.underwood@wh.org/durtyplans/russodies.ics
+*.ics
