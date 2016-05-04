@@ -18,7 +18,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity.Metadata.Internal;
 using Microsoft.Net.Http.Headers;
 
-namespace CalDav_Services.Controllers
+namespace CalDavServices.Controllers
 {
     //[Route("api/v1/[controller]")]
     public class CalDavController : Controller

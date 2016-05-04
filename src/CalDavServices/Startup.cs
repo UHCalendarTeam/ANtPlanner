@@ -1,6 +1,6 @@
 ﻿using ACL.Core;
 using ACL.Core.Authentication;
-using CalDav_Services.Extensions;
+using CalDavServices.Extensions;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +15,7 @@ using Microsoft.Data.Entity;
 
 
 
-namespace CalDav_Services
+namespace CalDavServices
 {
     public class Startup
     {
