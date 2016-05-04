@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CalDav_Services.Middlewares;
+using CalDavServices.Middlewares;
 using Microsoft.AspNet.Builder;
 
-namespace CalDav_Services.Extensions
+namespace CalDavServices.Extensions
 {
     public static class AuthorizationExtensions
     {

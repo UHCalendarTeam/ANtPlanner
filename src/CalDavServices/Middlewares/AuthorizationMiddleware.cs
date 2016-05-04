@@ -7,7 +7,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
 using ACL.Core.Authentication;
 
-namespace CalDav_Services.Middlewares
+namespace CalDavServices.Middlewares
 {
     /// <summary>
     /// This middleware hadles the authorization in the system.
@@ -32,11 +32,13 @@ namespace CalDav_Services.Middlewares
         {
             _logger.LogInformation("Handling authorization in resource: " + context.Request.Path);
             var principal = _authenticate.AuthenticateRequest(context);
+           
             if (principal == null)
             {
                 _logger.LogInformation("The client doesn't have enough privileges.");
                 return;
             }
+           
             //context.Session.SetString("principalId", principal.PrincipalURL);
             _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
             await  _next.Invoke(context);
