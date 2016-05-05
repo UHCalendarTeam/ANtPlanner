@@ -5,30 +5,22 @@
   "commands": {
     "test": "xunit.runner.dnx"
   },
-  "dependencies": {
-    "xunit": "2.1.0",
-    "xunit.runner.dnx": "2.1.0-rc1-build204",
-    "CalDAV": "1.0.0",
-    "TreeForXml": "1.0.3",
-    "Microsoft.AspNet.TestHost": "1.0.0-rc1-final",
-    "ACL": "1.0.0-*"
-  },
-  "description": "",
-  "frameworks": {
-    "dnx451": {
-      "dependencies": {
-        
-      }
-    },
-    "dnxcore50": {
-      "dependencies": {
+    "dependencies": {
+        "xunit": "2.1.0",
+        "xunit.runner.dnx": "2.1.0-rc1-build204",
+        "CalDAV": "1.0.0",
+        "TreeForXml": "1.0.3",
+        "Microsoft.AspNet.TestHost": "1.0.0-rc1-final",
+        "ACL": "1.0.0-*",
         "Microsoft.CSharp": "4.0.1-beta-*",
         "System.Collections": "4.0.11-beta-*",
         "System.Linq": "4.0.1-beta-*",
         "System.Runtime": "4.0.21-beta-*",
         "System.Threading": "4.0.11-beta-*"
-      }
-    }
+    },
+  "description": "",
+  "frameworks": {   
+    "dnxcore50": {}
   },
   "licenseUrl": "",
   "projectUrl": "",

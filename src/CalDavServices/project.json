@@ -35,8 +35,7 @@
         "wwwroot",
         "node_modules"
     ],
-    "frameworks": {
-        "dnx451": { },
+    "frameworks": {        
         "dnxcore50": { }
     },
     "publishExclude": [
