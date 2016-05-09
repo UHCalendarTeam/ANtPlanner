@@ -1,7 +1,7 @@
 {
     "commands": {
         "web": "Microsoft.AspNet.Server.Kestrel",
-        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://10.6.18.67:5003",
+        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://127.0.0.1:5003",
         "ef": "EntityFramework.Commands"
     },
     "compilationOptions": {

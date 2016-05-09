@@ -63,7 +63,7 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Warning;
+            loggerFactory.MinimumLevel = LogLevel.Verbose;
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
