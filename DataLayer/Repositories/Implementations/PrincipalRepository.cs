@@ -13,9 +13,10 @@ namespace DataLayer.Repositories
 {
     public class PrincipalRepository : IRepository<Principal, string>
     {
-        private readonly CalDavContext _context;
+        //private readonly CalDavContext _context;
+        private readonly CalDAVSQLiteContext _context;
 
-        public PrincipalRepository(CalDavContext context)
+        public PrincipalRepository(CalDAVSQLiteContext context)
         {
             _context = context;
         }
@@ -184,7 +185,7 @@ namespace DataLayer.Repositories
 
         public Principal GetByIdentifier(string identifier)
         {
-            using (var context = new CalDavContext())
+            using (var context = new CalDAVSQLiteContext())
             {
                 return context.Principals.Include(p => p.User)
                     .Include(p => p.Properties)

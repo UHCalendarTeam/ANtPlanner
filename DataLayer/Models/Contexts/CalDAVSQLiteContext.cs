@@ -1,9 +1,11 @@
-﻿using DataLayer.Models.ACL;
+﻿using System.IO;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace DataLayer
 {
@@ -39,9 +41,9 @@ namespace DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            var connection = Configuration["Production:SqliteConnectionString"];
+            var path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "UHCalendarDb");
+            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
             optionBuilder.UseSqlite(connection);
-            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

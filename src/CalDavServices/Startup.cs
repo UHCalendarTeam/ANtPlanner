@@ -1,4 +1,5 @@
-﻿using ACL.Core;
+﻿using System.IO;
+using ACL.Core;
 using ACL.Core.Authentication;
 using CalDavServices.Extensions;
 using CalDAV.Core;
@@ -12,6 +13,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace CalDavServices
 {
@@ -46,7 +48,8 @@ namespace CalDavServices
             //    .AddDbContext<CalDavContext>(options =>
             //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
 
-            var connection = Configuration["Production:SqliteConnectionString"];
+            var path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "UHCalendarDb");
+            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
 
             services.AddEntityFramework()
                 .AddSqlite()

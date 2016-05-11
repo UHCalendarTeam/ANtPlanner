@@ -32,7 +32,7 @@ namespace CalDav_tests
         [Fact]
         public async Task UnitTest1()
         {
-            var context = new CalDavContext(new DbContextOptions<CalDavContext>());
+            var context = new CalDAVSQLiteContext(new DbContextOptions<CalDAVSQLiteContext>());
             
 
             var prinRepository = new PrincipalRepository(context);
@@ -61,7 +61,7 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest4()
         {
-            using (var context = new CalDavContext())
+            using (var context = new CalDAVSQLiteContext())
             {
                 var prinRepository = new PrincipalRepository(context);
                 prinRepository.CreateStudentInSystem("unittest4@gmail.com", "Student1", _password, _career, _group,
@@ -137,7 +137,7 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest9()
         {
-            var context = new CalDavContext(new DbContextOptions<CalDavContext>());
+            var context = new CalDAVSQLiteContext(new DbContextOptions<CalDAVSQLiteContext>());
             var prinRepository = new PrincipalRepository(context);
 
             var user = prinRepository.CreateWorkerInSystem("worker1@gmail.com", "worker", "UnitTest9 worker", _faculty,
