@@ -1,11 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
+using Remotion.Linq.Clauses;
 using Xunit;
 
 namespace CalDav_tests
@@ -28,6 +33,7 @@ namespace CalDav_tests
         public async Task UnitTest1()
         {
             var context = new CalDavContext(new DbContextOptions<CalDavContext>());
+            
 
             var prinRepository = new PrincipalRepository(context);
 
@@ -145,6 +151,19 @@ namespace CalDav_tests
             Assert.NotNull(worker);
             Assert.NotNull(context.Principals.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
             Assert.NotNull(context.CalendarCollections.FirstOrDefault(x => x.PrincipalId == worker.PrincipalId.Value));
+        }
+
+        [Fact]
+        public void UnitTest123()
+        {
+            int number;
+            List<int> numbers = new List<int>();
+            while (int.TryParse(Console.ReadLine(), out number))
+            {
+                if (number%2 == 0)
+                    numbers.Add(number);
+            }
+            numbers.ForEach(x=>Console.WriteLine(x));
         }
 
         //}

@@ -28,7 +28,7 @@ namespace DataLayer.Repositories
 
         public Principal Get(string url)
         {
-            return _context.Principals.Include(p => p.Properties)
+            return _context.Principals.Include(p => p.Properties).Include(p=>p.CalendarCollections)
                 .FirstOrDefault(p => p.PrincipalURL == url);
         }
 
@@ -176,7 +176,9 @@ namespace DataLayer.Repositories
 
         public async Task<Principal> GetByIdentifierAsync(string identifier)
         {
-            return await _context.Principals.Include(p => p.User).Include(p => p.Properties)
+            return await _context.Principals.Include(p => p.User)
+                .Include(p => p.Properties)
+                .Include(p=>p.CalendarCollections)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
@@ -184,7 +186,9 @@ namespace DataLayer.Repositories
         {
             using (var context = new CalDavContext())
             {
-                return context.Principals.Include(p => p.User).Include(p => p.Properties)
+                return context.Principals.Include(p => p.User)
+                    .Include(p => p.Properties)
+                    .Include(p=>p.CalendarCollections)
                     .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
             }
         }
