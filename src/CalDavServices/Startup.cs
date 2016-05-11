@@ -38,13 +38,20 @@ namespace CalDavServices
                     builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             });
 
-            var connection =
-                @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
+            //var connection =
+            //    @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
             // Add framework services.
+            //services.AddEntityFramework()
+            //    .AddSqlServer()
+            //    .AddDbContext<CalDavContext>(options =>
+            //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
+
+            var connection = Configuration["Production:SqliteConnectionString"];
+
             services.AddEntityFramework()
-                .AddSqlServer()
-                .AddDbContext<CalDavContext>(options =>
-                    options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
+                .AddSqlite()
+                .AddDbContext<CalDAVSQLiteContext>(options =>
+                    options.UseSqlite(connection).MigrationsAssembly("DataLayer"));
 
             services.AddMvc();
 
