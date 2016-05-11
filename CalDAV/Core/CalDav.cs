@@ -388,15 +388,11 @@ namespace CalDAV.Core
 
             //Adding the collection to the database
 
-            var principal = _principalRepository.GetByIdentifier(principalId);
+            var principal = await _principalRepository.GetByIdentifierAsync(principalId);
             var collection = new CalendarCollection(url, collectionName);
-            var stack = new Stack<string>();
-            await _collectionRespository.CreateOrModifyProperty(url, "getctag", "http://calendarserver.org/ns/",
-                new XmlTreeStructure("getctag", @"xmlns=""http://calendarserver.org/ns/""")
-                {
-                    Value = Guid.NewGuid().ToString()
-                }.ToString(), stack, true);
+            
             principal.CalendarCollections.Add(collection);
+            await _principalRepository.SaveChangesAsync();
 
             //Adding the collection folder.
             StorageManagement.AddCalendarCollectionFolder(url);
@@ -947,7 +943,7 @@ namespace CalDAV.Core
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
-            await _resourceRespository.CreatePropertyForResource(resource, "getcontentlength", "DAV:",
+            await _resourceRespository.CreateOrModifyProperty(resource.Href, "getcontentlength", "DAV:",
                 $"<D:getcontentlength {_namespaces["D"]}>{StorageManagement.GetFileSize(url)}</D:getcontentlength>",
                 errorStack, true);
             await _collectionRespository.SaveChangeAsync();

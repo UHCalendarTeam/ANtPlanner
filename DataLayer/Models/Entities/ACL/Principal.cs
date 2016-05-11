@@ -14,6 +14,7 @@ namespace DataLayer.Models.ACL
     {
         public Principal()
         {
+           
         }
 
         /// <summary>
