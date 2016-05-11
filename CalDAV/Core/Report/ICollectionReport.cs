@@ -6,9 +6,13 @@ using TreeForXml;
 
 namespace CalDAV.Core
 {
+    /// <summary>
+    ///     This interface defines the necessary methods
+    ///     to handle the HTTP REPORT method.
+    /// </summary>
     public interface ICollectionReport
     {
-        string ExpandProperty();
+        //string ExpandProperty();
 
         /// <summary>
         ///     Process the REPORT request and send back the
@@ -23,8 +27,8 @@ namespace CalDAV.Core
         Task ProcessRequest(HttpContext context);
 
         /// <summary>
-        ///     Apply the calendar-query opertation to a
-        ///     user calendars.
+        ///     Apply the calendar-query operation
+        ///     to a collection.
         /// </summary>
         /// <param name="xmlBody">The xml send in the body of the request.</param>
         /// <param name="collectionUrl"></param>
@@ -33,8 +37,19 @@ namespace CalDAV.Core
         Task CalendarQuery(IXMLTreeStructure xmlBody, string collectionUrl, HttpContext httpContext);
 
         /// <summary>
-        ///     Take the calendar that passed the filter and
-        ///     create the multi-status xml.
+        ///     The CALDAV:calendar-multiget REPORT is used to retrieve specific calendar object resources from within a
+        ///     collection, if the Request-URI is a collection, or to retrieve a specific calendar object resource, if the
+        ///     Request-URI is a calendar object resource. This report is similar to the CALDAV:calendar-query REPORT
+        ///     (see Section 7.8), except that it takes a list of DAV:href elements, instead of a CALDAV:filter element, to
+        ///     determine which calendar object resources to return
+        /// </summary>
+        /// <returns></returns>
+        Task CalendarMultiget(IXMLTreeStructure xmlBody, HttpContext httpContext);
+
+        /// <summary>
+        ///     Take the calendar that passed the filters and
+        ///     create the multi-status xml that has to be send
+        ///     back in the response.
         /// </summary>
         /// <param name="resources">The resources to be returned</param>
         /// <param name="calendarData">

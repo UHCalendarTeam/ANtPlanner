@@ -181,7 +181,7 @@ namespace CalDAV.Core
         ///     determine which calendar object resources to return
         /// </summary>
         /// <returns></returns>
-        private async Task CalendarMultiget(IXMLTreeStructure xmlBody, HttpContext httpContext)
+        public async Task CalendarMultiget(IXMLTreeStructure xmlBody, HttpContext httpContext)
         {
             // take the first prop node to know the data that
             // should ne returned
