@@ -14,12 +14,16 @@ namespace CalDAV.Core.Method_Extensions
 {
     /// <summary>
     ///     This class contains method extensions for
-    ///     IEnumerable<VCALENDAR>
+    ///     VCALENDARs. This extension are used
+    ///     when the client send a request
+    ///     with a CALDAV:calendar-query REPORT
     /// </summary>
     public static class ExtensionsForFilters
     {
         /// <summary>
         ///     Apply different filters to the given calendar.
+        ///     The posible filters are time-range filter and
+        ///     text-match filter.
         /// </summary>
         /// <param name="calendar">THe calendar to apply the filter.</param>
         /// <param name="filterTree">The filter container. The node in the xml with name = "filter"</param>
@@ -62,7 +66,7 @@ namespace CalDAV.Core.Method_Extensions
         }
 
         /// <summary>
-        ///     Apply the given filters to to a property in the cal component.
+        ///     Apply the given filters to a calendar component property.
         /// </summary>
         /// <param name="component">The component where to apply the filters.</param>
         /// <param name="filter">Filters container.</param>
@@ -187,7 +191,7 @@ namespace CalDAV.Core.Method_Extensions
                     return negateCond ? !result : result;
 
                 default:
-                    throw new NotImplementedException("Implement the error for return");
+                    throw new NotImplementedException("The filter's collation is not supported.");
             }
         }
 
@@ -216,31 +220,6 @@ namespace CalDAV.Core.Method_Extensions
             }
             return true;
         }
-
-        /// <summary>
-        ///     Apply the time-filter to the
-        /// </summary>
-        /// <param name="resources"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public static Dictionary<string, VCalendar> TimeFilter(this Dictionary<string, VCalendar> resources,
-            DateTime start, DateTime end, IXMLTreeStructure filter)
-        {
-            foreach (var resource in resources)
-            {
-                var compNode = filter.GetChild("comp-filter");
-                var compName = compNode.Attributes["name"];
-                if (resource.Value.CalendarComponents.ContainsKey(compName))
-                {
-                }
-                else
-                    continue;
-            }
-            return null;
-        }
-
 
         /// <summary>
         ///     Apply the time filter to the given component as
@@ -283,7 +262,7 @@ namespace CalDAV.Core.Method_Extensions
             if (component is VTodo)
                 return component.ApplyTimeFilterToVTODO(start.Value, end.Value, expandedDates);
             if (component is VJournal)
-                throw new NotImplementedException("The doesn't support the VJOURNALs yet.");
+                throw new NotImplementedException("The system doesn't support the VJOURNALs yet.");
             if (component is VFreebusy)
                 return component.ApplyTimeFilterToVFREEBUSY(start.Value, end.Value);
             if (component is VAlarm)
