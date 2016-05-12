@@ -936,6 +936,8 @@ namespace CalDAV.Core
             var collection = _collectionRespository.Get(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
             collection.CalendarResources.Add(resource);
 
+            await _collectionRespository.SaveChangeAsync();
+
             //adding the file
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 

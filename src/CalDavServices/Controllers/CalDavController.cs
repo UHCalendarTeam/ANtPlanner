@@ -261,16 +261,25 @@ namespace CalDavServices.Controllers
             else
             {
                 var ifmatch = Request.Headers["If-Match"];
-                if (ifmatch.Count > 0)
+                foreach (var value in ifmatch)
                 {
-                    propertiesAndHeaders.Add("If-Match", ifmatch.ToString());
+                    propertiesAndHeaders.Add("If-Match", value);
                 }
+                //if (ifmatch.Count > 0)
+                //{
+                //    propertiesAndHeaders.Add("If-Match", ifmatch);
+                //}
+                
 
                 var ifnonematch = Request.Headers["If-None-Match"];
-                if (ifnonematch.Count > 0)
+                foreach (var value in ifnonematch)
                 {
-                    propertiesAndHeaders.Add("If-None-Match", ifnonematch.ToString());
+                    propertiesAndHeaders.Add("If-None-Match", value);
                 }
+                //if (ifnonematch.Count > 0)
+                //{
+                //    propertiesAndHeaders.Add("If-None-Match", ifnonematch);
+                //}
                 var contentSize = Request.Headers["Content-Length"];
                 if (contentSize.Count > 0)
                 {
