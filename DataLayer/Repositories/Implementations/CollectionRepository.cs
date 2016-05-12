@@ -9,9 +9,10 @@ namespace DataLayer.Repositories
 {
     public class CollectionRepository : IRepository<CalendarCollection, string>
     {
-        private readonly CalDavContext _context;
+        //private readonly CalDavContext _context;
+        private readonly CalDAVSQLiteContext _context;
 
-        public CollectionRepository(CalDavContext context)
+        public CollectionRepository(CalDAVSQLiteContext context)
         {
             _context = context;
         }
