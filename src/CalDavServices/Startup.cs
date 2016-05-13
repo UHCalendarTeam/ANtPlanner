@@ -14,6 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Sinks.RollingFile;
 
 namespace CalDavServices
 {
@@ -26,7 +30,16 @@ namespace CalDavServices
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Error()
+        .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
+        .CreateLogger();
+
+
         }
+
+
 
         public IConfigurationRoot Configuration { get; set; }
 
@@ -73,10 +86,8 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Warning;
-            loggerFactory.AddConsole();
-            loggerFactory.AddDebug();
-           
+            loggerFactory.AddSerilog();
+
 
 
             app.UseIISPlatformHandler();

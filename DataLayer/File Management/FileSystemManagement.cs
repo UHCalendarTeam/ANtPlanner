@@ -98,7 +98,7 @@ namespace DataLayer
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);
-            var calendarObjectResources = new List<VCalendar>();
+            List<VCalendar> calendarObjectResources = new List<VCalendar>();
 
             if (!Directory.Exists(path))
                 return null;
@@ -110,7 +110,7 @@ namespace DataLayer
                 var body = await GetCalendarObjectResource(file);
                 if (body != null)
                 {
-                    var iCalendar = new VCalendar(body);
+                    VCalendar iCalendar = VCalendar.Parse(body);
                     calendarObjectResources.Add(iCalendar);
                 }
             }
