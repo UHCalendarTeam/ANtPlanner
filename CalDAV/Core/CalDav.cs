@@ -700,7 +700,8 @@ namespace CalDAV.Core
 
             var resource =
                 _resourceRespository.Get(url);
-
+            //Checking that if exist an IF-Match Header the delete performs its operation
+            //avoiding lost updates.
             if (ifMatchEtags.Count > 0)
             {
                 if (resource != null)
@@ -710,6 +711,7 @@ namespace CalDAV.Core
                             .Value;
                     if (resourceEtag != null )
                     {
+                        //if the ETags match the perform delete
                         if (ifMatchEtags.Contains(resourceEtag))
                         {
                             response.StatusCode = (int) HttpStatusCode.NoContent;
@@ -726,11 +728,9 @@ namespace CalDAV.Core
 
                             return StorageManagement.DeleteCalendarObjectResource(url);
                         }
-                        else
-                        {
-                            response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
-                            return false;
-                        }
+                        //if the comparison fails the an error is returned.
+                        response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                        return false;
                     }
                     
                 }
