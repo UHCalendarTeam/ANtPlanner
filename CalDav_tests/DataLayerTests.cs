@@ -156,14 +156,7 @@ namespace CalDav_tests
         [Fact]
         public void UnitTest123()
         {
-            int number;
-            List<int> numbers = new List<int>();
-            while (int.TryParse(Console.ReadLine(), out number))
-            {
-                if (number%2 == 0)
-                    numbers.Add(number);
-            }
-            numbers.ForEach(x=>Console.WriteLine(x));
+           
         }
 
         //}
