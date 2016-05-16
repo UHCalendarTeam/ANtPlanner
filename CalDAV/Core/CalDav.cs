@@ -708,22 +708,31 @@ namespace CalDAV.Core
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
-                    if (resourceEtag != null && ifMatchEtags.Contains(resourceEtag))
+                    if (resourceEtag != null )
                     {
-                        response.StatusCode = (int) HttpStatusCode.NoContent;
-                        await _resourceRespository.Remove(resource);
+                        if (ifMatchEtags.Contains(resourceEtag))
+                        {
+                            response.StatusCode = (int) HttpStatusCode.NoContent;
+                            await _resourceRespository.Remove(resource);
 
 
-                        //updating the ctag
-                        var stack = new Stack<string>();
-                        await
-                            _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag",
-                                _namespacesSimple["S"],
-                                $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
+                            //updating the ctag
+                            var stack = new Stack<string>();
+                            await
+                                _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag",
+                                    _namespacesSimple["S"],
+                                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
 
 
-                        return StorageManagement.DeleteCalendarObjectResource(url);
+                            return StorageManagement.DeleteCalendarObjectResource(url);
+                        }
+                        else
+                        {
+                            response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                            return false;
+                        }
                     }
+                    
                 }
             }
 
