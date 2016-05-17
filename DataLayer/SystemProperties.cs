@@ -24,9 +24,13 @@ namespace DataLayer
         public enum HttpMethod
         {
             Put, 
+            PutCreate,//the put that create resources
+            PutUpdate,//the put that modified resources
             Get,
             Delete,
             Profind, 
+            ProfindCollection,//profind that is performed on a collection
+            ProfindResource,//profind that is performed on a resource
             Report,
             MKCalendar,
             Propatch

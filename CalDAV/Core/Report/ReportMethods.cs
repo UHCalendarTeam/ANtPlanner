@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -21,10 +22,12 @@ namespace CalDAV.Core
     public class CollectionReport : ICollectionReport
     {
         public readonly ResourceRespository _resourceRepository;
+        public readonly IReportPreconditions _preconditions;
 
-        public CollectionReport(IRepository<CalendarResource, string> resRepository)
+        public CollectionReport(IRepository<CalendarResource, string> resRepository, IReportPreconditions preconditions)
         {
             _resourceRepository = resRepository as ResourceRespository;
+            _preconditions = preconditions;
         }
 
         public string ExpandProperty()
@@ -39,6 +42,10 @@ namespace CalDAV.Core
         /// <returns></returns>
         public async Task ProcessRequest(HttpContext httpContext)
         {
+            //check the preconditions for the HTTP REPORT method
+            if(!_preconditions.PreconditionProcessor(httpContext))
+                return;
+
             var body = new StreamReader(httpContext.Request.Body).ReadToEnd();
 
             // var node = xmlBody.Children.First();
