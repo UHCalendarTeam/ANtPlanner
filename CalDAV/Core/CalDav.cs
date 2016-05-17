@@ -229,6 +229,77 @@ namespace CalDAV.Core
             await _aclProfind.Profind(httpContext);
         }
 
+        public async Task CHSetPropfind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
+        {
+            #region Extracting Properties
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
+            #endregion
+
+            //Creating and filling the root of the xml tree response
+            //All response are composed of a "multistatus" xml element
+            //witch contains a "response" element for each collection and resource analized witch url is included in a "href" element as a child of "response".
+            //As a child of the "response" there is a list of "propstat". One for each different status obtained
+            //trying to get the specified properties.
+            //Inside every "propstatus" there are a xml element "prop" with all the properties that match with
+            //the given "status" and a "status" xml containing the message of his "propstat".
+
+            ////checking Precondtions
+            //PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
+            //if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            //    return;
+
+            response.StatusCode = 207;
+            response.ContentType = "application/xml";
+            var responseTree = new XmlTreeStructure("multistatus", "DAV:");
+            responseTree.Namespaces.Add("D", "DAV:");
+            responseTree.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
+
+            //Tool that contains the methods for propfind.
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
+
+            //parsing the body into a xml tree
+            var xmlTree = XmlTreeStructure.Parse(body);
+
+            //Managing if the body was ok
+            if (xmlTree.NodeName != "propfind")
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            //Finding the right method of propfind, it is found in the first child of the tree.
+            //This methods take the response tree and they completed it with the necessary values and structure.
+            var propType = xmlTree.Children[0];
+            switch (propType.NodeName)
+            {
+                case "prop":
+                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
+
+                    //take the principalId from the properties
+                    var principal = _principalRepository.Get(principalUrl);
+                    await PropFindMethods.PropMethod(url, null, 1, props, responseTree, principal);
+                    break;
+                case "allprop":
+                    throw new ArgumentException("This should be a prop propfind");
+                    break;
+                case "propname":
+                    throw new ArgumentException("This should be a prop propfind");
+                    break;
+                default:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
+            }
+            var responseText = responseTree.ToString();
+            var responseBytes = Encoding.UTF8.GetBytes(responseText);
+            response.ContentLength = responseBytes.Length;
+            await response.WriteAsync(responseText);
+        } 
+
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.
         /// </summary>

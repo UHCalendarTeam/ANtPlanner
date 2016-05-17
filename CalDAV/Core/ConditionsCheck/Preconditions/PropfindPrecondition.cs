@@ -46,9 +46,8 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (!PermissionCheck(url, calendarResourceId, principalUrl, response))
-                return false;
-            return true;
+
+            return PermissionCheck(url, calendarResourceId, principalUrl, response);
         }
 
         private bool PermissionCheck(string url, string resourceId,string principalUrl, HttpResponse response)
