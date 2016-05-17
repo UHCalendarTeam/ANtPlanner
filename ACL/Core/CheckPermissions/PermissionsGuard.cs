@@ -15,6 +15,29 @@ namespace ACL.Core.CheckPermissions
         private const string _writePermissionString = "write";
         private readonly ResourceRespository _resourceRepo;
         private readonly CollectionRepository _calendarRepo;
+        /// <summary>
+        /// the HTTP method that need the read privilege
+        /// </summary>
+        private readonly SystemProperties.HttpMethod[] _readMethods = 
+        {
+            SystemProperties.HttpMethod.Get,
+            SystemProperties.HttpMethod.Report, 
+            SystemProperties.HttpMethod.ProfindCollection, 
+            SystemProperties.HttpMethod.ProfindResource
+        };
+        /// <summary>
+        /// the HTTP method that need the write privilege
+        /// </summary>
+        private readonly SystemProperties.HttpMethod[] _writeMethods = 
+        {
+          SystemProperties.HttpMethod.PutCreate,
+          SystemProperties.HttpMethod.PutUpdate,
+          SystemProperties.HttpMethod.Delete, 
+          SystemProperties.HttpMethod.MKCalendar, 
+          SystemProperties.HttpMethod.Propatch
+          
+         
+        };
 
         public PermissionsGuard(IRepository<CalendarResource,string> resRepository, IRepository<CalendarCollection, string> calRepository)
         {
@@ -45,17 +68,12 @@ namespace ACL.Core.CheckPermissions
         {
             var permissions = TakePermissions(url, principalUrl, method);
 
-            if (method == SystemProperties.HttpMethod.Put ||
-                method == SystemProperties.HttpMethod.Delete ||
-                method == SystemProperties.HttpMethod.Propatch)
-                if (permissions.Any(x => x == _writePermissionString))
-                    return true;
-
-            if (method == SystemProperties.HttpMethod.Get ||
-                method == SystemProperties.HttpMethod.Report ||
-                method == SystemProperties.HttpMethod.Profind)
-                if (permissions.Any(x => x == _readPermissionString))
-                    return true;
+            //check for the write permission
+            if (_writeMethods.Contains(method) && permissions.Any(x => x == _writePermissionString))
+                return true;
+            //check for the read permission
+            if (_readMethods.Contains(method) && permissions.Any(x => x == _readPermissionString))
+                return true;
 
             SetDeniedResponse(response);
             return false;
@@ -76,8 +94,19 @@ namespace ACL.Core.CheckPermissions
         {
             var output = new List<string>();
             var acesToCheck = new List<XElement>();
-            var aclP =
-                _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            Property aclP;
+
+            //check where to take the acl proeprty
+            //if the method perform an action on a collection then take the 
+            //acl property form the collection
+            if(method == SystemProperties.HttpMethod.ProfindCollection
+                || method == SystemProperties.HttpMethod.Report
+                ||method == SystemProperties.HttpMethod.PutCreate)
+                aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            //if the method perform an action on a resource in particular then take 
+            //the acl from the resource
+            else
+                 aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             //take the acl property
 
             var xdoc = XDocument.Parse(aclP.Value);
