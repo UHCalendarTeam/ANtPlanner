@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Xml.Linq;
 using DataLayer;
+using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 
@@ -13,69 +14,19 @@ namespace ACL.Core.CheckPermissions
         private const string _readPermissionString = "read";
         private const string _writePermissionString = "write";
         private readonly ResourceRespository _resourceRepo;
+        private readonly CollectionRepository _calendarRepo;
 
-        public PermissionsGuard(ResourceRespository repo)
+        public PermissionsGuard(IRepository<CalendarResource,string> resRepository, IRepository<CalendarCollection, string> calRepository)
         {
-            _resourceRepo = repo;
+            _resourceRepo = resRepository as ResourceRespository;
+            _calendarRepo = calRepository as CollectionRepository;
         }
-
-        /// <summary>
-        ///     The HTTP methods GET, REPORT need to pass
-        ///     this permission in order to perform an action
-        ///     on a resource.
-        /// </summary>
-        /// <param name="resourceUrl">The URL that identifies the resource.</param>
-        /// <param name="principalUrl">
-        ///     The URL that identifies the principal
-        ///     that is making the request.
-        /// </param>
-        /// <param name="response">The response for the client</param>
-        /// <returns>
-        ///     True if the principal has the read permission on the resource
-        ///     False otherwise
-        /// </returns>
-        public bool CheckReadPermission(string resourceUrl, string principalUrl, HttpResponse response)
-        {
-            var permissions = TakePermissions(resourceUrl, principalUrl);
-
-            if (permissions.Any(x => x == _readPermissionString))
-                return true;
-            SetDeniedResponse(response);
-            return false;
-        }
-
-        /// <summary>
-        ///     The HTTP methods PUT, DELETE need to pass
-        ///     this permission in order to perform an action
-        ///     on a resource.
-        /// </summary>
-        /// <param name="resourceUrl">The URL that identifies the resource.</param>
-        /// <param name="principalUrl">
-        ///     The URL that identifies the principal
-        ///     that is making the request.
-        /// </param>
-        /// <param name="response">The response for the client</param>
-        /// <returns>
-        ///     True if the principal has the write permission on the resource
-        ///     False otherwise
-        /// </returns>
-        public bool CheckWritePermission(string resourceUrl, string principalUrl, HttpResponse response)
-        {
-            var permissions = TakePermissions(resourceUrl, principalUrl);
-
-            if (permissions.Any(x => x == _writePermissionString))
-                return true;
-
-            SetDeniedResponse(response);
-            return false;
-        }
-
 
         /// <summary>
         ///     Check the permission needed to perform an action
         ///     by the given method.
         /// </summary>
-        /// <param name="resourceUrl">The URL that identifies the resource.</param>
+        /// <param name="url">The URL that identifies the resource.</param>
         /// <param name="principalUrl">
         ///     The URL that identifies the principal
         ///     that is making the request.
@@ -89,10 +40,10 @@ namespace ACL.Core.CheckPermissions
         ///     True if the principal has the permission granted on the resource
         ///     False otherwise
         /// </returns>
-        public bool CheckPermisionForMethod(string resourceUrl, string principalUrl, HttpResponse response,
+        public bool CheckPermisionForMethod(string url, string principalUrl, HttpResponse response,
             SystemProperties.HttpMethod method)
         {
-            var permissions = TakePermissions(resourceUrl, principalUrl);
+            var permissions = TakePermissions(url, principalUrl, method);
 
             if (method == SystemProperties.HttpMethod.Put ||
                 method == SystemProperties.HttpMethod.Delete ||
@@ -115,18 +66,18 @@ namespace ACL.Core.CheckPermissions
         ///     Take the permission granted for the given principal
         ///     Include the permissions granted to all the principals.
         /// </summary>
-        /// <param name="resourceUrl">The URL that identifies the resource.</param>
+        /// <param name="url">The URL that identifies the resource.</param>
         /// <param name="principalUrl">
         ///     The URL that identifies the principal
         ///     that is making the request.
         /// </param>
         /// <returns></returns>
-        private List<string> TakePermissions(string resourceUrl, string principalUrl)
+        private List<string> TakePermissions(string url, string principalUrl, SystemProperties.HttpMethod method)
         {
             var output = new List<string>();
             var acesToCheck = new List<XElement>();
             var aclP =
-                _resourceRepo.Get(resourceUrl).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+                _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             //take the acl property
 
             var xdoc = XDocument.Parse(aclP.Value);

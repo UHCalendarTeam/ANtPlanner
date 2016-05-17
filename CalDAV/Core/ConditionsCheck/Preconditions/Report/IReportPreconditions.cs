@@ -98,7 +98,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions.Report
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        bool HasPermission(HttpContext httpContext);
+        bool HasPermission(string pUrl, string resUrl, HttpResponse response);
 
 
         /// <summary>

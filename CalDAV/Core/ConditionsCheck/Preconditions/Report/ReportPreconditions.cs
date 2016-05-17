@@ -8,8 +8,10 @@ using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
 using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using CalDAV.Core.Method_Extensions;
+using DataLayer;
 using ICalendar.Calendar;
 using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Http.Extensions;
 
 namespace CalDAV.Core.ConditionsCheck.Preconditions
 {
@@ -26,9 +28,13 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
         public bool PreconditionProcessor(HttpContext httpContext)
         {
             var principal = _authenticator.AuthenticateRequest(httpContext);
+            var resourceUrl = GetRealUrl(httpContext.Request);
 
+            //for the moment just checking the permission
+            //on the resource
+            return HasPermission(principal.PrincipalURL,resourceUrl,httpContext.Response);
 
-            return true;
+            
         }
 
         public bool SuppoprtedCalendarData(string contentType, string version)
@@ -66,9 +72,9 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             throw new NotImplementedException();
         }
 
-        public bool HasPermission(HttpContext httpContext)
+        public bool HasPermission(string pUrl, string resUrl, HttpResponse response)
         {
-            throw new NotImplementedException();
+            return _permissionChecker.CheckPermisionForMethod(resUrl, pUrl, response, SystemProperties.HttpMethod.Report);
         }
 
         public void SetErrorResponse(int statusCode, string errorMessage, HttpContext httpContext)
@@ -81,6 +87,16 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
                 new XElement(xmlnsCaldav+errorMessage)));
             httpContext.Response.Body.Write(respBody.ToString());
             httpContext.Response.StatusCode = statusCode;
+        }
+
+
+
+        private string GetRealUrl(HttpRequest request)
+        {
+            var url = request.GetEncodedUrl();
+            var host = "http://" + request.Host.Value + SystemProperties._baseUrl;
+            url = url.Replace(host, "");
+            return url;
         }
     }
 }
