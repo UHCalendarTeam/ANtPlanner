@@ -7,6 +7,10 @@ using TreeForXml;
 
 namespace ACL.Core.Extension_Method
 {
+    /// <summary>
+    /// Contains some useful extension methods
+    /// for the Principals.
+    /// </summary>
     public static class PrincipalExtensionsMethods
     {
         /// <summary>
@@ -16,7 +20,7 @@ namespace ACL.Core.Extension_Method
         /// <param name="principal">The principal that wants to know his permissions.</param>
         /// <param name="property">The resource or collection's DAV:acl property</param>
         /// <returns>Return an I</returns>
-        public static XmlTreeStructure GetCurrentUserPermissions(this Principal principal, Property property)
+        public static XmlTreeStructure GetCurrentUserPermissionProperty(this Principal principal, Property property)
         {
             var pUrl = principal.PrincipalURL;
             var aclP = XDocument.Parse(property.Value).Root;
@@ -47,5 +51,8 @@ namespace ACL.Core.Extension_Method
             var xmlTree = XmlTreeStructure.Parse(outputStr) as XmlTreeStructure;
             return xmlTree;
         }
+
+
+       
     }
 }

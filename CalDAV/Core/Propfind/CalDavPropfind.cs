@@ -548,7 +548,7 @@ namespace CalDAV.Core.Propfind
                     {
                         case "current-user-privilege-set":
                             propertiesCol.RemoveAll(x => x.NodeName == pair.Key);
-                            propertiesCol.Add(principal.GetCurrentUserPermissions(aclProperty));
+                            propertiesCol.Add(principal.GetCurrentUserPermissionProperty(aclProperty));
                             break;
                     }
                 }

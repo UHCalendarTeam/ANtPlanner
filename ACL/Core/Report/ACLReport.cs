@@ -72,6 +72,13 @@ namespace ACL.Core
             }
         }
 
+        /// <summary>
+        ///     The DAV:acl-principal-prop-set report returns, for all principals in
+        ///     the DAV:acl property(of the Request-URI) that are identified by
+        ///     http(s) URLs or by a DAV:property principal, the value of the
+        ///     properties specified in the REPORT request body.
+        /// </summary>
+        /// <returns></returns>
         public async Task AclPrincipalPropSet(IXMLTreeStructure body, HttpResponse response)
         {
             //take the requested properties from the body
