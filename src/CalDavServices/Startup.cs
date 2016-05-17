@@ -1,8 +1,11 @@
 ﻿using System.IO;
 using ACL.Core;
 using ACL.Core.Authentication;
+using ACL.Core.CheckPermissions;
 using CalDavServices.Extensions;
 using CalDAV.Core;
+using CalDAV.Core.ConditionsCheck.Preconditions;
+using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
@@ -32,10 +35,10 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Error()
+        .MinimumLevel.Verbose()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
-
+           
 
         }
 
@@ -46,7 +49,7 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           // services.AddSession();
+           
             //Add Cors
             services.AddCors(options =>
             {
@@ -82,6 +85,9 @@ namespace CalDavServices
             services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
             services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
             services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+            services.AddScoped<IPermissionChecker, PermissionsGuard>();
+            services.AddScoped<IReportPreconditions, ReportPreconditions>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
@@ -89,14 +95,14 @@ namespace CalDavServices
         {
             loggerFactory.AddSerilog();
 
-
+            
 
             app.UseIISPlatformHandler();
 
             //app.UseStaticFiles();
-           // app.UseSession();
+            
 
-            //app.UseCors("AllowAllOrigins");
+            app.UseCors("AllowAllOrigins");
 
 
             //use the authentication middleware

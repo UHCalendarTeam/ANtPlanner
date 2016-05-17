@@ -21,6 +21,17 @@ namespace DataLayer
             User
         }
 
+        public enum HttpMethod
+        {
+            Put, 
+            Get,
+            Delete,
+            Profind, 
+            Report,
+            MKCalendar,
+            Propatch
+        }
+
         /// <summary>
         ///     Contains the base url path for the system.
         /// </summary>

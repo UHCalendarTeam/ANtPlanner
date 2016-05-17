@@ -90,6 +90,13 @@ namespace CalDAV.Core
 
             var userResources = new Dictionary<string, string>();
 
+            ///TODO: have to add the DTSTART and DTEND of the resource in the DB
+            ///generally the first time that a client syncronize with the system
+            /// the client send a REPORT resquest with a time-filter query. So and 
+            /// optimization would be to know if the request has a time-filter query
+            /// run the query in db in just load in memory the resources that pass the filter.
+            /// Right now we are loading all the resources i memory and running the filters
+            /// which may impact the memory consumption depending on how many resources the user has.
             await fs.GetAllCalendarObjectResource(collectionURl, userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
                 userResource => VCalendar.Parse(userResource.Value));

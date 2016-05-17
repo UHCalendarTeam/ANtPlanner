@@ -167,7 +167,10 @@ namespace ACL.Core.Authentication
             }
 
             if (principal != null)
+            {
+                httpContext.Session.SetString("principalURl", principal.PrincipalURL);
                 return principal;
+            }
 
             #region checking cookies
 
