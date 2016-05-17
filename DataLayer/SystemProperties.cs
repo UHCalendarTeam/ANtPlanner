@@ -35,6 +35,24 @@ namespace DataLayer
             Propatch
         }
 
+        public static readonly string[] PublicCalendarNames =
+        {
+            "1stYearCom",
+            "2ndYearCom",
+            "3rdYearCom",
+            "4thYearCom",
+            "5thYearCom",
+            "1stYearMat",
+            "2ndYearMat",
+            "3rdYearMat",
+            "4thYearMat",
+            "PublicCalendar"
+        };
+
+        public static string PublicCalendarHomeUrl = "collections/groups/public/";
+
+        
+
         /// <summary>
         ///     Contains the base url path for the system.
         /// </summary>

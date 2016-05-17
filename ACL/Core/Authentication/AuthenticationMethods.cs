@@ -65,9 +65,12 @@ namespace ACL.Core.Authentication
                 // the users automatically in the system.
                 // TODO: check if is a student or teacher
 
-                principal = _principalRepository.CreateUserInSystem(username, username, password);
+                else
+                {
+                    principal = _principalRepository.CreateUserInSystem(username, username, password);
 
-                Console.WriteLine($"------Created user with username: {username}");
+                    Console.WriteLine($"------Created user with username: {username}");
+                }
 
 
                 //TODO: change to this when work the WCF service
@@ -168,7 +171,6 @@ namespace ACL.Core.Authentication
 
             if (principal != null)
             {
-                httpContext.Session.SetString("principalURl", principal.PrincipalURL);
                 return principal;
             }
 

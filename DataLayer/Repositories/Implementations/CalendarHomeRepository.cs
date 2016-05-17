@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.Data.Entity;
@@ -148,6 +149,59 @@ namespace DataLayer.Repositories.Implementations
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+
+        public CalendarHome CreateCalendarHome(Principal owner)
+        {
+            var adminUser = owner.User.Email.EndsWith("@admin.uh.cu");
+            var fsm = new FileSystemManagement();
+            var defaultCalName = "DefaultCalendar";
+
+            var defaultCalHomeName =adminUser?"PublicCollections" : "HomeCollection";
+            var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
+               false, false);
+
+            var aclProperty =adminUser? PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL) : PropertyCreation.CreateAclPropertyForUserCollections(owner.PrincipalURL);
+
+            var calHome = new CalendarHome(
+                $"{SystemProperties._userCollectionUrl}{owner.User.Email}/", defaultCalHomeName, ownerProp, aclProperty);
+
+            fsm.AddCalendarCollectionFolder(calHome.Url);
+
+            //create the initial calendar collection for the user.
+            var initCollection =
+                new CalendarCollection(
+                    $"{calHome.Url}{defaultCalName}/",
+                    defaultCalName, ownerProp, aclProperty)
+                {
+                    Principal = owner,
+                    CalendarHome = calHome
+                };
+
+
+            //add the calendar to the collection of the principal
+            owner.CalendarCollections.Add(initCollection);
+
+            //add the calendar collection to the calHome
+            calHome.CalendarCollections.Add(initCollection);
+        }
+
+
+        private void CreatePublicCollections(CalendarHome publicCalendar, Principal owner, params Property[] properties)
+        {
+            foreach (var calName in SystemProperties.PublicCalendarNames)
+            {
+                var publicCollection =
+                new CalendarCollection(
+                    $"{SystemProperties.PublicCalendarHomeUrl}{calName}/",calName, properties)
+                {
+                    Principal = owner,
+                    CalendarHome = publicCalendar
+                };
+
+                publicCalendar.CalendarCollections.Add(publicCollection);
+            }
         }
     }
 }

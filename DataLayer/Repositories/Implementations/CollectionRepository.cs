@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.Data.Entity;
 
 namespace DataLayer.Repositories
@@ -152,7 +154,5 @@ namespace DataLayer.Repositories
         {
             return await _context.SaveChangesAsync();
         }
-
-        
     }
 }
