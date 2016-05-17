@@ -3,51 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.Data.Entity;
 
-namespace DataLayer.Repositories
+namespace DataLayer.Repositories.Implementations
 {
-    public class CollectionRepository : IRepository<CalendarCollection, string>
+    public class CalendarHomeRepository : IRepository<CalendarHome, string>
     {
         //private readonly CalDavContext _context;
         private readonly CalDAVSQLiteContext _context;
 
-        public CollectionRepository(CalDAVSQLiteContext context)
+        public CalendarHomeRepository(CalDAVSQLiteContext context)
         {
             _context = context;
         }
 
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<IList<CalendarCollection>> GetAll()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public Task<IList<CalendarHome>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public CalendarCollection Get(string url)
+        public CalendarHome Get(string url)
         {
-            return _context.CalendarCollections.Include(p => p.Properties).
-                Include(r => r.CalendarResources).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == url);
+            return _context.CalendarHomeCollections.Include(p => p.Properties).
+              Include(r => r.CalendarCollections).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == url);
         }
 
-        public async Task<CalendarCollection> GetAsync(string url)
+        public async Task<CalendarHome> GetAsync(string url)
         {
-            return await _context.CalendarCollections.Include(p => p.Properties).
-                Include(r => r.CalendarResources)
+            return await _context.CalendarHomeCollections.Include(p => p.Properties).
+                Include(r => r.CalendarCollections)
                 .ThenInclude(rp => rp.Properties)
                 .FirstOrDefaultAsync(c => c.Url == url);
         }
 
-        public void Add(CalendarCollection entity)
+        public void Add(CalendarHome entity)
         {
-            _context.CalendarCollections.Add(entity);
-            // await _context.SaveChangesAsync();
+            _context.CalendarHomeCollections.Add(entity);
         }
 
-        public async Task Remove(CalendarCollection entity)
+        public async Task Remove(CalendarHome entity)
         {
-            _context.CalendarCollections.Remove(entity);
+            _context.CalendarHomeCollections.Remove(entity);
             await _context.SaveChangesAsync();
         }
 
@@ -59,12 +56,12 @@ namespace DataLayer.Repositories
 
         public async Task<int> Count()
         {
-            return await _context.CalendarCollections.CountAsync();
+            return await _context.CalendarHomeCollections.CountAsync();
         }
 
         public async Task<bool> Exist(string url)
         {
-            return await _context.CalendarCollections.AnyAsync(c => c.Url == url);
+            return await _context.CalendarHomeCollections.AnyAsync(c => c.Url == url);
         }
 
         public async Task<IList<Property>> GetAllProperties(string url)
@@ -152,7 +149,5 @@ namespace DataLayer.Repositories
         {
             return await _context.SaveChangesAsync();
         }
-
-        
     }
 }
