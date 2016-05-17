@@ -5,6 +5,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using ACL.Core;
+using ACL.Core.Authentication;
+using ACL.Core.CheckPermissions;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.Propfind;
@@ -28,6 +30,8 @@ namespace CalDAV.Core
         private readonly CollectionRepository _collectionRespository;
         private readonly PrincipalRepository _principalRepository;
         private readonly ResourceRespository _resourceRespository;
+        private readonly IPermissionChecker _permissionChecker;
+        
 
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace CalDAV.Core
         public CalDav(IFileSystemManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository)
+            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker)
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
@@ -50,6 +54,7 @@ namespace CalDAV.Core
             _collectionRespository = collectionRespository as CollectionRepository;
             _principalRepository = principalRepository as PrincipalRepository;
             _resourceRespository = resourceRespository as ResourceRespository;
+            _permissionChecker = permissionChecker;
         }
 
         /// <summary>
@@ -69,14 +74,14 @@ namespace CalDAV.Core
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
-            {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
+            {"CS", @"xmlns:CS=""http://calendarserver.org/ns/"""}
         };
 
         private readonly Dictionary<string, string> _namespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
-            {"S", "http://calendarserver.org/ns/"}
+            {"CS", "http://calendarserver.org/ns/"}
         };
 
         #endregion
@@ -109,7 +114,10 @@ namespace CalDAV.Core
             #region Extracting Properties
 
             string calendarResourceId;
-            propertiesAndHeaders.TryGetValue("calendarResourceID", out calendarResourceId);
+            propertiesAndHeaders.TryGetValue("calendarResourceId", out calendarResourceId);
+
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
@@ -148,7 +156,7 @@ namespace CalDAV.Core
             //status correspondiente y un xml "status" que tiene el mensaje del estado de dicho "propstat". 
 
             //checking Precondtions
-            PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository);
+            PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
             if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
@@ -157,7 +165,7 @@ namespace CalDAV.Core
             var responseTree = new XmlTreeStructure("multistatus", "DAV:");
             responseTree.Namespaces.Add("D", "DAV:");
             responseTree.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
-            responseTree.Namespaces.Add("S", _namespacesSimple["S"]);
+            responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
 
             //Tool that contains the methods for propfind.
             PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
@@ -859,14 +867,14 @@ namespace CalDAV.Core
             }
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
-
+            
             #endregion
 
             //Note: calendar object resource = COR
 
             //CheckAllPreconditions
 
-            PreconditionCheck = new PutPrecondition(StorageManagement, _collectionRespository, _resourceRespository);
+            PreconditionCheck = new PutPrecondition(StorageManagement, _collectionRespository, _resourceRespository, _permissionChecker);
             if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 

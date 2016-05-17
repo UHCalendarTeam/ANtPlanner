@@ -9,6 +9,7 @@ using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using ACL.Core.Authentication;
 
 namespace CalDavServices.Controllers
 {
@@ -31,22 +32,8 @@ namespace CalDavServices.Controllers
             return reader.ReadToEnd();
         }
 
-        //[AcceptVerbs("Initialize")]
-        //public void InitialiseDb()
-        //{
-        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
-        //    var fs = new FileSystemManagement();
-        //    SqlMock.RecreateDb();
-
-        //    SqlMock.SeedDb_Fs();
-        //}
-
-        //[AcceptVerbs("Destroy")]
-        //public void DestroyDb()
-        //{
-        //    Response.StatusCode = (int)HttpStatusCode.NoContent;
-        //    SqlMock.RecreateDb();
-        //}
+        [FromServices]
+        private  IAuthenticate _authenticate { get; }
 
         private string GetPrincipalUrlFromUrl(string url, string collectionName)
         {
@@ -136,11 +123,10 @@ namespace CalDavServices.Controllers
         public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
-
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalId", principalId);
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
             propertiesAndHeaders.Add("collectionName", collectionName);
-
             propertiesAndHeaders.Add("url", url);
 
             await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
@@ -150,11 +136,12 @@ namespace CalDavServices.Controllers
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task PropFind(string groupOrUser, string principalId, string collectionName)
         {
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders["principalId"] = principalId;
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL); 
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
@@ -178,6 +165,7 @@ namespace CalDavServices.Controllers
         public async Task PropFind(string groupOrUser, string principalId, string collectionName,
             string calendarResource)
         {
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
@@ -186,7 +174,7 @@ namespace CalDavServices.Controllers
 
             propertiesAndHeaders.Add("calendarResourceId", calendarResource);
 
-            propertiesAndHeaders["principalId"] = principalId;
+            propertiesAndHeaders["principalUrl"] = principal.PrincipalURL;
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
@@ -202,6 +190,8 @@ namespace CalDavServices.Controllers
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
+            propertiesAndHeaders["principalUrl"] = principal.PrincipalURL;
 
             await CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
@@ -216,6 +206,8 @@ namespace CalDavServices.Controllers
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
             propertiesAndHeaders.Add("calendarResourceId", calendarResourceId);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
+            propertiesAndHeaders["principalUrl"] = principal.PrincipalURL;
 
             await CalDavRepository.PropPatch(propertiesAndHeaders, StreamToString(Request.Body), Response);
         }
@@ -242,9 +234,10 @@ namespace CalDavServices.Controllers
         public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
             var url = GetRealUrl(Request);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             var propertiesAndHeaders = new Dictionary<string, string>
             {
-                {"principalId", principalId},
+                {"principalUrl", principal.PrincipalURL},
                 {"url", url},
                 {"calendarResourceId", calendarResourceId},
                 {"body", StreamToString(Request.Body)}
@@ -265,21 +258,13 @@ namespace CalDavServices.Controllers
                 {
                     propertiesAndHeaders.Add("If-Match", value);
                 }
-                //if (ifmatch.Count > 0)
-                //{
-                //    propertiesAndHeaders.Add("If-Match", ifmatch);
-                //}
-                
 
                 var ifnonematch = Request.Headers["If-None-Match"];
                 foreach (var value in ifnonematch)
                 {
                     propertiesAndHeaders.Add("If-None-Match", value);
                 }
-                //if (ifnonematch.Count > 0)
-                //{
-                //    propertiesAndHeaders.Add("If-None-Match", ifnonematch);
-                //}
+               
                 var contentSize = Request.Headers["Content-Length"];
                 if (contentSize.Count > 0)
                 {
@@ -308,6 +293,8 @@ namespace CalDavServices.Controllers
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
 
             await CalDavRepository.ReadCalendarObjectResource(propertiesAndHeaders, Response);
         }
@@ -319,7 +306,9 @@ namespace CalDavServices.Controllers
         {
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalId", principalId);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
+
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
             propertiesAndHeaders.Add("url", url);
 
             var ifmatch = Request.Headers["If-Match"];
@@ -336,8 +325,9 @@ namespace CalDavServices.Controllers
         public async Task Delete(string groupOrUser, string principalId, string collectionName)
         {
             var url = GetRealUrl(Request);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalId", principalId);
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
             propertiesAndHeaders.Add("url", url);
 
             await CalDavRepository.DeleteCalendarCollection(propertiesAndHeaders, Response);
