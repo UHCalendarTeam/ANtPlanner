@@ -356,7 +356,7 @@ namespace CalDAV.Core
 
             propertiesAndHeaders.Add("body", body);
 
-            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository);
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker);
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, _collectionRespository);
 
             //Checking that all precondition pass
@@ -514,7 +514,7 @@ namespace CalDAV.Core
             #endregion
 
             //Checking precondition
-            PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository);
+            PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
             if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
