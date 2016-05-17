@@ -28,7 +28,8 @@ namespace DataLayer
             Delete,
             Profind, 
             Report,
-            MKCalendar
+            MKCalendar,
+            Propatch
         }
 
         /// <summary>

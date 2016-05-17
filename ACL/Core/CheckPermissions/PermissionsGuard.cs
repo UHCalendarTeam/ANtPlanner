@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Xml.Linq;
 using DataLayer;
 using DataLayer.Repositories;
@@ -94,7 +95,8 @@ namespace ACL.Core.CheckPermissions
             var permissions = TakePermissions(resourceUrl, principalUrl);
 
             if (method == SystemProperties.HttpMethod.Put ||
-                method == SystemProperties.HttpMethod.Delete)
+                method == SystemProperties.HttpMethod.Delete ||
+                method == SystemProperties.HttpMethod.Propatch)
                 if (permissions.Any(x => x == _writePermissionString))
                     return true;
 
@@ -128,10 +130,8 @@ namespace ACL.Core.CheckPermissions
             //take the acl property
 
             var xdoc = XDocument.Parse(aclP.Value);
-            IEnumerable<XElement> principalGrantPermissions = null;
             XName aceName = "ace";
-            var descendants = xdoc.Descendants();
-            var aces = descendants.Where(x => x.Name.LocalName == aceName).ToArray();
+            var aces = xdoc.Descendants().Where(x => x.Name.LocalName == aceName).ToArray();
 
             //take the ACEs with the given principal
             acesToCheck.Add(aces.FirstOrDefault(ace => ace.Descendants()
