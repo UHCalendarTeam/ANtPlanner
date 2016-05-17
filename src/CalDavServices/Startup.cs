@@ -32,10 +32,10 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Error()
+        .MinimumLevel.Verbose()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
-
+           
 
         }
 
@@ -88,14 +88,14 @@ namespace CalDavServices
         {
             loggerFactory.AddSerilog();
 
-
+            
 
             app.UseIISPlatformHandler();
 
             //app.UseStaticFiles();
 
 
-            //app.UseCors("AllowAllOrigins");
+            app.UseCors("AllowAllOrigins");
 
 
             //use the authentication middleware
