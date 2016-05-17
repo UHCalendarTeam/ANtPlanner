@@ -9,7 +9,9 @@ using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
+using DataLayer.Repositories.Implementations;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Data.Entity;
@@ -35,7 +37,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Verbose()
+        .MinimumLevel.Warning()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
            
@@ -85,6 +87,7 @@ namespace CalDavServices
             services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
             services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
             services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+            services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
             services.AddScoped<IPermissionChecker, PermissionsGuard>();
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
 

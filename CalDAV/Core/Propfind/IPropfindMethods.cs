@@ -40,5 +40,16 @@ namespace CalDAV.Core.Propfind
         /// <param name="multistatusTree">Response structure, element to be fill</param>
         /// <returns></returns>
         Task PropNameMethod(string url, string calendarResourceId, int? depth, XmlTreeStructure multistatusTree);
+
+        /// <summary>
+        /// Returns the value of the specified properties for the Calendar Home Set and all the calendar collections contained in it.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="calendarResourceId"></param>
+        /// <param name="propertiesReq"></param>
+        /// <param name="multistatusTree"></param>
+        /// <param name="principal"></param>
+        /// <returns></returns>
+        Task CHSetPropMethod(string url, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);
     }
 }

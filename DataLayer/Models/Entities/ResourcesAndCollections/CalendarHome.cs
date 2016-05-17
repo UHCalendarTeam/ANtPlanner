@@ -26,7 +26,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
             Properties = new List<Property>();
             if (properties != null && properties.Length > 0)
             {
-                Properties = properties;
+                Properties.AddRange(properties);
             }
             InitializeStandardCollectionProperties(name);
         }
@@ -65,7 +65,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         /// <summary>
         ///     Contains the properties of the collection.
         /// </summary>
-        public ICollection<Property> Properties { get; set; }
+        public List<Property> Properties { get; set; }
 
 
 

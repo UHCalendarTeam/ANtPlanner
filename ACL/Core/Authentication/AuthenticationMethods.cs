@@ -64,13 +64,13 @@ namespace ACL.Core.Authentication
                 //Temporaly if the WCF services doesnt work we are gonna create
                 // the users automatically in the system.
                 // TODO: check if is a student or teacher
-
                 else
                 {
                     principal = _principalRepository.CreateUserInSystem(username, username, password);
 
                     Console.WriteLine($"------Created user with username: {username}");
                 }
+
 
 
                 //TODO: change to this when work the WCF service

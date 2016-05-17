@@ -13,7 +13,9 @@ using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
+using DataLayer.Repositories.Implementations;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
@@ -30,6 +32,7 @@ namespace CalDAV.Core
         private readonly CollectionRepository _collectionRespository;
         private readonly PrincipalRepository _principalRepository;
         private readonly ResourceRespository _resourceRespository;
+        private readonly CalendarHomeRepository _calendarHomeRepository;
         private readonly IPermissionChecker _permissionChecker;
         
 
@@ -46,7 +49,7 @@ namespace CalDAV.Core
         public CalDav(IFileSystemManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker)
+            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository )
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
@@ -54,6 +57,7 @@ namespace CalDAV.Core
             _collectionRespository = collectionRespository as CollectionRepository;
             _principalRepository = principalRepository as PrincipalRepository;
             _resourceRespository = resourceRespository as ResourceRespository;
+            _calendarHomeRepository = calendarHomeRepository as CalendarHomeRepository;
             _permissionChecker = permissionChecker;
         }
 
@@ -168,7 +172,7 @@ namespace CalDAV.Core
             responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
 
             //Tool that contains the methods for propfind.
-            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository, _calendarHomeRepository);
 
             //if the body is empty assume that is an allprop request.          
             if (string.IsNullOrEmpty(body))
@@ -196,10 +200,7 @@ namespace CalDAV.Core
             {
                 case "prop":
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure) xmlTree);
-
-                    //take the principalId from the properties
-                    var principalId = propertiesAndHeaders["principalId"];
-                    var principal = _principalRepository.GetByIdentifier(principalId);
+                    var principal = _principalRepository.Get(principalUrl);
                     await PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -228,6 +229,77 @@ namespace CalDAV.Core
         {
             await _aclProfind.Profind(httpContext);
         }
+
+        public async Task CHSetPropfind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
+        {
+            #region Extracting Properties
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
+
+            string url;
+            propertiesAndHeaders.TryGetValue("url", out url);
+            #endregion
+
+            //Creating and filling the root of the xml tree response
+            //All response are composed of a "multistatus" xml element
+            //witch contains a "response" element for each collection and resource analized witch url is included in a "href" element as a child of "response".
+            //As a child of the "response" there is a list of "propstat". One for each different status obtained
+            //trying to get the specified properties.
+            //Inside every "propstatus" there are a xml element "prop" with all the properties that match with
+            //the given "status" and a "status" xml containing the message of his "propstat".
+
+            ////checking Precondtions
+            //PreconditionCheck = new PropfindPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
+            //if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            //    return;
+
+            response.StatusCode = 207;
+            response.ContentType = "application/xml";
+            var responseTree = new XmlTreeStructure("multistatus", "DAV:");
+            responseTree.Namespaces.Add("D", "DAV:");
+            responseTree.Namespaces.Add("C", "urn:ietf:params:xml:ns:caldav");
+            responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
+
+            //Tool that contains the methods for propfind.
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository, _calendarHomeRepository);
+
+            //parsing the body into a xml tree
+            var xmlTree = XmlTreeStructure.Parse(body);
+
+            //Managing if the body was ok
+            if (xmlTree.NodeName != "propfind")
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            //Finding the right method of propfind, it is found in the first child of the tree.
+            //This methods take the response tree and they completed it with the necessary values and structure.
+            var propType = xmlTree.Children[0];
+            switch (propType.NodeName)
+            {
+                case "prop":
+                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
+
+                    //take the principalId from the properties
+                    var principal =await _principalRepository.GetAsync(principalUrl);
+                    await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
+                    break;
+                case "allprop":
+                    throw new ArgumentException("This should be a prop propfind");
+                    break;
+                case "propname":
+                    throw new ArgumentException("This should be a prop propfind");
+                    break;
+                default:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
+            }
+            var responseText = responseTree.ToString();
+            var responseBytes = Encoding.UTF8.GetBytes(responseText);
+            response.ContentLength = responseBytes.Length;
+            await response.WriteAsync(responseText);
+        } 
 
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.
@@ -275,8 +347,8 @@ namespace CalDAV.Core
         {
             #region Extracting Properties
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
@@ -285,7 +357,7 @@ namespace CalDAV.Core
 
             propertiesAndHeaders.Add("body", body);
 
-            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository);
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker);
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, _collectionRespository);
 
             //Checking that all precondition pass
@@ -383,8 +455,8 @@ namespace CalDAV.Core
         {
             #region Extracting Properties
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
             string collectionName;
             propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
@@ -396,7 +468,7 @@ namespace CalDAV.Core
 
             //Adding the collection to the database
 
-            var principal = await _principalRepository.GetByIdentifierAsync(principalId);
+            var principal = await _principalRepository.GetAsync(principalUrl);
             var collection = new CalendarCollection(url, collectionName);
             
             principal.CalendarCollections.Add(collection);
@@ -443,7 +515,7 @@ namespace CalDAV.Core
             #endregion
 
             //Checking precondition
-            PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository);
+            PreconditionCheck = new ProppatchPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
             if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
                 return;
 
@@ -706,8 +778,7 @@ namespace CalDAV.Core
                 !await _collectionRespository.Exist(collectionUrl))
                 return true;
 
-            var resource =
-                _resourceRespository.Get(url);
+            var resource = await _resourceRespository.GetAsync(url);
             //Checking that if exist an IF-Match Header the delete performs its operation
             //avoiding lost updates.
             if (ifMatchEtags.Count > 0)
@@ -779,7 +850,7 @@ namespace CalDAV.Core
                 return true;
 
             //The collection is retrieve and if something unexpected happened an internal error is reflected.
-            var collection = _collectionRespository.Get(url);
+            var collection =await _collectionRespository.GetAsync(url);
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
@@ -813,7 +884,7 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes = _resourceRespository.Get(url);
+            var calendarRes =await _resourceRespository.GetAsync(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
@@ -1050,8 +1121,8 @@ namespace CalDAV.Core
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
 
             //var headers = response.GetTypedHeaders();
@@ -1065,8 +1136,8 @@ namespace CalDAV.Core
             var resource = new CalendarResource(url, calendarResourceId);
 
             //add the owner property           
-            var principal = _principalRepository.GetByIdentifier(principalId);
-            var principalUrl = principal == null ? "" : principal.PrincipalURL;
+            var principal = await _principalRepository.GetAsync(principalUrl);
+            
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));

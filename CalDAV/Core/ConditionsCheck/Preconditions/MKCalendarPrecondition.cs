@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using ACL.Core.Authentication;
+using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
@@ -13,12 +15,14 @@ namespace CalDAV.Core.ConditionsCheck
     public class MKCalendarPrecondition : IPrecondition
     {
         private readonly CollectionRepository _collectionRepository;
+        private readonly IPermissionChecker _permissionChecker;
 
         public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement,
-            IRepository<CalendarCollection, string> collectionRepository)
+            IRepository<CalendarCollection, string> collectionRepository, IPermissionChecker permissionChecker)
         {
             fs = fileSystemManagement;
             _collectionRepository = collectionRepository as CollectionRepository;
+            _permissionChecker = permissionChecker;
         }
 
         public IFileSystemManagement fs { get; }
@@ -30,8 +34,12 @@ namespace CalDAV.Core.ConditionsCheck
 
             var body = propertiesAndHeaders["body"];
             var url = propertiesAndHeaders["url"];
+            var principalUrl = propertiesAndHeaders["principalUrl"];
 
             #endregion
+
+            if (!PermissionCheck(url, principalUrl, response))
+                return false;
 
             if (fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))
             {
@@ -63,6 +71,12 @@ namespace CalDAV.Core.ConditionsCheck
             }
 
             return true;
+        }
+
+        private bool PermissionCheck(string url, string principalUrl, HttpResponse response)
+        {
+            return _permissionChecker.CheckPermisionForMethod(url, principalUrl, response,
+                SystemProperties.HttpMethod.MKCalendar);
         }
     }
 }

@@ -32,7 +32,8 @@ namespace DataLayer
             ProfindResource,//profind that is performed on a resource
             Report,
             MKCalendar,
-            Propatch
+            PropatchCollection,
+            ProppatchResource
         }
 
         public static readonly string[] PublicCalendarNames =

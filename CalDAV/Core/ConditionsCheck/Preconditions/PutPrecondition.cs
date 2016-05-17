@@ -62,10 +62,10 @@ namespace CalDAV.Core.ConditionsCheck
                 return false;
             }
 
-            if (await _resourceRespository.Exist(url) && !PermissionPrecondition(url, principalUrl, response))
+            var creationMode = !await _resourceRespository.Exist(url);
+            if (PermissionCheck(url, creationMode, principalUrl, response))
             {
-                return false;
-            }
+                return false;}
 
             //check that if the resource exist then all its components different of VTIMEZONE has to have the same UID
             //if the resource not exist can not be another resource with the same uid.
@@ -295,10 +295,11 @@ Content size exceeds max size allowed.
             return await Task.FromResult(true);
         }
 
-        private bool PermissionPrecondition(string resourceUrl, string principalUrl, HttpResponse response)
+        private bool PermissionCheck(string url, bool creationMode, string principalUrl, HttpResponse response)
         {
-            return _permissionChecker.CheckPermisionForMethod(resourceUrl, principalUrl, response,
-                SystemProperties.HttpMethod.PutCreate);//TODO:change this
+            return creationMode ?
+                  _permissionChecker.CheckPermisionForMethod(url, principalUrl, response, SystemProperties.HttpMethod.PutCreate) :
+                  _permissionChecker.CheckPermisionForMethod(url, principalUrl, response, SystemProperties.HttpMethod.PutUpdate);
         }
     }
 }

@@ -17,9 +17,10 @@ namespace CalDavServices.Controllers
     public class CalDavController : Controller
     {
         //Constructor
-        public CalDavController(ICalDav repoCalDav)
+        public CalDavController(ICalDav repoCalDav, IAuthenticate authenticate)
         {
             CalDavRepository = repoCalDav;
+            _authenticate = authenticate;
         }
 
         //dependency injection
@@ -115,7 +116,7 @@ namespace CalDavServices.Controllers
             if (Request.Headers.TryGetValue("Depth", out depth))
                 propertiesAndHeaders.Add("depth", depth);
 
-            await CalDavRepository.PropFind(propertiesAndHeaders, body, Response);
+            await CalDavRepository.CHSetPropfind(propertiesAndHeaders, body, Response);
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
