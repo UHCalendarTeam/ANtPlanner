@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
+using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using ICalendar.Calendar;
@@ -17,14 +19,15 @@ namespace CalDAV.Core.ConditionsCheck
     {
         private readonly CollectionRepository _collectionRepository;
         private readonly ResourceRespository _resourceRespository;
-
+        private readonly IPermissionChecker _permissionChecker;
         public PutPrecondition(IFileSystemManagement manager,
             IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository)
+            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker)
         {
             _collectionRepository = collectionRepository as CollectionRepository;
             _resourceRespository = resourceRepository as ResourceRespository;
             StorageManagement = manager;
+            _permissionChecker = permissionChecker;
         }
 
         private IFileSystemManagement StorageManagement { get; }
@@ -37,6 +40,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             var contentSize = propertiesAndHeaders["content-length"];
             var body = propertiesAndHeaders["body"];
+            var principalUrl = propertiesAndHeaders["principalUrl"];
             VCalendar iCalendar;
             try
             {
@@ -58,6 +62,10 @@ namespace CalDAV.Core.ConditionsCheck
                 return false;
             }
 
+            if (await _resourceRespository.Exist(url) && !PermissionPrecondition(url, principalUrl, response))
+            {
+                return false;
+            }
 
             //check that if the resource exist then all its components different of VTIMEZONE has to have the same UID
             //if the resource not exist can not be another resource with the same uid.
@@ -77,9 +85,7 @@ namespace CalDAV.Core.ConditionsCheck
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{
-                                SystemProperties._baseUrl + calendarresource
-                                    .Href}</href>
+<href xmlns='DAV:'>{SystemProperties._baseUrl + calendarresource.Href}</href>
 </no-uid-conflict>
 </error>");
                         return false;
@@ -104,9 +110,7 @@ namespace CalDAV.Core.ConditionsCheck
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
-<href xmlns='DAV:'>{
-                                SystemProperties._baseUrl + resource
-                                    .Href}</href>
+<href xmlns='DAV:'>{SystemProperties._baseUrl + resource.Href}</href>
 </no-uid-conflict>
 </error>");
                         return false;
@@ -289,6 +293,12 @@ Content size exceeds max size allowed.
             //than the max-instances property value.
 
             return await Task.FromResult(true);
+        }
+
+        private bool PermissionPrecondition(string resourceUrl, string principalUrl, HttpResponse response)
+        {
+            return _permissionChecker.CheckPermisionForMethod(resourceUrl, principalUrl, response,
+                SystemProperties.HttpMethod.Put);
         }
     }
 }
