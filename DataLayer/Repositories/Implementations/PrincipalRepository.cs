@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
 
@@ -227,7 +228,7 @@ namespace DataLayer.Repositories
         {
             //create the core passHasher
             var passHasher = new PasswordHasher<User>();
-
+            var fsm = new FileSystemManagement();
 
             var user = new User
             {
@@ -236,11 +237,12 @@ namespace DataLayer.Repositories
                 DisplayName = fullName
             };
 
-            var defaultCalName = email;
+            var defaultCalName = "DefaultCalendar";
+            var defaultCalHomeName = "HomeCollection";
 
             //create useful properties for the principal
             var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
-                defaultCalName);
+                defaultCalHomeName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
 
@@ -250,32 +252,41 @@ namespace DataLayer.Repositories
 
             user.Principal = principal;
 
-            #region create the collection for the principal
+            #region create the collections for the principal
 
-            //create the collection for the user.
-            var col =
-                new CalendarCollection(
-                    $"{SystemProperties._userCollectionUrl}{email}/{defaultCalName}/",
-                    defaultCalName)
-                {
-                    Principal = principal
-                };
-
-            //add the ACL properties to the collection
+            //create the ACL properties
             var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{principal.PrincipalURL}</D:href>",
                 false, false);
+            var aclProperty = PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL);
 
-            col.Properties.Add(ownerProp);
-            col.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL));
+            var calHome = new CalendarHome(
+                $"{SystemProperties._userCollectionUrl}{email}/",defaultCalHomeName, ownerProp, aclProperty);
+           
 
-            //add the calaendar to the collection of the principal
-            principal.CalendarCollections.Add(col);
+            //create the folder for the collection
+            fsm.AddCalendarCollectionFolder(calHome.Url);
+
+            //create the initial calendar collection for the user.
+            var initCollection =
+                new CalendarCollection(
+                    $"{calHome.Url}{defaultCalName}/",
+                    defaultCalName, ownerProp, aclProperty)
+                {
+                    Principal = principal,
+                    CalendarHome = calHome
+                };
+
+            //add the calendar to the collection of the principal
+            principal.CalendarCollections.Add(initCollection);
+
+            //add the calendar collection to the calHome
+            calHome.CalendarCollections.Add(initCollection);
 
             #endregion
 
             //create the folder that will contain the 
             //calendars of the user
-            new FileSystemManagement().AddCalendarCollectionFolder(col.Url);
+            fsm.AddCalendarCollectionFolder(initCollection.Url);
 
             //hass the user password 
             // the instance of the user has to be pass but is not used
@@ -286,7 +297,8 @@ namespace DataLayer.Repositories
             //add the user and its principal to the context
             _context.Users.Add(user);
             _context.Principals.Add(principal);
-            _context.CalendarCollections.Add(col);
+            _context.CalendarHomeCollections.Add(calHome);
+            _context.CalendarCollections.Add(initCollection);
 
             _context.SaveChanges();
 

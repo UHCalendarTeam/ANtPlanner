@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.ACL
 {
@@ -68,6 +69,11 @@ namespace DataLayer.Models.ACL
         ///     Contains the collection of the principal.
         /// </summary>
         public ICollection<CalendarCollection> CalendarCollections { get; set; }
+
+        /// <summary>
+        /// The calendar home associated to the principal.
+        /// </summary>
+        public CalendarHome CalendarHome { get; set; }
 
         /// <summary>
         ///     If the principal represents a user then

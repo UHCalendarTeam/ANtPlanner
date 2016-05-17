@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.Entities
 {
@@ -70,6 +71,17 @@ namespace DataLayer.Models.Entities
         ///     Contains the resources that are defined in this collection.
         /// </summary>
         public ICollection<CalendarResource> CalendarResources { get; set; }
+
+        /// <summary>
+        ///     The FK to the calendarHome where the calendarCollection
+        ///     belongs.
+        /// </summary>
+        public int CalendarHomeId { get; set; }
+
+        /// <summary>
+        ///     Reference to the calendar home of this collection.
+        /// </summary>
+        public CalendarHome CalendarHome { get; set; }
 
         /// <summary>
         ///     Contains the properties of the collection.

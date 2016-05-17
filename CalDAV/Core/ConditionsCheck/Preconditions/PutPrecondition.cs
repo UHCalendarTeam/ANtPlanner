@@ -298,7 +298,7 @@ Content size exceeds max size allowed.
         private bool PermissionPrecondition(string resourceUrl, string principalUrl, HttpResponse response)
         {
             return _permissionChecker.CheckPermisionForMethod(resourceUrl, principalUrl, response,
-                SystemProperties.HttpMethod.Put);
+                SystemProperties.HttpMethod.PutCreate);//TODO:change this
         }
     }
 }

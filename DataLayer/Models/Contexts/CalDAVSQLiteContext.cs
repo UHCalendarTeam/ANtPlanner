@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
@@ -31,6 +32,7 @@ namespace DataLayer
         public DbSet<Student> Students { get; set; }
 
         public DbSet<Worker> Workers { get; set; }
+        public DbSet<CalendarHome> CalendarHomeCollections { get; set; }
         public DbSet<CalendarCollection> CalendarCollections { get; set; }
 
         public DbSet<CalendarResource> CalendarResources { get; set; }
