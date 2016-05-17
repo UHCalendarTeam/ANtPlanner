@@ -152,9 +152,10 @@ namespace DataLayer.Repositories.Implementations
         }
 
 
-        public CalendarHome CreateCalendarHome(Principal owner)
+        public static CalendarHome CreateCalendarHome(Principal owner)
         {
-            var adminUser = owner.User.Email.EndsWith("@admin.uh.cu");
+            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu")&&!SystemProperties.PublicCalendarCreated;
+            
             var fsm = new FileSystemManagement();
             var defaultCalName = "DefaultCalendar";
 
@@ -164,8 +165,16 @@ namespace DataLayer.Repositories.Implementations
 
             var aclProperty =adminUser? PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL) : PropertyCreation.CreateAclPropertyForUserCollections(owner.PrincipalURL);
 
+            string calHomeUrl;
+            //if the user is admin then the collection home is public so the URL change
+            if (adminUser)
+                calHomeUrl = SystemProperties.PublicCalendarHomeUrl;
+            else
+                calHomeUrl = $"{SystemProperties._userCollectionUrl}{owner.PrincipalStringIdentifier}/";
+
+
             var calHome = new CalendarHome(
-                $"{SystemProperties._userCollectionUrl}{owner.User.Email}/", defaultCalHomeName, ownerProp, aclProperty);
+                calHomeUrl, defaultCalHomeName, ownerProp, aclProperty);
 
             fsm.AddCalendarCollectionFolder(calHome.Url);
 
@@ -179,17 +188,24 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = calHome
                 };
 
-
-            //add the calendar to the collection of the principal
-            owner.CalendarCollections.Add(initCollection);
+            //if the principal is admin the create the public calendars
+            if(adminUser)
+                CreatePublicCollections(calHome,owner, aclProperty, ownerProp);
+            
 
             //add the calendar collection to the calHome
             calHome.CalendarCollections.Add(initCollection);
+            owner.CalendarCollections.Add(initCollection);
+            SystemProperties.PublicCalendarCreated = true;
+
+
+            return calHome;
         }
 
 
-        private void CreatePublicCollections(CalendarHome publicCalendar, Principal owner, params Property[] properties)
+        private static void CreatePublicCollections(CalendarHome publicCalendar, Principal owner, params Property[] properties)
         {
+            var fsm = new FileSystemManagement();
             foreach (var calName in SystemProperties.PublicCalendarNames)
             {
                 var publicCollection =
@@ -200,7 +216,9 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = publicCalendar
                 };
 
+                fsm.AddCalendarCollectionFolder(publicCollection.Url);
                 publicCalendar.CalendarCollections.Add(publicCollection);
+                owner.CalendarCollections.Add(publicCollection);
             }
         }
     }

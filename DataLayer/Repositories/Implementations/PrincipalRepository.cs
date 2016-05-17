@@ -7,6 +7,7 @@ using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Repositories.Implementations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
 
@@ -252,41 +253,11 @@ namespace DataLayer.Repositories
 
             user.Principal = principal;
 
-            #region create the collections for the principal
+            
+            //create the cal home for the principal
+            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
 
-            //create the ACL properties
-            var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{principal.PrincipalURL}</D:href>",
-                false, false);
-            var aclProperty = PropertyCreation.CreateAclPropertyForUserCollections(principal.PrincipalURL);
-
-            var calHome = new CalendarHome(
-                $"{SystemProperties._userCollectionUrl}{email}/",defaultCalHomeName, ownerProp, aclProperty);
-           
-
-            //create the folder for the collection
-            fsm.AddCalendarCollectionFolder(calHome.Url);
-
-            //create the initial calendar collection for the user.
-            var initCollection =
-                new CalendarCollection(
-                    $"{calHome.Url}{defaultCalName}/",
-                    defaultCalName, ownerProp, aclProperty)
-                {
-                    Principal = principal,
-                    CalendarHome = calHome
-                };
-
-            //add the calendar to the collection of the principal
-            principal.CalendarCollections.Add(initCollection);
-
-            //add the calendar collection to the calHome
-            calHome.CalendarCollections.Add(initCollection);
-
-            #endregion
-
-            //create the folder that will contain the 
-            //calendars of the user
-            fsm.AddCalendarCollectionFolder(initCollection.Url);
+            
 
             //hass the user password 
             // the instance of the user has to be pass but is not used
@@ -298,8 +269,6 @@ namespace DataLayer.Repositories
             _context.Users.Add(user);
             _context.Principals.Add(principal);
             _context.CalendarHomeCollections.Add(calHome);
-            _context.CalendarCollections.Add(initCollection);
-
             _context.SaveChanges();
 
             return principal;

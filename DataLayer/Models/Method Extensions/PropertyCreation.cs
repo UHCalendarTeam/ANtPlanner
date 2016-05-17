@@ -72,10 +72,14 @@ namespace DataLayer
         public static Property CreateCalendarHomeSet(SystemProperties.PrincipalType pType, string principalId,
             string calName)
         {
+            var publicCalUrl = SystemProperties.PublicCalendarCreated
+                ? $"<D:href>{SystemProperties.PublicCalendarHomeUrl}</D:href>"
+                : "";
             var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
-                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</D:href></C:calendar-home-set>"
+                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</D:href>" +
+                        $"{publicCalUrl}</C:calendar-home-set>"
             };
             return property;
         }
