@@ -108,7 +108,7 @@ namespace DataLayer
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
-            {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
+            {"CS", @"xmlns:CS=""http://calendarserver.org/ns/"""}
         };
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace DataLayer
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
-            {"S", @"http://calendarserver.org/ns/"}
+            {"CS", @"http://calendarserver.org/ns/"}
         };
 
         /// <summary>

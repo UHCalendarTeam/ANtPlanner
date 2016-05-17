@@ -801,8 +801,8 @@ namespace CalDAV.Core
                             var stack = new Stack<string>();
                             await
                                 _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag",
-                                    _namespacesSimple["S"],
-                                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
+                                    _namespacesSimple["CS"],
+                                    $@"<CS:getctag {_namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>", stack, true);
 
 
                             return StorageManagement.DeleteCalendarObjectResource(url);
@@ -823,8 +823,8 @@ namespace CalDAV.Core
 
                 //updating the ctag
                 var stack = new Stack<string>();
-                await _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag", _namespacesSimple["S"],
-                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
+                await _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag", _namespacesSimple["CS"],
+                    $@"<CS:getctag {_namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>", stack, true);
 
 
                 return StorageManagement.DeleteCalendarObjectResource(url);
@@ -1078,8 +1078,8 @@ namespace CalDAV.Core
             //updating the ctag
             await
                 _collectionRespository.CreateOrModifyProperty(
-                    url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1), "getctag", _namespacesSimple["S"],
-                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", errorStack, true);
+                    url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1), "getctag", _namespacesSimple["CS"],
+                    $@"<CS:getctag {_namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>", errorStack, true);
 
             //updating the lastmodified
             await _resourceRespository.CreateOrModifyProperty(url, "getlastmodified", _namespacesSimple["D"],
@@ -1156,8 +1156,8 @@ namespace CalDAV.Core
             var stack = new Stack<string>();
             await
                 _collectionRespository.CreateOrModifyProperty(
-                    url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1), "getctag", _namespacesSimple["S"],
-                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
+                    url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1), "getctag", _namespacesSimple["CS"],
+                    $@"<CS:getctag {_namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>", stack, true);
 
             //getting the uid
             var calendarComponents =
