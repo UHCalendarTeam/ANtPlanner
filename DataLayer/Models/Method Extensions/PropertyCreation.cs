@@ -75,7 +75,7 @@ namespace DataLayer
             var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
-                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}{calName}/</D:href></C:calendar-home-set>"
+                        $"<D:href>{SystemProperties.BuildHomeSetUrl(pType, principalId)}</D:href></C:calendar-home-set>"
             };
             return property;
         }
