@@ -112,12 +112,12 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
                 Value = $"<D:creationdate {SystemProperties.Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
 
-            Properties.Add(new Property("getctag", SystemProperties.NamespacesValues["S"])
+            Properties.Add(new Property("getctag", SystemProperties.NamespacesValues["CS"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $@"<S:getctag {SystemProperties.Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
+                Value = $@"<CS:getctag {SystemProperties.Namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>"
             });
             Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
         }

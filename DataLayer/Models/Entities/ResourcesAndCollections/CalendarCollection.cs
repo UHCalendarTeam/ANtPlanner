@@ -16,14 +16,14 @@ namespace DataLayer.Models.Entities
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""},
-            {"S", @"xmlns:S=""http://calendarserver.org/ns/"""}
+            {"CS", @"xmlns:CS=""http://calendarserver.org/ns/"""}
         };
 
         private readonly Dictionary<string, string> _namespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"},
-            {"S", "http://calendarserver.org/ns/"}
+            {"CS", "http://calendarserver.org/ns/"}
         };
 
         public CalendarCollection()
@@ -196,12 +196,12 @@ namespace DataLayer.Models.Entities
                 IsMutable = true,
                 Value = $"<D:creationdate {_namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
-            Properties.Add(new Property("getctag", _namespacesSimple["S"])
+            Properties.Add(new Property("getctag", _namespacesSimple["CS"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
+                Value = $@"<CS:getctag {_namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>"
             });
             Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
         }
