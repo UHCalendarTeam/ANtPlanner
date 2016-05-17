@@ -41,18 +41,21 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            
             if (calendarResourceId != null && !await _resourceRespository.Exist(url))
             {
                 response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
+            if (!PermissionCheck(url, calendarResourceId, principalUrl, response))
+                return false;
             return true;
         }
 
-        private bool PermissionCheck(string url, string principalUrl, HttpResponse response)
+        private bool PermissionCheck(string url, string resourceId,string principalUrl, HttpResponse response)
         {
-            return _permissionChecker.CheckPermisionForMethod(url, principalUrl, response, SystemProperties.HttpMethod.Profind);
+          return resourceId == null?
+                _permissionChecker.CheckPermisionForMethod(url, principalUrl, response, SystemProperties.HttpMethod.ProfindCollection) :
+                _permissionChecker.CheckPermisionForMethod(url, principalUrl, response, SystemProperties.HttpMethod.ProfindResource);
         }
     }
 }

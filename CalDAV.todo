@@ -40,14 +40,22 @@ Preconditions:
     ✔ cambiar las propiedades @done (16-03-24 23:03)
     ✔ mandar lo de katrib @done (16-03-24 23:03)
     ✔ proppatch @done (16-04-13 00:52)
-    ☐ etag
+    ✔ etag @done (16-04-19 01:18)
+      ✔ generar etag en creacion de resource @done (16-04-19 01:18)
+      ✔ generar etag en modificacion de resource @done (16-04-19 01:18)
     ✔ makecalendar @done (16-04-13 02:50)
     ☐ documentar
     ✔ Pasar modelos a capa de datos. @done (16-04-13 00:52)
     ✔ Implementar test de proppatch. @done (16-04-13 00:52)
-    ☐ Arreglar PUT, GET, DELETE, etc.
-      ☐ Hacer que todos estos metodos devuelvan KVP<HttpStatusCode, string>
-    ☐ Hacer Contructor en POCO's de forma tal que:
-      ☐ Se inicializen las listas relacionales.
-      ☐ Se anadan las propiedades de WEBDAB y CALDAV.
-        ☐ displayname toma por defecto el nombre de la coleccion o recurso.
+    ✔ Arreglar PUT, GET, DELETE, etc.       @done (16-04-19 01:18)
+    ✔ Hacer Contructor en POCO's de forma tal que: @done (16-04-14 11:53)
+      ✔ Se inicializen las listas relacionales. @done (16-04-14 11:53)
+      ✔ Se anadan las propiedades de WEBDAB y CALDAV. @done (16-04-14 11:53)
+        ✔ displayname toma por defecto el nombre de la coleccion o recurso. @done (16-04-14 11:53)
+    ☐ Revisar como se usa el calendar-home-set
+    ✔ Hacer Test para MKCalendar @done (16-04-14 23:55)
+    ✔ Generar Etag en creacion y modificacion de resource @done (16-04-19 01:19)
+    ✔ Tomar tamanno de .ics y asignarlo a getcontentlenght en creacio y modificacion de resource. @done (16-04-19 01:19)
+    ✔ Actualizar getlastmodified en resource cuando este es modificado. @done (16-04-19 01:22)
+    ✔ content-type en http header debe ser application/xml cuando se devuelve un xml como body @done (16-04-19 16:52)
+    ☐ Terminar permission precondition.
