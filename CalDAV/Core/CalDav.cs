@@ -700,7 +700,8 @@ namespace CalDAV.Core
 
             var resource =
                 _resourceRespository.Get(url);
-
+            //Checking that if exist an IF-Match Header the delete performs its operation
+            //avoiding lost updates.
             if (ifMatchEtags.Count > 0)
             {
                 if (resource != null)
@@ -708,22 +709,30 @@ namespace CalDAV.Core
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
-                    if (resourceEtag != null && ifMatchEtags.Contains(resourceEtag))
+                    if (resourceEtag != null )
                     {
-                        response.StatusCode = (int) HttpStatusCode.NoContent;
-                        await _resourceRespository.Remove(resource);
+                        //if the ETags match the perform delete
+                        if (ifMatchEtags.Contains(resourceEtag))
+                        {
+                            response.StatusCode = (int) HttpStatusCode.NoContent;
+                            await _resourceRespository.Remove(resource);
 
 
-                        //updating the ctag
-                        var stack = new Stack<string>();
-                        await
-                            _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag",
-                                _namespacesSimple["S"],
-                                $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
+                            //updating the ctag
+                            var stack = new Stack<string>();
+                            await
+                                _collectionRespository.CreateOrModifyProperty(collectionUrl, "getctag",
+                                    _namespacesSimple["S"],
+                                    $@"<S:getctag {_namespaces["S"]} >{Guid.NewGuid()}</S:getctag>", stack, true);
 
 
-                        return StorageManagement.DeleteCalendarObjectResource(url);
+                            return StorageManagement.DeleteCalendarObjectResource(url);
+                        }
+                        //if the comparison fails the an error is returned.
+                        response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                        return false;
                     }
+                    
                 }
             }
 

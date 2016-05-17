@@ -50,6 +50,7 @@ namespace DataLayer.Models.ACL
         ///     property contains the URL that MUST be used to identify this principal
         ///     in an ACL request.
         /// </summary>
+        [Required]
         public string PrincipalURL { get; set; }
 
 

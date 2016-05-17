@@ -46,6 +46,7 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
             //Add Cors
             services.AddCors(options =>
             {
@@ -93,7 +94,7 @@ namespace CalDavServices
             app.UseIISPlatformHandler();
 
             //app.UseStaticFiles();
-
+            app.UseSession();
 
             app.UseCors("AllowAllOrigins");
 
