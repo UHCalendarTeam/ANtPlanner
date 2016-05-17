@@ -18,28 +18,28 @@ namespace ACL.Core.CheckPermissions
         /// <summary>
         /// the HTTP method that need the read privilege
         /// </summary>
-        private readonly SystemProperties.HttpMethod[] _readMethods = 
+        private readonly SystemProperties.HttpMethod[] _readMethods =
         {
             SystemProperties.HttpMethod.Get,
-            SystemProperties.HttpMethod.Report, 
-            SystemProperties.HttpMethod.ProfindCollection, 
+            SystemProperties.HttpMethod.Report,
+            SystemProperties.HttpMethod.ProfindCollection,
             SystemProperties.HttpMethod.ProfindResource
         };
         /// <summary>
         /// the HTTP method that need the write privilege
         /// </summary>
-        private readonly SystemProperties.HttpMethod[] _writeMethods = 
+        private readonly SystemProperties.HttpMethod[] _writeMethods =
         {
           SystemProperties.HttpMethod.PutCreate,
           SystemProperties.HttpMethod.PutUpdate,
-          SystemProperties.HttpMethod.Delete, 
-          SystemProperties.HttpMethod.MKCalendar, 
+          SystemProperties.HttpMethod.Delete,
+          SystemProperties.HttpMethod.MKCalendar,
           SystemProperties.HttpMethod.PropatchCollection,
           SystemProperties.HttpMethod.ProppatchResource
-         
+
         };
 
-        public PermissionsGuard(IRepository<CalendarResource,string> resRepository, IRepository<CalendarCollection, string> calRepository)
+        public PermissionsGuard(IRepository<CalendarResource, string> resRepository, IRepository<CalendarCollection, string> calRepository)
         {
             _resourceRepo = resRepository as ResourceRespository;
             _calendarRepo = calRepository as CollectionRepository;
@@ -99,14 +99,14 @@ namespace ACL.Core.CheckPermissions
             //check where to take the acl proeprty
             //if the method perform an action on a collection then take the 
             //acl property form the collection
-            if(method == SystemProperties.HttpMethod.ProfindCollection
+            if (method == SystemProperties.HttpMethod.ProfindCollection
                 || method == SystemProperties.HttpMethod.Report
-                ||method == SystemProperties.HttpMethod.PutCreate)
+                || method == SystemProperties.HttpMethod.PutCreate)
                 aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             //if the method perform an action on a resource in particular then take 
             //the acl from the resource
             else
-                 aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+                aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             //take the acl property
 
             var xdoc = XDocument.Parse(aclP.Value);
@@ -121,7 +121,7 @@ namespace ACL.Core.CheckPermissions
                 aces.FirstOrDefault(ace => ace.Descendants().FirstOrDefault(x => x.Name.LocalName == "principal")
                     .Descendants().FirstOrDefault(x => x.Name.LocalName == "all") != null));
 
-            foreach (var ace in acesToCheck)
+            foreach (var ace in acesToCheck.Where(x => x != null))
             {
                 output.AddRange(ace.Descendants()
                     .FirstOrDefault(x => x.Name.LocalName == "grant")

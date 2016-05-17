@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 
@@ -37,7 +38,7 @@ namespace DataLayer.Models.Entities
             Properties = new List<Property>();
             if (properties != null && properties.Length > 0)
             {
-                Properties = properties;
+                Properties.AddRange(properties);
             }
             InitializeStandardCollectionProperties(name);
         }
@@ -86,7 +87,7 @@ namespace DataLayer.Models.Entities
         /// <summary>
         ///     Contains the properties of the collection.
         /// </summary>
-        public ICollection<Property> Properties { get; set; }
+        public List<Property> Properties { get; set; }
 
 
         private void InitializeStandardCollectionProperties(string name)

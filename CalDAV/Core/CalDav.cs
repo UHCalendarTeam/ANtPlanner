@@ -200,10 +200,7 @@ namespace CalDAV.Core
             {
                 case "prop":
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure) xmlTree);
-
-                    //take the principalId from the properties
-                    var principalId = propertiesAndHeaders["principalId"];
-                    var principal = _principalRepository.GetByIdentifier(principalId);
+                    var principal = _principalRepository.Get(principalUrl);
                     await PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -285,7 +282,7 @@ namespace CalDAV.Core
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
 
                     //take the principalId from the properties
-                    var principal = _principalRepository.Get(principalUrl);
+                    var principal =await _principalRepository.GetAsync(principalUrl);
                     await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -350,8 +347,8 @@ namespace CalDAV.Core
         {
             #region Extracting Properties
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
@@ -458,8 +455,8 @@ namespace CalDAV.Core
         {
             #region Extracting Properties
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
             string collectionName;
             propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
@@ -471,7 +468,7 @@ namespace CalDAV.Core
 
             //Adding the collection to the database
 
-            var principal = await _principalRepository.GetByIdentifierAsync(principalId);
+            var principal = await _principalRepository.GetAsync(principalUrl);
             var collection = new CalendarCollection(url, collectionName);
             
             principal.CalendarCollections.Add(collection);
@@ -781,8 +778,7 @@ namespace CalDAV.Core
                 !await _collectionRespository.Exist(collectionUrl))
                 return true;
 
-            var resource =
-                _resourceRespository.Get(url);
+            var resource = await _resourceRespository.GetAsync(url);
             //Checking that if exist an IF-Match Header the delete performs its operation
             //avoiding lost updates.
             if (ifMatchEtags.Count > 0)
@@ -854,7 +850,7 @@ namespace CalDAV.Core
                 return true;
 
             //The collection is retrieve and if something unexpected happened an internal error is reflected.
-            var collection = _collectionRespository.Get(url);
+            var collection =await _collectionRespository.GetAsync(url);
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
@@ -888,7 +884,7 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes = _resourceRespository.Get(url);
+            var calendarRes =await _resourceRespository.GetAsync(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
@@ -1125,8 +1121,8 @@ namespace CalDAV.Core
             string url;
             propertiesAndHeaders.TryGetValue("url", out url);
 
-            string principalId;
-            propertiesAndHeaders.TryGetValue("principalId", out principalId);
+            string principalUrl;
+            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
 
             //var headers = response.GetTypedHeaders();
@@ -1140,8 +1136,8 @@ namespace CalDAV.Core
             var resource = new CalendarResource(url, calendarResourceId);
 
             //add the owner property           
-            var principal = _principalRepository.GetByIdentifier(principalId);
-            var principalUrl = principal == null ? "" : principal.PrincipalURL;
+            var principal = await _principalRepository.GetAsync(principalUrl);
+            
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));

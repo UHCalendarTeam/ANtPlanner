@@ -62,8 +62,10 @@ namespace CalDAV.Core.ConditionsCheck
                 return false;
             }
 
-            var creationMode = ! await _resourceRespository.Exist(url);
-            PermissionCheck(url, creationMode, principalUrl, response);
+            var creationMode = !await _resourceRespository.Exist(url);
+            if (PermissionCheck(url, creationMode, principalUrl, response))
+            {
+                return false;}
 
             //check that if the resource exist then all its components different of VTIMEZONE has to have the same UID
             //if the resource not exist can not be another resource with the same uid.

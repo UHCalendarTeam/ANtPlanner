@@ -24,6 +24,15 @@ namespace CalDAV.Core
         Task PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
 
         /// <summary>
+        /// Synchronization Method for read the calendar home set properties.
+        /// </summary>
+        /// <param name="propertiesAndHeaders"></param>
+        /// <param name="body"></param>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        Task CHSetPropfind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+
+        /// <summary>
         ///     CalDav HTTP Method PROPPATCH
         /// </summary>
         /// <param name="propertiesAndHeaders"></param>
