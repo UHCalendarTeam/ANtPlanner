@@ -5,7 +5,9 @@ using ACL.Core.Extension_Method;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
+using DataLayer.Repositories.Implementations;
 using TreeForXml;
 
 namespace CalDAV.Core.Propfind
@@ -31,17 +33,27 @@ namespace CalDAV.Core.Propfind
     {
         private readonly CollectionRepository _collectionRepository;
         private readonly ResourceRespository _resourceRespository;
+        private readonly CalendarHomeRepository _calendarHomeRepository;
 
         public CalDavPropfind(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository)
+            IRepository<CalendarResource, string> resourceRepository, IRepository<CalendarHome, string> calendarHomeRepository )
         {
             _collectionRepository = collectionRepository as CollectionRepository;
             _resourceRespository = resourceRepository as ResourceRespository;
+            _calendarHomeRepository = calendarHomeRepository as CalendarHomeRepository;
         }
 
         #region Home Set Collection Propfind Methods
-        public async Task CHSetPropMethod(string url, string calendarResourceId, int? depth,
-            List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal)
+
+        /// <summary>
+        /// Method in cha
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="propertiesReq"></param>
+        /// <param name="multistatusTree"></param>
+        /// <param name="principal"></param>
+        /// <returns></returns>
+        public async Task CHSetPropMethod(string url, List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal)
         {
             //Here it is created the response body for the collection or resource
             //It depends if calendarResourceId == null.
@@ -60,9 +72,9 @@ namespace CalDAV.Core.Propfind
             #region Adding the responses for resources.
 
             //TODO:Take the calendar home set instead
-            var collection = _collectionRepository.Get(url);
+            var calendarHome = _calendarHomeRepository.Get(url);
 
-            foreach (var calendarCollection in collection.CalendarCollections)
+            foreach (var calendarCollection in calendarHome.CalendarCollections)
             {
                 var resourceResponse =
                     await PropFillTree(calendarCollection.Url, null, propertiesReq, principal);
@@ -331,7 +343,7 @@ namespace CalDAV.Core.Propfind
             var propertiesCol = new List<XmlTreeStructure>();
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
-            var errorStack = new Stack<string>();
+      
 
             //Here all visible properties are retrieve plus a collection of extra properties that can be 
             //defined in the request body.  
@@ -527,8 +539,7 @@ namespace CalDAV.Core.Propfind
             var propertiesCol = new List<XmlTreeStructure>();
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
-            var errorStack = new Stack<string>();
-
+           
             //the current-user-privilege-set is generated per request
             //it needs the DAV:acl property and the principalID
             Property aclProperty = null;
@@ -698,8 +709,7 @@ namespace CalDAV.Core.Propfind
         ///     and property values specified in the request.
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="calendarResourceId"></param>
-        /// <param name="propertiesReq"></param>
+        /// <param name="propertiesNameNamespace"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
         private async Task<IXMLTreeStructure> CHSetPropFillTree(string url, List<KeyValuePair<string, string>> propertiesNameNamespace, Principal principal)
@@ -723,12 +733,10 @@ namespace CalDAV.Core.Propfind
             #region Adding the propstats
 
             #region Selecting properties
-            //TODO: Delete this property an change it for a call to the repository where it is used.
-            var tempProperty = new Property();
+
             var propertiesCol = new List<XmlTreeStructure>();
             var propertiesOk = new List<XmlTreeStructure>();
             var propertiesWrong = new List<XmlTreeStructure>();
-            var errorStack = new Stack<string>();
 
             //the current-user-privilege-set is generated per request
             //it needs the DAV:acl property and the principalID
@@ -740,14 +748,13 @@ namespace CalDAV.Core.Propfind
             //retrieve.
 
             //this is the calendar home set collection
-           //TODO:Take the calendar home set instead
-            var collection = _collectionRepository.Get(url);
+            var calendarHome = _calendarHomeRepository.Get(url);
             if (propertiesNameNamespace != null)
             {
                 foreach (var addProperty in propertiesNameNamespace)
                 {
                     //gets the property from database
-                    var property = tempProperty;
+                    var property = await _calendarHomeRepository.GetProperty(calendarHome.Url, addProperty);
                     //Builds the xmlTreeExtructure checking that if the value is null thats because 
                     //the property was not found.
                     IXMLTreeStructure prop;
@@ -762,7 +769,7 @@ namespace CalDAV.Core.Propfind
                     propertiesCol.Add((XmlTreeStructure)prop);
                 }
                 //take the acl property
-                aclProperty = collection.Properties.FirstOrDefault(x => x.Name == "acl");
+                aclProperty = calendarHome.Properties.FirstOrDefault(x => x.Name == "acl");
             }
 
 

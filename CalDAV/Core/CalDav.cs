@@ -13,7 +13,9 @@ using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
+using DataLayer.Repositories.Implementations;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNet.Http;
@@ -30,6 +32,7 @@ namespace CalDAV.Core
         private readonly CollectionRepository _collectionRespository;
         private readonly PrincipalRepository _principalRepository;
         private readonly ResourceRespository _resourceRespository;
+        private readonly CalendarHomeRepository _calendarHomeRepository;
         private readonly IPermissionChecker _permissionChecker;
         
 
@@ -46,7 +49,7 @@ namespace CalDAV.Core
         public CalDav(IFileSystemManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker)
+            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository )
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
@@ -54,6 +57,7 @@ namespace CalDAV.Core
             _collectionRespository = collectionRespository as CollectionRepository;
             _principalRepository = principalRepository as PrincipalRepository;
             _resourceRespository = resourceRespository as ResourceRespository;
+            _calendarHomeRepository = calendarHomeRepository as CalendarHomeRepository;
             _permissionChecker = permissionChecker;
         }
 
@@ -168,7 +172,7 @@ namespace CalDAV.Core
             responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
 
             //Tool that contains the methods for propfind.
-            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository, _calendarHomeRepository);
 
             //if the body is empty assume that is an allprop request.          
             if (string.IsNullOrEmpty(body))
@@ -260,7 +264,7 @@ namespace CalDAV.Core
             responseTree.Namespaces.Add("CS", _namespacesSimple["CS"]);
 
             //Tool that contains the methods for propfind.
-            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository);
+            PropFindMethods = new CalDavPropfind(_collectionRespository, _resourceRespository, _calendarHomeRepository);
 
             //parsing the body into a xml tree
             var xmlTree = XmlTreeStructure.Parse(body);
@@ -282,7 +286,7 @@ namespace CalDAV.Core
 
                     //take the principalId from the properties
                     var principal = _principalRepository.Get(principalUrl);
-                    await PropFindMethods.PropMethod(url, null, 1, props, responseTree, principal);
+                    await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
                     break;
                 case "allprop":
                     throw new ArgumentException("This should be a prop propfind");
