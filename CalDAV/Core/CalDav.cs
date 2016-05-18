@@ -769,10 +769,13 @@ namespace CalDAV.Core
                 ifMatchEtags = ifmatch.Split(',').ToList();
 
             #endregion
+            //Checking precondition
+            PreconditionCheck = new DeleteResourcePrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
+            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+                return false;
 
             //if the collection doesnt exist in the user folder
             // the can't do anything
-
             var collectionUrl = url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1);
             if (!StorageManagement.ExistCalendarCollection(collectionUrl) &&
                 !await _collectionRespository.Exist(collectionUrl))
@@ -842,6 +845,12 @@ namespace CalDAV.Core
             propertiesAndHeaders.TryGetValue("url", out url);
 
             #endregion
+
+            //Checking precondition
+            PreconditionCheck = new DeleteCollectionPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
+            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+                return false;
+
 
             //The delete method default status code
             response.StatusCode = (int) HttpStatusCode.NoContent;

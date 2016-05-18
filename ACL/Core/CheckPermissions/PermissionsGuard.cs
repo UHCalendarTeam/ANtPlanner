@@ -32,7 +32,8 @@ namespace ACL.Core.CheckPermissions
         {
           SystemProperties.HttpMethod.PutCreate,
           SystemProperties.HttpMethod.PutUpdate,
-          SystemProperties.HttpMethod.Delete,
+          SystemProperties.HttpMethod.DeleteCollection,
+          SystemProperties.HttpMethod.DeleteResource,
           SystemProperties.HttpMethod.MKCalendar,
           SystemProperties.HttpMethod.PropatchCollection,
           SystemProperties.HttpMethod.ProppatchResource

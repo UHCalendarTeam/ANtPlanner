@@ -58,4 +58,5 @@ Preconditions:
     ✔ Tomar tamanno de .ics y asignarlo a getcontentlenght en creacio y modificacion de resource. @done (16-04-19 01:19)
     ✔ Actualizar getlastmodified en resource cuando este es modificado. @done (16-04-19 01:22)
     ✔ content-type en http header debe ser application/xml cuando se devuelve un xml como body @done (16-04-19 16:52)
-    ☐ Terminar permission precondition.
+    ✔ Terminar permission precondition. @done (16-05-18 09:52)
+    ☐ Cambiar el delete colection para que tenga en cuanta el permiso sobre sus hijos.

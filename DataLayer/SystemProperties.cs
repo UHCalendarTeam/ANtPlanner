@@ -27,7 +27,8 @@ namespace DataLayer
             PutCreate,//the put that create resources
             PutUpdate,//the put that modified resources
             Get,
-            Delete,
+            DeleteCollection,
+            DeleteResource,
             ProfindCollection,//profind that is performed on a collection
             ProfindResource,//profind that is performed on a resource
             Report,
