@@ -1,26 +1,26 @@
 Caldav:
   ✔ using the the DB  to get the properties of the collection. @done (16-03-10 17:39)
-  ☐ Create the logic for the new users:
+  ✔ Create the logic for the new users: @done (16-05-18 17:11)
          ✔ create it in DB @done (16-03-11 08:23)
          ✔ Create the directory for the collection. @done (16-03-11 11:59)
-  ☐ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.)
-        ☐ Do the precodintions methods.
-        ☐ Do the postconditions.
+  ✔ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.) @done (16-05-18 17:11)
+        ✔ Do the precodintions methods. @done (16-05-18 17:11)
+        ✔ Do the postconditions. @done (16-05-18 17:11)
   ✔  Do a model for the  properties of the collections and resources. @done (16-04-13 00:51)
-  ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
+  ✔ add 6.2.1 CALDAV:calendar-home-set Property to the user table. @done (16-05-18 17:11)
 
   Report Method:
-    ☐ 7.3 Date and Floating Time    
+    ✔ 7.3 Date and Floating Time     @done (16-05-18 17:11)
     ✔ 7.4 Time Range Filtering @done (16-03-14 08:59)
     ☐ 7.6 Partial Retrieval
-    ☐ 7.8 CALDAV:calendar-query REPORT
-    ☐ Implement a tree structure for parsing and building the xml request and response.
-     ☐ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice.
+    ✔ 7.8 CALDAV:calendar-query REPORT @done (16-05-18 17:11)
+    ✔ Implement a tree structure for parsing and building the xml request and response. @done (16-05-18 17:11)
+     ✔ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice. @done (16-05-18 17:11)
      ☐ Servers MUST advertise the set of collations that they support via the CALDAV:supported-collation-set property defined on any resource that supports reports that use collations
 
 Preconditions:
-  ☐ Do the preconditions checks of the methods.
-  ☐ Do the postcondition checks of the methods
+  ✔ Do the preconditions checks of the methods. @done (16-05-18 17:12)
+  ✔ Do the postcondition checks of the methods @done (16-05-18 17:12)
 
 
 
@@ -52,7 +52,7 @@ Preconditions:
       ✔ Se inicializen las listas relacionales. @done (16-04-14 11:53)
       ✔ Se anadan las propiedades de WEBDAB y CALDAV. @done (16-04-14 11:53)
         ✔ displayname toma por defecto el nombre de la coleccion o recurso. @done (16-04-14 11:53)
-    ☐ Revisar como se usa el calendar-home-set
+    ✔ Revisar como se usa el calendar-home-set @done (16-05-18 17:12)
     ✔ Hacer Test para MKCalendar @done (16-04-14 23:55)
     ✔ Generar Etag en creacion y modificacion de resource @done (16-04-19 01:19)
     ✔ Tomar tamanno de .ics y asignarlo a getcontentlenght en creacio y modificacion de resource. @done (16-04-19 01:19)
