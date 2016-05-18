@@ -188,6 +188,8 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = calHome
                 };
 
+            fsm.AddCalendarCollectionFolder(initCollection.Url);
+
             //if the principal is admin the create the public calendars
             if(adminUser)
                 CreatePublicCollections(calHome,owner, aclProperty, ownerProp);

@@ -242,20 +242,23 @@ namespace DataLayer.Repositories
             var defaultCalHomeName = "HomeCollection";
 
             //create useful properties for the principal
-            var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
-                defaultCalHomeName);
+            //var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
+            //    defaultCalHomeName);
             var displayName = PropertyCreation.CreateProperty("displayname", "D", fullName);
 
 
             //create the principal the represents the user
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
-                displayName, calHomeSet);
+                displayName);
 
             user.Principal = principal;
 
             
             //create the cal home for the principal
             var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
+
+            var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
+            principal.Properties.Add(calHomeSet);
 
             principal.CalendarHome = calHome;
 

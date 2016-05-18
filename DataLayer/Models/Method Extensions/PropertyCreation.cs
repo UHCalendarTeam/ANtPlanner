@@ -84,6 +84,21 @@ namespace DataLayer
             return property;
         }
 
+
+        public static Property CreateCalHomeSetWithHref(string href)
+        {
+            var publicCalUrl = SystemProperties.PublicCalendarCreated
+                ? $"<D:href>{SystemProperties.PublicCalendarHomeUrl}</D:href>"
+                : "";
+            var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
+            {
+                Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
+                        $"<D:href>{href}</D:href>" +
+                        $"{publicCalUrl}</C:calendar-home-set>"
+            };
+            return property;
+        }
+
         /// <summary>
         ///     Create the DAV:owner property for the collections
         ///     and resources

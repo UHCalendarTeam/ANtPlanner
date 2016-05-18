@@ -50,9 +50,9 @@ namespace DataLayer
             "PublicCalendar"
         };
 
-        public static string PublicCalendarHomeUrl = "collections/groups/public/";
+        public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
-        public static bool PublicCalendarCreated;
+        public static bool PublicCalendarCreated = true;
 
         
 
