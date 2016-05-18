@@ -52,7 +52,7 @@ namespace DataLayer
 
         public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
-        public static bool PublicCalendarCreated = true;
+        public static bool PublicCalendarCreated;
 
         
 

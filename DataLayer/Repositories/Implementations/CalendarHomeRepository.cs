@@ -177,6 +177,10 @@ namespace DataLayer.Repositories.Implementations
                 calHomeUrl, defaultCalHomeName, ownerProp, aclProperty);
 
             fsm.AddCalendarCollectionFolder(calHome.Url);
+            ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
+              false, false);
+
+            aclProperty = adminUser ? PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL) : PropertyCreation.CreateAclPropertyForUserCollections(owner.PrincipalURL);
 
             //create the initial calendar collection for the user.
             var initCollection =
@@ -211,9 +215,13 @@ namespace DataLayer.Repositories.Implementations
             var fsm = new FileSystemManagement();
             foreach (var calName in SystemProperties.PublicCalendarNames)
             {
+                var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
+              false, false);
+
+                var aclProperty = PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL);
                 var publicCollection =
                 new CalendarCollection(
-                    $"{SystemProperties.PublicCalendarHomeUrl}{calName}/",calName, properties)
+                    $"{SystemProperties.PublicCalendarHomeUrl}{calName}/",calName, ownerProp, aclProperty)
                 {
                     Principal = owner,
                     CalendarHome = publicCalendar
