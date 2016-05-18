@@ -192,16 +192,22 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = calHome
                 };
 
-            fsm.AddCalendarCollectionFolder(initCollection.Url);
+            
 
-            //if the principal is admin the create the public calendars
+            //if the principal is admin then create the public calendars
             if(adminUser)
                 CreatePublicCollections(calHome,owner, aclProperty, ownerProp);
             
 
             //add the calendar collection to the calHome
-            calHome.CalendarCollections.Add(initCollection);
-            owner.CalendarCollections.Add(initCollection);
+            //if the principal is not admin
+            if (!adminUser)
+            {
+                fsm.AddCalendarCollectionFolder(initCollection.Url);
+                calHome.CalendarCollections.Add(initCollection);
+                owner.CalendarCollections.Add(initCollection);
+            }
+            
             return calHome;
         }
 
