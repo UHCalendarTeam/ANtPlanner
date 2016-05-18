@@ -202,10 +202,6 @@ namespace DataLayer.Repositories.Implementations
             //add the calendar collection to the calHome
             calHome.CalendarCollections.Add(initCollection);
             owner.CalendarCollections.Add(initCollection);
-            if(adminUser)
-                SystemProperties.PublicCalendarCreated = true;
-
-
             return calHome;
         }
 
