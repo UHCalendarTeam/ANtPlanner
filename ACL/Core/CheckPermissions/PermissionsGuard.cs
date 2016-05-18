@@ -97,18 +97,24 @@ namespace ACL.Core.CheckPermissions
             var acesToCheck = new List<XElement>();
             Property aclP;
 
+            //for now we'll take the permission from the calendar collection and not from the resource
+            if (url.Contains(".ics") || url.Contains(".ifb"))
+                url = url.Remove(url.LastIndexOf("\\") + 1);
+            #region uncomment this when after change the permissions
             //check where to take the acl proeprty
             //if the method perform an action on a collection then take the 
             //acl property form the collection
-            if (method == SystemProperties.HttpMethod.ProfindCollection
-                || method == SystemProperties.HttpMethod.Report
-                || method == SystemProperties.HttpMethod.PutCreate)
-                aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            //if (method == SystemProperties.HttpMethod.ProfindCollection
+            //    || method == SystemProperties.HttpMethod.Report
+            //    || method == SystemProperties.HttpMethod.PutCreate)
+            //aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             //if the method perform an action on a resource in particular then take 
             //the acl from the resource
-            else
-                aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            //else
+            //    aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            #endregion
             //take the acl property
+            aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
 
             var xdoc = XDocument.Parse(aclP.Value);
             XName aceName = "ace";
