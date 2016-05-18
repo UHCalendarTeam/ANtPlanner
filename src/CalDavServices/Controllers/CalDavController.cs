@@ -122,8 +122,8 @@ namespace CalDavServices.Controllers
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
-        public async Task MkCalendar(string groupOrUser, string principalId, string collectionName)
+        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/")]
+        public async Task MkCalendar(string groupOrUser, string calendarHome, string collectionName)
         {
             var url = GetRealUrl(Request);
             var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
