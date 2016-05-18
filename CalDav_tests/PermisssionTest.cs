@@ -32,7 +32,7 @@ namespace CalDav_tests
         {
             var list = new List<string>();
             var acesToCheck = new List<XElement>();
-            XDocument xdoc = XDocument.Parse(@"<D:acl xmlns:D=""DAV:"">
+            XDocument aclP = XDocument.Parse(@"<D:acl xmlns:D=""DAV:"">
            <D:ace>
              <D:principal>
                <D:href>adriano</D:href>
@@ -50,28 +50,32 @@ namespace CalDav_tests
              </D:grant>
            </D:ace>
          </D:acl>");
-            IEnumerable<XElement> principalGrantPermissions = null;
+            
+            var principalGrantPermissions = new List<IEnumerable<XElement>>();
             XName aceName = "ace";
 
             //take the permission for the principal if any
-            var descendants = xdoc.Descendants();
-            var aces = descendants.Where(x => x.Name.LocalName == aceName).ToArray();
+            var descendants = aclP?.Descendants();
+            var aces = descendants.Where(x => x.Name.LocalName == aceName);
+            var principalAce = aces.Where(ace => ace.Descendants()
+                .FirstOrDefault(x => x.Name.LocalName == "href")?.Value == "adriano" ||
+                ace.Descendants().FirstOrDefault(x => x.Name.LocalName == "principal")
+                    .Descendants().FirstOrDefault(x => x.Name.LocalName == "all") != null).ToArray();
 
-            //take the ACEs with the given principal
-            acesToCheck.Add(aces.FirstOrDefault(ace => ace.Descendants()
-                .FirstOrDefault(x => x.Name.LocalName == "href")?.Value == "adriano"));
-            //take the ACEs granted to all the principals
-            acesToCheck.Add(aces.FirstOrDefault(ace => ace.Descendants().FirstOrDefault(x => x.Name.LocalName == "principal")
-                .Descendants().FirstOrDefault(x => x.Name.LocalName == "all") != null));
-            var output = new List<string>();
+            if (principalAce.Any())
+                principalGrantPermissions.AddRange(principalAce.Select(element => element.Descendants().FirstOrDefault(x => x.Name.LocalName == "grant")?.Elements()));
 
-            foreach (var ace in acesToCheck)
-            {
-                output.AddRange(ace.Descendants()
-             .FirstOrDefault(x => x.Name.LocalName == "grant")
-             .Descendants().Where(x => x.Name.LocalName == "privilege")
-             .Descendants().Select(x => x.Name.LocalName));
-            }
+
+            //take the permission for all users if any
+            var output = new XElement("current-user-privilege-set", new XAttribute(XNamespace.Xmlns + "D", "DAV:"));
+
+
+            //add the permission to the response
+            if (principalGrantPermissions != null)
+                foreach (var permission in principalGrantPermissions)
+                {
+                    output.Add(permission);
+                }
 
 
         }

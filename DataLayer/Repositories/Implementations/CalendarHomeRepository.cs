@@ -177,6 +177,10 @@ namespace DataLayer.Repositories.Implementations
                 calHomeUrl, defaultCalHomeName, ownerProp, aclProperty);
 
             fsm.AddCalendarCollectionFolder(calHome.Url);
+            ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
+              false, false);
+
+            aclProperty = adminUser ? PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL) : PropertyCreation.CreateAclPropertyForUserCollections(owner.PrincipalURL);
 
             //create the initial calendar collection for the user.
             var initCollection =
@@ -188,18 +192,22 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = calHome
                 };
 
-            //if the principal is admin the create the public calendars
+            
+
+            //if the principal is admin then create the public calendars
             if(adminUser)
                 CreatePublicCollections(calHome,owner, aclProperty, ownerProp);
             
 
             //add the calendar collection to the calHome
-            calHome.CalendarCollections.Add(initCollection);
-            owner.CalendarCollections.Add(initCollection);
-            if(adminUser)
-                SystemProperties.PublicCalendarCreated = true;
-
-
+            //if the principal is not admin
+            if (!adminUser)
+            {
+                fsm.AddCalendarCollectionFolder(initCollection.Url);
+                calHome.CalendarCollections.Add(initCollection);
+                owner.CalendarCollections.Add(initCollection);
+            }
+            
             return calHome;
         }
 
@@ -209,9 +217,13 @@ namespace DataLayer.Repositories.Implementations
             var fsm = new FileSystemManagement();
             foreach (var calName in SystemProperties.PublicCalendarNames)
             {
+                var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
+              false, false);
+
+                var aclProperty = PropertyCreation.CreateAclPropertyForGroupCollections(owner.PrincipalURL);
                 var publicCollection =
                 new CalendarCollection(
-                    $"{SystemProperties.PublicCalendarHomeUrl}{calName}/",calName, properties)
+                    $"{SystemProperties.PublicCalendarHomeUrl}{calName}/",calName, ownerProp, aclProperty)
                 {
                     Principal = owner,
                     CalendarHome = publicCalendar

@@ -70,6 +70,12 @@ namespace DataLayer
                 .HasForeignKey(k => k.CalendarCollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<CalendarCollection>()
+                .HasOne(cl => cl.CalendarHome)
+                .WithMany(u => u.CalendarCollections)
+                .HasForeignKey(k => k.CalendarHomeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
 
             modelBuilder.Entity<Property>()
@@ -87,6 +93,14 @@ namespace DataLayer
                 .HasOne(p => p.Principal)
                 .WithMany(pr => pr.Properties)
                 .HasForeignKey(k => k.PricipalId);
+
+            modelBuilder.Entity<Property>()
+                .HasOne(p => p.CalendarHome)
+                .WithMany(ch => ch.Properties)
+                .HasForeignKey(k => k.CalendarHomeId);
+
+
+
         }
     }
 }

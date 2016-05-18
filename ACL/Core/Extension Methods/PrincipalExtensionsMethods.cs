@@ -24,20 +24,22 @@ namespace ACL.Core.Extension_Method
         {
             var pUrl = principal.PrincipalURL;
             var aclP = XDocument.Parse(property.Value).Root;
-            IEnumerable<XElement> principalGrantPermissions = null;
+            var principalGrantPermissions = new List<IEnumerable<XElement>>();
             XName aceName = "ace";
 
             //take the permission for the principal if any
             var descendants = aclP?.Descendants();
             var aces = descendants.Where(x => x.Name.LocalName == aceName);
-            var principalAce = aces.FirstOrDefault(ace => ace.Descendants()
-                .FirstOrDefault(x => x.Name.LocalName == "href")?.Value == pUrl);
-            if (principalAce != null)
-                principalGrantPermissions = principalAce.Descendants()
-                    .FirstOrDefault(x => x.Name.LocalName == "grant")?.Elements();
+            var principalAce = aces.Where(ace => ace.Descendants()
+                .FirstOrDefault(x => x.Name.LocalName == "href")?.Value == pUrl||
+                ace.Descendants().FirstOrDefault(x => x.Name.LocalName == "principal")
+                    .Descendants().FirstOrDefault(x => x.Name.LocalName == "all") != null).ToArray();
+
+            if (principalAce.Any())
+                principalGrantPermissions.AddRange(principalAce.Select(element => element.Descendants().FirstOrDefault(x => x.Name.LocalName == "grant")?.Elements()));
+
 
             //take the permission for all users if any
-
             var output = new XElement("current-user-privilege-set", new XAttribute(XNamespace.Xmlns + "D", "DAV:"));
 
 

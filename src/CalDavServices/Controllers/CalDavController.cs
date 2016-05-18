@@ -108,7 +108,9 @@ namespace CalDavServices.Controllers
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             var url = GetRealUrl(Request);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
             propertiesAndHeaders.Add("url", url);
             var body = StreamToString(Request.Body);
 
