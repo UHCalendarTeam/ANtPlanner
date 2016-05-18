@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.Entities
 {
@@ -72,6 +73,9 @@ namespace DataLayer.Models.Entities
         public CalendarCollection CalendarCollection { get; set; }
 
         public int? CalendarCollectionId { get; set; }
+        public CalendarHome CalendarHome{ get; set; }
+
+        public int? CalendarHomeId { get; set; }
 
         public int? PricipalId { get; set; }
 

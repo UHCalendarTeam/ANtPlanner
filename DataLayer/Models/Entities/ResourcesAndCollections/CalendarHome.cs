@@ -23,11 +23,8 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
             Url = url;
             Name = name;
             CalendarCollections = new List<CalendarCollection>();
-            Properties = new List<Property>();
-            if (properties != null && properties.Length > 0)
-            {
-                Properties.AddRange(properties);
-            }
+            Properties = new List<Property>(properties);
+           
             InitializeStandardCollectionProperties(name);
         }
 
@@ -65,7 +62,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         /// <summary>
         ///     Contains the properties of the collection.
         /// </summary>
-        public List<Property> Properties { get; set; }
+        public ICollection<Property> Properties { get; set; }
 
 
 

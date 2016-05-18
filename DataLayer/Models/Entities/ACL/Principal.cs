@@ -63,7 +63,7 @@ namespace DataLayer.Models.ACL
         ///     Contains the properties of
         ///     principal.
         /// </summary>
-        public List<Property> Properties { get; set; }
+        public ICollection<Property> Properties { get; set; }
 
         /// <summary>
         ///     Contains the collection of the principal.

@@ -21,11 +21,8 @@ namespace DataLayer.Models.Entities
             Url = url;
             Name = name;
             CalendarResources = new List<CalendarResource>();
-            Properties = new List<Property>();
-            if (properties != null && properties.Length > 0)
-            {
-                Properties.AddRange(properties);
-            }
+            Properties = new List<Property>(properties);
+          
             InitializeStandardCollectionProperties(name);
         }
 
@@ -73,7 +70,7 @@ namespace DataLayer.Models.Entities
         /// <summary>
         ///     Contains the properties of the collection.
         /// </summary>
-        public List<Property> Properties { get; set; }
+        public ICollection<Property> Properties { get; set; }
 
 
         private void InitializeStandardCollectionProperties(string name)
@@ -182,12 +179,12 @@ namespace DataLayer.Models.Entities
                 IsMutable = true,
                 Value = $"<D:creationdate {SystemProperties.Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
             });
-            Properties.Add(new Property("getctag", SystemProperties.NamespacesValues["S"])
+            Properties.Add(new Property("getctag", SystemProperties.NamespacesValues["CS"])
             {
                 IsVisible = true,
                 IsDestroyable = false,
                 IsMutable = false,
-                Value = $@"<S:getctag {SystemProperties.Namespaces["S"]} >{Guid.NewGuid()}</S:getctag>"
+                Value = $@"<CS:getctag {SystemProperties.Namespaces["CS"]} >{Guid.NewGuid()}</CS:getctag>"
             });
             Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
         }

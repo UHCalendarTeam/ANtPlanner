@@ -257,6 +257,8 @@ namespace DataLayer.Repositories
             //create the cal home for the principal
             var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
 
+            principal.CalendarHome = calHome;
+
             
 
             //hass the user password 
@@ -269,6 +271,10 @@ namespace DataLayer.Repositories
             _context.Users.Add(user);
             _context.Principals.Add(principal);
             _context.CalendarHomeCollections.Add(calHome);
+            _context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            _context.Properties.AddRange(calHome.Properties);
+            _context.Properties.AddRange(principal.Properties);
+            
             _context.SaveChanges();
 
             return principal;
