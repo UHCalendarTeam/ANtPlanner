@@ -122,7 +122,7 @@ namespace CalDavServices.Controllers
         }
 
         //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/")]
+        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/{collectionName}/")]
         public async Task MkCalendar(string groupOrUser, string calendarHome, string collectionName)
         {
             var url = GetRealUrl(Request);
