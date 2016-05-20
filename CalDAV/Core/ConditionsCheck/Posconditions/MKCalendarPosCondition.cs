@@ -13,7 +13,7 @@ namespace CalDAV.Core.ConditionsCheck
     {
         private readonly CollectionRepository _collectionRepository;
 
-        public MKCalendarPosCondition(IFileSystemManagement fs,
+        public MKCalendarPosCondition(IFileManagement fs,
             IRepository<CalendarCollection, string> collectionRepository)
         {
             _collectionRepository = collectionRepository as CollectionRepository;
@@ -21,7 +21,7 @@ namespace CalDAV.Core.ConditionsCheck
             Fs = fs;
         }
 
-        public IFileSystemManagement Fs { get; }
+        public IFileManagement Fs { get; }
 
         public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {

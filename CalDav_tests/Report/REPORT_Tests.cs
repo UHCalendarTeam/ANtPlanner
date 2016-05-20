@@ -15,7 +15,7 @@
 //        [Fact]
 //        public void UnitTest1()
 //        {
-//            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+//            IFileManagement fs = new FileManagement("bernard", "work");
 //            var xmlStr = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 //<C:calendar-query xmlns:D=""DAV:""
 //xmlns:C=""urn:ietf:params:xml:ns:caldav"">
@@ -104,7 +104,7 @@
 //</C:filter>
 //</C:calendar-query>";
 
-//            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+//            IFileManagement fs = new FileManagement("bernard", "work");
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
@@ -148,7 +148,7 @@
 //</C:filter>
 //</C:calendar-query>";
 
-//            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+//            IFileManagement fs = new FileManagement("bernard", "work");
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
@@ -205,7 +205,7 @@
 //</C:calendar-query>";
 
 
-//            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+//            IFileManagement fs = new FileManagement("bernard", "work");
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 
@@ -255,7 +255,7 @@
 //</C:calendar-multiget>";
 
 
-//            IFileSystemManagement fs = new FileSystemManagement("bernard", "work");
+//            IFileManagement fs = new FileManagement("bernard", "work");
 
 //            var xmlTree = XmlTreeStructure.Parse(xmlStr);
 

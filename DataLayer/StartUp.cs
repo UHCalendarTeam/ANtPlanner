@@ -8,12 +8,12 @@
 //    /// </summary>
 //    public class StartUp : IStartUp
 //    {
-//        public StartUp(IFileSystemManagement fileSystem)
+//        public StartUp(IFileManagement fileSystem)
 //        {
 //            FileSystemMangement = fileSystem;
 //        }
 
-//        public IFileSystemManagement FileSystemMangement { get; set; }
+//        public IFileManagement FileSystemMangement { get; set; }
 
 //        /// <summary>
 //        ///     Create a new user in the system( add him to the DB and create a directory for his collections)

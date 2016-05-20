@@ -12,13 +12,13 @@ namespace CalDAV.Core.ConditionsCheck
     {
         private readonly ResourceRespository _resourceRespository;
 
-        public GetPoscondition(IRepository<CalendarResource, string> resourceRepository, IFileSystemManagement fs)
+        public GetPoscondition(IRepository<CalendarResource, string> resourceRepository, IFileManagement fs)
         {
             _resourceRespository = resourceRepository as ResourceRespository;
             Fs = fs;
         }
 
-        public IFileSystemManagement Fs { get; }
+        public IFileManagement Fs { get; }
 
         public Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {

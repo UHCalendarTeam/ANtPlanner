@@ -7,7 +7,7 @@ namespace CalDAV.Core.ConditionsCheck
 {
     internal interface IPoscondition
     {
-        IFileSystemManagement Fs { get; }
+        IFileManagement Fs { get; }
 
         /// <summary>
         ///     Checks that all postconditions passed.

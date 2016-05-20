@@ -8,7 +8,7 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class PutPosconditions : IPoscondition
     {
-        public IFileSystemManagement Fs { get; }
+        public IFileManagement Fs { get; }
 
 
         public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)

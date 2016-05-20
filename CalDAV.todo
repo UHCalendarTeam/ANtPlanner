@@ -1,62 +1,94 @@
-Caldav:
-  ✔ using the the DB  to get the properties of the collection. @done (16-03-10 17:39)
-  ☐ Create the logic for the new users:
-         ✔ create it in DB @done (16-03-11 08:23)
-         ✔ Create the directory for the collection. @done (16-03-11 11:59)
-  ☐ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.)
-        ☐ Do the precodintions methods.
-        ☐ Do the postconditions.
-  ✔  Do a model for the  properties of the collections and resources. @done (16-04-13 00:51)
-  ☐ add 6.2.1 CALDAV:calendar-home-set Property to the user table.
-
-  Report Method:
-    ☐ 7.3 Date and Floating Time    
-    ✔ 7.4 Time Range Filtering @done (16-03-14 08:59)
-    ☐ 7.6 Partial Retrieval
-    ☐ 7.8 CALDAV:calendar-query REPORT
-    ☐ Implement a tree structure for parsing and building the xml request and response.
-     ☐ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice.
-     ☐ Servers MUST advertise the set of collations that they support via the CALDAV:supported-collation-set property defined on any resource that supports reports that use collations
-
-Preconditions:
-  ☐ Do the preconditions checks of the methods.
-  ☐ Do the postcondition checks of the methods
+Calendaring Reports:
+  ☐ 7.5.1 CALDAV:supported-collation-set Property
+  ☐ 7.6 Partial Retrieval
+  ☐ For the CALDAV:calendar-query REPORT, CalDAV servers MUST rely on the value of the CALDAV:timezone XML element, if specified as part of the request body, to perform the proper conversion of "floating date" and "floating time" values to date with UTC time values. If the CALDAV:timezone XML element is not specified in the request body, CalDAV servers MUST rely on the value of the CALDAV:calendar-timezone property, if defined, or else the CalDAV servers MAY rely on the time zone of their choice.
+  ☐ Servers MUST advertise the set of collations that they support via the CALDAV:supported-collation-set property defined on any resource that supports reports that use collations
+  ☐ CalDAV servers MUST advertise support for these reports on all calendar collections and calendar object resources with the DAV:supported-report-set property, defined in Section 3.1.5 of [RFC3253]. CalDAV servers MAY also advertise support for these reports on ordinary collections.
 
 
+Future implementations:
+   ☐ Support for WebDAV-Sync RFC 6578
+   calendar-query:
+       ☐ Implementar el expand que viene en calendar-data node.  -->9.6 CALDAV:calendar-data XML Element
+       ☐ Implementar el limit-recurrence-set que viene en calendar-data node.  -->9.6 CALDAV:calendar-data XML Element
+   General:
+     ☐ Hacer la clase FileSystemManagement statica.
+     ☐ el protocolo RFC 6638 es de Scheduling Extensions to CalDAV, aki se maneja que varios clientes accedan a la misma info.
+     ☐ A la hora de la creacion de un recurso en un calendario publico ponerle los permisos de lectura para todos.
+   REPORT:
+     ☐ expandir y poner RECURRENCE-ID a las instancias.
+     ☐ En el ApplyFilterVAlARM coger el tiempo como el DTSTART del contenedor mas el TRIGGER de la alarma.
+     ☐ 9.2. DAV:acl-principal-prop-set Report
+     ☐ 9.3. DAV:principal-match REPORT
+     ☐ 9.4. DAV:principal-property-search REPORT
+     ☐ 9.5. DAV:principal-search-property-set REPORT  
+TO-FIX: 
+   ☐ Esta fallando el OPTIONS con la direccion de un principal.
+   ☐ El MKCALENDAR esta dando 404 con el DAVDroid
 
-  questions:
-    ☐  Si implementar un versionging history of the resources.( mas data en el server)
+    BOTH:
+      ☐ Cuando son borrados alguno de los modelos, los q estan relacionados con el no son borrados, so hay que ver esto. Si no lo q se hace es borrarlos manualmente, tal con un evento o algo que se dispare a la hora que se borra algo.        
 
-    to search:
-      ☐ How to mock in EF7.
-      ☐ EF7 unit test examples
+＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+Archive:
+ ✔ Modificar el TAkePermissions en la forma de coger el DAV:acl de los recursos o las collections. @done (16-05-18 17:02) @project(TO-FIX)
+ ✔ add 6.2.1 CALDAV:calendar-home-set Property to the user table. @done (16-05-18 16:46) @project(Caldav)
+ ✔ Do the precodintions methods. @done (16-05-18 16:46) @project(Caldav)
+ ✔ Do the postconditions. @done (16-05-18 16:46) @project(Caldav)
+ ✔ Do the MKCALENDAR method, (this mehtod is gonna call the CreateNewCollectionForUser in the Startup class.) @done (16-05-18 16:46) @project(Caldav)
+ ✔ Create the logic for the new users: @done (16-05-18 16:46) @project(Caldav)
+ ✘ 4.1. DAV:alternate-URI-set @cancelled (16-05-18 16:45) @project(ACL / Properties / REQUIRED )
+ ✔ A los writes del FileSysMan les faltaba el .Close() por lo que no estban cerrando el file. cuando los cierro entconces that error con el DNX.Core 5 que no contiene ese metodo. Mira a ver como se resuelve eso. @done (16-05-18 16:43) @project(TO-FIX / Nacho)
+ ✘ Annadir un extension property pa lo anterior. @cancelled (16-05-18 16:42) @project(TODO / Adriano / REPORT)
+  el metodo q crea el user debe recibir si es student or teacher
+  si es student entonces recibe el anno, grupo
+  ambos reciben el nombreCompleto, email, password
+  el nombre completo es la propiedad displayname
+ ✔ getcontenttype in the REPORT @done (16-05-18 16:42) @project(TODO / Adriano / REPORT)
+ ✔ Ver si esto crea conflictos en Linux pues es diferente el \ y / en uno y otro. @done (16-05-18 16:42) @project(TO-FIX / Nacho)
+ ✔ TO implement: @done (16-05-18 16:42) @project(TODO / Adriano / REPORT)
+ ✔ Los folder se estan creando en la raiz del disco duro. Debe ser en la raiz relativa al proyecto. @done (16-05-18 16:42) @project(TO-FIX / Nacho)
+ ✔ Implementar DAV:displayname en todos los recursos. @done (16-05-18 16:42) @project(TODO / General)
+ ✘ Sacar los errores. @cancelled (16-05-18 16:41) @project(TODO / General)
+ ✘ EL root del FileSystemManagement tiene que ser la url del servicio. Esto pa cuando se devuelven los href de los pedidos. para esto hacer un config file donde tener entre otras cosas esto @cancelled (16-05-18 16:41) @project(TODO / General)
+ ✔ Implementar la propiedad DAV:resourcetype en todos los recursos(resources, collection...) @done (16-05-18 16:41) @project(TODO / General)
+ ✔ !!!EN el profind se pueden pedir propiedades que sean del ACL, so el metodo ResolveProperty tiene que saber donde buscar las propiedades. @done (16-05-18 16:41) @project(TODO / General)
+ ✔ Todos los metodos qq son llamados desde PRofin y REPORT tienen que devolver una estructura o algo con las     descripcion del error. Mandar una estrucura por referencia para los errores. @done (16-05-18 16:40) @project(Returning Errors)
+ ✔ Existen operacion costosas en el sistema (Como las expansion de fechas). Se deben usar thread para realizar las operacion o los servidores  @done (16-05-18 16:40) @project(questions)
+ ✔ Despues de los llamados a estos metodos revisar si hay error y procesarlo. @done (16-05-18 16:40) @project(Returning Errors)
+ ✔  COmo tener calendarios publicos que dependiendo del rol del usuario en el sistema se pueda modificar. @done (16-05-18 16:40) @project(questions)
+ ✔ 7.10 CALDAV:free-busy-query REPORT    @done (16-05-18 16:38) @project(Calendaring Reports)
+ ✔ 7.3 Date and Floating Time @done (16-05-18 16:37) @project(Calendaring Reports)
+ ✔ 5.3.4 Calendar Object Resource Entity Tag -> realizar los cambios de esto @done (16-05-18 16:37) @project(Calendar Access Features / MUST be defined on all calendar collections)
+ ✔ Do the preconditions checks of the methods. @done (16-05-18 16:36) @project(Preconditions)
+ ✔ Do the postcondition checks of the methods @done (16-05-18 16:36) @project(Preconditions)
+ ✔ 4.4. DAV:group-membership @done (16-04-30 16:04) @project(ACL / Properties / REQUIRED )
+ ✔ 4.3. DAV:group-member-set @done (16-04-30 16:04) @project(ACL / Properties / Useful properties)
+ ✔ 5.1. DAV:owner @done (16-04-28 13:37) @project(ACL / Properties / MUST)
+ ✔ 4.2. DAV:principal-URL @done (16-04-28 13:37) @project(ACL / Properties / REQUIRED )
+ ✔ annadir una propiedad string "Session" en los principal y para saber cuando un cliente esta autenticado. @done (16-04-28 13:36) @project(TODO / Adriano / REPORT / Principal PROFIND)
+ ✔ Cuando se hace un pedido directo a la url del principal, verifical la cookie "Session". @done (16-04-28 13:36) @project(TODO / Adriano / REPORT / Principal PROFIND)
+ ✔ POner los resources en la DB con el id de ellos. Aki poner el eTag!!! @done (16-04-04 14:23) @project(Future implementations / Database)
+ ✔ Implementar las propiedades que puedan cambiar, incluso las que incumben a todas las colleccion donde podrian tener valores iguales en la DB, pues si no habria que tner un lock para cuando se modifique el object que contiene la propiedad. @done (16-04-04 14:23) @project(Future implementations / Database)
+ ✔ 7.9 CALDAV:calendar-multiget REPORT @done (16-04-04 14:22) @project(Calendaring Reports)
+ ✔ 5.2.6 CALDAV:min-date-time Property->para limitar las componentes almacenadas. @done (16-04-04 14:21) @project(Calendar Access Features / MUST be defined on all calendar collections)
+ ✔ 5.2.5 CALDAV:max-resource-size Propert->para limitar el tamanno d los attachments. @done (16-04-04 14:21) @project(Calendar Access Features / MUST be defined on all calendar collections)
+ ✔ 5.2.2 CALDAV:calendar-timezone Property @done (16-04-04 14:21) @project(Calendar Access Features / MUST be defined on all calendar collections)
+ ✔  Do a class for the common properties of the collections. @done (16-04-04 14:20) @project(Caldav)
+ ✔ Tomar los valores de las componentes que deben ser retornados y luego de tener los resources que pasaron los filters, obtener la representacion en string de estos resources con los componentes pedidos. @done (16-04-02 14:03) @project(REPORT Method)
+ ✔ 7.1 REPORT Method  (defined in Section 3.6 of [RFC3253]) @done (16-03-31 01:17) @project(Calendaring Reports)
+ ✔ RFC 5546 @done (16-03-31 00:48) @project(to search)
+ ✔ Implement the especial expansion in the ApplyByDay depending on hte FREQ value and the other values. @done (16-03-29 01:39) @project(Time-Filter / RRULES)
+ ✔ How to mock in EF7. @done (16-03-28 10:54) @project(to search)
+ ✔ EF7 unit test examples @done (16-03-28 10:54) @project(to search)
+ ✔ 7.8 CALDAV:calendar-query REPORT @done (16-03-24 05:43) @project(Calendaring Reports)
+ ✔ 7.5 Searching Text: Collations @done (16-03-24 05:43) @project(Calendaring Reports)
+ ✔ 7.4 Time Range Filtering @done (16-03-24 05:43) @project(Calendaring Reports)
+ ✔ Implement an extensor method of DateTime to expand the dateT for given rules. @done (16-03-24 05:37) @project(Time-Filter / RRULES)
+ ✔ Implement a tree structure for parsing and building the xml request and response. @done (16-03-24 05:35) @project(Calendaring Reports)
+ ✔ 7.8 CALDAV:calendar-query REPORT @done (16-03-24 05:35) @project(Calendaring Reports)
+ ✔ FileSystemMangement implemntar metodo para devolver todos los recursos de una coleccion. @done (16-03-14 15:54) @project(Nacho)
+ ✔ Create the directory for the collection. @done (16-03-11 11:59) @project(Caldav)
+ ✔ create it in DB @done (16-03-11 08:23) @project(Caldav)
+ ✔ using the the DB  to get the properties of the collection. @done (16-03-10 17:39) @project(Caldav)
 
-  Nacho:
-    ✔ FileSystemMangement implemntar metodo para devolver todos los recursos de una coleccion. @done (16-03-14 15:54)
-    ✔ base de datos @done (16-03-24 23:03)
-    ✔ recur @done (16-03-30 23:31)
-    ✔ test propfind @done (16-03-30 23:31)
-    ✔ fix database @done (16-03-25 14:51)
-    ✔ cambiar las propiedades @done (16-03-24 23:03)
-    ✔ mandar lo de katrib @done (16-03-24 23:03)
-    ✔ proppatch @done (16-04-13 00:52)
-    ✔ etag @done (16-04-19 01:18)
-      ✔ generar etag en creacion de resource @done (16-04-19 01:18)
-      ✔ generar etag en modificacion de resource @done (16-04-19 01:18)
-    ✔ makecalendar @done (16-04-13 02:50)
-    ☐ documentar
-    ✔ Pasar modelos a capa de datos. @done (16-04-13 00:52)
-    ✔ Implementar test de proppatch. @done (16-04-13 00:52)
-    ✔ Arreglar PUT, GET, DELETE, etc.       @done (16-04-19 01:18)
-    ✔ Hacer Contructor en POCO's de forma tal que: @done (16-04-14 11:53)
-      ✔ Se inicializen las listas relacionales. @done (16-04-14 11:53)
-      ✔ Se anadan las propiedades de WEBDAB y CALDAV. @done (16-04-14 11:53)
-        ✔ displayname toma por defecto el nombre de la coleccion o recurso. @done (16-04-14 11:53)
-    ☐ Revisar como se usa el calendar-home-set
-    ✔ Hacer Test para MKCalendar @done (16-04-14 23:55)
-    ✔ Generar Etag en creacion y modificacion de resource @done (16-04-19 01:19)
-    ✔ Tomar tamanno de .ics y asignarlo a getcontentlenght en creacio y modificacion de resource. @done (16-04-19 01:19)
-    ✔ Actualizar getlastmodified en resource cuando este es modificado. @done (16-04-19 01:22)
-    ✔ content-type en http header debe ser application/xml cuando se devuelve un xml como body @done (16-04-19 16:52)
-    ✔ Terminar permission precondition. @done (16-05-18 09:52)
-    ☐ Cambiar el delete colection para que tenga en cuanta el permiso sobre sus hijos.

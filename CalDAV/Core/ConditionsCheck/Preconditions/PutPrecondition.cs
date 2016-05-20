@@ -20,7 +20,7 @@ namespace CalDAV.Core.ConditionsCheck
         private readonly CollectionRepository _collectionRepository;
         private readonly ResourceRespository _resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
-        public PutPrecondition(IFileSystemManagement manager,
+        public PutPrecondition(IFileManagement manager,
             IRepository<CalendarCollection, string> collectionRepository,
             IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker)
         {
@@ -30,7 +30,7 @@ namespace CalDAV.Core.ConditionsCheck
             _permissionChecker = permissionChecker;
         }
 
-        private IFileSystemManagement StorageManagement { get; }
+        private IFileManagement StorageManagement { get; }
 
         public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
         {

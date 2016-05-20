@@ -11,7 +11,7 @@
 //        [Fact]
 //        public void UnitTest1()
 //        {
-//            IFileSystemManagement fs = new FileSystemManagement("foo", "calendar1");
+//            IFileManagement fs = new FileManagement("foo", "calendar1");
 
 //            Assert.True(fs.AddUserFolder("foo"));
 
@@ -73,7 +73,7 @@
 //END:VEVENT
 //END:VCALENDAR";
 
-//            IFileSystemManagement fs = new FileSystemManagement("foo", "calendar1");
+//            IFileManagement fs = new FileManagement("foo", "calendar1");
 
 //            Assert.True(fs.AddUserFolder("foo"));
 

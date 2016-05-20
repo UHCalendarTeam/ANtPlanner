@@ -27,7 +27,7 @@
 //        {
 //            #region FIlling Database
 
-//            //FileSystemManagement fs = new FileSystemManagement();
+//            //FileManagement fs = new FileManagement();
 //            //var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
 //            // This is the magic line
@@ -272,7 +272,7 @@
 //        public void ModifyPropertySuccesful()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeaders = new Dictionary<string, string>
@@ -324,7 +324,7 @@
 //        public void CreateSuccesful()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeaders = new Dictionary<string, string>
@@ -377,7 +377,7 @@
 //        public void CreateAndThenRemoveSuccesful()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeaders = new Dictionary<string, string>
@@ -443,7 +443,7 @@
 //        public void ErrorCoctel()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeaders = new Dictionary<string, string>

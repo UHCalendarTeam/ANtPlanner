@@ -53,7 +53,7 @@ namespace DataLayer
 
         public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
-        public static bool PublicCalendarCreated => new FileSystemManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
+        public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
 
 
         /// <summary>

@@ -84,7 +84,7 @@ namespace CalDAV.Core
         /// <returns></returns>
         public async Task CalendarQuery(IXMLTreeStructure xmlDoc, string collectionURl, HttpContext httpContext)
         {
-            IFileSystemManagement fs = new FileSystemManagement();
+            IFileManagement fs = new FileManagement();
             // take the first prop node to know the data that
             // should ne returned
             IXMLTreeStructure propNode;
@@ -211,7 +211,7 @@ namespace CalDAV.Core
             // process the requested resources
             foreach (var href in hrefs)
             {
-                var fs = new FileSystemManagement();
+                var fs = new FileManagement();
 
                 var resourceContent = await fs.GetCalendarObjectResource(href);
 

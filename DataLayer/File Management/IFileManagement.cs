@@ -4,7 +4,11 @@ using ICalendar.Calendar;
 
 namespace DataLayer
 {
-    public interface IFileSystemManagement
+   /// <summary>
+   /// Define the necessary methods for working with the 
+   /// resources and collections on disk
+   /// </summary>
+    public interface IFileManagement
     {
         /// <summary>
         ///     Get the Root local directory location.

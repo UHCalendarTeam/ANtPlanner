@@ -17,15 +17,15 @@ namespace CalDAV.Core.ConditionsCheck
         private readonly CollectionRepository _collectionRepository;
         private readonly IPermissionChecker _permissionChecker;
 
-        public MKCalendarPrecondition(IFileSystemManagement fileSystemManagement,
+        public MKCalendarPrecondition(IFileManagement fileManagement,
             IRepository<CalendarCollection, string> collectionRepository, IPermissionChecker permissionChecker)
         {
-            fs = fileSystemManagement;
+            fs = fileManagement;
             _collectionRepository = collectionRepository as CollectionRepository;
             _permissionChecker = permissionChecker;
         }
 
-        public IFileSystemManagement fs { get; }
+        public IFileManagement fs { get; }
 
 
         public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)

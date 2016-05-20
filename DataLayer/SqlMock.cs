@@ -18,7 +18,7 @@
 //            var passHasher = new PasswordHasher<User>();
 //            using (var db = new CalDavContext())
 //            {
-//                var fs = new FileSystemManagement();
+//                var fs = new FileManagement();
 //                var frank = new User("Frank", "f.underwood@wh.org");
 //                //create useful properties for the principal
 //                var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, "f.underwood@wh.org", "durtyplans");
@@ -95,7 +95,7 @@
 //        {
 //            using (var db = new CalDavContext())
 //            {
-//                var fs = new FileSystemManagement();
+//                var fs = new FileManagement();
 //                db.Database.EnsureDeleted();
 //                db.Database.EnsureCreated();
 //                db.SaveChanges();
@@ -103,7 +103,7 @@
 //            }
 //        }
 
-//        public static void DestroyAll(this IFileSystemManagement fs)
+//        public static void DestroyAll(this IFileManagement fs)
 //        {
 //            if (Directory.Exists("collections"))
 //                Directory.Delete("collections", true);

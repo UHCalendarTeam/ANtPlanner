@@ -229,7 +229,7 @@ namespace DataLayer.Repositories
         {
             //create the core passHasher
             var passHasher = new PasswordHasher<User>();
-            var fsm = new FileSystemManagement();
+            var fsm = new FileManagement();
 
             var user = new User
             {
@@ -378,7 +378,7 @@ namespace DataLayer.Repositories
 
             //create the folder that will contain the 
             //calendars of the user
-            new FileSystemManagement().AddCalendarCollectionFolder(col.Url);
+            new FileManagement().AddCalendarCollectionFolder(col.Url);
 
             //add the user and its principal to the context
             _context.Workers.Add(worker);

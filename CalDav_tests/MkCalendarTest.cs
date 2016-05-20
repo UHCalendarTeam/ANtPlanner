@@ -28,7 +28,7 @@
 //        [Fact]
 //        public async Task EmptyBodyCreation()
 //        {
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var db = Mockdatabase();
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeader = new Dictionary<string, string>
@@ -50,7 +50,7 @@
 //        [Fact]
 //        public async  Task SimpleBodyCreation()
 //        {
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var db = Mockdatabase();
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeader = new Dictionary<string, string>
@@ -73,7 +73,7 @@
 //        [Fact]
 //        public async Task ComplexBodyCreation()
 //        {
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var db = Mockdatabase();
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeader = new Dictionary<string, string>
@@ -110,7 +110,7 @@
 //        [Fact]
 //        public async Task ComplexBodyFail()
 //        {
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var db = Mockdatabase();
 //            var caldav = new CalDav(fs, db);
 //            var propertiesAndHeader = new Dictionary<string, string>

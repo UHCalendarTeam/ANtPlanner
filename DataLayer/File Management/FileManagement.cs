@@ -6,7 +6,7 @@ using ICalendar.Calendar;
 
 namespace DataLayer
 {
-    public class FileSystemManagement : IFileSystemManagement
+    public class FileManagement : IFileManagement
     {
         public bool AddPrincipalFolder(string url)
         {

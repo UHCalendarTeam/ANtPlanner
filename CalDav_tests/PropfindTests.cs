@@ -106,7 +106,7 @@
 //        {
 //            #region FIlling Database
 
-//            //FileSystemManagement fs = new FileSystemManagement();
+//            //FileManagement fs = new FileManagement();
 //            var optionsBuilder = new DbContextOptionsBuilder<CalDavContext>();
 
 //            // This is the magic line
@@ -497,7 +497,7 @@
 //        public void ComparingCollectionFinalsXmlPropName()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -552,7 +552,7 @@
 //        public void ComparingCollectionFinalsXmlAllprop()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -601,7 +601,7 @@
 //        public void ComparingCollectionFinalXmlAllPropWithInclude()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -654,7 +654,7 @@
 //        public void ComparingCollectionFinalXmlProp()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -735,7 +735,7 @@
 //        public void ComparingCollectionWithResourceFinalsXmlPropName()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -807,7 +807,7 @@
 //        public void ComparingCollectionWithResourceFinalXmlAllPropWithInclude()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();
@@ -872,7 +872,7 @@
 //        public void ComparingCollectionWithResourceFinalXmlProp()
 //        {
 //            var db = MockDatabase();
-//            var fs = new FileSystemManagement();
+//            var fs = new FileManagement();
 //            var calDav = new CalDav(fs, db);
 
 //            var prop = new Dictionary<string, string>();

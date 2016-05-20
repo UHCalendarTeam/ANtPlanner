@@ -79,7 +79,7 @@ namespace CalDavServices
 
 
             services.AddScoped<ICalDav, CalDav>();
-            services.AddScoped<IFileSystemManagement, FileSystemManagement>();
+            services.AddScoped<IFileManagement, FileManagement>();
             services.AddTransient<IAuthenticate, UhCalendarAuthentication>();
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();

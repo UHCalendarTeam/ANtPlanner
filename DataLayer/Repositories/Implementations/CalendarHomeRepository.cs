@@ -156,7 +156,7 @@ namespace DataLayer.Repositories.Implementations
         {
             var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu")&&!SystemProperties.PublicCalendarCreated;
             
-            var fsm = new FileSystemManagement();
+            var fsm = new FileManagement();
             var defaultCalName = "DefaultCalendar";
 
             var defaultCalHomeName =adminUser?"PublicCollections" : "HomeCollection";
@@ -214,7 +214,7 @@ namespace DataLayer.Repositories.Implementations
 
         private static void CreatePublicCollections(CalendarHome publicCalendar, Principal owner, params Property[] properties)
         {
-            var fsm = new FileSystemManagement();
+            var fsm = new FileManagement();
             foreach (var calName in SystemProperties.PublicCalendarNames)
             {
                 var ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",

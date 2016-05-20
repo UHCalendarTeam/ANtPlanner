@@ -46,7 +46,7 @@ namespace CalDAV.Core
         /// <param name="collectionRespository"></param>
         /// <param name="resourceRespository"></param>
         /// <param name="principalRepository"></param>
-        public CalDav(IFileSystemManagement fsManagement, IACLProfind aclProfind,
+        public CalDav(IFileManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
             IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository )
@@ -92,7 +92,7 @@ namespace CalDAV.Core
 
         #region Dependencies
 
-        private IFileSystemManagement StorageManagement { get; }
+        private IFileManagement StorageManagement { get; }
         private IPropfindMethods PropFindMethods { get; set; }
         private IPrecondition PreconditionCheck { get; set; }
         private IPoscondition PosconditionCheck { get; set; }
