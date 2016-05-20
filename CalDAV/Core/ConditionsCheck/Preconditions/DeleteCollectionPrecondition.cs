@@ -32,18 +32,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
 
             string principalUrl;
             propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
-
-            //if (!await _collectionRepository.Exist(url))
-            //{
-            //    response.StatusCode = (int)HttpStatusCode.NotFound;
-            //    return false;
-            //}
-            //if (!await _resourceRespository.Exist(url))
-            //{
-            //    response.StatusCode = (int)HttpStatusCode.NotFound;
-            //    return false;
-            //}
-
+            
             return PermissionCheck(url, principalUrl, response);
 
 
