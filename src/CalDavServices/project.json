@@ -2,7 +2,10 @@
     "tools": {
         "Microsoft.EntityFrameworkCore.Tools": {
             "version": "1.0.0-*",
-            "imports": ["dnxcore50", "portable-net45+win8"]
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
         }
     },
     "buildOptions": {
@@ -16,12 +19,18 @@
         },
         "ACL": "1.0.0-*",
         "CalDAV": "1.0.0-*",
-        "Microsoft.EntityFrameworkCore.Tools": { "version": "1.0.0-*", "type": "build" },                
+        "Microsoft.EntityFrameworkCore.Tools": {
+            "version": "1.0.0-*",
+            "type": "build"
+        },
         "Microsoft.EntityFrameworkCore.InMemory": "1.0.0-rc2-final",
         "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-rc2-final",
         "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.0-rc2-final",
         "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0-rc2-final",
-        "Microsoft.EntityFrameworkCore.Sqlite.Design": { "version": "1.0.0-*", "type": "build" },
+        "Microsoft.EntityFrameworkCore.Sqlite.Design": {
+            "version": "1.0.0-*",
+            "type": "build"
+        },
         "ICalendar": "1.0.0-rc2-260400",
         "Microsoft.AspNetCore.Cors": "1.0.0-rc2-final",
         "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",
@@ -44,11 +53,19 @@
     },
     "frameworks": {
         "netcoreapp1.0": {
-            "imports": ["dnxcore50", "portable-net45+win8"]
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
         }
     },
     "runtimeOptions": {
         "gcServer": true
+    },
+    "commands": {
+        "run": "run server.urls=http://localhost:5003",
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5003",
+        "weblistener": "Microsoft.AspNet.Hosting --server WebListener --server.urls http://localhost:5004"
     },
     "publishOptions": {
         "include": [

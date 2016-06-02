@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System;
 using ACL.Core;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
@@ -14,15 +15,12 @@ using DataLayer.Repositories;
 using DataLayer.Repositories.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using Serilog.Sinks.RollingFile;
 
 namespace CalDavServices
@@ -40,7 +38,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Warning()
+        .MinimumLevel.Debug()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
 
@@ -70,7 +68,7 @@ namespace CalDavServices
             //    .AddDbContext<CalDavContext>(options =>
             //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
 
-            var path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "UHCalendarDb");
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
 
             // services.AddEntityFramework()
@@ -101,9 +99,7 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddSerilog();
-
-
+            loggerFactory.AddSerilog();            
 
             // app.UseIISPlatformHandler();
 
@@ -124,6 +120,7 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
+              .UseUrls("http://localhost:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

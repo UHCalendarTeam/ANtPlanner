@@ -44,7 +44,7 @@ namespace DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            var path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "UHCalendarDb");
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
             optionBuilder.UseSqlite(connection);
         }
