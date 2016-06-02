@@ -10,8 +10,8 @@ using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using ICalendar.Calendar;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace CalDAV.Core.ConditionsCheck.Preconditions
 {

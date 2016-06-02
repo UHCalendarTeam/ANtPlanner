@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core.ConditionsCheck
 {

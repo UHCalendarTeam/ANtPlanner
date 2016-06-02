@@ -1,5 +1,5 @@
 ﻿using CalDavServices.Middlewares;
-using Microsoft.AspNet.Builder;
+using Microsoft.AspNetCore.Builder;
 
 namespace CalDavServices.Extensions
 {

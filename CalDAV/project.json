@@ -1,27 +1,37 @@
 {
-    "authors": [ "UHCalendarTeam" ],
+    "authors": [
+        "UHCalendarTeam"
+    ],
     "dependencies": {
+        "Microsoft.NETCore.App": {
+            "version": "1.0.0-rc2-3002702",
+            "type": "platform"
+        },  
         "ACL": "1.0.0-*",
         "DataLayer": "1.0.0-*",
         "ICalendar": "1.0.0-rc2-260400",
-        "Microsoft.AspNet.Http.Abstractions": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Http.Extensions": "1.0.0-rc1-final",
-        "Microsoft.CSharp": "4.0.1-beta-*",
-        "System.Collections": "4.0.11-beta-*",
-        "System.IO": "4.0.11-beta-*",
-        "System.Linq": "4.0.1-beta-*",
-        "System.Reflection": "4.1.0-beta-*",
-        "System.Runtime": "4.0.21-beta-*",
-        "System.Threading": "4.0.11-beta-*",
-        "System.Xml.XDocument": "4.0.11-beta-23516",
+        "Microsoft.AspNetCore.Http.Abstractions": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Http.Extensions": "1.0.0-rc2-final",
+        "Microsoft.CSharp": "4.0.1-rc2-24027",
+        "System.Collections": "4.0.11-rc2-24027",
+        "System.IO": "4.1.0-rc2-24027",
+        "System.Linq": "4.1.0-rc2-24027",
+        "System.Reflection": "4.1.0-rc2-24027",
+        "System.Runtime": "4.1.0-rc2-24027",
+        "System.Threading": "4.0.11-rc2-24027",
+        "System.Xml.XDocument": "4.0.11-rc2-24027",
         "TreeForXml": "1.0.4"
     },
     "description": "CalDAV Library",
-    "frameworks": {        
-        "dnxcore50": { }
+    "frameworks": {
+        "netcoreapp1.0": {
+            "imports": ["dnxcore50", "portable-net45+win8"]
+        }
     },
     "licenseUrl": "",
     "projectUrl": "",
-    "tags": [ "" ],
+    "tags": [
+        ""
+    ],
     "version": "1.0.0-*"
 }

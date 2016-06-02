@@ -1,23 +1,33 @@
 {
     "version": "1.0.0-*",
     "description": "ACL Class Library",
-    "authors": [ "UHCalendarTeam" ],
-    "tags": [ "" ],
+    "authors": [
+        "UHCalendarTeam"
+    ],
+    "tags": [
+        ""
+    ],
     "projectUrl": "",
     "licenseUrl": "",
     "dependencies": {
+        "Microsoft.NETCore.App": {
+            "version": "1.0.0-rc2-3002702",
+            "type": "platform"
+        }, 
         "DataLayer": "1.0.0-*",
-        "Microsoft.AspNet.Http": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Net.Http": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
+        "Microsoft.AspNetCore.Http": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-rc2-final",
+        "Microsoft.CSharp": "4.0.1-rc2-24027",
+        "System.Collections": "4.0.11-rc2-24027",
+        "System.Linq": "4.1.0-rc2-24027",
+        "System.Net.Http": "4.0.1-rc2-24027",
+        "System.Runtime": "4.1.0-rc2-24027",
+        "System.Threading": "4.0.11-rc2-24027",
         "TreeForXml": "1.0.4"
     },
-    "frameworks": {
-        "dnxcore50": { }
+   "frameworks": {
+        "netcoreapp1.0": {
+            "imports": ["dnxcore50", "portable-net45+win8"]
+        }
     }
 }

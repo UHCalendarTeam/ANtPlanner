@@ -2,8 +2,8 @@
 using System.IO;
 using System.Text;
 using DataLayer;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace CalDAV.Core.Method_Extensions
 {

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Repositories;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace ACL.Core.Authentication
 {

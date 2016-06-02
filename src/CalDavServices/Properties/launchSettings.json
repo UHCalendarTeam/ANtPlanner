@@ -13,23 +13,24 @@
       "launchBrowser": true,
       "launchUrl": "api/v1/webdav",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "web": {
       "commandName": "web",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5000/",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "webip": {
       "commandName": "webip",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5000/api/values",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

@@ -10,7 +10,7 @@ using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using ICalendar.Calendar;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace CalDAV.Core.ConditionsCheck

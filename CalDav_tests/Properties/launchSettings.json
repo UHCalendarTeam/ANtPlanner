@@ -1,8 +1,19 @@
 {
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:1716/",
+      "sslPort": 0
+    }
+  },
   "profiles": {
-    "test": {
-      "commandName": "test",
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

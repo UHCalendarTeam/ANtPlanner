@@ -1,5 +1,5 @@
 ﻿using DataLayer;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace ACL.Core.CheckPermissions
 {

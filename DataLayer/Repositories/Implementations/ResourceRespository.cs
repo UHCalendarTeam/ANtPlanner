@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Models.Entities;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {

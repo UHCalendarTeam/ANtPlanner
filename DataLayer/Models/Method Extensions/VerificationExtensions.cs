@@ -1,5 +1,5 @@
 ﻿using DataLayer.Models.Entities;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataLayer.ExtensionMethods
 {

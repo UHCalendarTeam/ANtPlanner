@@ -8,8 +8,8 @@ using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories.Implementations;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {

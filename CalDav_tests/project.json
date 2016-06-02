@@ -1,26 +1,27 @@
 {
   "authors": [
     ""
-  ],
-  "commands": {
-    "test": "xunit.runner.dnx"
+  ],  
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+            "version": "1.0.0-rc2-3002702",
+            "type": "platform"
+        },   
+    "CalDAV": "1.0.0",    
+    "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
+    "ACL": "1.0.0-*",
+    "Microsoft.CSharp": "4.0.1-rc2-24027",
+    "System.Collections": "4.0.11-rc2-24027",
+    "System.Linq": "4.1.0-rc2-24027",
+    "System.Runtime": "4.1.0-rc2-24027",
+    "System.Threading": "4.0.11-rc2-24027"
   },
-    "dependencies": {
-        "xunit.runner.dnx": "2.1.0-rc1-build204",
-        "CalDAV": "1.0.0",
-        "xunit": "2.2.0-beta1-build3239",
-        "Microsoft.AspNet.TestHost": "1.0.0-rc1-final",
-        "ACL": "1.0.0-*",
-        "Microsoft.CSharp": "4.0.1-beta-*",
-        "System.Collections": "4.0.11-beta-*",
-        "System.Linq": "4.0.1-beta-*",
-        "System.Runtime": "4.0.21-beta-*",
-        "System.Threading": "4.0.11-beta-*"
-    },
   "description": "",
-  "frameworks": {   
-    "dnxcore50": {}
-  },
+  "frameworks": {
+        "netcoreapp1.0": {
+            "imports": ["dnxcore50", "portable-net45+win8"]
+        }
+    },
   "licenseUrl": "",
   "projectUrl": "",
   "tags": [
