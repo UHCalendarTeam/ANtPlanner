@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 
 namespace ACL.Core.CheckPermissions

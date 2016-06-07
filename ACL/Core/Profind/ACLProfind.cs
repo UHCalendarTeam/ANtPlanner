@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using DataLayer;
 using DataLayer.Models.ACL;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace ACL.Core

@@ -7,7 +7,7 @@ using ACL.Interfaces;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace ACL.Core

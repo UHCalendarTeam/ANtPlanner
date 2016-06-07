@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {

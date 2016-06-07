@@ -7,7 +7,7 @@ using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Repositories;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace CalDAV.Core.ConditionsCheck

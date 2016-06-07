@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using DataLayer.Models.Entities;
-using Microsoft.Data.Entity.ValueGeneration.Internal;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using TreeForXml;
 
 namespace DataLayer

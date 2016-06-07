@@ -11,25 +11,16 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/v1/webdav",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "web": {
-      "commandName": "web",
+      "commandName": "web",      
+      "launchUrl": "http://localhost:5003/",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
-    },
-    "webip": {
-      "commandName": "webip",
-      "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update2"
-    }
-  }
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }    
+  }  
 }

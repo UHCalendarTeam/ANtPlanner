@@ -2,9 +2,10 @@
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Metadata;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.PlatformAbstractions;
 
@@ -43,7 +44,7 @@ namespace DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            var path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "UHCalendarDb");
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
             optionBuilder.UseSqlite(connection);
         }

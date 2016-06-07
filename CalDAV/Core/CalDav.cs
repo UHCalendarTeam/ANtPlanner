@@ -18,7 +18,7 @@ using DataLayer.Repositories;
 using DataLayer.Repositories.Implementations;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace CalDAV.Core

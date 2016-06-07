@@ -4,11 +4,11 @@ using System.Net;
 using System.Threading.Tasks;
 using CalDAV.Core;
 using DataLayer;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Extensions;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Http.Headers;
 using ACL.Core.Authentication;
 
 namespace CalDavServices.Controllers
@@ -17,14 +17,13 @@ namespace CalDavServices.Controllers
     public class CalDavController : Controller
     {
         //Constructor
-        public CalDavController(ICalDav repoCalDav, IAuthenticate authenticate)
+        public CalDavController([FromServices] ICalDav repoCalDav,[FromServices] IAuthenticate authenticate)
         {
             CalDavRepository = repoCalDav;
             _authenticate = authenticate;
         }
 
-        //dependency injection
-        [FromServices]
+        //dependency injection        
         private ICalDav CalDavRepository { get; }
 
         private string StreamToString(Stream stream)
@@ -33,7 +32,7 @@ namespace CalDavServices.Controllers
             return reader.ReadToEnd();
         }
 
-        [FromServices]
+        
         private  IAuthenticate _authenticate { get; }
 
         private string GetPrincipalUrlFromUrl(string url, string collectionName)
@@ -278,15 +277,15 @@ namespace CalDavServices.Controllers
             }
         }
 
-        private string EtagAsString(IList<EntityTagHeaderValue> etags)
-        {
-            var res = "";
-            foreach (var etag in etags)
-            {
-                res += etag.Tag + ",";
-            }
-            return res.Remove(res.Length - 1);
-        }
+        // private string EtagAsString(IList<EntityTagHeaderValue> etags)
+        // {
+        //     var res = "";
+        //     foreach (var etag in etags)
+        //     {
+        //         res += etag.Tag + ",";
+        //     }
+        //     return res.Remove(res.Length - 1);
+        // }
 
 
         // GET api/caldav/user_name/calendars/collection_name/object_resource_file_name

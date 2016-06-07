@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using ICalendar.Calendar;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core.ConditionsCheck.Preconditions.Report
 {

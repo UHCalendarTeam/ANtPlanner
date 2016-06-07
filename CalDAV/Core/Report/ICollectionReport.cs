@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
 namespace CalDAV.Core

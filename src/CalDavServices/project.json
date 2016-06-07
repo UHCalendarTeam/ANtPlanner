@@ -1,50 +1,84 @@
 {
+    "tools": {
+        "Microsoft.EntityFrameworkCore.Tools": {
+            "version": "1.0.0-*",
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    },
+    "buildOptions": {
+        "emitEntryPoint": true,
+        "preserveCompilationContext": true
+    },
+    "dependencies": {
+        "Microsoft.NETCore.App": {
+            "version": "1.0.0-rc2-3002702",
+            "type": "platform"
+        },
+        "ACL": "1.0.0-*",
+        "CalDAV": "1.0.0-*",
+        "Microsoft.EntityFrameworkCore.Tools": {
+            "version": "1.0.0-*",
+            "type": "build"
+        },
+        "Microsoft.EntityFrameworkCore.InMemory": "1.0.0-rc2-final",
+        "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-rc2-final",
+        "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.0-rc2-final",
+        "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0-rc2-final",
+        "Microsoft.EntityFrameworkCore.Sqlite.Design": {
+            "version": "1.0.0-*",
+            "type": "build"
+        },
+        "ICalendar": "1.0.0-rc2-260400",
+        "Microsoft.AspNetCore.Cors": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Server.WebListener": "0.1.0-rc2-final",
+        "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",
+        "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging.Debug": "1.0.0-rc2-final",
+        "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-final",
+        "Serilog.Extensions.Logging": "1.0.0-rc2-10110",
+        "Serilog.Sinks.RollingFile": "2.0.0-rc-703"
+    },
+    "frameworks": {
+        "netcoreapp1.0": {
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    },
+    "runtimeOptions": {
+        "gcServer": true
+    },
     "commands": {
-        "web": "Microsoft.AspNet.Server.Kestrel",
-        "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://192.168.0.102:5003",
-        "ef": "EntityFramework.Commands"
+        "run": "run server.urls=http://localhost:5003",
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5003",
+        "weblistener": "Microsoft.AspNet.Hosting --server WebListener --server.urls http://localhost:5004"
     },
-    "compilationOptions": {
-        "emitEntryPoint": true
+    "publishOptions": {
+        "include": [
+            "wwwroot",
+            "Views",
+            "appsettings.json",
+            "web.config"
+        ]
     },
-  "dependencies": {
-    "ACL": "1.0.0-*",
-    "CalDAV": "1.0.0-*",
-    "EntityFramework.Commands": "7.0.0-rc1-final",
-    "EntityFramework.Core": "7.0.0-rc1-final",
-    "EntityFramework.InMemory": "7.0.0-rc1-final",
-    "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-    "EntityFramework.MicrosoftSqlServer.Design": "7.0.0-rc1-final",
-    "EntityFramework.SQLite": "7.0.0-rc1-final",
-    "EntityFramework.Sqlite.Design": "7.0.0-rc1-final",
-    "ICalendar": "1.0.0-rc2-260400",
-    "Microsoft.AspNet.Cors": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Hosting": "1.0.0-rc1-final",
-    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Server.WebListener": "1.0.0-rc1-final",   
-    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
-    "Microsoft.AspNet.TestHost": "1.0.0-rc1-final",   
-    "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
-    "Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final",
-    "Serilog.Extensions.Logging": "1.0.0-rc1-final-10092",
-    "Serilog.Sinks.RollingFile": "2.0.0-beta-465"
-  },
-    "exclude": [
-        "wwwroot",
-        "node_modules"
-    ],
-    "frameworks": {        
-        "dnxcore50": { }
+    "scripts": {
+        "postpublish": [
+            "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
+        ]
     },
-    "publishExclude": [
-        "**.user",
-        "**.vspscc"
-    ],
-    "version": "1.0.0-*"}
+    "version": "1.0.0-*"
+}

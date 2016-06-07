@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DataLayer.Models.ACL;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace ACL.Core.Authentication
 {
