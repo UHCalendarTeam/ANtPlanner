@@ -4,28 +4,20 @@ using ICalendar.Calendar;
 
 namespace DataLayer
 {
-   /// <summary>
-   /// Define the necessary methods for working with the 
-   /// resources and collections on disk
-   /// </summary>
+    /// <summary>
+    ///     Define the necessary methods for working with the
+    ///     resources and collections on disk
+    /// </summary>
     public interface IFileManagement
     {
-        /// <summary>
-        ///     Get the Root local directory location.
-        /// </summary>
-        /// <summary>
-        ///     Creates a new folder which will contain all user calendar collections.
-        /// </summary>
-        /// <param name="principalUrl">Email of the owner of the folder</param>
-        /// <returns></returns>
-        bool AddPrincipalFolder(string principalUrl);
+      
 
         /// <summary>
         ///     Creates a new folder which will contain all calendar object resource.
         /// </summary>
         /// <param name="collectionUrl"></param>
         /// <returns></returns>
-        bool AddCalendarCollectionFolder(string collectionUrl);
+        bool CreateFolder(string collectionUrl);
 
         /// <summary>
         ///     Retrieves all iCalendar Objects stored in calendarCollection specified.

@@ -15,7 +15,7 @@
 
 //            Assert.True(fs.AddUserFolder("foo"));
 
-//            Assert.True(fs.AddCalendarCollectionFolder(TODO));
+//            Assert.True(fs.CreateFolder(TODO));
 
 //            Assert.True(fs.ExistCalendarCollection(TODO));
 
@@ -77,7 +77,7 @@
 
 //            Assert.True(fs.AddUserFolder("foo"));
 
-//            Assert.True(fs.AddCalendarCollectionFolder(TODO));
+//            Assert.True(fs.CreateFolder(TODO));
 
 //            Assert.True(fs.ExistCalendarCollection(TODO));
 

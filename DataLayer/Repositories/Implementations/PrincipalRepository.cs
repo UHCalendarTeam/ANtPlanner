@@ -164,7 +164,7 @@ namespace DataLayer.Repositories
         /// <returns></returns>
         public bool VerifyPassword(Principal principal, string password = "")
         {
-            //if the user doenst exit return false
+            //if the user doesn't exit return false
             if (principal == null)
                 return false;
 
@@ -378,7 +378,7 @@ namespace DataLayer.Repositories
 
             //create the folder that will contain the 
             //calendars of the user
-            new FileManagement().AddCalendarCollectionFolder(col.Url);
+            new FileManagement().CreateFolder(col.Url);
 
             //add the user and its principal to the context
             _context.Workers.Add(worker);

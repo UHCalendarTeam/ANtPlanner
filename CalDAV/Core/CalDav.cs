@@ -475,7 +475,7 @@ namespace CalDAV.Core
             await _principalRepository.SaveChangesAsync();
 
             //Adding the collection folder.
-            StorageManagement.AddCalendarCollectionFolder(url);
+            StorageManagement.CreateFolder(url);
         }
 
         #endregion

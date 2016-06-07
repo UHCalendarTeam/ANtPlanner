@@ -38,7 +38,7 @@
 //                db.Principals.Add(frankPrincipal);
 
 //                fs.AddPrincipalFolder(SystemProperties._userCollectionUrl + frank.Email);
-//                fs.AddCalendarCollectionFolder(frankCollection.Url);
+//                fs.CreateFolder(frankCollection.Url);
 
 //                #region Body
 //                var body = @"BEGIN:VCALENDAR

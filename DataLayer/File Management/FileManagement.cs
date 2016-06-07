@@ -8,15 +8,8 @@ namespace DataLayer
 {
     public class FileManagement : IFileManagement
     {
-        public bool AddPrincipalFolder(string url)
-        {
-            url = RemoveInitialSlash(url);
-            var path = url.Replace('/', Path.DirectorySeparatorChar);
-            var dirInfo = Directory.CreateDirectory(path);
-            return dirInfo.Exists;
-        }
-
-        public bool AddCalendarCollectionFolder(string url)
+      
+        public bool CreateFolder(string url)
         {
             url = RemoveInitialSlash(url);
             var path = url.Replace('/', Path.DirectorySeparatorChar);

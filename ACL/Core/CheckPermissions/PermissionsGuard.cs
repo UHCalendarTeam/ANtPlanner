@@ -7,6 +7,7 @@ using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using Microsoft.AspNet.Http;
 
+
 namespace ACL.Core.CheckPermissions
 {
     public class PermissionsGuard : IPermissionChecker

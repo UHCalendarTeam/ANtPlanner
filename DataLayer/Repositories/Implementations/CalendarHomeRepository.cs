@@ -176,7 +176,7 @@ namespace DataLayer.Repositories.Implementations
             var calHome = new CalendarHome(
                 calHomeUrl, defaultCalHomeName, ownerProp, aclProperty);
 
-            fsm.AddCalendarCollectionFolder(calHome.Url);
+            fsm.CreateFolder(calHome.Url);
             ownerProp = PropertyCreation.CreateProperty("owner", "D", $"<D:href>{owner.PrincipalURL}</D:href>",
               false, false);
 
@@ -203,7 +203,7 @@ namespace DataLayer.Repositories.Implementations
             //if the principal is not admin
             if (!adminUser)
             {
-                fsm.AddCalendarCollectionFolder(initCollection.Url);
+                fsm.CreateFolder(initCollection.Url);
                 calHome.CalendarCollections.Add(initCollection);
                 owner.CalendarCollections.Add(initCollection);
             }
@@ -229,7 +229,7 @@ namespace DataLayer.Repositories.Implementations
                     CalendarHome = publicCalendar
                 };
 
-                fsm.AddCalendarCollectionFolder(publicCollection.Url);
+                fsm.CreateFolder(publicCollection.Url);
                 publicCalendar.CalendarCollections.Add(publicCollection);
                 owner.CalendarCollections.Add(publicCollection);
             }
