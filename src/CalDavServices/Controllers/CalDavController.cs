@@ -2,14 +2,13 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using ACL.Core.Authentication;
 using CalDAV.Core;
 using DataLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using Microsoft.AspNetCore.Http.Headers;
-using ACL.Core.Authentication;
 
 namespace CalDavServices.Controllers
 {
@@ -17,7 +16,7 @@ namespace CalDavServices.Controllers
     public class CalDavController : Controller
     {
         //Constructor
-        public CalDavController([FromServices] ICalDav repoCalDav,[FromServices] IAuthenticate authenticate)
+        public CalDavController([FromServices] ICalDav repoCalDav, [FromServices] IAuthenticate authenticate)
         {
             CalDavRepository = repoCalDav;
             _authenticate = authenticate;
@@ -26,14 +25,14 @@ namespace CalDavServices.Controllers
         //dependency injection        
         private ICalDav CalDavRepository { get; }
 
+
+        private IAuthenticate _authenticate { get; }
+
         private string StreamToString(Stream stream)
         {
             var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
-
-        
-        private  IAuthenticate _authenticate { get; }
 
         private string GetPrincipalUrlFromUrl(string url, string collectionName)
         {
@@ -96,6 +95,22 @@ namespace CalDavServices.Controllers
 
         #region Collection Methods
 
+      
+
+        //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
+        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/{collectionName}/")]
+        public async Task MkCalendar(string groupOrUser, string calendarHome, string collectionName)
+        {
+            var url = GetRealUrl(Request);
+            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
+            var propertiesAndHeaders = new Dictionary<string, string>();
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
+            propertiesAndHeaders.Add("collectionName", collectionName);
+            propertiesAndHeaders.Add("url", url);
+
+            await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
+        }
+
         /// <summary>
         ///     THis action is called when the client perfoms a PROFIND
         ///     on a collection to take the calendars.
@@ -120,20 +135,6 @@ namespace CalDavServices.Controllers
             await CalDavRepository.CHSetPropfind(propertiesAndHeaders, body, Response);
         }
 
-        //MKCAL api\v1\caldav\{username}\calendars\{collection_name}\
-        [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/{collectionName}/")]
-        public async Task MkCalendar(string groupOrUser, string calendarHome, string collectionName)
-        {
-            var url = GetRealUrl(Request);
-            var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
-            var propertiesAndHeaders = new Dictionary<string, string>();
-            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
-            propertiesAndHeaders.Add("collectionName", collectionName);
-            propertiesAndHeaders.Add("url", url);
-
-            await CalDavRepository.MkCalendar(propertiesAndHeaders, StreamToString(Request.Body), Response);
-        }
-
         //PROPFIND COLLECTIONS
         [AcceptVerbs("PropFind", Route = "collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task PropFind(string groupOrUser, string principalId, string collectionName)
@@ -143,7 +144,7 @@ namespace CalDavServices.Controllers
             var url = GetRealUrl(Request);
             var propertiesAndHeaders = new Dictionary<string, string>();
             propertiesAndHeaders.Add("url", url);
-            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL); 
+            propertiesAndHeaders.Add("principalUrl", principal.PrincipalURL);
 
             StringValues depth;
             if (Request.Headers.TryGetValue("Depth", out depth))
@@ -266,7 +267,7 @@ namespace CalDavServices.Controllers
                 {
                     propertiesAndHeaders.Add("If-None-Match", value);
                 }
-               
+
                 var contentSize = Request.Headers["Content-Length"];
                 if (contentSize.Count > 0)
                 {
