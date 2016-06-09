@@ -62,11 +62,12 @@
     "runtimeOptions": {
         "gcServer": true
     },
-    "commands": {
-        "run": "run server.urls=http://localhost:5003",
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5003",
-        "weblistener": "Microsoft.AspNet.Hosting --server WebListener --server.urls http://localhost:5004"
-    },
+  "commands": {
+    "run": "run server.urls=http://10.6.125.119:5003",
+    "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://10.6.125.119:5003",
+    "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://10.6.125.119:5003",
+    "weblistener": "Microsoft.AspNet.Hosting --server WebListener --server.urls http://10.6.125.119:5004"
+  },
     "publishOptions": {
         "include": [
             "wwwroot",
