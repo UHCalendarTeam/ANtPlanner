@@ -7,8 +7,7 @@ using ICalendar.Calendar;
 namespace DataLayer
 {
     public class FileManagement : IFileManagement
-    {
-      
+    {      
         public bool CreateFolder(string url)
         {
             url = RemoveInitialSlash(url);
