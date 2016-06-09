@@ -16,11 +16,11 @@
       }
     },
     "web": {
-      "commandName": "web",      
-      "launchUrl": "http://localhost:5003/",
+      "commandName": "web",
+      "launchUrl": "http://localhost:5001/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    }    
-  }  
+    }
+  }
 }

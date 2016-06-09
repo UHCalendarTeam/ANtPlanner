@@ -64,7 +64,7 @@
     },
     "commands": {
         "run": "run server.urls=http://localhost:5003",
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5003",
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5001",
         "weblistener": "Microsoft.AspNet.Hosting --server WebListener --server.urls http://localhost:5004"
     },
     "publishOptions": {
