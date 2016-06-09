@@ -113,6 +113,9 @@ namespace DataLayer
         public static readonly string _cookieSessionName = "authSession";
 
 
+        public static string  AbsolutePath { get; set; }
+
+
         /// <summary>
         ///     Contains the full ns (i.e xmlns:...)
         /// </summary>
