@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DataLayer.Repositories;
 
 namespace DataLayer
 {
@@ -39,21 +40,32 @@ namespace DataLayer
 
         public static readonly string[] PublicCalendarNames =
         {
-            "1stYearCom",
-            "2ndYearCom",
-            "3rdYearCom",
-            "4thYearCom",
-            "5thYearCom",
-            "1stYearMat",
-            "2ndYearMat",
-            "3rdYearMat",
-            "4thYearMat",
-            "PublicCalendar"
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "M1",
+            "M2",
+            "M3",
+            "M4",
+            "PublicEvents"
         };
 
         public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
-        public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
+       // public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
+        public static bool PublicCalendarCreated
+        {
+            get
+            {
+                var principalRepo = new PrincipalRepository(new CalDAVSQLiteContext());
+                var admin = principalRepo.GetByIdentifier("admin@admin.uh.cu");
+                return admin != null;
+            }
+        }
+
+    
 
 
         /// <summary>

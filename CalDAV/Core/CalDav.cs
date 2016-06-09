@@ -475,7 +475,7 @@ namespace CalDAV.Core
             await _principalRepository.SaveChangesAsync();
 
             //Adding the collection folder.
-            StorageManagement.AddCalendarCollectionFolder(url);
+            StorageManagement.CreateFolder(url);
         }
 
         #endregion
@@ -970,7 +970,7 @@ namespace CalDAV.Core
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
-                    if (ifMatchEtags.Contains(resourceEtag))
+                    if (ifMatchEtags.Contains(resourceEtag))//TODO: ERROR HERE!!!
                     {
                         await UpdateCalendarObjectResource(propertiesAndHeaders, response);
                         return;

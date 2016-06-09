@@ -76,7 +76,7 @@
 //                };
 //                principal.CalendarCollections.Add(collection);
 //                db.SaveChanges();
-//                //var result = FileSystemMangement.AddCalendarCollectionFolder(TODO);
+//                //var result = FileSystemMangement.CreateFolder(TODO);
 //                return result;
 //            }
 //        }

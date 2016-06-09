@@ -38,7 +38,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Debug()
+        .MinimumLevel.Warning()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
 
@@ -120,7 +120,7 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://localhost:5001")
+              .UseUrls("http://10.6.125.119:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

@@ -7,6 +7,7 @@ using DataLayer.Models.Entities;
 using DataLayer.Repositories;
 using Microsoft.AspNetCore.Http;
 
+
 namespace ACL.Core.CheckPermissions
 {
     public class PermissionsGuard : IPermissionChecker
@@ -99,7 +100,7 @@ namespace ACL.Core.CheckPermissions
 
             //for now we'll take the permission from the calendar collection and not from the resource
             if (url.Contains(".ics") || url.Contains(".ifb"))
-                url = url.Remove(url.LastIndexOf("\\") + 1);
+                url = url.Remove(url.LastIndexOf("/") + 1);
             #region uncomment this when after change the permissions
             //check where to take the acl proeprty
             //if the method perform an action on a collection then take the 
