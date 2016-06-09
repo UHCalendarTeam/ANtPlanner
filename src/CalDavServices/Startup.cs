@@ -41,7 +41,8 @@ namespace CalDavServices
         .MinimumLevel.Warning()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
-
+            SystemProperties.AbsolutePath = env.ContentRootPath;
+      
 
         }
 
@@ -130,4 +131,4 @@ namespace CalDavServices
         }
         // public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
-}
+}   

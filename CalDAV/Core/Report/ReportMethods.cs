@@ -266,8 +266,16 @@ namespace CalDAV.Core
                         break;
                     //if not try to take the property from the resource's properties
                     default:
-                        var currentProperty = calResource.Properties.FirstOrDefault(p => p.Name == prop.NodeName);
-                        currentPropNode.Value = currentProperty != null ? currentProperty.PropertyRealValue() : "";
+                        Property currentProperty;
+                        try
+                        {
+                            currentProperty = calResource.Properties.FirstOrDefault(p => p.Name == prop.NodeName);
+                            currentPropNode.Value = currentProperty != null ? currentProperty.PropertyRealValue() : "";
+                        }
+                        catch
+                        {
+                            currentProperty = null;
+                        }
                         if (currentProperty != null)
                             resPropertiesOk.Add(currentPropNode);
                         else

@@ -126,11 +126,11 @@ namespace DataLayer
 
             foreach (var file in filesPath)
             {
-                var lstIndex = file.LastIndexOf("\\", StringComparison.Ordinal);
+                var lstIndex = file.LastIndexOf(Path.DirectorySeparatorChar);
                 var fileName = file.Substring(lstIndex + 1);
                 var temp = await GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(url + fileName, temp);
+                    calendarObjectResources.Add(path + fileName, temp);
             }
             return true;
         }
