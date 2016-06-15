@@ -154,6 +154,9 @@ namespace DataLayer.Repositories.Implementations
 
         public static CalendarHome CreateCalendarHome(Principal owner)
         {
+            //check if the user is an admin user.
+            //if it is the first admin user then create the public 
+            //calendars
             var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu")&&!SystemProperties.PublicCalendarCreated;
             
             var fsm = new FileManagement();

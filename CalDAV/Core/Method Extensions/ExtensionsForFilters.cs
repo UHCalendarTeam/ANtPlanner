@@ -256,7 +256,8 @@ namespace CalDAV.Core.Method_Extensions
                     x => ((IValue<Recur>) x).Value).ToList());
             if (expandedDates == null)
                 expandedDates = new List<DateTime> {compDTSTART};
-
+            //the time filters has to be applied depending of the 
+            //component type
             if (component is VEvent)
                 return component.ApplyTimeFilterToVEVENT(start.Value, end.Value, expandedDates);
             if (component is VTodo)

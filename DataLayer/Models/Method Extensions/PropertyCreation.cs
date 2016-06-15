@@ -57,7 +57,7 @@ namespace DataLayer
 
         /// <summary>
         ///     Create the c:calendar-home-set property
-        ///     THis property says where to find the principal's calendars.
+        ///     THis property says where to find the principal's calendars.a
         /// </summary>
         /// <param name="pType">
         ///     Says if the principal is gonna represents

@@ -208,7 +208,8 @@ namespace CalDAV.Core
 
             var result = new Dictionary<string, string>();
 
-            // process the requested resources
+            // process the requested resources taking each
+            // from the file system
             foreach (var href in hrefs)
             {
                 var fs = new FileManagement();
@@ -217,6 +218,7 @@ namespace CalDAV.Core
 
                 result.Add(href, resourceContent);
             }
+            //build the response and send it to the client.
             await ReportResponseBuilder(result
                 .Select(
                     x =>
