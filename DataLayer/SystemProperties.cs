@@ -38,6 +38,12 @@ namespace DataLayer
             ProppatchResource
         }
 
+        public enum AuthenticationMethods {
+            Basic,
+            Digest,
+            OpenId
+        }
+
         public static readonly string[] PublicCalendarNames =
         {
             "C1",
@@ -66,7 +72,7 @@ namespace DataLayer
         }
 
     
-
+        public static AuthenticationMethods AuthenticationMethod => AuthenticationMethods.Basic;
 
         /// <summary>
         ///     Contains the base url path for the system.

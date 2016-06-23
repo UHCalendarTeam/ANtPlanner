@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Repositories;
 using Microsoft.AspNetCore.Http;
+
 
 namespace ACL.Core.Authentication
 {
@@ -338,6 +340,18 @@ namespace ACL.Core.Authentication
             throw new NotImplementedException("The Digest Authorization is not supported in UhCalendar system.");
         }
 
+        /// <summary>
+        /// Create the nonce for the client and set the 
+        /// authentication header of the response specifying
+        /// the Digest authentication and sending the nonce.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        private void GenerateDigestHeader(HttpContext httpContext)
+        {
+            throw new NotImplementedException("The Digest Authentication method is not supported yet.");
+        }
+
 
         /// <summary>
         ///     Set in the response the 401 - Unauthorized
@@ -348,7 +362,13 @@ namespace ACL.Core.Authentication
         private void SetUnauthorizedRequest(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
+            
+            ///check the authentication method that the system is using and set
+            /// the 
+            if(SystemProperties.AuthenticationMethod == SystemProperties.AuthenticationMethods.Basic)
+                httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
+            else if (SystemProperties.AuthenticationMethod == SystemProperties.AuthenticationMethods.Digest)
+                GenerateDigestHeader(httpContext);
         }
 
         #endregion

@@ -34,7 +34,7 @@ namespace CalDAV.Core.Method_Extensions
         /// <returns></returns>
         private static IEnumerable<DateTime> ApplyFrequency(this DateTime dateTime, Recur rule)
         {
-            //limit the COunt and Ultil if are not specified
+            //limit the COunt and Until if are not specified
             var count = rule.Count ?? 1000;
             var until = rule.Until ?? dateTime.AddYears(10);
 
