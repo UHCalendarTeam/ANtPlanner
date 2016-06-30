@@ -34,7 +34,7 @@ namespace CalDAV.Core
         private readonly ResourceRespository _resourceRespository;
         private readonly CalendarHomeRepository _calendarHomeRepository;
         private readonly IPermissionChecker _permissionChecker;
-        
+
 
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace CalDAV.Core
         public CalDav(IFileManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository )
+            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository)
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
@@ -189,7 +189,7 @@ namespace CalDAV.Core
             //Managing if the body was ok
             if (xmlTree.NodeName != "propfind")
             {
-                response.StatusCode = (int) HttpStatusCode.BadRequest;
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return;
             }
 
@@ -199,12 +199,12 @@ namespace CalDAV.Core
             switch (propType.NodeName)
             {
                 case "prop":
-                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure) xmlTree);
+                    var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
                     var principal = _principalRepository.Get(principalUrl);
                     await PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
-                    var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure) xmlTree);
+                    var additionalProperties = ExtractIncludePropertiesNameMainNS((XmlTreeStructure)xmlTree);
                     await PropFindMethods.AllPropMethod(url, calendarResourceId,
                         depth, additionalProperties, responseTree);
                     break;
@@ -212,7 +212,7 @@ namespace CalDAV.Core
                     await PropFindMethods.PropNameMethod(url, calendarResourceId, depth, responseTree);
                     break;
                 default:
-                    response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return;
             }
             var responseText = responseTree.ToString();
@@ -282,7 +282,7 @@ namespace CalDAV.Core
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
 
                     //take the principalId from the properties
-                    var principal =await _principalRepository.GetAsync(principalUrl);
+                    var principal = await _principalRepository.GetAsync(principalUrl);
                     await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -299,7 +299,7 @@ namespace CalDAV.Core
             var responseBytes = Encoding.UTF8.GetBytes(responseText);
             response.ContentLength = responseBytes.Length;
             await response.WriteAsync(responseText);
-        } 
+        }
 
         /// <summary>
         ///     Extract all property names and property namespace from a prop element of a  propfind body.
@@ -368,7 +368,7 @@ namespace CalDAV.Core
 
             //I create here the collection already but i wait for other comprobations before save the database.
             await CreateDefaultCalendar(propertiesAndHeaders);
-            response.StatusCode = (int) HttpStatusCode.Created;
+            response.StatusCode = (int)HttpStatusCode.Created;
 
 
             //If it has not body and  Posconditions are OK, it is created with default values.
@@ -377,7 +377,7 @@ namespace CalDAV.Core
                 if (!await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     await DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
                     return;
                 }
@@ -394,7 +394,7 @@ namespace CalDAV.Core
                 if (!await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
                 {
                     await DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
                     await response.WriteAsync("Poscondition Failed");
 
                     return;
@@ -447,7 +447,7 @@ namespace CalDAV.Core
             }
 
             await DeleteCalendarCollection(propertiesAndHeaders, response);
-            response.StatusCode = (int) HttpStatusCode.Forbidden;
+            response.StatusCode = (int)HttpStatusCode.Forbidden;
             await response.WriteAsync("Poscondition Failed");
         }
 
@@ -470,7 +470,7 @@ namespace CalDAV.Core
 
             var principal = await _principalRepository.GetAsync(principalUrl);
             var collection = new CalendarCollection(url, collectionName);
-            
+
             principal.CalendarCollections.Add(collection);
             await _principalRepository.SaveChangesAsync();
 
@@ -544,7 +544,7 @@ namespace CalDAV.Core
 
             if (xmlTree.NodeName != "propertyupdate")
             {
-                response.StatusCode = (int) HttpStatusCode.BadRequest;
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await
                     response.WriteAsync(
                         @"Body in bad format, body of proppatch must contain ""propertyupdate"" xml element");
@@ -560,7 +560,7 @@ namespace CalDAV.Core
             //propertyupdate must have at least one element
             if (setsAndRemoves.Count == 0)
             {
-                response.StatusCode = (int) HttpStatusCode.BadRequest;
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await response.WriteAsync("propertyupdate must have at least one element");
                 return;
                 //throw new ArgumentException("propertyupdate must have at least one element");
@@ -635,7 +635,7 @@ namespace CalDAV.Core
                 //the error and no more further message changing is needed.
                 if (statMessage != "HTTP/1.1 200 OK")
                     return;
-                ((XmlTreeStructure) status).Value = "HTTP/1.1 424 Failed Dependency";
+                ((XmlTreeStructure)status).Value = "HTTP/1.1 424 Failed Dependency";
             }
         }
 
@@ -791,12 +791,12 @@ namespace CalDAV.Core
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
-                    if (resourceEtag != null )
+                    if (resourceEtag != null)
                     {
                         //if the ETags match the perform delete
                         if (ifMatchEtags.Contains(resourceEtag))
                         {
-                            response.StatusCode = (int) HttpStatusCode.NoContent;
+                            response.StatusCode = (int)HttpStatusCode.NoContent;
                             await _resourceRespository.Remove(resource);
 
 
@@ -814,14 +814,14 @@ namespace CalDAV.Core
                         response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                         return false;
                     }
-                    
+
                 }
             }
 
 
             if (resource != null)
             {
-                response.StatusCode = (int) HttpStatusCode.NoContent;
+                response.StatusCode = (int)HttpStatusCode.NoContent;
                 await _resourceRespository.Remove(resource);
 
                 //updating the ctag
@@ -853,17 +853,17 @@ namespace CalDAV.Core
 
 
             //The delete method default status code
-            response.StatusCode = (int) HttpStatusCode.NoContent;
+            response.StatusCode = (int)HttpStatusCode.NoContent;
             //If the collection already is gone it is treated as a successful operation.
             if (!StorageManagement.ExistCalendarCollection(url))
                 return true;
 
             //The collection is retrieve and if something unexpected happened an internal error is reflected.
-            var collection =await _collectionRespository.GetAsync(url);
+            var collection = await _collectionRespository.GetAsync(url);
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
-                response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return false;
             }
 
@@ -893,11 +893,11 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes =await _resourceRespository.GetAsync(url);
+            var calendarRes = await _resourceRespository.GetAsync(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
-                response.StatusCode = (int) HttpStatusCode.NotFound;
+                response.StatusCode = (int)HttpStatusCode.NotFound;
                 return;
             }
 
@@ -947,7 +947,7 @@ namespace CalDAV.Core
             }
             string body;
             propertiesAndHeaders.TryGetValue("body", out body);
-            
+
             #endregion
 
             //Note: calendar object resource = COR
@@ -975,7 +975,7 @@ namespace CalDAV.Core
                         await UpdateCalendarObjectResource(propertiesAndHeaders, response);
                         return;
                     }
-                    response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
+                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                     return;
                 }
             }
@@ -987,7 +987,7 @@ namespace CalDAV.Core
                     await CreateCalendarObjectResource(propertiesAndHeaders, response);
                     return;
                 }
-                response.StatusCode = (int) HttpStatusCode.PreconditionFailed;
+                response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                 return;
             }
 
@@ -1038,7 +1038,7 @@ namespace CalDAV.Core
             //adding the file
             await StorageManagement.AddCalendarObjectResourceFile(url, body);
 
-            response.StatusCode = (int) HttpStatusCode.Created;
+            response.StatusCode = (int)HttpStatusCode.Created;
 
             //setting the content lenght property.
             var errorStack = new Stack<string>();
@@ -1105,7 +1105,7 @@ namespace CalDAV.Core
                 errorStack, true);
 
             //the response for this methos is NO CONTENT
-            response.StatusCode = (int) HttpStatusCode.NoContent;
+            response.StatusCode = (int)HttpStatusCode.NoContent;
 
             //Adding to the dataBase
             await _resourceRespository.SaveChangeAsync();
@@ -1146,7 +1146,7 @@ namespace CalDAV.Core
 
             //add the owner property           
             var principal = await _principalRepository.GetAsync(principalUrl);
-            
+
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));
