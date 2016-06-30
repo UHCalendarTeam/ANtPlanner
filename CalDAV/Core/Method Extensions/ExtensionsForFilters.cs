@@ -173,7 +173,7 @@ namespace CalDAV.Core.Method_Extensions
             if (filter.Attributes.TryGetValue("negate-condition", out negCondStr))
                 negateCond = negCondStr == "yes";
             bool result;
-            //add the default collation if the node doesnt contains one.
+            //add the default collation if the node doesnt contain one.
             if (!filter.Attributes.ContainsKey("collation"))
                 filter.Attributes["collation"] = "i;ascii-casemap";
             switch (filter.Attributes["collation"])
@@ -256,7 +256,8 @@ namespace CalDAV.Core.Method_Extensions
                     x => ((IValue<Recur>) x).Value).ToList());
             if (expandedDates == null)
                 expandedDates = new List<DateTime> {compDTSTART};
-
+            //the time filters has to be applied depending of the 
+            //component type
             if (component is VEvent)
                 return component.ApplyTimeFilterToVEVENT(start.Value, end.Value, expandedDates);
             if (component is VTodo)

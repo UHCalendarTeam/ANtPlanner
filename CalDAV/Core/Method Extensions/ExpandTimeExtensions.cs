@@ -24,7 +24,7 @@ namespace CalDAV.Core.Method_Extensions
             return ruleProperties.SelectMany(rule => dateTime.ApplyFrequency(rule));
         }
 
-        //TODO: Ver Adriano
+        
         /// <summary>
         ///     Expand the dates dependending on the FREQ and the INTERVAL
         ///     of the property.
@@ -34,7 +34,7 @@ namespace CalDAV.Core.Method_Extensions
         /// <returns></returns>
         private static IEnumerable<DateTime> ApplyFrequency(this DateTime dateTime, Recur rule)
         {
-            //limit the COunt and Ultil if are not specified
+            //limit the COunt and Until if are not specified
             var count = rule.Count ?? 1000;
             var until = rule.Until ?? dateTime.AddYears(10);
 
@@ -42,7 +42,7 @@ namespace CalDAV.Core.Method_Extensions
             var genDTs = new List<DateTime>();
             var freq = rule.Frequency.Value;
             var interval = rule.Interval ?? 1;
-            //gonna create as dates as the count specify
+            //gonna create as many dates as the count specify
             for (var i = 0; i < count - 1; i++)
             {
                 //take the last added item and work with it
@@ -53,7 +53,7 @@ namespace CalDAV.Core.Method_Extensions
                     output.RemoveAt(output.Count - 1);
                     break;
                 }
-
+                //add as many days to the datetime as the interval specify
                 switch (freq)
                 {
                     case RecurValues.Frequencies.DAILY:
@@ -83,8 +83,8 @@ namespace CalDAV.Core.Method_Extensions
 
             //remove the datetimes before the DTSTART
             result = result.Where(x => x >= dateTime);
-            //apply the last evaluations
-            //the number of item have to be the first COUNT item
+            //apply the last evaluation
+            //the number of items have to be the first COUNT item
             result = result.Take(count);
 
             //the dts have to be less than the UNTIL value
