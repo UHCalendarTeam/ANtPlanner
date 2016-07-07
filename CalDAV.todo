@@ -18,13 +18,14 @@ Calendaring Reports:
 
 Future implementations:
    ☐ Support for WebDAV-Sync RFC 6578
+   ☐ Calendar Sharing and Publishing Draft
    calendar-query:
        ☐ Implementar el expand que viene en calendar-data node.  -->9.6 CALDAV:calendar-data XML Element
        ☐ Implementar el limit-recurrence-set que viene en calendar-data node.  -->9.6 CALDAV:calendar-data XML Element
    General:
      ☐ Hacer la clase FileSystemManagement statica.
      ☐ el protocolo RFC 6638 es de Scheduling Extensions to CalDAV, aki se maneja que varios clientes accedan a la misma info.
-     ☐ A la hora de la creacion de un recurso en un calendario publico ponerle los permisos de lectura para todos.
+     ✔ A la hora de la creacion de un recurso en un calendario publico ponerle los permisos de lectura para todos. @done (16-07-04 16:31)
    REPORT:
      ☐ expandir y poner RECURRENCE-ID a las instancias.
      ☐ En el ApplyFilterVAlARM coger el tiempo como el DTSTART del contenedor mas el TRIGGER de la alarma.
