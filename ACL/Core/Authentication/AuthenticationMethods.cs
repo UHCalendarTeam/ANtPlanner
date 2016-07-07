@@ -7,7 +7,6 @@ using DataLayer.Models.ACL;
 using DataLayer.Repositories;
 using Microsoft.AspNetCore.Http;
 
-
 namespace ACL.Core.Authentication
 {
     public class UhCalendarAuthentication : IAuthenticate
@@ -44,7 +43,7 @@ namespace ACL.Core.Authentication
 
             if (!string.IsNullOrEmpty(authHeader))
             {
-                var credentials = TakeCreadential(authHeader);
+                var credentials = TakeCredentials(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
                 principal = _principalRepository.GetByIdentifier(username);
@@ -72,7 +71,6 @@ namespace ACL.Core.Authentication
 
                     Console.WriteLine($"------Created user with username: {username}");
                 }
-
 
 
                 //TODO: change to this when work the WCF service
@@ -145,7 +143,7 @@ namespace ACL.Core.Authentication
 
             if (!string.IsNullOrEmpty(authHeader))
             {
-                var credentials = TakeCreadential(authHeader);
+                var credentials = TakeCredentials(authHeader);
                 var username = credentials.Key;
                 var password = credentials.Value;
                 principal = _principalRepository.GetByIdentifier(username);
@@ -295,11 +293,11 @@ namespace ACL.Core.Authentication
         /// </summary>
         /// <param name="authHeader">The header with the credentials</param>
         /// <returns></returns>
-        public KeyValuePair<string, string> TakeCreadential(string authHeader)
+        public KeyValuePair<string, string> TakeCredentials(string authHeader)
         {
             var credentials = authHeader.StartsWith("Basic")
-                ? TakeCredentionFromBasic(authHeader)
-                : TakeCredentionFromDigest(authHeader);
+                ? TakeCredentialsFromBasic(authHeader)
+                : TakeCredentialsFromDigest(authHeader);
             return credentials;
         }
 
@@ -313,7 +311,7 @@ namespace ACL.Core.Authentication
         ///     authorization credentials.
         /// </param>
         /// <returns>A KeyValuePair that contains the username and password</returns>
-        private KeyValuePair<string, string> TakeCredentionFromBasic(string basicAuthorizationString)
+        private KeyValuePair<string, string> TakeCredentialsFromBasic(string basicAuthorizationString)
         {
             var encodedUsernamePassword = basicAuthorizationString.Substring("Basic ".Length).Trim();
             var encoding = Encoding.GetEncoding("iso-8859-1");
@@ -328,29 +326,26 @@ namespace ACL.Core.Authentication
 
 
         /// <summary>
-        ///     Take the credential from the Digest authorization
+        ///     Take the credential from the Digest authentication
         ///     that comes in the request from the client.
         /// </summary>
-        /// <param name="digestAuthorizationString"></param>
         /// <returns>The username and password</returns>
-        private KeyValuePair<string, string> TakeCredentionFromDigest(string digestAuthorizationString)
-
-        {
-            //TODO: implement this
-            throw new NotImplementedException("The Digest Authorization is not supported in UhCalendar system.");
-        }
+        //private KeyValuePair<string, string> TakeCredentionFromDigest(string digestAuthHeader)
+        //{
+        //    throw new NotImplementedException("The Digest Authentication method is not supported yet.");
+        //}
 
         /// <summary>
-        /// Create the nonce for the client and set the 
-        /// authentication header of the response specifying
-        /// the Digest authentication and sending the nonce.
+        ///     Create the nonce for the client and set the
+        ///     authentication header of the response specifying
+        ///     the Digest authentication and sending the nonce.
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        private void GenerateDigestHeader(HttpContext httpContext)
-        {
-            throw new NotImplementedException("The Digest Authentication method is not supported yet.");
-        }
+        //private void GenerateDigestHeader(HttpContext httpContext)
+        //{
+        //    throw new NotImplementedException("The Digest Authentication method is not supported yet.");
+        //}
 
 
         /// <summary>
@@ -359,17 +354,44 @@ namespace ACL.Core.Authentication
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
+
+
+
+
+
+
+
+
+      
+
         private void SetUnauthorizedRequest(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            
-            ///check the authentication method that the system is using and set
-            /// the 
-            if(SystemProperties.AuthenticationMethod == SystemProperties.AuthenticationMethods.Basic)
-                httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
-            else if (SystemProperties.AuthenticationMethod == SystemProperties.AuthenticationMethods.Digest)
-                GenerateDigestHeader(httpContext);
+
+            switch (SystemProperties.AuthenticationMethod)
+            {
+                case SystemProperties.AuthenticationMethods.Basic:
+                    httpContext.Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{httpContext.Request.Path}\"";
+                    break;
+                case SystemProperties.AuthenticationMethods.Digest:
+                    GenerateDigestHeader(httpContext);
+                    break;
+            }
         }
+
+        private void GenerateDigestHeader(HttpContext httpContext)
+        {
+            throw new NotImplementedException("Digest Authentication is not supported yet.");
+        }
+
+        private KeyValuePair<string, string> TakeCredentialsFromDigest(string digestAuthHeader)
+        {
+            throw new NotImplementedException("Digest Authentication is not supported yet.");
+        }
+
+
+
+
 
         #endregion
     }

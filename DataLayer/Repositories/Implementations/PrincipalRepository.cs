@@ -264,9 +264,9 @@ namespace DataLayer.Repositories
 
             
 
-            //hass the user password 
+            //hash the user password 
             // the instance of the user has to be pass but is not used
-            // so it need to be updated
+            // so it need to be updated with the encrypted password
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
