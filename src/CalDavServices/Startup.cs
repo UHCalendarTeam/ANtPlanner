@@ -42,7 +42,7 @@ namespace CalDavServices
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
-      
+
 
         }
 
@@ -100,7 +100,7 @@ namespace CalDavServices
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddSerilog();            
+            loggerFactory.AddSerilog();
 
             // app.UseIISPlatformHandler();
 
@@ -131,4 +131,4 @@ namespace CalDavServices
         }
         // public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
-}   
+}
