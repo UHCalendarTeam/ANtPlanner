@@ -7,13 +7,15 @@
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0",
+      "version": "1.0.0-*",
       "type": "platform"
     },
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0",
     "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0",
     "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.0",
+    "Microsoft.EntityFrameworkCore.Sqlite.Design": "1.0.0",
+    "Microsoft.EntityFrameworkCore.Design": "1.0.0-preview2-final",
     "ICalendar": "1.0.0-rc2-260400",
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
     "Microsoft.CSharp": "4.0.1",
