@@ -44,23 +44,50 @@ namespace DataLayer
             OpenId
         }
 
+        ///Contains the names of the public calendar that are gonna be created
+        ///when the admin user is created in the system.
+        //
+        // Modified this list in order to change the public calendar of the system.
         public static readonly string[] PublicCalendarNames =
         {
-            "C1",
-            "C2",
-            "C3",
-            "C4",
-            "C5",
-            "M1",
-            "M2",
-            "M3",
-            "M4",
+            "C111",
+            "C112",
+            "C113",
+            "C121",
+            "C122",
+            "C123",
+            "C211",
+            "C212",
+            "C213",
+            "C311",
+            "C312",
+            "C411",
+            "C412",
+            "C511",
+            "C512",           
+            "M111",
+            "M112",
+            "M211",
+            "M212",
+            "M311",         
+            "M411",           
             "PublicEvents"
         };
 
+        /// <summary>
+        ///     Contains the name of the url that represent the calendar collection
+        ///     for the public calendars.
+        /// </summary>
         public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
        // public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
+        
+        /// <summary>
+        ///     Check if the admin user is created in the system.
+        ///     Till now is used to create the public calendar with the 
+        ///     creation of the admin user. 
+        /// </summary>
+        /// <returns></returns>
         public static bool PublicCalendarCreated
         {
             get
@@ -81,7 +108,8 @@ namespace DataLayer
 
         /// <summary>
         ///     Contains the url for the user's collections
-        ///     Add the email of the user
+        ///     Add the email of the user at the end of the path to create the 
+        ///     container of an user's calendar
         /// </summary>
         public static readonly string _userCollectionUrl = "/collections/users/";
 
@@ -99,9 +127,9 @@ namespace DataLayer
         public static readonly string _principalUrl = "principals";
 
         /// <summary>
-        ///     Contains the url that has to be assigned the the priciapl that
+        ///     Contains the url that has to be assigned the the pricipal that
         ///     represent a normal user.
-        ///     The email of the user has to be added to the end of the url
+        ///     The email of the user has to be added at the end of the url
         /// </summary>
         public static readonly string _userPrincipalUrl = "/principals/users/";
 
@@ -123,7 +151,8 @@ namespace DataLayer
 
 
         /// <summary>
-        ///     Contains the full ns (i.e xmlns:...)
+        ///     Contains the full namespaces (i.e xmlns:...) that are used in the 
+        ///     body of the request from the client and to the client.
         /// </summary>
         public static readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
@@ -133,7 +162,7 @@ namespace DataLayer
         };
 
         /// <summary>
-        ///     Contains the value of the ns (i.e: DAV:)
+        ///     Contains the value of the namespaces (i.e: DAV:)
         /// </summary>
         public static readonly Dictionary<string, string> NamespacesValues = new Dictionary<string, string>
         {
