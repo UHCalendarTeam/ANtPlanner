@@ -22,7 +22,7 @@
   "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
   "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0",
   "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0",
-  "ICalendar": "1.0.0-rc2-260400",
+  "ICalendar": "1.0.0-rc2-080900",
   "Microsoft.AspNetCore.Cors": "1.0.0",
   "Microsoft.AspNetCore.Hosting": "1.0.0",
   "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",

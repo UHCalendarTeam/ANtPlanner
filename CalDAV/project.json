@@ -5,7 +5,7 @@
   "dependencies": {
     "ACL": "1.0.0",
     "DataLayer": "1.0.0",
-    "ICalendar": "1.0.0-rc2-260400",
+    "ICalendar": "1.0.0-rc2-080900",
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
     "Microsoft.AspNetCore.Http.Extensions": "1.0.0",
     "Microsoft.CSharp": "4.0.1",
