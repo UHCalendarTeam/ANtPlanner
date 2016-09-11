@@ -9,6 +9,7 @@ using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.ConditionsCheck.Preconditions;
+using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
 using DataLayer;
 using DataLayer.Models.ACL;
@@ -34,7 +35,7 @@ namespace CalDAV.Core
         private readonly ResourceRespository _resourceRespository;
         private readonly CalendarHomeRepository _calendarHomeRepository;
         private readonly IPermissionChecker _permissionChecker;
-
+        private readonly IAuthenticate _authenticate;
 
 
         /// <summary>
@@ -46,10 +47,13 @@ namespace CalDAV.Core
         /// <param name="collectionRespository"></param>
         /// <param name="resourceRespository"></param>
         /// <param name="principalRepository"></param>
+        /// <param name="permissionChecker"></param>
+        /// <param name="calendarHomeRepository"></param>
         public CalDav(IFileManagement fsManagement, IACLProfind aclProfind,
             ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
                 string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome, string> calendarHomeRepository)
+            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome,
+                string> calendarHomeRepository, IAuthenticate authenticate)
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
@@ -59,6 +63,7 @@ namespace CalDAV.Core
             _resourceRespository = resourceRespository as ResourceRespository;
             _calendarHomeRepository = calendarHomeRepository as CalendarHomeRepository;
             _permissionChecker = permissionChecker;
+            _authenticate = authenticate;
         }
 
         /// <summary>
@@ -343,42 +348,44 @@ namespace CalDAV.Core
 
         #region MkCalendar Methods
 
-        public async Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response)
+        public async Task MkCalendar(HttpContext httpContext)
         {
             #region Extracting Properties
 
-            string principalUrl;
-            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
+            string principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalURL;
+            //propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
 
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
+            string url = httpContext.Request.GetRealUrl();
+            //propertiesAndHeaders.TryGetValue("url", out url);
+            string collectionName = httpContext.Request.GetCollectionName();
 
+            string body = httpContext.Request.Body.StreamToString();
             #endregion
 
-            propertiesAndHeaders.Add("body", body);
+            //propertiesAndHeaders.Add("body", body);
 
-            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker);
+            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker, _authenticate);
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, _collectionRespository);
 
             //Checking that all precondition pass
 
             //Cheking Preconditions
-            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!await PreconditionCheck.PreconditionsOK(httpContext))
                 return;
 
             //I create here the collection already but i wait for other comprobations before save the database.
-            await CreateDefaultCalendar(propertiesAndHeaders);
-            response.StatusCode = (int)HttpStatusCode.Created;
+            await CreateDefaultCalendar(principalUrl, collectionName, url);
+            httpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
 
             //If it has not body and  Posconditions are OK, it is created with default values.
             if (string.IsNullOrEmpty(body))
             {
-                if (!await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+                if (!await PosconditionCheck.PosconditionOk(httpContext))
                 {
-                    await DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int)HttpStatusCode.Forbidden;
-                    await response.WriteAsync("Poscondition Failed");
+                    await DeleteCalendarCollection(url, httpContext);
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    await httpContext.Response.WriteAsync("Poscondition Failed");
                     return;
                 }
                 await _collectionRespository.SaveChangeAsync();
@@ -391,11 +398,11 @@ namespace CalDAV.Core
             //if it does not have set property it is treated as a empty body.
             if (mkCalendarTree.Children.Count == 0)
             {
-                if (!await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+                if (!await PosconditionCheck.PosconditionOk(httpContext))
                 {
-                    await DeleteCalendarCollection(propertiesAndHeaders, response);
-                    response.StatusCode = (int)HttpStatusCode.Forbidden;
-                    await response.WriteAsync("Poscondition Failed");
+                    await DeleteCalendarCollection(url, httpContext);
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    await httpContext.Response.WriteAsync("Poscondition Failed");
 
                     return;
                 }
@@ -428,44 +435,31 @@ namespace CalDAV.Core
 
             if (hasError)
             {
-                await DeleteCalendarCollection(propertiesAndHeaders, response);
-                response.ContentType = "application/xml";
+                await DeleteCalendarCollection(url, httpContext);
+                httpContext.Response.ContentType = "application/xml";
 
                 ChangeToDependencyError(responseTree);
 
-                response.StatusCode = 207;
-                await response.WriteAsync(multistatus.ToString());
+                httpContext.Response.StatusCode = 207;
+                await httpContext.Response.WriteAsync(multistatus.ToString());
                 return;
             }
 
             //Checking Preconditions   
-            if (await PosconditionCheck.PosconditionOk(propertiesAndHeaders, response))
+            if (await PosconditionCheck.PosconditionOk(httpContext))
             {
                 await _collectionRespository.SaveChangeAsync();
                 return;
                 // return createdMessage;
             }
 
-            await DeleteCalendarCollection(propertiesAndHeaders, response);
-            response.StatusCode = (int)HttpStatusCode.Forbidden;
-            await response.WriteAsync("Poscondition Failed");
+            await DeleteCalendarCollection(url, httpContext);
+            httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            await httpContext.Response.WriteAsync("Poscondition Failed");
         }
 
-        private async Task CreateDefaultCalendar(Dictionary<string, string> propertiesAndHeaders)
+        private async Task CreateDefaultCalendar(string principalUrl, string collectionName, string url)
         {
-            #region Extracting Properties
-
-            string principalUrl;
-            propertiesAndHeaders.TryGetValue("principalUrl", out principalUrl);
-
-            string collectionName;
-            propertiesAndHeaders.TryGetValue("collectionName", out collectionName);
-
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
-
-            #endregion
-
             //Adding the collection to the database
 
             var principal = await _principalRepository.GetAsync(principalUrl);
@@ -754,24 +748,22 @@ namespace CalDAV.Core
 
         #region Delete Methods
 
-        public async Task<bool> DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders,
-            HttpResponse response)
+        public async Task<bool> DeleteCalendarObjectResource(HttpContext httpContext)
         {
             #region Extracting Properties
 
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
+            string url = httpContext.Request.GetRealUrl();
 
-            string ifmatch;
+            string ifmatch = httpContext.Request.GetIfMatchValues();
             var ifMatchEtags = new List<string>();
-            propertiesAndHeaders.TryGetValue("If-Match", out ifmatch);
+     
             if (ifmatch != null)
                 ifMatchEtags = ifmatch.Split(',').ToList();
 
             #endregion
             //Checking precondition
             PreconditionCheck = new DeleteResourcePrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
-            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            if (!await PreconditionCheck.PreconditionsOK(httpContext))
                 return false;
 
             //if the collection doesnt exist in the user folder
@@ -796,7 +788,7 @@ namespace CalDAV.Core
                         //if the ETags match the perform delete
                         if (ifMatchEtags.Contains(resourceEtag))
                         {
-                            response.StatusCode = (int)HttpStatusCode.NoContent;
+                            httpContext.Response.StatusCode = (int)HttpStatusCode.NoContent;
                             await _resourceRespository.Remove(resource);
 
 
@@ -811,7 +803,7 @@ namespace CalDAV.Core
                             return StorageManagement.DeleteCalendarObjectResource(url);
                         }
                         //if the comparison fails the an error is returned.
-                        response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                        httpContext.Response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                         return false;
                     }
 
@@ -821,7 +813,7 @@ namespace CalDAV.Core
 
             if (resource != null)
             {
-                response.StatusCode = (int)HttpStatusCode.NoContent;
+                httpContext.Response.StatusCode = (int)HttpStatusCode.NoContent;
                 await _resourceRespository.Remove(resource);
 
                 //updating the ctag
@@ -836,24 +828,16 @@ namespace CalDAV.Core
             return StorageManagement.DeleteCalendarObjectResource(url);
         }
 
-        public async Task<bool> DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders,
-            HttpResponse response)
+        public async Task<bool> DeleteCalendarCollection(string url, HttpContext httpContext)
         {
-            #region Extracting Properties
-
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
-
-            #endregion
-
             //Checking precondition
-            PreconditionCheck = new DeleteCollectionPrecondition(_collectionRespository, _resourceRespository, _permissionChecker);
-            if (!await PreconditionCheck.PreconditionsOK(propertiesAndHeaders, response))
+            PreconditionCheck = new DeleteCollectionPrecondition(_collectionRespository, _resourceRespository, _permissionChecker, _authenticate);
+            if (!await PreconditionCheck.PreconditionsOK(httpContext))
                 return false;
 
 
             //The delete method default status code
-            response.StatusCode = (int)HttpStatusCode.NoContent;
+            httpContext.Response.StatusCode = (int)HttpStatusCode.NoContent;
             //If the collection already is gone it is treated as a successful operation.
             if (!StorageManagement.ExistCalendarCollection(url))
                 return true;
@@ -863,7 +847,7 @@ namespace CalDAV.Core
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return false;
             }
 

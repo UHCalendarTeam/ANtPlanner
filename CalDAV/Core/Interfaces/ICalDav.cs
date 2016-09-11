@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ICalendar.ComponentProperties;
 using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core
@@ -9,10 +10,8 @@ namespace CalDAV.Core
         /// <summary>
         ///     CalDAV HTTP Method for create a new collection of COR (new calendar)
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
-        /// <param name="response"></param>
-        Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task MkCalendar(HttpContext httpContext);
 
         /// <summary>
         ///     WebDAV PROFIND HTTP Method .
@@ -59,16 +58,15 @@ namespace CalDAV.Core
         /// <summary>
         ///     CalDav Method for delete a Calendar Object Resource
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task<bool> DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task<bool> DeleteCalendarObjectResource(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav & WebDav Method for delete a Collection
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task<bool> DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="url"></param>
+        /// <param name="httpContext"></param>
+        Task<bool> DeleteCalendarCollection(string url, HttpContext httpContext);
 
         /// <summary>
         ///     CalDav HTTP Method Get for a COR

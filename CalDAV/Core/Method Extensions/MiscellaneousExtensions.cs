@@ -29,6 +29,17 @@ namespace CalDAV.Core.Method_Extensions
         }
 
         /// <summary>
+        /// Reads the string representation of a Stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToString(this Stream stream)
+        {
+            var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+
+        /// <summary>
         ///     FOr the ACL PROFINDs the principalId is included
         ///     in the url. Takes the principalId from it.
         /// </summary>
@@ -44,6 +55,35 @@ namespace CalDAV.Core.Method_Extensions
 
             var output = url.Substring(index + 1);
             return output;
+        }
+        /// <summary>
+        /// Returns the name of the target collection based on the url.
+        /// </summary>
+        /// <param name="httpRequest"></param>
+        /// <returns></returns>
+        public static string GetCollectionName(this HttpRequest httpRequest)
+        {
+            var url = httpRequest.GetRealUrl();
+            string collectionName = null;
+           
+            var elements = url.Split('/');
+            //the word collection in the url refers to a phisical URL (calendar homes, collections or resources)
+            //and the number 4 means that is at least a collection with 3 it is a calendar home.
+            if (url.StartsWith("collections") && elements.Length > 4)
+            {
+                collectionName = elements[3];
+            }
+            return collectionName;
+        }
+
+        public static string GetIfMatchValues(this HttpRequest request)
+        {
+            var ifmatch = request.Headers["If-Match"];
+            if (ifmatch.Count > 0)
+            {
+                return ifmatch.ToString();
+            }
+            return null;
         }
     }
 }

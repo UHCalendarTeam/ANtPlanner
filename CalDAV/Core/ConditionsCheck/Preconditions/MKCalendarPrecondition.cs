@@ -16,35 +16,37 @@ namespace CalDAV.Core.ConditionsCheck
     {
         private readonly CollectionRepository _collectionRepository;
         private readonly IPermissionChecker _permissionChecker;
-
+        public IFileManagement fs { get; }
+        private readonly IAuthenticate _autheticate;
         public MKCalendarPrecondition(IFileManagement fileManagement,
-            IRepository<CalendarCollection, string> collectionRepository, IPermissionChecker permissionChecker)
+            IRepository<CalendarCollection, string> collectionRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
             fs = fileManagement;
             _collectionRepository = collectionRepository as CollectionRepository;
             _permissionChecker = permissionChecker;
+            _autheticate = authenticate;
         }
 
-        public IFileManagement fs { get; }
 
 
-        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+
+        public async Task<bool> PreconditionsOK(HttpContext httpContext)
         {
             #region Extracting Properties
 
-            var body = propertiesAndHeaders["body"];
-            var url = propertiesAndHeaders["url"];
-            var principalUrl = propertiesAndHeaders["principalUrl"];
+            var body = httpContext.Request.Body.StreamToString();
+            var url = httpContext.Request.GetRealUrl();
+            var principalUrl = (await _autheticate.AuthenticateRequestAsync(httpContext))?.PrincipalURL;
 
             #endregion
 
-            if (!PermissionCheck(url, principalUrl, response))
+            if (!PermissionCheck(url, principalUrl, httpContext.Response))
                 return false;
 
             if (fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))
             {
-                response.StatusCode = (int) HttpStatusCode.Forbidden;
-                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
   <resource-must-be-null/>  
 </error>");
@@ -57,14 +59,14 @@ namespace CalDAV.Core.ConditionsCheck
                 var bodyTree = XmlTreeStructure.Parse(body);
                 if (bodyTree == null)
                 {
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
-                    response.Body.Write("Wrong Body");
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    httpContext.Response.Body.Write("Wrong Body");
                     return false;
                 }
                 if (bodyTree.NodeName != "mkcalendar")
                 {
-                    response.StatusCode = (int) HttpStatusCode.Forbidden;
-                    response.Body.Write("Wrong Body");
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    httpContext.Response.Body.Write("Wrong Body");
 
                     return false;
                 }
