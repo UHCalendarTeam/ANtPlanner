@@ -27,9 +27,7 @@ namespace CalDAV.Core.ConditionsCheck
         {
             #region Extracting Properties
 
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
-
+            string url = httpContext.Request.GetRealUrl();
             #endregion
 
             if (!Fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))

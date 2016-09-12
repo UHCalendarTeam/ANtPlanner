@@ -16,7 +16,7 @@
     "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.0",
     "Microsoft.EntityFrameworkCore.Sqlite.Design": "1.0.0",
     "Microsoft.EntityFrameworkCore.Design": "1.0.0-preview2-final",
-    "ICalendar": "1.0.0-rc2-080900",
+    "ICalendar": "1.0.0-*",
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
     "Microsoft.CSharp": "4.0.1",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0",
