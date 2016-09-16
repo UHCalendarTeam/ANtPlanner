@@ -761,7 +761,7 @@ namespace CalDAV.Core
             if (!await PreconditionCheck.PreconditionsOK(httpContext))
                 return false;
 
-            //if the collection doesnt exist in the user folder
+            //if the collection doesn't exist in the user folder
             // the can't do anything
             var collectionUrl = url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1);
             if (!StorageManagement.ExistCalendarCollection(collectionUrl) &&
