@@ -1,7 +1,7 @@
 {
-    "authors": [
-        "UHCalendarTeam"
-    ],
+  "authors": [
+    "UHCalendarTeam"
+  ],
   "dependencies": {
     "ACL": "1.0.0",
     "DataLayer": "1.0.0",
@@ -23,16 +23,11 @@
     "TreeForXml": "1.0.4",
     "Microsoft.EntityFrameworkCore.Design": "1.0.0-preview2-final"
   },
-    "description": "CalDAV Library",
-    "frameworks": {
-        "netcoreapp1.0": {
-            "imports": ["dnxcore50", "portable-net45+win8"]
-        }
-    },
-    "licenseUrl": "",
-    "projectUrl": "",
-    "tags": [
-        ""
-    ],
-    "version": "1.0.0-*"
+  "description": "CalDAV Library",
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [ "dnxcore50", "portable-net45+win8" ]
+    }
+  },
+  "version": "1.0.0-*"
 }

@@ -1,13 +1,13 @@
 {
   "authors": [
     ""
-  ],  
+  ],
   "dependencies": {
     "Microsoft.NETCore.App": {
-            "version": "1.0.0-rc2-3002702",
-            "type": "platform"
-        },   
-    "CalDAV": "1.0.0",    
+      "version": "1.0.0-rc2-3002702",
+      "type": "platform"
+    },
+    "CalDAV": "1.0.0",
     "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
     "ACL": "1.0.0-*",
     "Microsoft.CSharp": "4.0.1-rc2-24027",
@@ -18,15 +18,10 @@
   },
   "description": "",
   "frameworks": {
-        "netcoreapp1.0": {
-            "imports": ["dnxcore50", "portable-net45+win8"]
-        }
-    },
-  "licenseUrl": "",
-  "projectUrl": "",
-  "tags": [
-    ""
-  ],
+    "netcoreapp1.0": {
+      "imports": [ "dnxcore50", "portable-net45+win8" ]
+    }
+  },
   "tooling": {
     "defaultNamespace": "<%= namespace %>"
   },
