@@ -4,17 +4,17 @@
   ],
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0-rc2-3002702",
+      "version": "1.0.0",
       "type": "platform"
     },
     "CalDAV": "1.0.0",
-    "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.TestHost": "1.0.0",
     "ACL": "1.0.0-*",
-    "Microsoft.CSharp": "4.0.1-rc2-24027",
-    "System.Collections": "4.0.11-rc2-24027",
-    "System.Linq": "4.1.0-rc2-24027",
-    "System.Runtime": "4.1.0-rc2-24027",
-    "System.Threading": "4.0.11-rc2-24027"
+    "Microsoft.CSharp": "4.0.1",
+    "System.Collections": "4.0.11",
+    "System.Linq": "4.1.0",
+    "System.Runtime": "4.1.0",
+    "System.Threading": "4.0.11"
   },
   "description": "",
   "frameworks": {

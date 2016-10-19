@@ -59,28 +59,12 @@ namespace CalDavServices
             // {
             //     options.AddPolicy("AllowAllOrigins", builder =>
             //         builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            // });
+            // });            
 
-            //var connection =
-            //    @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
-            // Add framework services.
-            //services.AddEntityFramework()
-            //    .AddSqlServer()
-            //    .AddDbContext<CalDavContext>(options =>
-            //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
-
-            var path = PlatformServices.Default.Application.ApplicationBasePath;
-            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
-
-            // services.AddEntityFramework()
-            //     .AddSqlite()
-            //     .AddDbContext<CalDAVSQLiteContext>(options =>
-            //         options.UseSqlite(connection).MigrationsAssembly("DataLayer"));
-            services.AddDbContext<CalDAVSQLiteContext>(options =>
-  options.UseSqlite(connection));
+            //This method is the one that add the database services.
+            ConfigureDatabase(services);
 
             services.AddMvc();
-
 
             services.AddScoped<ICalDav, CalDav>();
             services.AddScoped<IFileManagement, FileManagement>();
@@ -116,12 +100,34 @@ namespace CalDavServices
             app.UseMvc();
         }
 
+        public virtual void ConfigureDatabase(IServiceCollection services)
+        {
+            //var connection =
+            //    @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
+            // Add framework services.
+            //services.AddEntityFramework()
+            //    .AddSqlServer()
+            //    .AddDbContext<CalDavContext>(options =>
+            //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
+
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
+            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
+
+            // services.AddEntityFramework()
+            //     .AddSqlite()
+            //     .AddDbContext<CalDAVSQLiteContext>(options =>
+            //         options.UseSqlite(connection).MigrationsAssembly("DataLayer"));
+            services.AddDbContext<CalDAVSQLiteContext>(options =>
+  options.UseSqlite(connection));
+
+        }
+
         // Entry point for the application.
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://10.6.31.30:5003")
+              .UseUrls("http://10.6.31.132:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()
