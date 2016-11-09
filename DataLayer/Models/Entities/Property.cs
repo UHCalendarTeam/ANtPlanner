@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.ACL;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.Entities
 {

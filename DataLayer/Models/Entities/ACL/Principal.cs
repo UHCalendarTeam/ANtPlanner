@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.ACL
 {

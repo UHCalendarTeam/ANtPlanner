@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

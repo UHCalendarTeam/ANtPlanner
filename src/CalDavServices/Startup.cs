@@ -10,7 +10,6 @@ using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
 using DataLayer.Repositories.Implementations;
 using Microsoft.AspNetCore.Builder;

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DataLayer.ExtensionMethods;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories.Implementations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

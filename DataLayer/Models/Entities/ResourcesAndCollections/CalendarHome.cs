@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Models.ACL;
 
-namespace DataLayer.Models.Entities.ResourcesAndCollections
+namespace DataLayer.Models.Entities
 {
     /// <summary>
     /// Represents the a principal's calendar home.

@@ -5,7 +5,6 @@ using ACL.Core.Extension_Method;
 using DataLayer;
 using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Repositories;
 using DataLayer.Repositories.Implementations;
 using TreeForXml;
