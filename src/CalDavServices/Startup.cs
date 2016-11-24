@@ -42,10 +42,12 @@ namespace CalDavServices
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
 
-
         }
 
-
+        public virtual void EnsureDatabaseCreated(CalDavContext context)
+        {
+            context.Database.Migrate();
+        }
 
         public IConfigurationRoot Configuration { get; set; }
 
@@ -89,35 +91,53 @@ namespace CalDavServices
 
             //app.UseStaticFiles();
 
+            ConfigureInDev(app, env);          
 
-            // app.UseCors("AllowAllOrigins");
-
+            // app.UseCors("AllowAllOrigins");            
 
             //use the authentication middleware
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseMvc();
         }
 
+        /// <summary>
+        /// Method for Configure  the system is set into an Development Environment.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        public virtual void ConfigureInDev(IApplicationBuilder app, IHostingEnvironment env)
+        {
+           //Nothing here this is method is used in TestStartup for testing.
+        }
+
+        /// <summary>
+        /// Method to configure the Database Conections and Settings
+        /// </summary>
+        /// <param name="services"></param>
         public virtual void ConfigureDatabase(IServiceCollection services)
         {
-            //var connection =
-            //    @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;MultipleActiveResultSets=False";
-            // Add framework services.
-            //services.AddEntityFramework()
-            //    .AddSqlServer()
-            //    .AddDbContext<CalDavContext>(options =>
-            //        options.UseSqlServer(connection).MigrationsAssembly("DataLayer"));
+            #region SQLServer
 
-            var path = PlatformServices.Default.Application.ApplicationBasePath;
-            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
+            // Add framework services.
+            services.AddDbContext<CalDavContext>(options =>
+            options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
+            #endregion
+
+            #region SQLite          
 
             // services.AddEntityFramework()
             //     .AddSqlite()
             //     .AddDbContext<CalDAVSQLiteContext>(options =>
             //         options.UseSqlite(connection).MigrationsAssembly("DataLayer"));
-            services.AddDbContext<CalDAVSQLiteContext>(options =>
-  options.UseSqlite(connection));
+            //          services.AddDbContext<CalDavContext>(options =>
+            //options.UseSqlite(SystemProperties.SQLiteConnectionString()));
+            #endregion
+
+            #region Npgsql
+
+            #endregion
+
 
         }
 

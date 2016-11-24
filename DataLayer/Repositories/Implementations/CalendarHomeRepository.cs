@@ -11,9 +11,9 @@ namespace DataLayer.Repositories.Implementations
     public class CalendarHomeRepository : IRepository<CalendarHome, string>
     {
         //private readonly CalDavContext _context;
-        private readonly CalDAVSQLiteContext _context;
+        private readonly CalDavContext _context;
 
-        public CalendarHomeRepository(CalDAVSQLiteContext context)
+        public CalendarHomeRepository(CalDavContext context)
         {
             _context = context;
         }

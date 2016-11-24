@@ -10,9 +10,9 @@ namespace DataLayer.Repositories
     public class ResourceRespository : IRepository<CalendarResource, string>
     {
         //private readonly CalDavContext _context;
-        private readonly CalDAVSQLiteContext _context;
+        private readonly CalDavContext _context;
 
-        public ResourceRespository(CalDAVSQLiteContext context)
+        public ResourceRespository(CalDavContext context)
         {
             _context = context;
         }

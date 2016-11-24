@@ -29,6 +29,7 @@ namespace DataLayer
         public DbSet<Student> Students { get; set; }
 
         public DbSet<Worker> Workers { get; set; }
+        public DbSet<CalendarHome> CalendarHomeCollections { get; set; }
         public DbSet<CalendarCollection> CalendarCollections { get; set; }
 
         public DbSet<CalendarResource> CalendarResources { get; set; }
@@ -39,9 +40,25 @@ namespace DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
         {
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=UHCalendarDB;Trusted_Connection=True;";
-            optionBuilder.UseSqlServer(connection);
-            //optionBuilder.UseInMemoryDatabase();
+            if (!optionBuilder.IsConfigured)
+            {
+                #region SQLServer            
+                //optionBuilder.UseSqlServer(SystemProperties.SQLServerConnectionString());
+                optionBuilder.UseInMemoryDatabase();
+                #endregion
+
+                #region SQLite
+                //var path = PlatformServices.Default.Application.ApplicationBasePath;
+                //var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
+                //optionBuilder.UseSqlite(connection);
+                #endregion
+
+                #region Npgsql
+
+                #endregion
+            }
+
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,16 +68,28 @@ namespace DataLayer
                 .WithOne(u => u.Principal)
                 .HasForeignKey<User>(u => u.PrincipalId);
 
+            modelBuilder.Entity<Principal>().HasAlternateKey(p => p.PrincipalURL);
+
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(u => u.Principal)
                 .WithMany(cl => cl.CalendarCollections)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CalendarCollection>().HasAlternateKey(c => c.Url);
 
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.CalendarCollection)
                 .WithMany(u => u.CalendarResources)
                 .HasForeignKey(k => k.CalendarCollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CalendarCollection>()
+               .HasOne(cl => cl.CalendarHome)
+               .WithMany(u => u.CalendarCollections)
+               .HasForeignKey(k => k.CalendarHomeId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
 
             modelBuilder.Entity<Property>()
                 .HasOne(c => c.CalendarCollection)
@@ -78,6 +107,11 @@ namespace DataLayer
                 .HasOne(p => p.Principal)
                 .WithMany(pr => pr.Properties)
                 .HasForeignKey(k => k.PricipalId);
+
+            modelBuilder.Entity<Property>()
+                .HasOne(p => p.CalendarHome)
+                .WithMany(ch => ch.Properties)
+                .HasForeignKey(k => k.CalendarHomeId);
         }
     }
 }

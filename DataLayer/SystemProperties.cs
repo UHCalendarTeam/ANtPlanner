@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using DataLayer.Repositories;
+using Microsoft.Extensions.PlatformAbstractions;
+using System.IO;
 
 namespace DataLayer
 {
@@ -24,7 +26,7 @@ namespace DataLayer
 
         public enum HttpMethod
         {
-           
+
             PutCreate,//the put that create resources
             PutUpdate,//the put that modified resources
             Get,
@@ -38,7 +40,8 @@ namespace DataLayer
             ProppatchResource
         }
 
-        public enum AuthenticationMethods {
+        public enum AuthenticationMethods
+        {
             Basic,
             Digest,
             OpenId
@@ -64,13 +67,13 @@ namespace DataLayer
             "C411",
             "C412",
             "C511",
-            "C512",           
+            "C512",
             "M111",
             "M112",
             "M211",
             "M212",
-            "M311",         
-            "M411",           
+            "M311",
+            "M411",
             "PublicEvents"
         };
 
@@ -80,8 +83,8 @@ namespace DataLayer
         /// </summary>
         public static string PublicCalendarHomeUrl = "/collections/groups/public/";
 
-       // public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
-        
+        // public static bool PublicCalendarCreated => new FileManagement().ExistCalendarCollection(PublicCalendarHomeUrl);
+
         /// <summary>
         ///     Check if the admin user is created in the system.
         ///     Till now is used to create the public calendar with the 
@@ -92,13 +95,13 @@ namespace DataLayer
         {
             get
             {
-                var principalRepo = new PrincipalRepository(new CalDAVSQLiteContext());
+                var principalRepo = new PrincipalRepository(new CalDavContext());
                 var admin = principalRepo.GetByIdentifier("admin@admin.uh.cu");
                 return admin != null;
             }
         }
 
-    
+
         public static AuthenticationMethods AuthenticationMethod => AuthenticationMethods.Basic;
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace DataLayer
         public static readonly string _cookieSessionName = "authSession";
 
 
-        public static string  AbsolutePath { get; set; }
+        public static string AbsolutePath { get; set; }
 
 
         /// <summary>
@@ -210,5 +213,25 @@ namespace DataLayer
                     .ToUniversalTime()
                     .ToString("yyyyMMddTHHmmssZ");
         }
+
+        #region DB Connection Strings      
+        public static string SQLiteConnectionString()
+        {
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
+            var connection = "Filename=" + Path.Combine(path, "UHCalendar.db");
+            return connection;
+        }
+
+        public static string SQLServerConnectionString()
+        {
+            return @"Server=(localdb)\mssqllocaldb;Database=UHCalendar;Trusted_Connection=True;MultipleActiveResultSets=True";
+            //return @"Server=(localdb)\mssqllocaldb;Database=UHCalendar;Trusted_Connection=True";
+        }
+
+        public static string NpgsqlConnectionString()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }
