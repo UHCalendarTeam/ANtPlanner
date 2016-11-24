@@ -332,13 +332,4 @@ src/CalDav_Services/collections/users/f.underwood@wh.org/durtyplans/russodies.ic
 *.ics
 *.txt
 *.db
-DataLayer/Migrations/20160906194808_InitMigrations.cs
-DataLayer/Migrations/20160906194808_InitMigrations.cs
-DataLayer/Migrations/20160906194808_InitMigrations.Designer.cs
-DataLayer/Migrations/20161121183403_SingleContext.cs
-DataLayer/Migrations/20161121183403_SingleContext.Designer.cs
-DataLayer/Migrations/CalDavContextModelSnapshot.cs
-DataLayer/Migrations/CalDAVSQLiteContextModelSnapshot.cs
-DataLayer/Migrations/20160906194808_InitMigrations.cs
-DataLayer/Migrations/20160906194808_InitMigrations.Designer.cs
-DataLayer/Migrations/CalDAVSQLiteContextModelSnapshot.cs
+DataLayer/Migrations/
