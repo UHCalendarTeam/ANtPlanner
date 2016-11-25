@@ -7,10 +7,9 @@
     "DataLayer": "1.0.0",
     "ICalendar": "1.0.0-*",
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
-    "Microsoft.AspNetCore.Http.Extensions": "1.0.0",
-    "Microsoft.CSharp": "4.0.1",
+    "Microsoft.AspNetCore.Http.Extensions": "1.0.0",    
     "Microsoft.NETCore.App": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "platform"
     },
     "System.Collections": "4.0.11",

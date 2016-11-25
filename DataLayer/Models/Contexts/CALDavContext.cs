@@ -54,7 +54,7 @@ namespace DataLayer
                 #endregion
 
                 #region Npgsql
-
+                //optionBuilder.UseNpgsql(SystemProperties.NpgsqlConnectionString());
                 #endregion
             }
 

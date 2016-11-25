@@ -230,7 +230,7 @@ namespace DataLayer
 
         public static string NpgsqlConnectionString()
         {
-            throw new NotImplementedException();
+            return @"User ID=admin;Password=admin;Host=localhost;Port=5432;Database=UHCalendar;Pooling=true;";
         }
         #endregion
     }

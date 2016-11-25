@@ -13,7 +13,7 @@ using DataLayer.Repositories.Implementations;
 using DataLayer.Repositories;
 using System.Net;
 using CalDavServices.Controllers;
-using CalDavServices.IntegrationTest;
+
 
 namespace Tests
 {
@@ -64,9 +64,10 @@ namespace Tests
 <D:propfind xmlns: D = ""DAV:"">
    <propname/>
 </D:propfind >");
+            request.Headers.Add("Authorization", "Basic YWRtaW5AYWRtaW4udWguY3U6MTIzNA==");
 
             var response = _client.SendAsync(request);
-            Assert.Equal(response.Result.StatusCode, (HttpStatusCode)407);
+            Assert.Equal(response.Result.StatusCode, (HttpStatusCode)200);
 
         }
 

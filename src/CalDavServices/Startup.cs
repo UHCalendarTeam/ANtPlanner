@@ -96,7 +96,7 @@ namespace CalDavServices
             // app.UseCors("AllowAllOrigins");            
 
             //use the authentication middleware
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseMvc();
         }
@@ -135,7 +135,8 @@ namespace CalDavServices
             #endregion
 
             #region Npgsql
-
+            //services.AddDbContext<CalDavContext>(options =>
+            //options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
 
 
