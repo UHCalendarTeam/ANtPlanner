@@ -48,7 +48,7 @@ namespace CalDavServices
             // This is the magic line
             //  optionsBuilder.UseInMemoryDatabase();  
             #region User
-            var user = new User("admin", "admin@admin.uh.cu", "1234");
+            var user = new User("admin@admin.uh.cu", "admin@admin.uh.cu", "AQAAAAEAACcQAAAAEPHS/DMuYco3Ny3d2Y3iczPAT6nZ2C7rh/JDs5L5MhrmUGmgdLLNWwLjo/Ecw52Wqw==");
             #endregion
 
             #region Principal
@@ -111,15 +111,7 @@ namespace CalDavServices
                 var context = app.ApplicationServices.GetService<CalDavContext>();
                 MockDatabase(context).Wait();
             }
-        }
-
-        public override void EnsureDatabaseCreated(CalDavContext context)
-        {
-            context.Database.OpenConnection();
-            context.Database.EnsureCreated();
-
-            context.Database.Migrate();
-        }
+        }        
 
     }
 }

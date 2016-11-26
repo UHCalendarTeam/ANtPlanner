@@ -10,22 +10,20 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "web": {
       "commandName": "web",
-      "launchBrowser": false,
-      "launchUrl": "http://10.6.125.119:5003",
+      "launchBrowser": true,
+      "launchUrl": "http://192.168.99.1:5003",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "webip": {
       "commandName": "webip",
-      "launchBrowser": false,
       "launchUrl": "http://10.6.125.119:5003",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"

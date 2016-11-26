@@ -13,7 +13,7 @@ using DataLayer.Repositories.Implementations;
 using DataLayer.Repositories;
 using System.Net;
 using CalDavServices.Controllers;
-
+using System.Net.Http.Headers;
 
 namespace Tests
 {
@@ -59,15 +59,16 @@ namespace Tests
         [Fact]
         public async Task PropfindPropnameTest()
         {           
-            var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), "collections/groups/public/C212/");
-            request.Content = new StringContent(@"<?xml version=""1.0"" encoding=""utf - 8"" ?>
-<D:propfind xmlns: D = ""DAV:"">
+            var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), "/collections/groups/public/C212/");
+            request.Content = new StringContent(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<D:propfind xmlns:D=""DAV:"">
    <propname/>
-</D:propfind >");
-            request.Headers.Add("Authorization", "Basic YWRtaW5AYWRtaW4udWguY3U6MTIzNA==");
+</D:propfind>");
+            request.Headers.Add("Authorization", "Basic YWRtaW5AYWRtaW4udWguY3U6YWRtaW4=");
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
 
-            var response = _client.SendAsync(request);
-            Assert.Equal(response.Result.StatusCode, (HttpStatusCode)200);
+            var response = await _client.SendAsync(request);
+            Assert.Equal(response.StatusCode, (HttpStatusCode)207);
 
         }
 

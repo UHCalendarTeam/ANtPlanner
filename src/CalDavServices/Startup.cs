@@ -44,11 +44,6 @@ namespace CalDavServices
 
         }
 
-        public virtual void EnsureDatabaseCreated(CalDavContext context)
-        {
-            context.Database.Migrate();
-        }
-
         public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -147,7 +142,7 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://10.6.31.132:5003")
+              .UseUrls("http://192.168.99.1:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()
