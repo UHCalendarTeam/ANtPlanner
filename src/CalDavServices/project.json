@@ -11,7 +11,7 @@
   "dependencies": {
     "ACL": "1.0.0",
     "CalDAV": "1.0.0",
-    "ICalendar": "1.0.0-*",
+    "ICalendar": "1.0.0",
     "Microsoft.AspNetCore.Cors": "1.0.0",
     "Microsoft.AspNetCore.Hosting": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.1",
