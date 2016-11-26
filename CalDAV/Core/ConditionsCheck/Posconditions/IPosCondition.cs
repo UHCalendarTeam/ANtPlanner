@@ -12,9 +12,8 @@ namespace CalDAV.Core.ConditionsCheck
         /// <summary>
         ///     Checks that all postconditions passed.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> PosconditionOk(HttpContext httpContext);
     }
 }

@@ -11,7 +11,7 @@ namespace CalDAV.Core.ConditionsCheck
         public IFileManagement Fs { get; }
 
 
-        public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PosconditionOk(HttpContext httpContext)
         {
             throw new NotImplementedException();
         }

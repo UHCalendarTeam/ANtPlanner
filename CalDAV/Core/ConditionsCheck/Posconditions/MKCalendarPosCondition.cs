@@ -23,19 +23,17 @@ namespace CalDAV.Core.ConditionsCheck
 
         public IFileManagement Fs { get; }
 
-        public async Task<bool> PosconditionOk(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PosconditionOk(HttpContext httpContext)
         {
             #region Extracting Properties
 
-            string url;
-            propertiesAndHeaders.TryGetValue("url", out url);
-
+            string url = httpContext.Request.GetRealUrl();
             #endregion
 
             if (!Fs.ExistCalendarCollection(url) || await _collectionRepository.Exist(url))
             {
-                response.StatusCode = (int) HttpStatusCode.Forbidden;
-                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                httpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
+                httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns:D='DAV:' xmlns:C='urn:ietf:params:xml:ns:caldav'>
   <C:initialize-calendar-collection/>  
 </error>");

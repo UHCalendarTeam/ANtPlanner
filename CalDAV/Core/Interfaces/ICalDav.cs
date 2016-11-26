@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ICalendar.ComponentProperties;
 using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core
@@ -9,37 +10,29 @@ namespace CalDAV.Core
         /// <summary>
         ///     CalDAV HTTP Method for create a new collection of COR (new calendar)
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
-        /// <param name="response"></param>
-        Task MkCalendar(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task MkCalendar(HttpContext httpContext);
 
         /// <summary>
         ///     WebDAV PROFIND HTTP Method .
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
-        /// <param name="response"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        Task PropFind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        Task PropFind(HttpContext httpContext);
 
         /// <summary>
         /// Synchronization Method for read the calendar home set properties.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="body"></param>
-        /// <param name="response"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        Task CHSetPropfind(Dictionary<string, string> propertiesAndHeaders, string body, HttpResponse response);
+        Task CHSetPropfind(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav HTTP Method PROPPATCH
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="Body"></param>
-        /// <param name="response"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        Task PropPatch(Dictionary<string, string> propertiesAndHeaders, string Body, HttpResponse response);
+        Task PropPatch(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav HTTP Method REPORT for Calendar Collections
@@ -52,38 +45,35 @@ namespace CalDAV.Core
         /// <summary>
         ///     CalDAV PUT for create a new COR
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task AddCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task AddCalendarObjectResource(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav Method for delete a Calendar Object Resource
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task<bool> DeleteCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task<bool> DeleteCalendarObjectResource(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav & WebDav Method for delete a Collection
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task<bool> DeleteCalendarCollection(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="url"></param>
+        /// <param name="httpContext"></param>
+        Task<bool> DeleteCalendarCollection(string url, HttpContext httpContext);
 
         /// <summary>
         ///     CalDav HTTP Method Get for a COR
         /// </summary>
         /// <returns></returns>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
-        Task ReadCalendarObjectResource(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        /// <param name="httpContext"></param>
+        Task ReadCalendarObjectResource(HttpContext httpContext);
 
         /// <summary>
         ///     CalDav Http method for get a Calendar Collection
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        string ReadCalendarCollection(Dictionary<string, string> propertiesAndHeaders);
+        string ReadCalendarCollection(HttpContext httpContext);
 
         /// <summary>
         ///     This method perfoms a profind on a principal.

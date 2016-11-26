@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
@@ -20,27 +21,32 @@ namespace CalDAV.Core.ConditionsCheck
         private readonly CollectionRepository _collectionRepository;
         private readonly ResourceRespository _resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
+        private readonly IAuthenticate _authenticate;
         public PutPrecondition(IFileManagement manager,
             IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker)
+            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
             _collectionRepository = collectionRepository as CollectionRepository;
             _resourceRespository = resourceRepository as ResourceRespository;
             StorageManagement = manager;
             _permissionChecker = permissionChecker;
+            _authenticate = authenticate;
         }
 
         private IFileManagement StorageManagement { get; }
 
-        public async Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response)
+        public async Task<bool> PreconditionsOK(HttpContext httpContext)
         {
             #region Extracting Properties
 
-            var url = propertiesAndHeaders["url"];
+            var url = httpContext.Request.GetRealUrl();
 
-            var contentSize = propertiesAndHeaders["content-length"];
-            var body = propertiesAndHeaders["body"];
-            var principalUrl = propertiesAndHeaders["principalUrl"];
+            var contentSize = httpContext.Request.GetContentLength();
+            var body = httpContext.Request.Body.StreamToString();
+            var principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalURL;
+
+            var ifMatch = httpContext.Request.GetIfMatchValues();
+            var ifNoneMatch = httpContext.Request.GetIfNoneMatchValues();
             VCalendar iCalendar;
             try
             {
@@ -48,7 +54,7 @@ namespace CalDAV.Core.ConditionsCheck
             }
             catch (Exception)
             {
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return false;
             }
 
@@ -58,12 +64,12 @@ namespace CalDAV.Core.ConditionsCheck
             if (
                 !StorageManagement.ExistCalendarCollection(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1)))
             {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
             }
 
             var creationMode = !await _resourceRespository.Exist(url);
-            if (!PermissionCheck(url, creationMode, principalUrl, response))
+            if (!PermissionCheck(url, creationMode, principalUrl, httpContext.Response))
             {
                 return false;
             }
@@ -81,8 +87,8 @@ namespace CalDAV.Core.ConditionsCheck
                 {
                     if (uid == calendarresource.Uid)
                     {
-                        response.StatusCode = (int)HttpStatusCode.Conflict;
-                        response.Body.Write(
+                        httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                        httpContext.Response.Body.Write(
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
@@ -106,8 +112,8 @@ namespace CalDAV.Core.ConditionsCheck
 
                     if (resource.Uid != null && resource.Uid != uid)
                     {
-                        response.StatusCode = (int)HttpStatusCode.Conflict;
-                        response.Body.Write(
+                        httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                        httpContext.Response.Body.Write(
                             $@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
@@ -120,22 +126,22 @@ namespace CalDAV.Core.ConditionsCheck
             }
 
 
-            if (propertiesAndHeaders.ContainsKey("If-Match"))
+            if (!string.IsNullOrEmpty(ifMatch))
             {
                 //check that the value do exist
                 if (!StorageManagement.ExistCalendarObjectResource(url))
                 {
-                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                     return false;
                 }
             }
 
-            if (propertiesAndHeaders.ContainsKey("If-None-Match"))
+            if (!string.IsNullOrEmpty(ifNoneMatch))
             {
                 //check that the value do not exist
                 if (StorageManagement.ExistCalendarObjectResource(url))
                 {
-                    response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                     return false;
                 }
             }
@@ -147,8 +153,8 @@ namespace CalDAV.Core.ConditionsCheck
             {
                 if (!iCalendar.CalendarComponents.ContainsKey("VTIMEZONE"))
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
@@ -172,8 +178,8 @@ VTimezone Calendar Component Must be present.
                         var uidComp = component.Properties["UID"].StringValue;
                         if (uid != uidComp)
                         {
-                            response.StatusCode = (int)HttpStatusCode.Conflict;
-                            response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                            httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                            httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
@@ -201,8 +207,8 @@ If the count of calendar components execeds 2 including VTimezone the rest must 
             {
                 if (!iCalendar.CalendarComponents.ContainsKey("VTIMEZONE"))
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
@@ -244,8 +250,8 @@ VTimezone Calendar Component Must be present.
             //iCalendar object MUST NOT implement METHOD property
             if (!string.IsNullOrEmpty(methodProp?.StringValue))
             {
-                response.StatusCode = (int)HttpStatusCode.Conflict;
-                response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'></valid-calendar-object-resource>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>
@@ -271,8 +277,8 @@ Method prop must not be present
                 if (int.TryParse(XmlTreeStructure.Parse(maxSize?.Value).Value, out maxSizeInt) &&
                     contentSizeInt > maxSizeInt)
                 {
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    httpContext.Response.Body.Write(@"<?xml version='1.0' encoding='UTF-8'?>
 <error xmlns='DAV:'>
 <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'></max-resource-size>
 <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>

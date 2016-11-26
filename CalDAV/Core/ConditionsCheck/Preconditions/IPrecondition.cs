@@ -9,9 +9,8 @@ namespace CalDAV.Core.ConditionsCheck
         /// <summary>
         ///     Checks that all preconditions passed.
         /// </summary>
-        /// <param name="propertiesAndHeaders"></param>
-        /// <param name="response"></param>
+        /// <param name="httpContext"></param>
         /// <returns></returns>
-        Task<bool> PreconditionsOK(Dictionary<string, string> propertiesAndHeaders, HttpResponse response);
+        Task<bool> PreconditionsOK(HttpContext httpContext);
     }
 }
