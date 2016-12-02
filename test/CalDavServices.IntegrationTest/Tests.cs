@@ -1,18 +1,11 @@
 ﻿using CalDavServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using DataLayer;
-using DataLayer.Models.Entities;
 using System.Collections.Generic;
-using DataLayer.Models.ACL;
-using DataLayer.Repositories.Implementations;
-using DataLayer.Repositories;
 using System.Net;
-using CalDavServices.Controllers;
 using System.Net.Http.Headers;
 
 namespace Tests
