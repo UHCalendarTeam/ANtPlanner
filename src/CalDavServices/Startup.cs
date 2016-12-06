@@ -8,6 +8,7 @@ using CalDAV.Core;
 using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
+using DataLayer.Contexts;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
@@ -69,17 +70,39 @@ namespace CalDavServices
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
             //services.AddScoped<CalDavContext>();
-            services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
-            services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
-            services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
-            services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
+
+            //change by yasmany to test
+
+            #region old
+
+            //services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
+            //services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
+            //services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+            //services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
+            //services.AddScoped<IPermissionChecker, PermissionsGuard>();
+            //services.AddScoped<IReportPreconditions, ReportPreconditions>();
+
+            #endregion
+
+            #region new
+
+            services.AddScoped<ICollectionRepository, CollectionRepository>();
+            services.AddScoped<ICalendarResourceRepository, ResourceRespository>();
+            services.AddScoped<IPrincipalRepository, PrincipalRepository>();
+            services.AddScoped<ICalendarHomeRepository, CalendarHomeRepository>();
             services.AddScoped<IPermissionChecker, PermissionsGuard>();
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
+            // add by yasmany (working in contextseed)
+            services.AddScoped<CalDavContext>();
+            services.AddEntityFrameworkNpgsql().AddDbContext<CalDavContext>();
+            services.AddTransient<CalDavContext>();
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,DbContextSeedData seeder)
         {   //todo:remove after resolve dependency
             //loggerFactory.AddSerilog();
 
@@ -95,6 +118,8 @@ namespace CalDavServices
             app.UseAuthorization();
 
             app.UseMvc();
+
+            seeder.Seed(50);
         }
 
         /// <summary>
