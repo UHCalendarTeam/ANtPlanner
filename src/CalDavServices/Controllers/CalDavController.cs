@@ -174,7 +174,7 @@ namespace CalDavServices.Controllers
             var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             var propertiesAndHeaders = new Dictionary<string, string>
             {
-                {"principalUrl", principal.PrincipalURL},
+                {"principalUrl", principal.PrincipalUrl},
                 {"url", url},
                 {"calendarResourceId", calendarResourceId},
                 {"body", Request.Body.StreamToString()}

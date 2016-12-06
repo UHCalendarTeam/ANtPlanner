@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities.ACL;
 
 namespace ACL.Interfaces

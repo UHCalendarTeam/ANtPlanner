@@ -6,7 +6,9 @@ using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
@@ -36,7 +38,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             var body = httpContext.Request.Body.StreamToString();
             var url = httpContext.Request.GetRealUrl();
-            var principalUrl = (await _autheticate.AuthenticateRequestAsync(httpContext))?.PrincipalURL;
+            var principalUrl = (await _autheticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
 
             #endregion
 

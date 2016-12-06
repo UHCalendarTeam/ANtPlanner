@@ -142,7 +142,7 @@ namespace ACL.Core
             HttpResponse response)
         {
             //take the collection with the given href
-            var col = _collectionRepository.Get(href);
+            var col = _collectionRepository.Find(href);
 
             //if the collection doesnt exit then return an error
             if (col == null)

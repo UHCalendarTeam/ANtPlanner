@@ -7,9 +7,10 @@ using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using ICalendar.Calendar;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
@@ -18,16 +19,16 @@ namespace CalDAV.Core.ConditionsCheck
 {
     public class PutPrecondition : IPrecondition
     {
-        private readonly CollectionRepository _collectionRepository;
-        private readonly ResourceRespository _resourceRespository;
+        private readonly ICollectionRepository _collectionRepository;
+        private readonly ICalendarResourceRepository _resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
         public PutPrecondition(IFileManagement manager,
             IRepository<CalendarCollection, string> collectionRepository,
             IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as CollectionRepository;
-            _resourceRespository = resourceRepository as ResourceRespository;
+            _collectionRepository = collectionRepository as ICollectionRepository;
+            _resourceRespository = resourceRepository as ICalendarResourceRepository;
             StorageManagement = manager;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
@@ -43,7 +44,7 @@ namespace CalDAV.Core.ConditionsCheck
 
             var contentSize = httpContext.Request.GetContentLength();
             var body = httpContext.Request.Body.StreamToString();
-            var principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalURL;
+            var principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
 
             var ifMatch = httpContext.Request.GetIfMatchValues();
             var ifNoneMatch = httpContext.Request.GetIfNoneMatchValues();
@@ -82,7 +83,7 @@ namespace CalDAV.Core.ConditionsCheck
                 var uid = component.FirstOrDefault()?.Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 var collection =
-                    _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                    _collectionRepository.Find(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid == calendarresource.Uid)
@@ -108,7 +109,7 @@ namespace CalDAV.Core.ConditionsCheck
                 {
                     var uid = calendarComponent.Properties["UID"].StringValue;
 
-                    var resource = _resourceRespository.Get(url);
+                    var resource = _resourceRespository.Find(url);
 
                     if (resource.Uid != null && resource.Uid != uid)
                     {
@@ -268,7 +269,7 @@ Method prop must not be present
             if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
             {
                 var collection =
-                    _collectionRepository.Get(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                    _collectionRepository.Find(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 //here the max-resource-property of the collection is called.
                 var maxSize =
                     collection.Properties.FirstOrDefault(

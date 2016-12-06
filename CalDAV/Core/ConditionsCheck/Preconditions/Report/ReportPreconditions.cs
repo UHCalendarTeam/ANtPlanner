@@ -32,7 +32,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
 
             //for the moment just checking the permission
             //on the resource
-            return HasPermission(principal.PrincipalURL,resourceUrl,httpContext.Response);
+            return HasPermission(principal.PrincipalUrl,resourceUrl,httpContext.Response);
 
             
         }

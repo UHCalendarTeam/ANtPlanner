@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ACL.Interfaces;
-using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ACL;
 
 namespace ACL.Core
 {
@@ -36,7 +36,7 @@ namespace ACL.Core
         /// <returns></returns>
         public string GetPrincipalURL(Principal principal)
         {
-            return principal.PrincipalURL;
+            return principal.PrincipalUrl;
         }
 
         public string GetGroupMemberSet(Principal principal)

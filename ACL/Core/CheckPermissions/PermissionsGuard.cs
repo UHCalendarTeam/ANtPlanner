@@ -4,7 +4,9 @@ using System.Net.Http;
 using System.Xml.Linq;
 using DataLayer;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
 
@@ -14,8 +16,8 @@ namespace ACL.Core.CheckPermissions
     {
         private const string _readPermissionString = "read";
         private const string _writePermissionString = "write";
-        private readonly ResourceRespository _resourceRepo;
-        private readonly CollectionRepository _calendarRepo;
+        private readonly ICalendarResourceRepository _resourceRepo;
+        private readonly ICollectionRepository _calendarRepo;
         /// <summary>
         /// the HTTP method that need the read privilege
         /// </summary>
@@ -43,8 +45,8 @@ namespace ACL.Core.CheckPermissions
 
         public PermissionsGuard(IRepository<CalendarResource, string> resRepository, IRepository<CalendarCollection, string> calRepository)
         {
-            _resourceRepo = resRepository as ResourceRespository;
-            _calendarRepo = calRepository as CollectionRepository;
+            _resourceRepo = resRepository as ICalendarResourceRepository;
+            _calendarRepo = calRepository as ICollectionRepository;
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace ACL.Core.CheckPermissions
             //    aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             #endregion
             //take the acl property
-            aclP = _calendarRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
+            aclP = _calendarRepo.Find(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
 
             var xdoc = XDocument.Parse(aclP.Value);
             XName aceName = "ace";

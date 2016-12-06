@@ -8,7 +8,9 @@ using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using ICalendar.Calendar;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
@@ -21,12 +23,12 @@ namespace CalDAV.Core
     /// </summary>
     public class CollectionReport : ICollectionReport
     {
-        public readonly ResourceRespository _resourceRepository;
+        public readonly ICalendarResourceRepository _resourceRepository;
         public readonly IReportPreconditions _preconditions;
 
         public CollectionReport(IRepository<CalendarResource, string> resRepository, IReportPreconditions preconditions)
         {
-            _resourceRepository = resRepository as ResourceRespository;
+            _resourceRepository = resRepository as ICalendarResourceRepository;
             _preconditions = preconditions;
         }
 
@@ -247,7 +249,7 @@ namespace CalDAV.Core
             var resPropertiesNotExist = new List<XmlTreeStructure>();
 
             var href = resource.Key[0] != '/' ? "/" + resource.Key : resource.Key;
-            var calResource = _resourceRepository.Get(href);
+            var calResource = _resourceRepository.Find(href);
 
             foreach (var prop in incomPropNode.Children)
             {

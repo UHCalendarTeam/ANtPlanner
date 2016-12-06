@@ -4,19 +4,21 @@ using System.Threading.Tasks;
 using CalDAV.Core.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core.ConditionsCheck
 {
     public class MKCalendarPosCondition : IPoscondition
     {
-        private readonly CollectionRepository _collectionRepository;
+        private readonly ICollectionRepository _collectionRepository;
 
         public MKCalendarPosCondition(IFileManagement fs,
             IRepository<CalendarCollection, string> collectionRepository)
         {
-            _collectionRepository = collectionRepository as CollectionRepository;
+            _collectionRepository = collectionRepository as ICollectionRepository;
 
             Fs = fs;
         }

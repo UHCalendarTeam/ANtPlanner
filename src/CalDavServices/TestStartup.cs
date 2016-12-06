@@ -9,9 +9,10 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories.Implementations;
-using DataLayer.Models.ACL;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Repositories;
 
 namespace CalDavServices
 {
@@ -94,7 +95,7 @@ namespace CalDavServices
 
             var collectionRepo = new CollectionRepository(_context);
 
-            var collectionC212 = collectionRepo.Get("/collections/groups/public/C212/");
+            var collectionC212 = collectionRepo.Find("/collections/groups/public/C212/");
 
             collectionC212.CalendarResources.Add(resources[0]);
 

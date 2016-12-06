@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ACL;
 using TreeForXml;
 
 namespace ACL.Core.Extension_Method
@@ -22,7 +22,7 @@ namespace ACL.Core.Extension_Method
         /// <returns>Return an I</returns>
         public static XmlTreeStructure GetCurrentUserPermissionProperty(this Principal principal, Property property)
         {
-            var pUrl = principal.PrincipalURL;
+            var pUrl = principal.PrincipalUrl;
             var aclP = XDocument.Parse(property.Value).Root;
             var principalGrantPermissions = new List<IEnumerable<XElement>>();
             XName aceName = "ace";

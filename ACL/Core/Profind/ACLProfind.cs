@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using DataLayer;
-using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ACL;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
@@ -117,7 +117,7 @@ namespace ACL.Core
                     case "principal-URL":
                         propNode.AddChild(new XmlTreeStructure("principal-URL", "DAV:")
                         {
-                            Value = principal.PrincipalURL
+                            Value = principal.PrincipalUrl
                         });
                         break;
                 }

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
-using DataLayer.Models.ACL;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
 namespace ACL.Core.Authentication
 {
     public class UhCalendarAuthentication : IAuthenticate
     {
-        private readonly PrincipalRepository _principalRepository;
+        private readonly IPrincipalRepository _principalRepository;
 
         /// <summary>
         ///     Injects an instance of CaldavContext
@@ -46,7 +47,7 @@ namespace ACL.Core.Authentication
                 var credentials = TakeCredentials(authHeader);
                 username = credentials.Key;
                 var password = credentials.Value;
-                principal = _principalRepository.GetByIdentifier(username);
+                principal = _principalRepository.FindByIdentifier(username);
                 //check if the user exist in our DB
                 if (principal != null)
                 {
@@ -146,7 +147,7 @@ namespace ACL.Core.Authentication
                 var credentials = TakeCredentials(authHeader);
                 var username = credentials.Key;
                 var password = credentials.Value;
-                principal = _principalRepository.GetByIdentifier(username);
+                principal = _principalRepository.FindByIdentifier(username);
                 //check if the user exist in our DB
                 if (principal != null)
                 {

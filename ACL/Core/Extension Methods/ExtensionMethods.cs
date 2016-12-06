@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ACL;
 
 namespace ACL.Core
 {

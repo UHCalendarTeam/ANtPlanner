@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using ACL.Core.Extension_Method;
 using DataLayer;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
-using DataLayer.Repositories.Implementations;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using TreeForXml;
 
 namespace CalDAV.Core.Propfind
@@ -30,16 +31,16 @@ namespace CalDAV.Core.Propfind
     /// </summary>
     public class CalDavPropfind : IPropfindMethods
     {
-        private readonly CollectionRepository _collectionRepository;
-        private readonly ResourceRespository _resourceRespository;
-        private readonly CalendarHomeRepository _calendarHomeRepository;
+        private readonly ICollectionRepository _collectionRepository;
+        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarHomeRepository _calendarHomeRepository;
 
         public CalDavPropfind(IRepository<CalendarCollection, string> collectionRepository,
             IRepository<CalendarResource, string> resourceRepository, IRepository<CalendarHome, string> calendarHomeRepository )
         {
-            _collectionRepository = collectionRepository as CollectionRepository;
-            _resourceRespository = resourceRepository as ResourceRespository;
-            _calendarHomeRepository = calendarHomeRepository as CalendarHomeRepository;
+            _collectionRepository = collectionRepository as ICollectionRepository;
+            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _calendarHomeRepository = calendarHomeRepository as ICalendarHomeRepository;
         }
 
         #region Home Set Collection Propfind Methods
@@ -71,7 +72,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the responses for resources.
 
             //TODO:Take the calendar home set instead
-            var calendarHome = _calendarHomeRepository.Get(url);
+            var calendarHome = _calendarHomeRepository.Find(url);
 
             foreach (var calendarCollection in calendarHome.CalendarCollections)
             {
@@ -123,7 +124,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.Get(url);
+                var collection = _collectionRepository.Find(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -174,7 +175,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.Get(url);
+                var collection = _collectionRepository.Find(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -216,7 +217,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.Get(url);
+                var collection = _collectionRepository.Find(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -549,7 +550,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = _collectionRepository.Get(url);
+                collection = _collectionRepository.Find(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
@@ -575,7 +576,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = _resourceRespository.Get(url);
+                resource = _resourceRespository.Find(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
@@ -747,7 +748,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
 
             //this is the calendar home set collection
-            var calendarHome = _calendarHomeRepository.Get(url);
+            var calendarHome = _calendarHomeRepository.Find(url);
             if (propertiesNameNamespace != null)
             {
                 foreach (var addProperty in propertiesNameNamespace)
