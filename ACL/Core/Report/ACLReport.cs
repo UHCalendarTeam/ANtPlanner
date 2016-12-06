@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using ACL.Interfaces;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
@@ -14,16 +16,16 @@ namespace ACL.Core
 {
     public class ACLReport : IReportMethods
     {
-        private readonly CollectionRepository _collectionRepository;
-        private readonly PrincipalRepository _principalRepository;
-        private readonly ResourceRespository _resourceRepository;
+        private readonly ICollectionRepository _collectionRepository;
+        private readonly IPrincipalRepository _principalRepository;
+        private readonly ICalendarResourceRepository _resourceRepository;
 
         public ACLReport(IRepository<Principal, string> prinRepository,
             IRepository<CalendarCollection, string> colRepository,
             IRepository<CalendarResource, string> resRepository)
         {
             _principalRepository = prinRepository as PrincipalRepository;
-            _collectionRepository = _collectionRepository;
+           //todo:resolve _collectionRepository = _collectionRepository;
             _resourceRepository = resRepository as ResourceRespository;
         }
 
@@ -96,7 +98,7 @@ namespace ACL.Core
 
             //Take the resource with the href == to the given url
             //TODO: should the href property be store in a property?
-            var resource = await _resourceRepository.GetAsync(colUrl);
+            var resource = await _resourceRepository.FindAsync(colUrl);
 
             //take the string representation of the acl property
             //this property is stored in xml format so is needed to
@@ -113,7 +115,7 @@ namespace ACL.Core
             //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
-                var principal = _principalRepository.Get(pUrl.Value);
+                var principal = _principalRepository.Find(pUrl.Value);
                 if (principal != null)
                     principals.Add(principal, null);
             }
@@ -196,7 +198,7 @@ namespace ACL.Core
                 //each returned resource has is own response and href nodes
                 var responseNode = new XmlTreeStructure("response", "DAV:");
                 var hrefNode = new XmlTreeStructure("href", "DAV:");
-                hrefNode.AddValue(pp.Key.PrincipalURL);
+                hrefNode.AddValue(pp.Key.PrincipalUrl);
 
                 //href is a child pf response
                 responseNode.AddChild(hrefNode);

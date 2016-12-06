@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ACL;
+using System.Collections.Generic;
+using DataLayer.Models.Interfaces;
 
-namespace DataLayer.Models.Entities
+namespace DataLayer.Models.Entities.Users
 {
     /// <summary>
     ///     Defines the main properties for the users
     ///     of the system.
     /// </summary>
-    public class User
+    public class User:Entity
     {
         public User()
         {
@@ -27,19 +29,18 @@ namespace DataLayer.Models.Entities
         /// <param name="password">The user password.</param>
         public User(string displayName, string email, string password)
         {
+            DisplayName = displayName;
             Email = email;
             Password = password;
-            DisplayName = displayName;
         }
 
-        [ScaffoldColumn(false)]
-        public int UserId { get; set; }
+        public string DisplayName { get; set; }
 
         [Required]
-        public string Email { get; set; }
+        public  string Email { get; set; }
 
         /// Contains the user fullName.
-        public string DisplayName { get; set; }
+        //public string DisplayName { get; set; } :todo comment by yasmany tem,see Adriano
 
         /// <summary>
         ///     Contains the user password.
@@ -52,6 +53,6 @@ namespace DataLayer.Models.Entities
         /// </summary>
         public Principal Principal { get; set; }
 
-        public int? PrincipalId { get; set; }
+        public string PrincipalId { get; set; }
     }
 }

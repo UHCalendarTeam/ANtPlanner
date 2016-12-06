@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ACL;
 using TreeForXml;
 
 namespace DataLayer
@@ -315,7 +315,7 @@ namespace DataLayer
             if (principal != null)
                 href = new XmlTreeStructure("href", "DAV:")
                 {
-                    Value = principal.PrincipalURL
+                    Value = principal.PrincipalUrl
                 };
 
             else

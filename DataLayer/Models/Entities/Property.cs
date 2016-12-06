@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataLayer.Models.ACL;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.OtherEnt;
+using DataLayer.Models.Entities.OtherEnt.Resource;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.Entities
 {
@@ -67,18 +70,44 @@ namespace DataLayer.Models.Entities
 
         public CalendarResource CalendarResource { get; set; }
 
-        public int? CalendarResourceId { get; set; }
+        public string CalendarResourceId { get; set; }
 
         public CalendarCollection CalendarCollection { get; set; }
 
-        public int? CalendarCollectionId { get; set; }
-        public CalendarHome CalendarHome{ get; set; }
+        public string CalendarCollectionId { get; set; }
+        public CalendarHome CalendarHome { get; set; }
 
-        public int? CalendarHomeId { get; set; }
 
-        public int? PricipalId { get; set; }
+        public int PersonId { get; set; }
+        public Person Person { get; set; }
+
+        public string ResourceTypeId { get; set; }
+
+        public ResourceType ResourceType { get; set; }
+
+        public int LocationId { get; set; }
+        public Location Location { get; set; }
+
+        public string CalendarHomeId { get; set; }
+
+        public string PricipalId { get; set; }
 
         public Principal Principal { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            Property other = obj as Property;
+            if (ReferenceEquals(other, null))
+                return false;
+
+            if (!other.Name.Equals(Name))
+                return false;
+
+            if (!other.Namespace.Equals(Namespace))
+                return false;
+
+            return other.Value.Equals(Value);
+        }
 
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace DataLayer.ExtensionMethods

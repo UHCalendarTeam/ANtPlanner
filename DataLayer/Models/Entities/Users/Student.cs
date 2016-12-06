@@ -1,4 +1,6 @@
-﻿namespace DataLayer.Models.Entities
+﻿using System.Collections.Generic;
+
+namespace DataLayer.Models.Entities.Users
 {
     /// <summary>
     ///     Represent a user in the system that

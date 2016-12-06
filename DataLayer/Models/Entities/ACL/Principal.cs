@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Interfaces;
 
-namespace DataLayer.Models.ACL
+namespace DataLayer.Models.Entities.ACL
 {
     /// <summary>
     ///     Entity for the properties of the principals.
@@ -10,11 +12,11 @@ namespace DataLayer.Models.ACL
     ///     All the groups and users contains a Principal because contains
     ///     useful properties for the ACL.
     /// </summary>
-    public class Principal
+    public class Principal : Entity,IPropertyContainer
     {
         public Principal()
         {
-           
+
         }
 
         /// <summary>
@@ -31,14 +33,12 @@ namespace DataLayer.Models.ACL
         {
             //build the principalUrl depending if the principal represents a user
             //or a group
-            PrincipalURL = userOrGroup != SystemProperties.PrincipalType.Group
+            PrincipalUrl = userOrGroup != SystemProperties.PrincipalType.Group
                 ? SystemProperties._userPrincipalUrl + pIdentifier + "/"
                 : SystemProperties._groupPrincipalUrl + pIdentifier + "/";
 
 
             Properties = new List<Property>(properties);
-
-            CalendarCollections = new List<CalendarCollection>();
 
             PrincipalStringIdentifier = pIdentifier;
         }
@@ -51,12 +51,7 @@ namespace DataLayer.Models.ACL
         ///     in an ACL request.
         /// </summary>
         [Required]
-        public string PrincipalURL { get; set; }
-
-
-        [ScaffoldColumn(false)]
-        public int PrincipalId { get; set; }
-
+        public string PrincipalUrl { get; set; }
 
         /// <summary>
         ///     Contains the properties of
@@ -67,12 +62,13 @@ namespace DataLayer.Models.ACL
         /// <summary>
         ///     Contains the collection of the principal.
         /// </summary>
-        public ICollection<CalendarCollection> CalendarCollections { get; set; }
+        public ICollection<CalendarCollection> CalendarCollections => CalendarHome.CalendarCollections;
 
         /// <summary>
         /// The calendar home associated to the principal.
         /// </summary>
-        public CalendarHome CalendarHome { get; set; }
+        public CalendarHome CalendarHome
+        { get; set; }
 
         /// <summary>
         ///     If the principal represents a user then

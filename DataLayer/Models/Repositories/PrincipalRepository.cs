@@ -1,157 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Contexts;
 using DataLayer.ExtensionMethods;
-using DataLayer.Models.ACL;
-using DataLayer.Models.Entities;
-using DataLayer.Repositories.Implementations;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLayer.Repositories
+namespace DataLayer.Models.Repositories
 {
-    public class PrincipalRepository : IRepository<Principal, string>
+    public class PrincipalRepository : PropertyContainerRepository<Principal, string>, IPrincipalRepository
     {
-        //private readonly CalDavContext _context;
-        private readonly CalDavContext _context;
-
-        public PrincipalRepository(CalDavContext context)
+        public PrincipalRepository(CalDavContext context) : base(context)
         {
-            _context = context;
         }
 
-
-        public async Task<IList<Principal>> GetAll()
+        public new Principal Find(string id)
         {
-            return await _context.Principals.ToListAsync();
+            return Context.Principals.Include(p => p.Properties).Include(p => p.CalendarCollections)
+                .FirstOrDefault(p => p.PrincipalUrl == id);
         }
 
-        public Principal Get(string url)
+        public new async Task<Principal> FindAsync(string id)
         {
-            return _context.Principals.Include(p => p.Properties).Include(p=>p.CalendarCollections)
-                .FirstOrDefault(p => p.PrincipalURL == url);
-        }
-
-        public async Task<Principal> GetAsync(string url)
-        {
-            return await Task.FromResult(_context.Principals.Include(p => p.Properties)
-                .FirstOrDefault(p => p.PrincipalURL == url));
-        }
-
-
-        public void Add(Principal entity)
-        {
-            _context.Principals.Add(entity);
-            _context.SaveChanges();
-        }
-
-        public async Task Remove(Principal entity)
-        {
-            _context.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task Remove(string url)
-        {
-            var principal = await _context.Principals.FirstOrDefaultAsync(p => p.PrincipalURL == url);
-            await Remove(principal);
-        }
-
-        public Task<int> Count()
-        {
-            return _context.Principals.CountAsync();
-        }
-
-        public async Task<bool> Exist(string url)
-        {
-            return await Task.FromResult(_context.Principals.Any(p => p.PrincipalURL == url));
-        }
-
-        public async Task<IList<Property>> GetAllProperties(string url)
-        {
-            var principal = await GetAsync(url);
-
-            return principal?.Properties.Where(x => x.IsVisible).ToList();
-        }
-
-        public async Task<Property> GetProperty(string url, KeyValuePair<string, string> propertyNameandNs)
-        {
-            var principal = Get(url);
-            Property property;
-
-            if (string.IsNullOrEmpty(propertyNameandNs.Value))
-                property = principal.Properties.FirstOrDefault(
-                    prop => prop.Name == propertyNameandNs.Key && prop.Namespace == propertyNameandNs.Value);
-            else
-                property = principal.Properties.FirstOrDefault(
-                    prop => prop.Name == propertyNameandNs.Key);
-            return await Task.FromResult(property);
-        }
-
-        public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(string url)
-        {
-            var principal = Get(url);
-            return
-                await
-                    Task.FromResult(
-                        principal?.Properties.Select(prop => new KeyValuePair<string, string>(prop.Name, prop.Namespace))
-                            .ToList());
-        }
-
-        public async Task<bool> RemoveProperty(string url, KeyValuePair<string, string> propertyNameNs,
-            Stack<string> errorStack)
-        {
-            var principal = Get(url);
-            var property =
-                principal.Properties.FirstOrDefault(
-                    prop => prop.Name == propertyNameNs.Key && prop.Namespace == propertyNameNs.Value);
-
-            if (property == null)
-                return false;
-            if (property.IsDestroyable)
-            {
-                principal.Properties.Remove(property);
-            }
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> CreateOrModifyProperty(string url, string propName, string propNs, string propValue,
-            Stack<string> errorStack,
-            bool adminPrivilege)
-        {
-            var principal = Get(url);
-            var propperty =
-                principal.Properties.FirstOrDefault(prop => prop.Name == propName && prop.Namespace == propNs);
-
-            //if the property is null then create it
-            if (propperty == null)
-            {
-                var prop = new Property(propName, propNs)
-                {
-                    Value = propValue
-                };
-                principal.Properties.Add(prop);
-            }
-            else
-            {
-                if (propperty.IsMutable || adminPrivilege)
-                {
-                    propperty.Value = propValue;
-                }
-            }
-            return await Task.FromResult(true);
-        }
-
-        public async Task<int> SaveChangeAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
+            return await Task.FromResult(Context.Principals.Include(p => p.Properties)
+                .FirstOrDefault(p => p.PrincipalUrl == id));
         }
 
         /// <summary>
@@ -159,9 +36,10 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="context"></param>
         /// <param name="userEmail">The user email (this is out username)</param>
+        /// <param name="principal"></param>
         /// <param name="password">The provided password.</param>
         /// <returns></returns>
-        public bool VerifyPassword(Principal principal, string password = "")
+        public static bool VerifyPassword(Principal principal, string password = "")
         {
             //if the user doesn't exit return false
             if (principal == null)
@@ -175,22 +53,26 @@ namespace DataLayer.Repositories
             return result != PasswordVerificationResult.Failed;
         }
 
-
-        public async Task<Principal> GetByIdentifierAsync(string identifier)
+        bool IPrincipalRepository.VerifyPassword(Principal principal, string password)
         {
-            return await _context.Principals.Include(p => p.User)
+            return VerifyPassword(principal, password);
+        }
+
+        public async Task<Principal> FindByIdentifierAsync(string identifier)
+        {
+            return await Context.Principals.Include(p => p.User)
                 .Include(p => p.Properties)
-                .Include(p=>p.CalendarCollections)
+                .Include(p => p.CalendarCollections)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
-        public Principal GetByIdentifier(string identifier)
+        public Principal FindByIdentifier(string identifier)
         {
             using (var context = new CalDavContext())
             {
                 return context.Principals.Include(p => p.User)
                     .Include(p => p.Properties)
-                    .Include(p=>p.CalendarCollections)
+                    .Include(p => p.CalendarCollections)
                     .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
             }
         }
@@ -202,15 +84,13 @@ namespace DataLayer.Repositories
         /// <returns></returns>
         public async Task<Principal> GetByCookie(string cookieValue)
         {
-            return await _context.Principals.FirstOrDefaultAsync(p => p.SessionId == cookieValue);
+            return await Context.Principals.FirstOrDefaultAsync(p => p.SessionId == cookieValue);
         }
-
 
         public async Task<bool> ExistByStringIs(string identifier)
         {
-            return await _context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
+            return await Context.Principals.AnyAsync(p => p.PrincipalStringIdentifier == identifier);
         }
-
 
         /// <summary>
         ///     Add a user to the system.
@@ -252,16 +132,16 @@ namespace DataLayer.Repositories
 
             user.Principal = principal;
 
-            
+
             //create the cal home for the principal
-            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
+            var calHome = HomeRepository.CreateCalendarHome(principal);
 
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);
 
             principal.CalendarHome = calHome;
 
-            
+
 
             //hash the user password 
             // the instance of the user has to be pass but is not used
@@ -270,14 +150,14 @@ namespace DataLayer.Repositories
             user.Password = hashedPassword;
 
             //add the user and its principal to the context
-            _context.Users.Add(user);
-            _context.Principals.Add(principal);
-            _context.CalendarHomeCollections.Add(calHome);
-            _context.CalendarCollections.AddRange(calHome.CalendarCollections);
-            _context.Properties.AddRange(calHome.Properties);
-            _context.Properties.AddRange(principal.Properties);
-            
-            _context.SaveChanges();
+            Context.Users.Add(user);
+            Context.Principals.Add(principal);
+            Context.CalendarHomeCollections.Add(calHome);
+            Context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            Context.Properties.AddRange(calHome.Properties);
+            Context.Properties.AddRange(principal.Properties);
+
+            Context.SaveChanges();
 
             return principal;
         }
@@ -321,7 +201,7 @@ namespace DataLayer.Repositories
 
             //take the collection with user group name
             var collection =
-                _context.CalendarCollections.FirstOrDefault(
+                Context.CalendarCollections.FirstOrDefault(
                     col => col.Url == SystemProperties._groupCollectionUrl + group);
 
             //if the collection doent exit then something is wrong with the group
@@ -336,14 +216,13 @@ namespace DataLayer.Repositories
             //add the property to the principal
             principal.Properties.Add(calHomeSet);
 
-            _context.Students.Add(student);
-            _context.Principals.Add(principal);
+            Context.Students.Add(student);
+            Context.Principals.Add(principal);
 
-            _context.SaveChanges();
+            Context.SaveChanges();
 
             return student;
         }
-
 
         public Worker CreateWorkerInSystem(string email, string password,
             string fullName, string faculty, string department)
@@ -380,32 +259,27 @@ namespace DataLayer.Repositories
             new FileManagement().CreateFolder(col.Url);
 
             //add the user and its principal to the context
-            _context.Workers.Add(worker);
-            _context.Principals.Add(principal);
-            _context.CalendarCollections.Add(col);
+            Context.Workers.Add(worker);
+            Context.Principals.Add(principal);
+            Context.CalendarCollections.Add(col);
 
-            _context.SaveChanges();
+            Context.SaveChanges();
             return worker;
         }
-
 
         public Principal CreateGroup(string pUrl, string groupName)
         {
             throw new NotImplementedException();
         }
 
-
-        
-
-
         public async Task SetCookie(string principalEmail, string cookieValue)
         {
-            var principal = GetByIdentifier(principalEmail);
+            var principal = FindByIdentifier(principalEmail);
             if (principal == null)
                 return;
 
             principal.SessionId = cookieValue;
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
         }
     }
 }

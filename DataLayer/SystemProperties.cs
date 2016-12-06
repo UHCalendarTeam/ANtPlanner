@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataLayer.Repositories;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
+using DataLayer.Models.Repositories;
 
 namespace DataLayer
 {
@@ -96,7 +96,7 @@ namespace DataLayer
             get
             {
                 var principalRepo = new PrincipalRepository(new CalDavContext());
-                var admin = principalRepo.GetByIdentifier("admin@admin.uh.cu");
+                var admin = principalRepo.FindByIdentifierAsync("admin@admin.uh.cu");
                 return admin != null;
             }
         }

@@ -2,66 +2,53 @@
 using System.Threading.Tasks;
 using DataLayer.Models.Entities;
 
-namespace DataLayer.Repositories
+namespace DataLayer.Models.Interfaces.Repositories
 {
-    public interface IRepository<TEnt, in TPk> where TEnt : class
+
+    public interface IPropertyContainerRepository<TEnt,in TKey> :IRepository<TEnt, TKey> where TEnt : class,IPropertyContainer
     {
-        Task<IList<TEnt>> GetAll();
-        TEnt Get(TPk url);
-        Task<TEnt> GetAsync(TPk url);
-        void Add(TEnt entity);
-        Task Remove(TEnt entity);
-
-        Task Remove(TPk url);
-
-        Task<int> Count();
-
-        Task<bool> Exist(TPk url);
-
         /// <summary>
         ///     Returns all the visible properties
         ///     related to the given url.
         /// </summary>
-        /// <param name="url"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        Task<IList<Property>> GetAllProperties(TPk url);
+        Task<IList<Property>> GetAllProperties(TKey key);
 
         /// <summary>
         ///     Returns the property that match the given
         ///     property name and namespace for the given url;
         /// </summary>
-        /// <param name="url"></param>
+        /// <param name="key"></param>
         /// <param name="propertyNameandNs"></param>
         /// <returns></returns>
-        Task<Property> GetProperty(TPk url, KeyValuePair<string, string> propertyNameandNs);
+        Task<Property> GetProperty(TKey key, KeyValuePair<string, string> propertyNameandNs);
 
         /// <summary>
         ///     Returns all the properties
         /// </summary>
         /// <returns></returns>
-        Task<IList<KeyValuePair<string, string>>> GetAllPropname(TPk url);
+        Task<IList<KeyValuePair<string, string>>> GetAllPropname(TKey key);
 
         /// <summary>
         ///     Remove a property with the given name and namespace.
         /// </summary>
-        /// <param name="url">The object's identifier</param>
+        /// <param name="key">The object's identifier</param>
         /// <param name="propertyNameNs">The property name and namespace.</param>
         /// <param name="errorStack">The error stack.</param>
-        Task<bool> RemoveProperty(TPk url, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack);
+        Task<bool> RemoveProperty(TKey key, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack);
 
         /// <summary>
         ///     Create a modify a property
         /// </summary>
-        /// <param name="url">The property father url.</param>
+        /// <param name="key">The property father url.</param>
         /// <param name="propName"></param>
         /// <param name="propNs"></param>
         /// <param name="propValue"></param>
         /// <param name="errorStack"></param>
         /// <param name="adminPrivilege"></param>
         /// <returns></returns>
-        Task<bool> CreateOrModifyProperty(TPk url, string propName, string propNs, string propValue,
+        Task<bool> CreateOrModifyProperty(TKey key, string propName, string propNs, string propValue,
             Stack<string> errorStack, bool adminPrivilege);
-
-        Task<int> SaveChangeAsync();
     }
 }

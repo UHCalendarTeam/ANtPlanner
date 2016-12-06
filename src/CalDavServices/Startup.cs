@@ -8,10 +8,11 @@ using CalDAV.Core;
 using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
-using DataLayer.Models.ACL;
 using DataLayer.Models.Entities;
-using DataLayer.Repositories;
-using DataLayer.Repositories.Implementations;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -79,8 +80,8 @@ namespace CalDavServices
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
-            loggerFactory.AddSerilog();
+        {   //todo:remove after resolve dependency
+            //loggerFactory.AddSerilog();
 
             // app.UseIISPlatformHandler();
 

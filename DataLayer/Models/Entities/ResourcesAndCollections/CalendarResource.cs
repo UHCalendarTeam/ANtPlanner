@@ -1,39 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Models.Entities.OtherEnt;
+using DataLayer.Models.Entities.OtherEnt.RelationsEnt;
+using DataLayer.Models.Entities.Users;
 
-namespace DataLayer.Models.Entities
+namespace DataLayer.Models.Entities.ResourcesAndCollections
 {
     /// <summary>
     ///     to store the main properties of a cal resource.
     /// </summary>
-    public class CalendarResource
+    public class CalendarResource : AbstractCalendar
     {
-        [ScaffoldColumn(false)]
-        public int CalendarResourceId { get; set; }
+        public CalendarResource()
+        {
+        }
+
+        public CalendarResource(string href, string name) : base(href, name, new Property[0])
+        {
+            Href = href;
+        }
+
+        public CalendarResource(string url, string name, params Property[] properties) : this(url, name)
+        {
+
+        }
 
         /// <summary>
         ///     The url where is the resource.
         /// </summary>
-        [Required]
+  
         public string Href { get; set; }
-
-        [Required]
-        public string Name { get; set; }
 
         //public string Getetag { get; set; }
 
         public string Uid { get; set; }
 
-        public int CalendarCollectionId { get; set; }
 
         /// <summary>
         ///     The collection where the resource is defined.
         /// </summary>
         public CalendarCollection CalendarCollection { get; set; }
 
-
-        public ICollection<Property> Properties { get; set; }
+        /// <summary>
+        /// The CalendarResource have others CalendarResource related. 
+        /// </summary>
+        public ICollection<CalendarResource> RelatedCalendarResources { get; set; }
 
         ///// <summary>
         ///// The ACL properties of the resource.
@@ -42,15 +54,26 @@ namespace DataLayer.Models.Entities
 
         //public int AccessControlPropertiesId { get; set; }
 
+        /// <summary>
+        /// The CalendarResourse content (.ics).
+        /// </summary>
+        public string Content { get; set; }
+
+        /// <summary>
+        ///     The type of the calendarResouorse.
+        /// </summary>
+        public CalendarResourseType CalendarResourseType { get; set; }
+
+
         #region auxiliary properties
 
-        private readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
+        public readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
             {"D", @"xmlns:D=""DAV:"""},
             {"C", @"xmlns:C=""urn:ietf:params:xml:ns:caldav"""}
         };
 
-        private readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
+        public readonly Dictionary<string, string> NamespacesSimple = new Dictionary<string, string>
         {
             {"D", "DAV:"},
             {"C", "urn:ietf:params:xml:ns:caldav"}
@@ -58,83 +81,26 @@ namespace DataLayer.Models.Entities
 
         #endregion
 
-        #region Initializers and constructors
 
-        private void InitializeStandardResourceProperties()
-        {
-            Properties.Add(new Property("getcontenttype", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsMutable = false,
-                IsDestroyable = false,
-                Value = $"<D:getcontenttype {Namespaces["D"]}>text/calendar</D:getcontenttype>"
-            });
+        //TODO: add the time properties and other useful properties for the queries
 
-            Properties.Add(new Property("resourcetype", NamespacesSimple["D"])
-            {IsVisible = true, IsDestroyable = false, IsMutable = false, Value = $"<D:resourcetype {Namespaces["D"]}/>"});
+        public ICollection<User> Users { get; set; }
 
-            Properties.Add(new Property("displayname", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = true,
-                Value = $"<D:displayname {Namespaces["D"]}>Test</D:displayname>"
-            });
+        public ICollection<RCalendarResourcesImagenFiles> RImageFilesResources { get; set; }
 
-            //TODO: Generar Etag en creacion.
-            Properties.Add(new Property("getetag", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = false,
-                Value = $@"<D:getetag {Namespaces["D"]}>""{Guid.NewGuid()}""</D:getetag>"
-            });
+        public ICollection<RCalendarResourceLocation> RCalendarResourceLocations { get; set; }
 
-            Properties.Add(new Property("creationdate", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = false,
-                Value = $"<D:creationdate {Namespaces["D"]}>{DateTime.Now}</D:creationdate>"
-            });
+        public ICollection<RCalendarResourcePerson> RCalendarResourcePersons { get; set; }
 
-            Properties.Add(new Property("getcontentlanguage", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = true,
-                Value = $"<D:getcontentlanguage {Namespaces["D"]}>en</D:getcontentlanguage>"
-            });
+        public ICollection<RResourceCalendarResource> RResourceCalendarResources { get; set; }
 
-            Properties.Add(new Property("getcontentlength", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = false,
-                Value = $"<D:getcontentlength {Namespaces["D"]}>0</D:getcontentlength>"
-            });
+        //public ICollection<RCalendarResourcesCalendarResource> RCalendarResourcesCalendarResources { get; set; }
+    }
 
-            Properties.Add(new Property("getlastmodified", NamespacesSimple["D"])
-            {
-                IsVisible = true,
-                IsDestroyable = false,
-                IsMutable = false,
-                Value = $"<D:getlastmodified {Namespaces["D"]}>{DateTime.Now}</D:getlastmodified>"
-            });
-        }
-
-        public CalendarResource()
-        {
-        }
-
-        public CalendarResource(string href, string name)
-        {
-            Name = name;
-            Href = href;
-            Properties = new List<Property>();
-            InitializeStandardResourceProperties();
-        }
-
-        #endregion
+    public enum CalendarResourseType
+    {
+        VEvent,
+        VTodo,
+        VA
     }
 }

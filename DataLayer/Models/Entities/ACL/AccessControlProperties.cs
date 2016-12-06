@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataLayer.Models.ACL
+namespace DataLayer.Models.Entities.ACL
 {
     /// <summary>
     ///     Defines new properties for the WebDav resources.
