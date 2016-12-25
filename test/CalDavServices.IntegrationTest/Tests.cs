@@ -42,14 +42,14 @@ namespace Tests
             //var controller = new CalDavController();
         }
 
-        //todo:remove after resolve dependecy [Fact]
+         [Fact]
         public async Task MkCalendarTest()
         {
             var response = await _client.GetAsync("");
             //todo:remove after resolve dependecy Assert.True(true);
         }
 
-        //todo:remove after resolve dependecy [Fact]
+         [Fact]
         public async Task PropfindPropnameTest()
         {           
             var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), "/collections/groups/public/C212/");
