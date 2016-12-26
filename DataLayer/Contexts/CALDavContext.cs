@@ -1,4 +1,6 @@
-﻿using DataLayer.Models.Entities;
+﻿using System.Diagnostics;
+using System.IO;
+using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.OtherEnt;
 using DataLayer.Models.Entities.OtherEnt.RelationsEnt;
@@ -9,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.PlatformAbstractions;
+
 
 namespace DataLayer
 {
@@ -18,7 +22,7 @@ namespace DataLayer
 
         public CalDavContext()
         {
-            Database.EnsureCreated();
+            // Database.EnsureCreated();
         }
 
         public CalDavContext(DbContextOptions options)
@@ -62,7 +66,7 @@ namespace DataLayer
             {
                 #region SQLServer            
                 //optionBuilder.UseSqlServer(SystemProperties.SQLServerConnectionString());
-                optionBuilder.UseInMemoryDatabase();
+                //optionBuilder.UseInMemoryDatabase();
                 #endregion
 
                 #region SQLite
@@ -73,6 +77,7 @@ namespace DataLayer
 
                 #region Npgsql
                 //optionBuilder.UseNpgsql(SystemProperties.NpgsqlConnectionString());
+                optionBuilder.UseNpgsql("User ID=postgres;Password=Adarosa9103;Host=Localhost;port=5432;Database=Calendar_Database1");//testing in my pc yasmany
                 #endregion
             }
 

@@ -6,7 +6,6 @@ namespace DataLayer.Models.Interfaces.Repositories
 {
    public interface IImageFileRepository:IRepository<FileImage,string>
     {
-
         Task<ICollection<FileImage>> GetByPerson(string personId);
 
         Task<ICollection<FileImage>> GetByResource(string resourceId);

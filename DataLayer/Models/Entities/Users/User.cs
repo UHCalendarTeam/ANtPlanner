@@ -40,7 +40,7 @@ namespace DataLayer.Models.Entities.Users
         public  string Email { get; set; }
 
         /// Contains the user fullName.
-        //public string DisplayName { get; set; } :todo comment by yasmany tem,see Adriano
+        //public string DisplayName { get; set; } 
 
         /// <summary>
         ///     Contains the user password.

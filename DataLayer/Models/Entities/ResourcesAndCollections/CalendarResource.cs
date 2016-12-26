@@ -62,7 +62,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         /// <summary>
         ///     The type of the calendarResouorse.
         /// </summary>
-        public CalendarResourseType CalendarResourseType { get; set; }
+        public int CalendarResourseType { get; set; }
 
 
         #region auxiliary properties
