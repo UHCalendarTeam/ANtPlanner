@@ -75,12 +75,12 @@ namespace CalDavServices
 
             #region old
 
-            //services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
-            //services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
-            //services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
-            //services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
-            //services.AddScoped<IPermissionChecker, PermissionsGuard>();
-            //services.AddScoped<IReportPreconditions, ReportPreconditions>();
+            services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
+            services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
+            services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+            services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
+            services.AddScoped<IPermissionChecker, PermissionsGuard>();
+            services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
             #endregion
 
@@ -97,6 +97,7 @@ namespace CalDavServices
             services.AddScoped<CalDavContext>();
             services.AddEntityFrameworkNpgsql().AddDbContext<CalDavContext>();
             services.AddTransient<CalDavContext>();
+            services.AddTransient<DbContextSeedData>();
 
             #endregion
         }
@@ -168,7 +169,8 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://192.168.99.1:5003")
+              .UseUrls("http://localhost:5003")
+              //.UseUrls("http://192.168.99.1:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()
