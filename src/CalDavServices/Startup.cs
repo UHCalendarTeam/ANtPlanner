@@ -75,12 +75,12 @@ namespace CalDavServices
 
             #region old
 
-            services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
-            services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
-            services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
-            services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
-            services.AddScoped<IPermissionChecker, PermissionsGuard>();
-            services.AddScoped<IReportPreconditions, ReportPreconditions>();
+            //services.AddScoped<IRepository<CalendarCollection, string>, CollectionRepository>();
+            //services.AddScoped<IRepository<CalendarResource, string>, ResourceRespository>();
+            //services.AddScoped<IRepository<Principal, string>, PrincipalRepository>();
+            //services.AddScoped<IRepository<CalendarHome, string>, CalendarHomeRepository>();
+            //services.AddScoped<IPermissionChecker, PermissionsGuard>();
+            //services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
             #endregion
 
@@ -107,14 +107,13 @@ namespace CalDavServices
         {   //todo:remove after resolve dependency
             //loggerFactory.AddSerilog();
 
-            // app.UseIISPlatformHandler();
+             //app.UseIISPlatformHandler();
 
-            //app.UseStaticFiles();
+            app.UseStaticFiles();
 
             ConfigureInDev(app, env);          
 
             // app.UseCors("AllowAllOrigins");            
-
             //use the authentication middleware
             app.UseAuthorization();
 

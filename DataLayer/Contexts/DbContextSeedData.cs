@@ -133,15 +133,27 @@ namespace DataLayer.Contexts
 
         public void Seed(int entitiesAmmount = 30)
         {
-            if (_context.Persons.Any())
+            if (!_context.Persons.Any())
+            {
                 StanadardEntitySeed(_context.Persons, entitiesAmmount);
-            if (_context.Locations.Any())
+            }
+            else
+            {
+                #region 
+                //Console.WriteLine("element");
+                //foreach (var VARIABLE in _context.Persons)
+                //{
+                 //   Console.WriteLine(VARIABLE.DisplayName);
+                //}
+                #endregion
+            }
+            if (!_context.Locations.Any())
                 StanadardEntitySeed(_context.Locations, entitiesAmmount);
-            if (_context.ResourceTypes.Any())
+            if (!_context.ResourceTypes.Any())
                 StanadardEntitySeed(_context.ResourceTypes, entitiesAmmount);
-            if (_context.Resources.Any())
+            if (!_context.Resources.Any())
                 StanadardEntitySeed(_context.Resources, entitiesAmmount);
-            if (_context.ImageFile.Any())
+            if (!_context.ImageFile.Any())
                 StanadardEntitySeed(_context.ImageFile, entitiesAmmount);
         }
 
@@ -162,7 +174,7 @@ namespace DataLayer.Contexts
             }
 
             dbSet.AddRange(result);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
     }
 }

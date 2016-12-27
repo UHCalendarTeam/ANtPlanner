@@ -18,7 +18,7 @@ namespace ACL.Core.Authentication
         ///     Injects an instance of CaldavContext
         /// </summary>
         /// <param name="context"></param>
-        public UhCalendarAuthentication(IRepository<Principal, string> principalRepository)
+        public UhCalendarAuthentication(IPrincipalRepository principalRepository)
         {
             _principalRepository = principalRepository as PrincipalRepository;
         }
