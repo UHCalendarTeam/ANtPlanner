@@ -17,7 +17,7 @@
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
-    "Microsoft.AspNetCore.Server.WebListener": "0.1.0",
+    "Microsoft.AspNetCore.Server.WebListener": "1.0.0",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0",
     "Microsoft.AspNetCore.TestHost": "1.0.0",
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.1",
@@ -36,8 +36,15 @@
       "type": "platform"
     },
     "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.2",
-   //Todo: resolve dependency "Serilog.Extensions.Logging": "1.3.1",
+    //Todo: resolve dependency "Serilog.Extensions.Logging": "1.3.1",
     "Serilog.Sinks.RollingFile": "3.2.0"
+  },
+  "commands": {
+    "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5003",
+    "run": "run server.urls=http://localhost:5003",
+    "web": "Microsoft.AspNet.Server.Kestrel",
+    "webip": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5003"
+
   },
   "frameworks": {
     "netcoreapp1.0": {
