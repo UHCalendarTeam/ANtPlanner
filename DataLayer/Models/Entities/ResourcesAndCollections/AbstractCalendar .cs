@@ -29,7 +29,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         /// <summary>
         ///     The collection can belongs to a
         /// </summary>
-        public int? PrincipalId
+        public string PrincipalId
         { get; set; }
 
         /// <summary>

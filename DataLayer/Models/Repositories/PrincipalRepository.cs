@@ -132,6 +132,7 @@ namespace DataLayer.Models.Repositories
 
             user.PrincipalId = principal.Id;
             principal.User = user;
+            principal.UserId = user.Id;
 
 
             //create the cal home for the principal
@@ -140,8 +141,8 @@ namespace DataLayer.Models.Repositories
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);
 
+            calHome.PrincipalId = principal.Id;
             principal.CalendarHome = calHome;
-
 
 
             //hash the user password 
