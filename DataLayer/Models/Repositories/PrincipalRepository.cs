@@ -130,7 +130,8 @@ namespace DataLayer.Models.Repositories
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName);
 
-            user.Principal = principal;
+            user.PrincipalId = principal.Id;
+            principal.User = user;
 
 
             //create the cal home for the principal

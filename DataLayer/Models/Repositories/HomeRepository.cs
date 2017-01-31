@@ -109,7 +109,7 @@ namespace DataLayer.Models.Repositories
             {
                 fsm.CreateFolder(initCollection.Url);
                 calHome.CalendarCollections.Add(initCollection);
-                owner.CalendarCollections.Add(initCollection);
+                //owner.CalendarCollections.Add(initCollection);
             }
 
             return calHome;

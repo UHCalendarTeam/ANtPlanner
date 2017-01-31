@@ -168,8 +168,8 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://localhost:5003")
-              //.UseUrls("http://192.168.99.1:5003")
+              //.UseUrls("http://:5003")
+              .UseUrls("http://192.168.0.104:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

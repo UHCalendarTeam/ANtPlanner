@@ -16,7 +16,6 @@ namespace DataLayer.Models.Entities.ACL
     {
         public Principal()
         {
-
         }
 
         /// <summary>
@@ -75,6 +74,8 @@ namespace DataLayer.Models.Entities.ACL
         ///     this is.
         /// </summary>
         public User User { get; set; }
+
+        public string UserId { get; set; }
 
         /// <summary>
         ///     When the principal represents an User this property
