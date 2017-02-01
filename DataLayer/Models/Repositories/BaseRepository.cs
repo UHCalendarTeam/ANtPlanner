@@ -27,6 +27,11 @@ namespace DataLayer.Models.Repositories
             Context.SaveChangesAsync();
         }
 
+        public void AddRange(IEnumerable<TEnt> entities)
+        {
+            Context.AddRange(entities);
+        }
+
         public virtual async Task Remove(TEnt entity)
         {
             DbSet.Remove(entity);

@@ -9,9 +9,15 @@ namespace DataLayer.Models.Interfaces.Repositories
     public interface IRepository<TEnt, in TPk> where TEnt : class
     {
         Task<IList<TEnt>> GetAll();
+
         TEnt Find(TPk id);
+
         Task<TEnt> FindAsync(TPk id);
+
         void Add(TEnt entity);
+
+        void AddRange(IEnumerable<TEnt> entities);
+
         Task Remove(TEnt entity);
 
         Task Remove(TPk id);

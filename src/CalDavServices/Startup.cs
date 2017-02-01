@@ -39,7 +39,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Warning()
+        .MinimumLevel.Error()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
@@ -141,8 +141,8 @@ namespace CalDavServices
             #region SQLServer
 
             // Add framework services.
-            services.AddDbContext<CalDavContext>(options =>
-            options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
+            //services.AddDbContext<CalDavContext>(options =>
+            //options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
             #endregion
 
             #region SQLite          
@@ -156,8 +156,8 @@ namespace CalDavServices
             #endregion
 
             #region Npgsql
-            //services.AddDbContext<CalDavContext>(options =>
-            //options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
+            services.AddDbContext<CalDavContext>(options =>
+            options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
 
 

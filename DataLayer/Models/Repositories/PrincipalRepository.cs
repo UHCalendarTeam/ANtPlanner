@@ -15,8 +15,13 @@ namespace DataLayer.Models.Repositories
 {
     public class PrincipalRepository : PropertyContainerRepository<Principal, string>, IPrincipalRepository
     {
+        private ICalendarCollectionRepository _collectionRepository;
+        private ICalendarHomeRepository _homeRepository;
+
         public PrincipalRepository(CalDavContext context) : base(context)
         {
+            _collectionRepository = new CalendarCollectionRepository(context);
+            _homeRepository =new CalendarHomeRepository(context);
         }
 
         public new Principal Find(string id)
@@ -72,7 +77,7 @@ namespace DataLayer.Models.Repositories
             {
                 return context.Principals.Include(p => p.User)
                     .Include(p => p.Properties)
-                    .Include(p => p.CalendarCollections)
+                    .Include(p => p.CalendarHome)
                     .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
             }
         }
@@ -130,8 +135,8 @@ namespace DataLayer.Models.Repositories
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName);
 
+           
             user.PrincipalId = principal.Id;
-            principal.User = user;
             principal.UserId = user.Id;
 
 
@@ -154,12 +159,22 @@ namespace DataLayer.Models.Repositories
             //add the user and its principal to the context
             Context.Users.Add(user);
             Context.Principals.Add(principal);
-            Context.CalendarHomeCollections.Add(calHome);
-            Context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            //Context.CalendarHomeCollections.Add(calHome);
+            _homeRepository.Add(calHome);
+            //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            _collectionRepository.AddRange(calHome.CalendarCollections);
             Context.Properties.AddRange(calHome.Properties);
             Context.Properties.AddRange(principal.Properties);
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (DbUpdateException e)
+            {
 
-            Context.SaveChanges();
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.InnerException.Message);
+            }
 
             return principal;
         }

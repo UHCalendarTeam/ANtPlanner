@@ -29,7 +29,7 @@ namespace DataLayer
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
-            Database.EnsureCreated();
+           // Database.EnsureCreated();
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace DataLayer
 
                 #region Npgsql
                 //optionBuilder.UseNpgsql(SystemProperties.NpgsqlConnectionString());
-                optionBuilder.UseNpgsql("User ID=postgres;Password=Adarosa9103;Host=Localhost;port=5432;Database=Calendar_Database1");//testing in my pc yasmany
+                optionBuilder.UseNpgsql(SystemProperties.NpgsqlConnectionString());//testing in my pc yasmany
                 #endregion
             }
 
