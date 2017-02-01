@@ -159,8 +159,8 @@ namespace DataLayer.Models.Repositories
             user.Password = hashedPassword;
 
             //add the user and its principal to the context
-            //Context.Users.Add(user);
-            _userRepository.Add(user);
+            Context.Users.Add(user);
+            //_userRepository.Add(user);
             Context.Principals.Add(principal);
             //Context.CalendarHomeCollections.Add(calHome);
             _homeRepository.Add(calHome);
@@ -168,7 +168,15 @@ namespace DataLayer.Models.Repositories
             _collectionRepository.AddRange(calHome.CalendarCollections);
             Context.Properties.AddRange(calHome.Properties);
             Context.Properties.AddRange(principal.Properties);
-            Context.SaveChanges();
+            try
+            {
+                Context.SaveChanges();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             return principal;
         }

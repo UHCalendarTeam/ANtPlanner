@@ -30,6 +30,7 @@ namespace DataLayer.Models.Repositories
         public void AddRange(IEnumerable<TEnt> entities)
         {
             Context.AddRange(entities);
+            Context.SaveChanges();
         }
 
         public virtual async Task Remove(TEnt entity)
