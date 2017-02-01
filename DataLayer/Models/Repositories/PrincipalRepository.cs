@@ -17,11 +17,13 @@ namespace DataLayer.Models.Repositories
     {
         private ICalendarCollectionRepository _collectionRepository;
         private ICalendarHomeRepository _homeRepository;
+        private IUserRepository _userRepository;
 
         public PrincipalRepository(CalDavContext context) : base(context)
         {
             _collectionRepository = new CalendarCollectionRepository(context);
-            _homeRepository =new CalendarHomeRepository(context);
+            _homeRepository = new CalendarHomeRepository(context);
+            _userRepository = new UserRepository(context);
         }
 
         public new Principal Find(string id)
@@ -135,7 +137,7 @@ namespace DataLayer.Models.Repositories
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName);
 
-           
+
             user.PrincipalId = principal.Id;
             principal.UserId = user.Id;
 
@@ -157,7 +159,8 @@ namespace DataLayer.Models.Repositories
             user.Password = hashedPassword;
 
             //add the user and its principal to the context
-            Context.Users.Add(user);
+            //Context.Users.Add(user);
+            _userRepository.Add(user);
             Context.Principals.Add(principal);
             //Context.CalendarHomeCollections.Add(calHome);
             _homeRepository.Add(calHome);
@@ -165,16 +168,7 @@ namespace DataLayer.Models.Repositories
             _collectionRepository.AddRange(calHome.CalendarCollections);
             Context.Properties.AddRange(calHome.Properties);
             Context.Properties.AddRange(principal.Properties);
-            try
-            {
-                Context.SaveChanges();
-            }
-            catch (DbUpdateException e)
-            {
-
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.InnerException.Message);
-            }
+            Context.SaveChanges();
 
             return principal;
         }

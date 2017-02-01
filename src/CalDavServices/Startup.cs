@@ -39,7 +39,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Error()
+        .MinimumLevel.Verbose()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
@@ -71,7 +71,6 @@ namespace CalDavServices
             services.AddScoped<ICollectionReport, CollectionReport>();
             //services.AddScoped<CalDavContext>();
 
-            //change by yasmany to test
 
             #region old
 
@@ -141,8 +140,8 @@ namespace CalDavServices
             #region SQLServer
 
             // Add framework services.
-            //services.AddDbContext<CalDavContext>(options =>
-            //options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
+            services.AddDbContext<CalDavContext>(options =>
+            options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
             #endregion
 
             #region SQLite          
@@ -156,8 +155,8 @@ namespace CalDavServices
             #endregion
 
             #region Npgsql
-            services.AddDbContext<CalDavContext>(options =>
-            options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
+            //services.AddDbContext<CalDavContext>(options =>
+            //options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
 
 
@@ -168,8 +167,8 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              //.UseUrls("http://:5003")
-              .UseUrls("http://192.168.0.104:5003")
+              .UseUrls("http://localhost:5003")
+              //.UseUrls("http://192.168.99.1:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

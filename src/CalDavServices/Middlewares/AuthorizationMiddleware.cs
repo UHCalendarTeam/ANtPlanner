@@ -33,13 +33,14 @@ namespace CalDavServices.Middlewares
             if (principal == null)
             {
                 _logger.LogInformation("The client doesn't have enough privileges.");
-                return;
             }
-
-            //context.Session.SetString("principalId", principal.PrincipalURL);
-            _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
-            await _next.Invoke(context);
-            _logger.LogInformation("Finished handling request.");
+            else
+            {
+                //context.Session.SetString("principalId", principal.PrincipalURL);
+                _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
+                await _next.Invoke(context);
+                _logger.LogInformation("Finished handling request.");
+            }
         }
     }
 }
