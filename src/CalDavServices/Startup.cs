@@ -140,8 +140,8 @@ namespace CalDavServices
             #region SQLServer
 
             // Add framework services.
-            services.AddDbContext<CalDavContext>(options =>
-            options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
+            //services.AddDbContext<CalDavContext>(options =>
+            //options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
             #endregion
 
             #region SQLite          
@@ -155,8 +155,8 @@ namespace CalDavServices
             #endregion
 
             #region Npgsql
-            //services.AddDbContext<CalDavContext>(options =>
-            //options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
+            services.AddDbContext<CalDavContext>(options =>
+            options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
 
 
@@ -167,8 +167,8 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              .UseUrls("http://localhost:5003")
-              //.UseUrls("http://192.168.99.1:5003")
+              //.UseUrls("http://localhost:5003")
+              .UseUrls("http://192.168.0.104:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()
