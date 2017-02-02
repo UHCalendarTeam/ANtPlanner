@@ -50,18 +50,16 @@ namespace CalDAV.Core
         /// <param name="permissionChecker"></param>
         /// <param name="calendarHomeRepository"></param>
         public CalDav(IFileManagement fsManagement, IACLProfind aclProfind,
-            ICollectionReport collectionCollectionReport, IRepository<CalendarCollection,
-                string> collectionRespository, IRepository<CalendarResource, string> resourceRespository,
-            IRepository<Principal, string> principalRepository, IPermissionChecker permissionChecker, IRepository<CalendarHome,
-                string> calendarHomeRepository, IAuthenticate authenticate)
+            ICollectionReport collectionCollectionReport, ICollectionRepository collectionRespository, ICalendarResourceRepository resourceRespository,
+            IPrincipalRepository principalRepository, IPermissionChecker permissionChecker, ICalendarHomeRepository calendarHomeRepository, IAuthenticate authenticate)
         {
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
             _colectionCollectionReport = collectionCollectionReport;
-            _collectionRespository = collectionRespository as ICollectionRepository;
-            _principalRepository = principalRepository as IPrincipalRepository;
-            _resourceRespository = resourceRespository as ICalendarResourceRepository;
-            _calendarHomeRepository = calendarHomeRepository as ICalendarHomeRepository;
+            _collectionRespository = collectionRespository  ;
+            _principalRepository = principalRepository  ;
+            _resourceRespository = resourceRespository  ;
+            _calendarHomeRepository = calendarHomeRepository  ;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }

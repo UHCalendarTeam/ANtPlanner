@@ -39,7 +39,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Debug()
+        .MinimumLevel.Information()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
@@ -104,7 +104,7 @@ namespace CalDavServices
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbContextSeedData seeder)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {   
             loggerFactory.AddSerilog();
              
@@ -119,8 +119,6 @@ namespace CalDavServices
             app.UseAuthorization();
 
             app.UseMvc();
-
-            seeder.Seed(50);
 
         }
 
