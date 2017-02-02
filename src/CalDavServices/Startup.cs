@@ -39,7 +39,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Verbose()
+        .MinimumLevel.Debug()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
@@ -49,7 +49,7 @@ namespace CalDavServices
         public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services )
         {
 
             //Add Cors
@@ -93,32 +93,35 @@ namespace CalDavServices
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
             // add by yasmany (working in contextseed)
-            services.AddScoped<CalDavContext>();
+            //services.AddScoped<CalDavContext>();
             services.AddEntityFrameworkNpgsql().AddDbContext<CalDavContext>();
             services.AddTransient<CalDavContext>();
             services.AddTransient<DbContextSeedData>();
 
             #endregion
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,DbContextSeedData seeder)
-        {   //todo:remove after resolve dependency
-            //loggerFactory.AddSerilog();
-
-             //app.UseIISPlatformHandler();
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbContextSeedData seeder)
+        {   
+            loggerFactory.AddSerilog();
+             
+            //app.UseIISPlatformHandler();
 
             app.UseStaticFiles();
 
             ConfigureInDev(app, env);          
 
-            // app.UseCors("AllowAllOrigins");            
+            app.UseCors("AllowAllOrigins");            
             //use the authentication middleware
             app.UseAuthorization();
 
             app.UseMvc();
 
             seeder.Seed(50);
+
         }
 
         /// <summary>
@@ -158,7 +161,6 @@ namespace CalDavServices
             services.AddDbContext<CalDavContext>(options =>
             options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
-
 
         }
 

@@ -36,7 +36,7 @@
       "type": "platform"
     },
     "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.2",
-    //Todo: resolve dependency "Serilog.Extensions.Logging": "1.3.1",
+    "Serilog.Extensions.Logging": "1.2.0",
     "Serilog.Sinks.RollingFile": "3.2.0"
   },
   "commands": {

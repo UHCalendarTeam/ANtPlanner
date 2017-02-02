@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -33,14 +34,12 @@ namespace CalDavServices.Middlewares
             if (principal == null)
             {
                 _logger.LogInformation("The client doesn't have enough privileges.");
+                return;
             }
-            else
-            {
-                //context.Session.SetString("principalId", principal.PrincipalURL);
-                _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
-                await _next.Invoke(context);
-                _logger.LogInformation("Finished handling request.");
-            }
+            //context.Session.SetString("principalId", principal.PrincipalURL);
+            _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
+            await _next.Invoke(context);
+            _logger.LogInformation("Finished handling request.");
         }
     }
 }
