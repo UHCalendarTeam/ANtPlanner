@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Models.Repositories
 {
-    public class CalendarCollectionRepository : CaldavEntitiesRepository<CalendarCollection>,ICalendarCollectionRepository
+    public class CalendarCollectionRepository : CaldavEntitiesRepository<CalendarCollection>,ICollectionRepository
     {
         public CalendarCollectionRepository(CalDavContext context):base(context)
         {
@@ -113,6 +113,11 @@ namespace DataLayer.Models.Repositories
                     $"<D:resourcetype {SystemProperties.Namespaces["D"]}><D:collection/><C:calendar xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/></D:resourcetype>"
             });
             base.InitializeStandardProperties(entity, name);
+        }
+
+        public CalendarCollection FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
         }
     }
 }

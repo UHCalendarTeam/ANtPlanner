@@ -2,7 +2,7 @@
 
 namespace DataLayer.Models.Interfaces.Repositories
 {
-    public interface ICalendarHomeRepository : IPropertyContainerRepository<CalendarHome, string>
+    public interface ICalendarHomeRepository : IUrlContainerRepository<CalendarHome>, IPropertyContainerRepository<CalendarHome, string>
     {
         CalendarHome FindWihtPropertiesAndCalendarCollections(string url);
 

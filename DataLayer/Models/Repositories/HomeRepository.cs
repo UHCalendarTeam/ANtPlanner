@@ -13,6 +13,7 @@ namespace DataLayer.Models.Repositories
     {
         public HomeRepository(CalDavContext context) : base(context)
         {
+            
         }
 
         public  CalendarHome FindWihtPropertiesAndCalendarCollections(string url)
@@ -137,6 +138,11 @@ namespace DataLayer.Models.Repositories
                 publicCalendar.CalendarCollections.Add(publicCollection);
                 owner.CalendarCollections.Add(publicCollection);
             }
+        }
+
+        public CalendarHome FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
         }
     }
 }

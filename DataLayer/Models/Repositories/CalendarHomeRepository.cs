@@ -138,5 +138,10 @@ namespace DataLayer.Models.Repositories
                 owner.CalendarCollections.Add(publicCollection);
             }
         }
+
+        public CalendarHome FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
+        }
     }
 }
