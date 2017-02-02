@@ -130,17 +130,13 @@ namespace DataLayer.Models.Repositories
             var principal = new Principal(email, SystemProperties.PrincipalType.User,
                 displayName);
 
-            user.Principal = principal;
-
 
             //create the cal home for the principal
             var calHome = HomeRepository.CreateCalendarHome(principal);
 
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);
-
-            principal.CalendarHome = calHome;
-
+           
 
 
             //hash the user password 
@@ -149,11 +145,19 @@ namespace DataLayer.Models.Repositories
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
+            calHome.Principal = principal;
+            calHome.PrincipalId = principal.Id;
+            //_userRepository.Add(user);
+
+            user.PrincipalId = principal.Id;
+
+            principal.User = user;
+            principal.UserId = user.Id;
+
             //add the user and its principal to the context
             Context.Users.Add(user);
+            //_userRepository.Add(user);
             Context.Principals.Add(principal);
-            Context.CalendarHomeCollections.Add(calHome);
-            Context.CalendarCollections.AddRange(calHome.CalendarCollections);
             Context.Properties.AddRange(calHome.Properties);
             Context.Properties.AddRange(principal.Properties);
 
