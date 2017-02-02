@@ -72,7 +72,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the responses for resources.
 
             //TODO:Take the calendar home set instead
-            var calendarHome = _calendarHomeRepository.Find(url);
+            var calendarHome = _calendarHomeRepository.FindWihtCalendarCollections(url);
 
             foreach (var calendarCollection in calendarHome.CalendarCollections)
             {
@@ -748,7 +748,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
 
             //this is the calendar home set collection
-            var calendarHome = _calendarHomeRepository.Find(url);
+            var calendarHome = _calendarHomeRepository.FindWihtProperties(url);
             if (propertiesNameNamespace != null)
             {
                 foreach (var addProperty in propertiesNameNamespace)
