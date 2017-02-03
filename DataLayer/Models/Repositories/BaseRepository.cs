@@ -24,12 +24,12 @@ namespace DataLayer.Models.Repositories
         public virtual void Add(TEnt entity)
         {
             DbSet.Add(entity);
-            Context.SaveChangesAsync();
+            Context.SaveChanges();
         }
 
         public void AddRange(IEnumerable<TEnt> entities)
         {
-            Context.AddRange(entities);
+            DbSet.AddRange(entities);
             Context.SaveChanges();
         }
 

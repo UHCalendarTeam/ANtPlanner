@@ -161,7 +161,7 @@ namespace ACL.Core.Authentication
                 }
                 else
                 {
-                    principal = _principalRepository.CreateUserInSystem(username, username, password);
+                     principal = _principalRepository.CreateUserInSystem(username, username, password);
 
                     Console.WriteLine($"------Created user with username: {username}");
                 }

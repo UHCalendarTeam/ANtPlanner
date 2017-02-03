@@ -55,7 +55,7 @@ namespace DataLayer.Models.Repositories
         }
 
         public static CalendarHome CreateCalendarHome(Principal owner)
-        {
+         {
             //check if the user is an admin user.
             //if it is the first admin user then create the public 
             //calendars

@@ -10,6 +10,7 @@ using DataLayer.Models.Entities.Users;
 using DataLayer.Models.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace DataLayer.Models.Repositories
 {
@@ -159,22 +160,22 @@ namespace DataLayer.Models.Repositories
             user.Password = hashedPassword;
 
             //add the user and its principal to the context
+            //Context.Users.Add(user);
             Context.Users.Add(user);
-            //_userRepository.Add(user);
             Context.Principals.Add(principal);
-            //Context.CalendarHomeCollections.Add(calHome);
-            _homeRepository.Add(calHome);
+            Context.CalendarHomeCollections.Add(calHome);
+            //_homeRepository.Add(calHome);
             //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
             _collectionRepository.AddRange(calHome.CalendarCollections);
-            Context.Properties.AddRange(calHome.Properties);
-            Context.Properties.AddRange(principal.Properties);
+            //Context.Properties.AddRange(calHome.Properties);
+            //Context.Properties.AddRange(principal.Properties);
             try
             {
                 Context.SaveChanges();
 
             }
-            catch (Exception e)
-            {
+            catch (NpgsqlException e)
+             {
                 Console.WriteLine(e.Message);
             }
 
