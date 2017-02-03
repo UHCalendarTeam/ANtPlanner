@@ -60,7 +60,7 @@ namespace DataLayer.Models.Repositories
             //if it is the first admin user then create the public 
             //calendars
             var created = SystemProperties.PublicCalendarCreated;
-            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu") && created;
+            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu");
 
             var fsm = new FileManagement();
             var defaultCalName = "DefaultCalendar";
@@ -136,7 +136,7 @@ namespace DataLayer.Models.Repositories
 
                 fsm.CreateFolder(publicCollection.Url);
                 publicCalendar.CalendarCollections.Add(publicCollection);
-                owner.CalendarCollections.Add(publicCollection);
+                //owner.CalendarCollections.Add(publicCollection);
             }
         }
 
