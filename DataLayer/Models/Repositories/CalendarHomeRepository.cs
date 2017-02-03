@@ -59,7 +59,8 @@ namespace DataLayer.Models.Repositories
             //check if the user is an admin user.
             //if it is the first admin user then create the public 
             //calendars
-            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu") && !SystemProperties.PublicCalendarCreated;
+            var created = SystemProperties.PublicCalendarCreated;
+            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu");
 
             var fsm = new FileManagement();
             var defaultCalName = "DefaultCalendar";
@@ -100,7 +101,7 @@ namespace DataLayer.Models.Repositories
 
 
             //if the principal is admin then create the public calendars
-            if (adminUser)
+            if (!created)
                 CreatePublicCollections(calHome, owner, aclProperty, ownerProp);
 
 
