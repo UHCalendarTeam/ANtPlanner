@@ -23,20 +23,26 @@ namespace DataLayer.Models.Repositories
 
         public virtual void Add(TEnt entity)
         {
-            DbSet.Add(entity);
-            Context.SaveChanges();
+            try
+            {
+                DbSet.Add(entity);
+
+            }
+            catch (Exception exception)
+            {
+
+                Console.WriteLine(exception.Message);
+            }
         }
 
-        public void AddRange(IEnumerable<TEnt> entities)
+        public virtual void AddRange(IEnumerable<TEnt> entities)
         {
             DbSet.AddRange(entities);
-            Context.SaveChanges();
         }
 
         public virtual async Task Remove(TEnt entity)
         {
             DbSet.Remove(entity);
-            await SaveChangesAsync();
         }
 
         public virtual async Task Remove(TKey id)

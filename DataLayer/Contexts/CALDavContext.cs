@@ -117,7 +117,7 @@ namespace DataLayer
 
             modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
 
-            modelBuilder.Entity<Property>()
+             modelBuilder.Entity<Property>()
                 .HasOne(c => c.CalendarCollection)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.CalendarCollectionId);

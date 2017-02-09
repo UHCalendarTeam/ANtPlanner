@@ -150,7 +150,7 @@ namespace DataLayer.Models.Repositories
             principal.Properties.Add(calHomeSet);
 
             calHome.PrincipalId = principal.Id;
-            principal.CalendarHome = calHome;
+            principal.CalendarHomeId = calHome.Id;
 
 
             //hash the user password 
@@ -159,14 +159,16 @@ namespace DataLayer.Models.Repositories
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
+
+            _collectionRepository.AddRange(calHome.CalendarCollections);
+            calHome.CalendarCollections = null;
             //add the user and its principal to the context
             //Context.Users.Add(user);
-            Context.Users.Add(user);
-            Context.Principals.Add(principal);
-            Context.CalendarHomeCollections.Add(calHome);
-            //_homeRepository.Add(calHome);
+            _homeRepository.Add(calHome);
+            _userRepository.Add(user);
+            Add(principal);
             //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
-            _collectionRepository.AddRange(calHome.CalendarCollections);
+            //_collectionRepository.AddRange(calHome.CalendarCollections);
             //Context.Properties.AddRange(calHome.Properties);
             //Context.Properties.AddRange(principal.Properties);
             try
