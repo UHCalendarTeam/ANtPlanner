@@ -29,7 +29,7 @@ namespace DataLayer.Models.Repositories
 
         public new Principal Find(string id)
         {
-            return Context.Principals.Include(p => p.Properties).Include(p => p.CalendarCollections)
+            return Context.Principals.Include(p => p.Properties).Include(p => p.CalendarHome).ThenInclude(x => x.CalendarCollections)
                 .FirstOrDefault(p => p.PrincipalUrl == id);
         }
 
@@ -70,7 +70,7 @@ namespace DataLayer.Models.Repositories
         {
             return await Context.Principals.Include(p => p.User)
                 .Include(p => p.Properties)
-                .Include(p => p.CalendarCollections)
+                .Include(p => p.CalendarHome).ThenInclude(x => x.CalendarCollections)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
@@ -161,12 +161,14 @@ namespace DataLayer.Models.Repositories
 
 
             _collectionRepository.AddRange(calHome.CalendarCollections);
-            calHome.CalendarCollections = null;
+            //calHome.CalendarCollections = null;
             //add the user and its principal to the context
             //Context.Users.Add(user);
+            Add(principal);
+            calHome.CalendarCollections = null;
             _homeRepository.Add(calHome);
             _userRepository.Add(user);
-            Add(principal);
+
             //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
             //_collectionRepository.AddRange(calHome.CalendarCollections);
             //Context.Properties.AddRange(calHome.Properties);
@@ -274,7 +276,7 @@ namespace DataLayer.Models.Repositories
                 };
 
             //add the calaendar to the collection of the principal
-            principal.CalendarCollections.Add(col);
+            principal.CalendarHome.CalendarCollections.Add(col);
 
             //create the folder that will contain the 
             //calendars of the user

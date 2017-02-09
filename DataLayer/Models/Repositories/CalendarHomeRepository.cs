@@ -111,7 +111,7 @@ namespace DataLayer.Models.Repositories
             {
                 fsm.CreateFolder(initCollection.Url);
                 calHome.CalendarCollections.Add(initCollection);
-                owner.CalendarCollections.Add(initCollection);
+                owner.CalendarHome.CalendarCollections.Add(initCollection);
             }
 
             return calHome;
@@ -136,7 +136,7 @@ namespace DataLayer.Models.Repositories
 
                 fsm.CreateFolder(publicCollection.Url);
                 publicCalendar.CalendarCollections.Add(publicCollection);
-                owner.CalendarCollections.Add(publicCollection);
+                owner.CalendarHome.CalendarCollections.Add(publicCollection);
             }
         }
 

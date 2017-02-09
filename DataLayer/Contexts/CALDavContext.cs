@@ -96,12 +96,12 @@ namespace DataLayer
 
             modelBuilder.Entity<Principal>().HasAlternateKey(p => p.PrincipalUrl);
 
-            modelBuilder.Entity<CalendarCollection>()
-                .HasOne(u => u.Principal)
-                .WithMany(cl => cl.CalendarCollections)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<CalendarCollection>()
+            //    .HasOne(u => u.Principal)
+            //    .WithMany(cl => cl.CalendarCollections)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<CalendarCollection>().HasAlternateKey(c => c.Url);
+            //modelBuilder.Entity<CalendarCollection>().HasAlternateKey(c => c.Url);
 
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.CalendarCollection)
