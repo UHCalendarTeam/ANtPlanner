@@ -550,13 +550,13 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = _collectionRepository.Find(url);
+                collection = _collectionRepository.FindUrl(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
                     {
                         //gets the property from database
-                        var property = await _collectionRepository.GetProperty(url, addProperty);
+                        var property = await _collectionRepository.GetProperty(collection.Id, addProperty);
                         //Builds the xmlTreeExtructure checking that if the value is null thats because 
                         //the property was not found.
                         IXMLTreeStructure prop;
