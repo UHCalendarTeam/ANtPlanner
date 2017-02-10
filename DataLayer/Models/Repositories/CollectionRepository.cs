@@ -114,5 +114,10 @@ namespace DataLayer.Models.Repositories
             });
             base.InitializeStandardProperties(entity, name);
         }
+
+        public CalendarCollection FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
+        }
     }
 }

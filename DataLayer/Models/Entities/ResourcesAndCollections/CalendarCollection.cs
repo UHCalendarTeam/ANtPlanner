@@ -20,6 +20,9 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         /// <summary>
         ///     Reference to the calendar home of this collection.
         /// </summary>
+
+        public string CalendarHomeId { get; set; }
+
         public CalendarHome CalendarHome { get; set; }
 
         public CalendarCollection()

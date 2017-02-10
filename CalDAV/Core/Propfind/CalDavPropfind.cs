@@ -72,7 +72,7 @@ namespace CalDAV.Core.Propfind
             #region Adding the responses for resources.
 
             //TODO:Take the calendar home set instead
-            var calendarHome = _calendarHomeRepository.Find(url);
+            var calendarHome = _calendarHomeRepository.FindWihtCalendarCollections(url);
 
             foreach (var calendarCollection in calendarHome.CalendarCollections)
             {
@@ -550,13 +550,13 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = _collectionRepository.Find(url);
+                collection = _collectionRepository.FindUrl(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
                     {
                         //gets the property from database
-                        var property = await _collectionRepository.GetProperty(url, addProperty);
+                        var property = await _collectionRepository.GetProperty(collection.Id, addProperty);
                         //Builds the xmlTreeExtructure checking that if the value is null thats because 
                         //the property was not found.
                         IXMLTreeStructure prop;
@@ -748,13 +748,13 @@ namespace CalDAV.Core.Propfind
             //retrieve.
 
             //this is the calendar home set collection
-            var calendarHome = _calendarHomeRepository.Find(url);
+            var calendarHome = _calendarHomeRepository.FindWihtProperties(url);
             if (propertiesNameNamespace != null)
             {
                 foreach (var addProperty in propertiesNameNamespace)
                 {
                     //gets the property from database
-                    var property = await _calendarHomeRepository.GetProperty(calendarHome.Url, addProperty);
+                    var property = await _calendarHomeRepository.GetProperty(calendarHome.Id, addProperty);
                     //Builds the xmlTreeExtructure checking that if the value is null thats because 
                     //the property was not found.
                     IXMLTreeStructure prop;

@@ -10,18 +10,26 @@ using DataLayer.Models.Entities.Users;
 using DataLayer.Models.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace DataLayer.Models.Repositories
 {
     public class PrincipalRepository : PropertyContainerRepository<Principal, string>, IPrincipalRepository
     {
+        private ICollectionRepository _collectionRepository;
+        private ICalendarHomeRepository _homeRepository;
+        private IUserRepository _userRepository;
+
         public PrincipalRepository(CalDavContext context) : base(context)
         {
+            _collectionRepository = new  CalendarCollectionRepository(context);
+            _homeRepository = new CalendarHomeRepository(context);
+            _userRepository = new UserRepository(context);
         }
 
         public new Principal Find(string id)
         {
-            return Context.Principals.Include(p => p.Properties).Include(p => p.CalendarCollections)
+            return Context.Principals.Include(p => p.Properties).Include(p => p.CalendarHome).ThenInclude(x => x.CalendarCollections)
                 .FirstOrDefault(p => p.PrincipalUrl == id);
         }
 
@@ -62,7 +70,7 @@ namespace DataLayer.Models.Repositories
         {
             return await Context.Principals.Include(p => p.User)
                 .Include(p => p.Properties)
-                .Include(p => p.CalendarCollections)
+                .Include(p => p.CalendarHome).ThenInclude(x => x.CalendarCollections)
                 .FirstOrDefaultAsync(u => u.PrincipalStringIdentifier == identifier);
         }
 
@@ -72,7 +80,7 @@ namespace DataLayer.Models.Repositories
             {
                 return context.Principals.Include(p => p.User)
                     .Include(p => p.Properties)
-                    .Include(p => p.CalendarCollections)
+                    .Include(p => p.CalendarHome)
                     .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
             }
         }
@@ -131,12 +139,18 @@ namespace DataLayer.Models.Repositories
                 displayName);
 
 
+            user.PrincipalId = principal.Id;
+            principal.UserId = user.Id;
+
+
             //create the cal home for the principal
             var calHome = HomeRepository.CreateCalendarHome(principal);
 
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);
            
+            calHome.PrincipalId = principal.Id;
+            principal.CalendarHomeId = calHome.Id;
 
 
             //hash the user password 
@@ -145,23 +159,34 @@ namespace DataLayer.Models.Repositories
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
-            calHome.Principal = principal;
-            calHome.PrincipalId = principal.Id;
-            //_userRepository.Add(user);
+            var collection = calHome.CalendarCollections;
+            calHome.CalendarCollections = null;
+            _homeRepository.Add(calHome);
 
-            user.PrincipalId = principal.Id;
+            _collectionRepository.AddRange(collection);
 
             principal.User = user;
             principal.UserId = user.Id;
 
             //add the user and its principal to the context
-            Context.Users.Add(user);
-            //_userRepository.Add(user);
-            Context.Principals.Add(principal);
-            Context.Properties.AddRange(calHome.Properties);
-            Context.Properties.AddRange(principal.Properties);
+            //Context.Users.Add(user);
+            _userRepository.Add(user);
+            Add(principal);
+            
 
-            Context.SaveChanges();
+            //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            //_collectionRepository.AddRange(calHome.CalendarCollections);
+            //Context.Properties.AddRange(calHome.Properties);
+            //Context.Properties.AddRange(principal.Properties);
+            try
+            {
+                Context.SaveChanges();
+
+            }
+             catch (Exception e)
+             {
+                Console.WriteLine(e.Message);
+            }
 
             return principal;
         }
@@ -256,7 +281,7 @@ namespace DataLayer.Models.Repositories
                 };
 
             //add the calaendar to the collection of the principal
-            principal.CalendarCollections.Add(col);
+            principal.CalendarHome.CalendarCollections.Add(col);
 
             //create the folder that will contain the 
             //calendars of the user

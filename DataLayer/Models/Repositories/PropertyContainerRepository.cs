@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Contexts;
 using DataLayer.Models.Entities;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces;
 using DataLayer.Models.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Models.Repositories
 {
@@ -16,27 +19,42 @@ namespace DataLayer.Models.Repositories
 
         public async Task<IList<Property>> GetAllProperties(TKey url)
         {
-            var collection = await FindAsync(url);
+            var collection = await FindWithProperties(url);
 
             return collection?.Properties.Where(p => p.IsVisible).ToList();
         }
 
-        public async Task<Property> GetProperty(TKey url, KeyValuePair<string, string> propertyNameandNs)
+        public Task<TEnt> FindWithProperties(TKey key)
         {
-            var collection = await FindAsync(url);
+            return DbSet.Include(p => p.Properties).FirstOrDefaultAsync(c => c.Id.Equals(key));
+        }
 
-            var property = string.IsNullOrEmpty(propertyNameandNs.Value)
+
+        public async Task<Property> GetProperty(TKey id, KeyValuePair<string, string> propertyNameandNs)
+        {
+            var collection = await FindWithProperties(id);
+
+            try
+            {
+                var property = string.IsNullOrEmpty(propertyNameandNs.Value)
                 ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameandNs.Key)
                 : collection?.Properties.FirstOrDefault(
                     p => p.Name == propertyNameandNs.Key && p.Namespace == propertyNameandNs.Value);
+                return property;
+            }
+            catch (Exception e)
+            {
 
-            return property;
+                Console.WriteLine(e.Message);
+            }
+
+            return null;
         }
-       
+
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(TKey key)
         {
-            var collection = await FindAsync(key);
+            var collection = await FindWithProperties(key);
             return
                 collection?.Properties.ToList()
                     .Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace))
@@ -45,7 +63,7 @@ namespace DataLayer.Models.Repositories
 
         public async Task<bool> RemoveProperty(TKey key, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var collection = await FindAsync(key);
+            var collection = await FindWithProperties(key);
             var property = string.IsNullOrEmpty(propertyNameNs.Value)
                 ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key)
                 : collection?.Properties.FirstOrDefault(
@@ -66,7 +84,7 @@ namespace DataLayer.Models.Repositories
         public async Task<bool> CreateOrModifyProperty(TKey key, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var collection = await FindAsync(key);
+            var collection = await FindWithProperties(key);
             //get the property
             var property =
                 collection.Properties

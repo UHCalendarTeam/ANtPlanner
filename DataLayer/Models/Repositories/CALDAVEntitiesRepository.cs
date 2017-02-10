@@ -7,10 +7,11 @@ using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces;
 using DataLayer.Models.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Models.Repositories
 {
-    public class CaldavEntitiesRepository<TEnt> : PropertyContainerRepository<TEnt, string> where TEnt : AbstractCalendar
+    public class CaldavEntitiesRepository<TEnt> :  PropertyContainerRepository<TEnt, string> where TEnt : AbstractCalendar
     {
         public CaldavEntitiesRepository(CalDavContext context) : base(context)
         {
@@ -20,6 +21,15 @@ namespace DataLayer.Models.Repositories
         {
             InitializeStandardProperties(entity, entity.Name);
             base.Add(entity);
+        }
+
+
+        public override void AddRange(IEnumerable<TEnt> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Add(entity);
+            }
         }
 
         public virtual void InitializeStandardProperties(TEnt entity, string name)

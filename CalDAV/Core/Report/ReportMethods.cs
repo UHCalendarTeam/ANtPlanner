@@ -26,9 +26,9 @@ namespace CalDAV.Core
         public readonly ICalendarResourceRepository _resourceRepository;
         public readonly IReportPreconditions _preconditions;
 
-        public CollectionReport(IRepository<CalendarResource, string> resRepository, IReportPreconditions preconditions)
+        public CollectionReport(ICalendarResourceRepository resRepository, IReportPreconditions preconditions)
         {
-            _resourceRepository = resRepository as ICalendarResourceRepository;
+            _resourceRepository = resRepository;
             _preconditions = preconditions;
         }
 

@@ -33,13 +33,16 @@ namespace DataLayer.Models.Repositories
 
                 Console.WriteLine(exception.Message);
             }
-            Context.SaveChanges();
+        }
+
+        public virtual void AddRange(IEnumerable<TEnt> entities)
+        {
+            DbSet.AddRange(entities);
         }
 
         public virtual async Task Remove(TEnt entity)
         {
             DbSet.Remove(entity);
-            await SaveChangesAsync();
         }
 
         public virtual async Task Remove(TKey id)

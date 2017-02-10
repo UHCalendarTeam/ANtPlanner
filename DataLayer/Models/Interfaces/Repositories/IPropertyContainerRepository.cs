@@ -15,7 +15,8 @@ namespace DataLayer.Models.Interfaces.Repositories
         /// <returns></returns>
         Task<IList<Property>> GetAllProperties(TKey key);
 
-        /// <summary>
+        Task<TEnt> FindWithProperties(TKey key);
+            /// <summary>
         ///     Returns the property that match the given
         ///     property name and namespace for the given url;
         /// </summary>

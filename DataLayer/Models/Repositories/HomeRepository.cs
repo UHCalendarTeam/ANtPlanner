@@ -13,6 +13,7 @@ namespace DataLayer.Models.Repositories
     {
         public HomeRepository(CalDavContext context) : base(context)
         {
+            
         }
 
         public  CalendarHome FindWihtPropertiesAndCalendarCollections(string url)
@@ -54,12 +55,12 @@ namespace DataLayer.Models.Repositories
         }
 
         public static CalendarHome CreateCalendarHome(Principal owner)
-        {
+         {
             //check if the user is an admin user.
             //if it is the first admin user then create the public 
             //calendars
-            var create = !SystemProperties.PublicCalendarCreated;
-            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu") && create;
+            var created = SystemProperties.PublicCalendarCreated;
+            var adminUser = owner.PrincipalStringIdentifier.EndsWith("@admin.uh.cu");
 
             var fsm = new FileManagement();
             var defaultCalName = "DefaultCalendar";
@@ -93,15 +94,13 @@ namespace DataLayer.Models.Repositories
                     $"{calHome.Url}{defaultCalName}/",
                     defaultCalName, ownerProp, aclProperty)
                 {
-                    Principal = owner,
-                    CalendarHome = calHome,
-                    PrincipalId = owner.Id
-                };
-
+                   PrincipalId= owner.Id,
+                    CalendarHomeId = calHome.Id
+                                    };
 
 
             //if the principal is admin then create the public calendars
-            if (!create)
+            if (!created && adminUser)
                 CreatePublicCollections(calHome, owner, aclProperty, ownerProp);
 
 
@@ -111,7 +110,7 @@ namespace DataLayer.Models.Repositories
             {
                 fsm.CreateFolder(initCollection.Url);
                 calHome.CalendarCollections.Add(initCollection);
-                owner.CalendarCollections.Add(initCollection);
+                //owner.CalendarCollections.Add(initCollection);
             }
 
             return calHome;
@@ -130,14 +129,19 @@ namespace DataLayer.Models.Repositories
                 new CalendarCollection(
                     $"{SystemProperties.PublicCalendarHomeUrl}{calName}/", calName, ownerProp, aclProperty)
                 {
-                    Principal = owner,
-                    CalendarHome = publicCalendar
+                    PrincipalId = owner.Id,
+                    CalendarHomeId = publicCalendar.Id
                 };
 
                 fsm.CreateFolder(publicCollection.Url);
                 publicCalendar.CalendarCollections.Add(publicCollection);
+                //owner.CalendarCollections.Add(publicCollection);
             }
-            //owner.CalendarHome = publicCalendar;
+        }
+
+        public CalendarHome FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
         }
     }
 }

@@ -39,7 +39,7 @@ namespace CalDavServices
             Configuration = builder.Build();
 
             Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Warning()
+        .MinimumLevel.Information()
         .WriteTo.RollingFile(Path.Combine("appLogs", "log-{Date}.txt"))
         .CreateLogger();
             SystemProperties.AbsolutePath = env.ContentRootPath;
@@ -49,7 +49,7 @@ namespace CalDavServices
         public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services )
         {
 
             //Add Cors
@@ -71,7 +71,6 @@ namespace CalDavServices
             services.AddScoped<ICollectionReport, CollectionReport>();
             //services.AddScoped<CalDavContext>();
 
-            //change by yasmany to test
 
             #region old
 
@@ -94,32 +93,33 @@ namespace CalDavServices
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
             // add by yasmany (working in contextseed)
-            services.AddScoped<CalDavContext>();
+            //services.AddScoped<CalDavContext>();
             services.AddEntityFrameworkNpgsql().AddDbContext<CalDavContext>();
             services.AddTransient<CalDavContext>();
             services.AddTransient<DbContextSeedData>();
 
             #endregion
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. MiddleWares?
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,DbContextSeedData seeder)
-        {   //todo:remove after resolve dependency
-            //loggerFactory.AddSerilog();
-
-             //app.UseIISPlatformHandler();
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {   
+            loggerFactory.AddSerilog();
+             
+            //app.UseIISPlatformHandler();
 
             app.UseStaticFiles();
 
             ConfigureInDev(app, env);          
 
-            // app.UseCors("AllowAllOrigins");            
+            app.UseCors("AllowAllOrigins");            
             //use the authentication middleware
             app.UseAuthorization();
 
             app.UseMvc();
 
-            seeder.Seed(50);
         }
 
         /// <summary>
@@ -141,8 +141,8 @@ namespace CalDavServices
             #region SQLServer
 
             // Add framework services.
-            services.AddDbContext<CalDavContext>(options =>
-            options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
+            //services.AddDbContext<CalDavContext>(options =>
+            //options.UseSqlServer(SystemProperties.SQLServerConnectionString()));
             #endregion
 
             #region SQLite          
@@ -156,10 +156,9 @@ namespace CalDavServices
             #endregion
 
             #region Npgsql
-            //services.AddDbContext<CalDavContext>(options =>
-            //options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
+            services.AddDbContext<CalDavContext>(options =>
+            options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
             #endregion
-
 
         }
 
@@ -169,7 +168,7 @@ namespace CalDavServices
             var host = new WebHostBuilder()
               .UseKestrel()
               .UseUrls("http://localhost:5003")
-              //.UseUrls("http://192.168.99.1:5003")
+              //.UseUrls("http://192.168.0.104:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

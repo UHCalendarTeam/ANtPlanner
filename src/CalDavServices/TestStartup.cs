@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Data.Sqlite;
 using DataLayer;
+using DataLayer.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using DataLayer.Models.Entities;
@@ -43,6 +44,9 @@ namespace CalDavServices
         private async Task MockDatabase(CalDavContext _context)
         {
             #region FIlling Database
+
+            DbContextSeedData seed =new DbContextSeedData(_context);
+            seed.Seed();
 
             //FileManagement fs = new FileManagement();            
 

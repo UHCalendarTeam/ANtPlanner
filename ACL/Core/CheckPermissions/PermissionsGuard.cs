@@ -43,10 +43,10 @@ namespace ACL.Core.CheckPermissions
 
         };
 
-        public PermissionsGuard(IRepository<CalendarResource, string> resRepository, IRepository<CalendarCollection, string> calRepository)
+        public PermissionsGuard(ICalendarResourceRepository resRepository, ICollectionRepository calRepository)
         {
-            _resourceRepo = resRepository as ICalendarResourceRepository;
-            _calendarRepo = calRepository as ICollectionRepository;
+            _resourceRepo = resRepository ;
+            _calendarRepo = calRepository ;
         }
 
         /// <summary>
