@@ -32,7 +32,7 @@ namespace DataLayer.Models.Repositories
 
         public async Task<Property> GetProperty(TKey id, KeyValuePair<string, string> propertyNameandNs)
         {
-            var collection = await FindAsync(id);
+            var collection = await FindWithProperties(id);
 
             try
             {
