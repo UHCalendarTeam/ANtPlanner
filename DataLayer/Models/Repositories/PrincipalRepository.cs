@@ -159,15 +159,16 @@ namespace DataLayer.Models.Repositories
             var hashedPassword = passHasher.HashPassword(user, password);
             user.Password = hashedPassword;
 
-
-            _collectionRepository.AddRange(calHome.CalendarCollections);
-            //calHome.CalendarCollections = null;
-            //add the user and its principal to the context
-            //Context.Users.Add(user);
-            Add(principal);
+            var collection = calHome.CalendarCollections;
             calHome.CalendarCollections = null;
             _homeRepository.Add(calHome);
+
+            _collectionRepository.AddRange(collection);
+            //add the user and its principal to the context
+            //Context.Users.Add(user);
             _userRepository.Add(user);
+            Add(principal);
+            
 
             //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
             //_collectionRepository.AddRange(calHome.CalendarCollections);
@@ -178,7 +179,7 @@ namespace DataLayer.Models.Repositories
                 Context.SaveChanges();
 
             }
-            catch (NpgsqlException e)
+             catch (Exception e)
              {
                 Console.WriteLine(e.Message);
             }

@@ -112,7 +112,7 @@ namespace DataLayer
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(cl => cl.CalendarHome)
                 .WithMany(u => u.CalendarCollections)
-                .HasForeignKey(k => k.Id)
+                .HasForeignKey(k => k.CalendarHomeId)//change by yasmay
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
