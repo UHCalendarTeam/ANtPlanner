@@ -61,7 +61,13 @@ namespace DataLayer.Models.Entities.ACL
         /// <summary>
         ///     Contains the collection of the principal.
         /// </summary>
-        public ICollection<CalendarCollection> CalendarCollections => CalendarHome?.CalendarCollections;
+        //public ICollection<CalendarCollection> CalendarCollections => CalendarHome?.CalendarCollections;
+
+        public string CalendarHomeId
+        {
+            get; set;
+            
+        }
 
         /// <summary>
         /// The calendar home associated to the principal.

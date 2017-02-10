@@ -459,7 +459,7 @@ namespace CalDAV.Core
             var principal = await _principalRepository.FindAsync(principalUrl);
             var collection = new CalendarCollection(url, collectionName);
 
-            principal.CalendarCollections.Add(collection);
+            principal.CalendarHome.CalendarCollections.Add(collection);
             await _principalRepository.SaveChangesAsync();
 
             //Adding the collection folder.

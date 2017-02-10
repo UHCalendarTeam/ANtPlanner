@@ -96,12 +96,12 @@ namespace DataLayer
 
             modelBuilder.Entity<Principal>().HasAlternateKey(p => p.PrincipalUrl);
 
-            modelBuilder.Entity<CalendarCollection>()
-                .HasOne(u => u.Principal)
-                .WithMany(cl => cl.CalendarCollections)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<CalendarCollection>()
+            //    .HasOne(u => u.Principal)
+            //    .WithMany(cl => cl.CalendarCollections)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<CalendarCollection>().HasAlternateKey(c => c.Url);
+            //modelBuilder.Entity<CalendarCollection>().HasAlternateKey(c => c.Url);
 
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.CalendarCollection)
@@ -112,12 +112,12 @@ namespace DataLayer
             modelBuilder.Entity<CalendarCollection>()
                 .HasOne(cl => cl.CalendarHome)
                 .WithMany(u => u.CalendarCollections)
-                .HasForeignKey(k => k.Id)
+                .HasForeignKey(k => k.CalendarHomeId)//change by yasmay
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
 
-            modelBuilder.Entity<Property>()
+             modelBuilder.Entity<Property>()
                 .HasOne(c => c.CalendarCollection)
                 .WithMany(p => p.Properties)
                 .HasForeignKey(k => k.CalendarCollectionId);

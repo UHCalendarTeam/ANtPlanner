@@ -94,14 +94,13 @@ namespace DataLayer.Models.Repositories
                     $"{calHome.Url}{defaultCalName}/",
                     defaultCalName, ownerProp, aclProperty)
                 {
-                    Principal = owner,
-                    CalendarHome = calHome
+                   PrincipalId= owner.Id,
+                    CalendarHomeId = calHome.Id
                 };
 
 
-            //puse negacion yasmany
             //if the principal is admin then create the public calendars
-            if (!created)
+            if (!created && adminUser)
                 CreatePublicCollections(calHome, owner, aclProperty, ownerProp);
 
 
@@ -130,8 +129,8 @@ namespace DataLayer.Models.Repositories
                 new CalendarCollection(
                     $"{SystemProperties.PublicCalendarHomeUrl}{calName}/", calName, ownerProp, aclProperty)
                 {
-                    Principal = owner,
-                    CalendarHome = publicCalendar
+                    PrincipalId = owner.Id,
+                    CalendarHomeId = publicCalendar.Id
                 };
 
                 fsm.CreateFolder(publicCollection.Url);

@@ -24,6 +24,14 @@ namespace DataLayer.Models.Repositories
         }
 
 
+        public override void AddRange(IEnumerable<TEnt> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Add(entity);
+            }
+        }
+
         public virtual void InitializeStandardProperties(TEnt entity, string name)
         {
             entity.Properties.Add(new Property("calendar-timezone", SystemProperties.NamespacesValues["C"])
