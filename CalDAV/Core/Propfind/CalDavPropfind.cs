@@ -33,14 +33,14 @@ namespace CalDAV.Core.Propfind
     {
         private readonly ICollectionRepository _collectionRepository;
         private readonly ICalendarResourceRepository _resourceRespository;
-        private readonly ICalendarHomeRepository _calendarHomeRepository;
+        private readonly IHomeRepository _calendarHomeRepository;
 
-        public CalDavPropfind(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IRepository<CalendarHome, string> calendarHomeRepository )
+        public CalDavPropfind(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IHomeRepository calendarHomeRepository )
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
-            _calendarHomeRepository = calendarHomeRepository as ICalendarHomeRepository;
+            _collectionRepository = collectionRepository;
+            _resourceRespository = resourceRepository;
+            _calendarHomeRepository = calendarHomeRepository;
         }
 
         #region Home Set Collection Propfind Methods

@@ -17,13 +17,13 @@ namespace DataLayer.Models.Repositories
     public class PrincipalRepository : PropertyContainerRepository<Principal, string>, IPrincipalRepository
     {
         private ICollectionRepository _collectionRepository;
-        private ICalendarHomeRepository _homeRepository;
+        private IHomeRepository _homeRepository;
         private IUserRepository _userRepository;
 
         public PrincipalRepository(CalDavContext context) : base(context)
         {
             _collectionRepository = new  CalendarCollectionRepository(context);
-            _homeRepository = new CalendarHomeRepository(context);
+            _homeRepository = new HomeRepository(context);
             _userRepository = new UserRepository(context);
         }
 

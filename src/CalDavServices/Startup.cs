@@ -88,7 +88,7 @@ namespace CalDavServices
             services.AddScoped<ICollectionRepository, CollectionRepository>();
             services.AddScoped<ICalendarResourceRepository, ResourceRespository>();
             services.AddScoped<IPrincipalRepository, PrincipalRepository>();
-            services.AddScoped<ICalendarHomeRepository, CalendarHomeRepository>();
+            services.AddScoped<IHomeRepository, HomeRepository>();
             services.AddScoped<IPermissionChecker, PermissionsGuard>();
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
 
