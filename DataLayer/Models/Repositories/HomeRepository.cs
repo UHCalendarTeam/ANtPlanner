@@ -96,7 +96,7 @@ namespace DataLayer.Models.Repositories
                 {
                    PrincipalId= owner.Id,
                     CalendarHomeId = calHome.Id
-                };
+                                    };
 
 
             //if the principal is admin then create the public calendars

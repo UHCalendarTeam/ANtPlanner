@@ -148,7 +148,7 @@ namespace DataLayer.Models.Repositories
 
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);
-
+           
             calHome.PrincipalId = principal.Id;
             principal.CalendarHomeId = calHome.Id;
 
@@ -164,6 +164,10 @@ namespace DataLayer.Models.Repositories
             _homeRepository.Add(calHome);
 
             _collectionRepository.AddRange(collection);
+
+            principal.User = user;
+            principal.UserId = user.Id;
+
             //add the user and its principal to the context
             //Context.Users.Add(user);
             _userRepository.Add(user);
