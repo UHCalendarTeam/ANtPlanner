@@ -72,7 +72,7 @@ namespace CalDavServices
             #endregion            
 
             #region CalendarHome
-            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
+            var calHome = HomeRepository.CreateCalendarHome(principal);
 
 
             //var homeCollection = new CalendarHome("/collections/groups/public/", "PubicCollections");
