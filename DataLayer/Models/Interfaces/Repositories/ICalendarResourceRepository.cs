@@ -4,7 +4,7 @@ using DataLayer.Models.Entities.ResourcesAndCollections;
 
 namespace DataLayer.Models.Interfaces.Repositories
 {
-    public interface ICalendarResourceRepository : IPropertyContainerRepository<CalendarResource, string>
+    public interface ICalendarResourceRepository :IUrlContainerRepository<CalendarResource>, IPropertyContainerRepository<CalendarResource, string>
     {
         Task<bool> CreatePropertyForResource(CalendarResource resource, string propName, string propNs,
           string propValue, Stack<string> errorStack,

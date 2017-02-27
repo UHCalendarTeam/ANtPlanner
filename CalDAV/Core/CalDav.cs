@@ -763,10 +763,11 @@ namespace CalDAV.Core
             // the can't do anything
             var collectionUrl = url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1);
             if (!StorageManagement.ExistCalendarCollection(collectionUrl) &&
-                !await _collectionRespository.Exist(collectionUrl))
+                //todo : poner await
+                 _collectionRespository.FindUrl(collectionUrl) == null)
                 return true;
-
-            var resource = await _resourceRespository.FindAsync(url);
+            //todo poner await
+            var resource = _resourceRespository.FindUrl(url);
             //Checking that if exist an IF-Match Header the delete performs its operation
             //avoiding lost updates.
             if (ifMatchEtags.Count > 0)

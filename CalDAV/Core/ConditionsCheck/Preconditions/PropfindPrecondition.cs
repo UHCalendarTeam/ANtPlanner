@@ -39,12 +39,16 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
 
             string principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
 
-            if (calendarResourceId == null && !await _collectionRepository.Exist(url))
+            //Todo: cambiar para await;
+            var a = _collectionRepository.FindUrl(url);
+            if (calendarResourceId == null &&  a == null)
             {
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (calendarResourceId != null && !await _resourceRespository.Exist(url))
+            //todo: cambiar para que funcione el await
+            var b = _resourceRespository.FindUrl(url);
+            if (calendarResourceId != null && a == null)
             {
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;

@@ -132,5 +132,10 @@ namespace DataLayer.Models.Repositories
             DbSet.Where(cr => cr.RelatedCalendarResources.Any(rcr =>
             rcr.Id.Equals(calendarResourceId))).ToList());
         }
+
+        public CalendarResource FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.Url.Equals(url));
+        }
     }
 }
