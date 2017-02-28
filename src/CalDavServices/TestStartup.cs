@@ -99,7 +99,7 @@ namespace CalDavServices
 
             var collectionRepo = new CollectionRepository(_context);
 
-            var collectionC212 = collectionRepo.Find("/collections/groups/public/C212/");
+            var collectionC212 = collectionRepo.FindUrl("/collections/groups/public/C212/");
 
             collectionC212.CalendarResources.Add(resources[0]);
 

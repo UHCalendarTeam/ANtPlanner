@@ -310,5 +310,10 @@ namespace DataLayer.Models.Repositories
             principal.SessionId = cookieValue;
             await Context.SaveChangesAsync();
         }
+
+        public Principal FindUrl(string url)
+        {
+            return DbSet.FirstOrDefault(e => e.PrincipalUrl.Equals(url));
+        }
     }
 }

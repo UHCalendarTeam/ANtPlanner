@@ -4,7 +4,7 @@ using DataLayer.Models.Entities.Users;
 
 namespace DataLayer.Models.Interfaces.Repositories
 {
-    public interface IPrincipalRepository:IPropertyContainerRepository<Principal,string>
+    public interface IPrincipalRepository:IUrlContainerRepository<Principal>,IPropertyContainerRepository<Principal,string>
     {
         /// <summary>
         ///     Verify if the provided password match with the user's password.

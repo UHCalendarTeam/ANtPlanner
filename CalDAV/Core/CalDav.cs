@@ -199,7 +199,7 @@ namespace CalDAV.Core
             {
                 case "prop":
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
-                    var principal = _principalRepository.Find(principalUrl);
+                    var principal = _principalRepository.FindUrl(principalUrl);
                     await PropFindMethods.PropMethod(url, calendarResourceId, depth, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -281,7 +281,8 @@ namespace CalDAV.Core
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
 
                     //take the principalId from the properties
-                    var principal = await _principalRepository.FindAsync(principalUrl);
+                   //TODO:cambiar await
+                    var principal = _principalRepository.FindUrl(principalUrl);
                     await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
                     break;
                 case "allprop":
@@ -455,8 +456,8 @@ namespace CalDAV.Core
         private async Task CreateDefaultCalendar(string principalUrl, string collectionName, string url)
         {
             //Adding the collection to the database
-
-            var principal = await _principalRepository.FindAsync(principalUrl);
+            //TODO: cambiar await
+            var principal = _principalRepository.FindUrl(principalUrl);
             var collection = new CalendarCollection(url, collectionName);
 
             principal.CalendarHome.CalendarCollections.Add(collection);
@@ -837,7 +838,8 @@ namespace CalDAV.Core
                 return true;
 
             //The collection is retrieve and if something unexpected happened an internal error is reflected.
-            var collection = await _collectionRespository.FindAsync(url);
+            //TODO:cambiar await
+            var collection = _collectionRespository.FindUrl(url);
             if (collection == null)
             {
                 StorageManagement.DeleteCalendarCollection(url);
@@ -869,7 +871,8 @@ namespace CalDAV.Core
             //StorageManagement.SetUserAndCollection(principalUrl, collectionName);
             //Must return the Etag header of the COR
 
-            var calendarRes = await _resourceRespository.FindAsync(url);
+            //TODO:cambiar await
+            var calendarRes =  _resourceRespository.FindUrl(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
@@ -930,8 +933,8 @@ namespace CalDAV.Core
             PreconditionCheck = new PutPrecondition(StorageManagement, _collectionRespository, _resourceRespository, _permissionChecker, _authenticate);
             if (!await PreconditionCheck.PreconditionsOK(httpContext))
                 return;
-
-            var resourceExist = await _resourceRespository.Exist(url);
+            //TODO: cambiar por await
+            var resourceExist = _resourceRespository.FindUrl(url) != null;
             //If the ifmatch is included i look for the etag in the resource, but first the resource has to exist.
             //If all is ok and the if-match etag matches the etag in the resource then i update the resource.
             //If the if-match dont match then i set that the precondition failed.
@@ -939,7 +942,7 @@ namespace CalDAV.Core
             {
                 if (resourceExist)
                 {
-                    var resource = _resourceRespository.Find(url);
+                    var resource = _resourceRespository.FindUrl(url);
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
@@ -999,7 +1002,7 @@ namespace CalDAV.Core
             var resource = await FillResource(iCal, httpContext);
 
             //adding the resource to the db
-            var collection = _collectionRespository.Find(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+            var collection = _collectionRespository.FindUrl(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
             collection.CalendarResources.Add(resource);
 
             await _collectionRespository.SaveChangesAsync();
@@ -1104,8 +1107,9 @@ namespace CalDAV.Core
 
             var resource = new CalendarResource(url, calendarResourceId);
 
-            //add the owner property           
-            var principal = await _principalRepository.FindAsync(principalUrl);
+            //add the owner property  
+            //TODO:CAMBIaR await         
+            var principal =  _principalRepository.FindUrl(principalUrl);
 
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
