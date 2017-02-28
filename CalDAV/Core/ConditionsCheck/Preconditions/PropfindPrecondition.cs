@@ -48,7 +48,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             }
             //todo: cambiar para que funcione el await
             var b = _resourceRespository.FindUrl(url);
-            if (calendarResourceId != null && a == null)
+            if (calendarResourceId != null && b == null)
             {
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;

@@ -6,8 +6,6 @@ namespace DataLayer.Models.Interfaces.Repositories
     {
         CalendarHome FindWihtPropertiesAndCalendarCollections(string url);
 
-        CalendarHome FindWihtProperties(string url);
-
         CalendarHome FindWihtCalendarCollections(string url);
     }
 }

@@ -19,12 +19,17 @@ namespace DataLayer.Models.Repositories
 
         public async Task<IList<Property>> GetAllProperties(TKey url)
         {
-            var collection = await FindWithProperties(url);
+            var collection = await FindWithPropertiesAsync(url);
 
             return collection?.Properties.Where(p => p.IsVisible).ToList();
         }
 
-        public Task<TEnt> FindWithProperties(TKey key)
+        public virtual TEnt FindWithProperties(TKey key)
+        {
+            return DbSet.Include(p => p.Properties).FirstOrDefault(c => c.Id.Equals(key));
+        }
+
+        public virtual Task<TEnt> FindWithPropertiesAsync(TKey key)
         {
             return DbSet.Include(p => p.Properties).FirstOrDefaultAsync(c => c.Id.Equals(key));
         }
@@ -32,7 +37,7 @@ namespace DataLayer.Models.Repositories
 
         public async Task<Property> GetProperty(TKey id, KeyValuePair<string, string> propertyNameandNs)
         {
-            var collection = await FindWithProperties(id);
+            var collection = await FindWithPropertiesAsync(id);
 
             try
             {
@@ -54,7 +59,7 @@ namespace DataLayer.Models.Repositories
 
         public async Task<IList<KeyValuePair<string, string>>> GetAllPropname(TKey key)
         {
-            var collection = await FindWithProperties(key);
+            var collection = await FindWithPropertiesAsync(key);
             return
                 collection?.Properties.ToList()
                     .Select(p => new KeyValuePair<string, string>(p.Name, p.Namespace))
@@ -63,7 +68,7 @@ namespace DataLayer.Models.Repositories
 
         public async Task<bool> RemoveProperty(TKey key, KeyValuePair<string, string> propertyNameNs, Stack<string> errorStack)
         {
-            var collection = await FindWithProperties(key);
+            var collection = await FindWithPropertiesAsync(key);
             var property = string.IsNullOrEmpty(propertyNameNs.Value)
                 ? collection?.Properties.FirstOrDefault(p => p.Name == propertyNameNs.Key)
                 : collection?.Properties.FirstOrDefault(
@@ -84,7 +89,7 @@ namespace DataLayer.Models.Repositories
         public async Task<bool> CreateOrModifyProperty(TKey key, string propName, string propNs, string propValue, Stack<string> errorStack,
             bool adminPrivilege)
         {
-            var collection = await FindWithProperties(key);
+            var collection = await FindWithPropertiesAsync(key);
             //get the property
             var property =
                 collection.Properties

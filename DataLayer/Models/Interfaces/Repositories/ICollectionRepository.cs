@@ -6,8 +6,6 @@ namespace DataLayer.Models.Interfaces.Repositories
     {
          CalendarCollection FindwithCalendarResource(string url);
 
-         CalendarCollection FindwithPropeties(string url);
-
-         CalendarCollection FindwithPropetiesAndCalendarResource(string url);
+        CalendarCollection FindwithPropetiesAndCalendarResource(string url);
     }
 }

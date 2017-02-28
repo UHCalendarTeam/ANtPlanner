@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Models.Repositories
 {
-    public class CaldavEntitiesRepository<TEnt> :  PropertyContainerRepository<TEnt, string> where TEnt : AbstractCalendar
+    public class CaldavEntitiesRepository<TEnt> : PropertyContainerRepository<TEnt, string> where TEnt : AbstractCalendar
     {
         public CaldavEntitiesRepository(CalDavContext context) : base(context)
         {
@@ -77,6 +77,16 @@ namespace DataLayer.Models.Repositories
             });
             //todo: remember, the inheritance class call base ending the override.
             entity.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
+        }
+
+        public override TEnt FindWithProperties(string key)
+        {
+            return DbSet.Include(p => p.Properties).FirstOrDefault(c => c.Url.Equals(key));
+        }
+
+        public override Task<TEnt> FindWithPropertiesAsync(string key)
+        {
+            return DbSet.Include(p => p.Properties).FirstOrDefaultAsync(c => c.Url.Equals(key));
         }
     }
 }

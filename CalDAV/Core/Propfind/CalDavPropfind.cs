@@ -748,7 +748,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
 
             //this is the calendar home set collection
-            var calendarHome = _calendarHomeRepository.FindWihtProperties(url);
+            var calendarHome = _calendarHomeRepository.FindWithProperties(url);
             if (propertiesNameNamespace != null)
             {
                 foreach (var addProperty in propertiesNameNamespace)

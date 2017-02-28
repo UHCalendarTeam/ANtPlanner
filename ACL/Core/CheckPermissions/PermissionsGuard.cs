@@ -117,8 +117,8 @@ namespace ACL.Core.CheckPermissions
             //    aclP = _resourceRepo.Get(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             #endregion
             //take the acl property
-            aclP = _calendarRepo.Find(url).Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
-
+            var calendar = _calendarRepo.FindWithProperties(url);
+            aclP =calendar.Properties.FirstOrDefault(x => x.Name == "acl" && x.Namespace == "DAV:");
             var xdoc = XDocument.Parse(aclP.Value);
             XName aceName = "ace";
             var aces = xdoc.Descendants().Where(x => x.Name.LocalName == aceName).ToArray();
