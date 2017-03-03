@@ -30,7 +30,6 @@ namespace Tests
             {"CS", "http://calendarserver.org/ns/"}
         };
 
-
         public Tests()
         {
             //_client = fixture.Client;      
@@ -64,6 +63,5 @@ namespace Tests
             //todo:remove after resolve dependecy  Assert.Equal(response.StatusCode, (HttpStatusCode)207);
 
         }
-
     }
 }

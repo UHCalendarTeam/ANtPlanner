@@ -129,7 +129,7 @@ namespace CalDAV.Core
             //Taking depth form headers.
             //Depth 0 means that it looks for prop only in the collection
             //Depth 1 means that it looks in their childs too.
-            //And infinitum that looks in the entirely tree.
+            //And infinitum that looks in the enly tree.
             int depth;
             string strDepth = httpContext.Request.GetIfMatchValues();
             try
@@ -922,7 +922,7 @@ namespace CalDAV.Core
             {
                 ifNoneMatchEtags = ifnonematch.Split(',').ToList();
             }
-            string body = httpContext.Request.Body.StreamToString();
+            //string body = httpContext.Request.Body.StreamToString();
 
             #endregion
 

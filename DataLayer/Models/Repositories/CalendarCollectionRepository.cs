@@ -22,7 +22,8 @@ namespace DataLayer.Models.Repositories
 
         public CalendarCollection FindwithPropeties(string url)
         {
-            throw new System.NotImplementedException();
+            return Context.CalendarCollections.
+                Include(r => r.Properties).FirstOrDefault(c => c.Url == url);
         }
 
 

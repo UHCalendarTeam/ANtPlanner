@@ -172,13 +172,13 @@ namespace CalDavServices.Controllers
         {
             var url = Request.GetRealUrl();
             var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
-            var propertiesAndHeaders = new Dictionary<string, string>
-            {
-                {"principalUrl", principal.PrincipalUrl},
-                {"url", url},
-                {"calendarResourceId", calendarResourceId},
-                {"body", Request.Body.StreamToString()}
-            };
+            //var propertiesAndHeaders = new Dictionary<string, string>
+            //{
+            //    {"principalUrl", principal.PrincipalUrl},
+            //    {"url", url},
+            //    {"calendarResourceId", calendarResourceId},
+            //    {"body", Request.Body.StreamToString()}
+            //};
 
             var headers = Request.GetTypedHeaders();
 
@@ -190,23 +190,23 @@ namespace CalDavServices.Controllers
             }
             else
             {
-                var ifmatch = Request.Headers["If-Match"];
-                foreach (var value in ifmatch)
-                {
-                    propertiesAndHeaders.Add("If-Match", value);
-                }
+                //var ifmatch = Request.Headers["If-Match"];
+                //foreach (var value in ifmatch)
+                //{
+                //    propertiesAndHeaders.Add("If-Match", value);
+                //}
 
-                var ifnonematch = Request.Headers["If-None-Match"];
-                foreach (var value in ifnonematch)
-                {
-                    propertiesAndHeaders.Add("If-None-Match", value);
-                }
+                //var ifnonematch = Request.Headers["If-None-Match"];
+                //foreach (var value in ifnonematch)
+                //{
+                //    propertiesAndHeaders.Add("If-None-Match", value);
+                //}
 
-                var contentSize = Request.Headers["Content-Length"];
-                if (contentSize.Count > 0)
-                {
-                    propertiesAndHeaders.Add("content-length", contentSize);
-                }
+                //var contentSize = Request.Headers["Content-Length"];
+                //if (contentSize.Count > 0)
+                //{
+                //    propertiesAndHeaders.Add("content-length", contentSize);
+                //}
 
                 await CalDavRepository.AddCalendarObjectResource(HttpContext);
             }

@@ -23,7 +23,6 @@ namespace DataLayer.Models.Repositories
             base.Add(entity);
         }
 
-
         public override void AddRange(IEnumerable<TEnt> entities)
         {
             foreach (var entity in entities)

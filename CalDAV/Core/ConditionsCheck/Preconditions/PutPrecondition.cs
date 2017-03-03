@@ -24,11 +24,11 @@ namespace CalDAV.Core.ConditionsCheck
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
         public PutPrecondition(IFileManagement manager,
-            IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+            ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository;
+            _resourceRespository = resourceRepository;
             StorageManagement = manager;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
@@ -69,7 +69,8 @@ namespace CalDAV.Core.ConditionsCheck
                 return false;
             }
 
-            var creationMode = !await _resourceRespository.Exist(url);
+            //TODO: cambiar a await
+            var creationMode = _resourceRespository.FindUrl(url) == null;
             if (!PermissionCheck(url, creationMode, principalUrl, httpContext.Response))
             {
                 return false;
@@ -83,7 +84,7 @@ namespace CalDAV.Core.ConditionsCheck
                 var uid = component.FirstOrDefault()?.Properties["UID"].StringValue;
                 // var resource = db.GetCalendarResource(userEmail, collectionName, calendarResourceId);
                 var collection =
-                    _collectionRepository.Find(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                    _collectionRepository.FindwithCalendarResource(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 foreach (var calendarresource in collection.CalendarResources)
                 {
                     if (uid == calendarresource.Uid)
@@ -269,7 +270,7 @@ Method prop must not be present
             if (!string.IsNullOrEmpty(contentSize) && int.TryParse(contentSize, out contentSizeInt))
             {
                 var collection =
-                    _collectionRepository.Find(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+                    _collectionRepository.FindWithProperties(url.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
                 //here the max-resource-property of the collection is called.
                 var maxSize =
                     collection.Properties.FirstOrDefault(
