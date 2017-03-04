@@ -16,6 +16,7 @@ using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Method_Extensions;
 using DataLayer.Models.Repositories;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
@@ -1005,6 +1006,7 @@ namespace CalDAV.Core
 
             //adding the resource to the db
             var collection = _collectionRespository.FindUrl(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+            resource.CalendarCollectionId = collection.Id;
             collection.CalendarResources.Add(resource);
 
             await _collectionRespository.SaveChangesAsync();

@@ -3,7 +3,7 @@ using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using TreeForXml;
 
-namespace DataLayer
+namespace DataLayer.Models.Method_Extensions
 {
     /// <summary>
     ///     Contains useful methods for the creation

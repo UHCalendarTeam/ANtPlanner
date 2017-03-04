@@ -13,6 +13,7 @@ using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Method_Extensions;
 using DataLayer.Models.Repositories;
 
 namespace CalDavServices
