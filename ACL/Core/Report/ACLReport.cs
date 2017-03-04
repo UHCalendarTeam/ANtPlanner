@@ -20,13 +20,13 @@ namespace ACL.Core
         private readonly IPrincipalRepository _principalRepository;
         private readonly ICalendarResourceRepository _resourceRepository;
 
-        public ACLReport(IRepository<Principal, string> prinRepository,
-            IRepository<CalendarCollection, string> colRepository,
-            IRepository<CalendarResource, string> resRepository)
+        public ACLReport(IPrincipalRepository prinRepository,
+            ICollectionRepository colRepository,
+            ICalendarResourceRepository resRepository)
         {
-            _principalRepository = prinRepository as PrincipalRepository;
-           //todo:resolve _collectionRepository = _collectionRepository;
-            _resourceRepository = resRepository as ResourceRespository;
+            _principalRepository = prinRepository;
+             _collectionRepository = colRepository;
+            _resourceRepository = resRepository;
         }
 
         public async Task ProcessRequest(HttpRequest request, HttpResponse response)

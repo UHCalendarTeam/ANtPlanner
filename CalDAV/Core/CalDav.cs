@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ACL.Core;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
+using CalDAV.ConditionsCheck.Preconditions;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.Method_Extensions;
@@ -125,8 +126,7 @@ namespace CalDAV.Core
 
             string url = httpContext.Request.GetRealUrl();
 
-            //string body = httpContext.Request.Body.StreamToString();
-            string body = SystemProperties.BODY_TEM;
+            string body = httpContext.Request.Body.StreamToString();
 
             //Taking depth form headers.
             //Depth 0 means that it looks for prop only in the collection
