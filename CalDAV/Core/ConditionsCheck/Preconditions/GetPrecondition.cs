@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
-using CalDAV.Core.Method_Extensions;
+using CalDAV.Core.ConditionsCheck;
+using CalDAV.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
-using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
-namespace CalDAV.Core.ConditionsCheck
+namespace CalDAV.ConditionsCheck.Preconditions
 {
     public class GetPrecondition : IPrecondition
     {

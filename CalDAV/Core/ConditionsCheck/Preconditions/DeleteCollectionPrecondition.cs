@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
 using CalDAV.Core.Method_Extensions;
+using CalDAV.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;

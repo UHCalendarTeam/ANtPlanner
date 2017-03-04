@@ -12,6 +12,7 @@ using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
+using CalDAV.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;

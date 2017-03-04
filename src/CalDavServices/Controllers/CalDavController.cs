@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using CalDAV.Core;
 using CalDAV.Core.Method_Extensions;
+using CalDAV.Method_Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DataLayer;
@@ -83,7 +84,7 @@ namespace CalDavServices.Controllers
         [AcceptVerbs("MkCalendar", Route = "collections/{groupOrUser}/{calendarHome}/{collectionName}/")]
         public async Task MkCalendar(string groupOrUser, string calendarHome, string collectionName)
         {
-            var url = Request.GetRealUrl();
+            var url = MiscellaneousExtensions.GetRealUrl(Request);
            
             await CalDavRepository.MkCalendar(HttpContext);
         }
@@ -171,7 +172,7 @@ namespace CalDavServices.Controllers
         [HttpPut("collections/{groupOrUser}/{principalId}/{collectionName}/{calendarResourceId}")]
         public async Task Put(string groupOrUser, string principalId, string collectionName, string calendarResourceId)
         {
-            var url = Request.GetRealUrl();
+            var url = MiscellaneousExtensions.GetRealUrl(Request);
             var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
             //var propertiesAndHeaders = new Dictionary<string, string>
             //{
@@ -208,7 +209,7 @@ namespace CalDavServices.Controllers
                 //{
                 //    propertiesAndHeaders.Add("content-length", contentSize);
                 //}
-                SystemProperties.BODY_TEM = Request.Body.StreamToString();
+                SystemProperties.BODY_TEM = MiscellaneousExtensions.StreamToString(Request.Body);
                 await CalDavRepository.AddCalendarObjectResource(HttpContext);
                 SystemProperties.BODY_TEM = "";
             }
@@ -244,7 +245,7 @@ namespace CalDavServices.Controllers
         [HttpDelete("collections/{groupOrUser}/{principalId}/{collectionName}/")]
         public async Task Delete(string groupOrUser, string principalId, string collectionName)
         {
-            var url = Request.GetRealUrl();
+            var url = MiscellaneousExtensions.GetRealUrl(Request);
             
             await CalDavRepository.DeleteCalendarCollection(url, HttpContext);
         }

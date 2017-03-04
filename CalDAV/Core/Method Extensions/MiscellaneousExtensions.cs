@@ -5,7 +5,7 @@ using DataLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace CalDAV.Core.Method_Extensions
+namespace CalDAV.Method_Extensions
 {
     public static class MiscellaneousExtensions
     {

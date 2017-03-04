@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using CalDAV.Core.Method_Extensions;
+using CalDAV.Method_Extensions;
 using DataLayer;
 using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ResourcesAndCollections;
