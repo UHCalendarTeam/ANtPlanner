@@ -35,8 +35,12 @@ namespace CalDAV.Core.Method_Extensions
         /// <returns></returns>
         public static string StreamToString(this Stream stream)
         {
-            var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
+            string result = "";
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                result =reader.ReadToEnd();
+            }
+            return result;
         }
 
         /// <summary>
@@ -89,9 +93,10 @@ namespace CalDAV.Core.Method_Extensions
             var elements = url.Split('/');
             //the word collection in the url refers to a physical URL (calendar homes, collections or resources)
             //and the number 5 means that is at least a resource with 3 it is a calendar home and with 4 a collection.
-            if (url.StartsWith("collections") && elements.Length > 5)
+            if ((url.StartsWith("collections") || url.StartsWith("/collections")) && elements.Length > 5)
             {
                 collectionName = elements[4];
+                //collectionName = elements[5];
             }
             return collectionName;
         }

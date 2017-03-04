@@ -106,7 +106,7 @@ namespace DataLayer
             modelBuilder.Entity<CalendarResource>()
                 .HasOne(cl => cl.CalendarCollection)
                 .WithMany(u => u.CalendarResources)
-                .HasForeignKey(k => k.Id)
+                .HasForeignKey(k => k.CalendarCollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CalendarCollection>()

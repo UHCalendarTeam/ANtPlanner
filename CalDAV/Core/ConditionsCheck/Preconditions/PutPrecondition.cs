@@ -43,9 +43,10 @@ namespace CalDAV.Core.ConditionsCheck
             var url = httpContext.Request.GetRealUrl();
 
             var contentSize = httpContext.Request.GetContentLength();
-            var body = httpContext.Request.Body.StreamToString();
+            //var body = httpContext.Request.Body.StreamToString();
+            string body = SystemProperties.BODY_TEM;
             var principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
-
+            
             var ifMatch = httpContext.Request.GetIfMatchValues();
             var ifNoneMatch = httpContext.Request.GetIfNoneMatchValues();
             VCalendar iCalendar;

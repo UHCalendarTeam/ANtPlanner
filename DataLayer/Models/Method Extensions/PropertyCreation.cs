@@ -91,7 +91,7 @@ namespace DataLayer
             if (SystemProperties.PublicCalendarCreated)
             {
                 publicCalUrl = $"<D:href>{SystemProperties.PublicCalendarHomeUrl}</D:href>";
-            }
+            }else
             {
                 publicCalUrl="";
             }

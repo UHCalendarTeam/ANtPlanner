@@ -28,7 +28,7 @@ namespace DataLayer.Models.Interfaces.Repositories
 
         IQueryable<TEnt> Get(Expression<Func<TEnt, bool>> predicate);
 
-        Task<int> SaveChanges();
+        int SaveChanges();
 
         Task<int> SaveChangesAsync();
     }

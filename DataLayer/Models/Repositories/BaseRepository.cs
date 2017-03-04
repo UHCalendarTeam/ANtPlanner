@@ -81,14 +81,24 @@ namespace DataLayer.Models.Repositories
             return await DbSet.CountAsync();
         }
 
-        public virtual Task<int> SaveChanges()
+        public virtual int SaveChanges()
         {
-           return Context.SaveChangesAsync();
+           return Context.SaveChanges();
         }
 
         public virtual async Task<int> SaveChangesAsync()
         {
-            return await SaveChanges();
+            try
+            {
+                return await Context.SaveChangesAsync();
+
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.Message);
+            }
+            throw new NotImplementedException();
         }
     }
 }

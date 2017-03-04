@@ -56,10 +56,10 @@ namespace CalDAV.Core
             StorageManagement = fsManagement;
             _aclProfind = aclProfind;
             _colectionCollectionReport = collectionCollectionReport;
-            _collectionRespository = collectionRespository  ;
-            _principalRepository = principalRepository  ;
-            _resourceRespository = resourceRespository  ;
-            _calendarHomeRepository = calendarHomeRepository  ;
+            _collectionRespository = collectionRespository;
+            _principalRepository = principalRepository;
+            _resourceRespository = resourceRespository;
+            _calendarHomeRepository = calendarHomeRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }
@@ -124,7 +124,8 @@ namespace CalDAV.Core
 
             string url = httpContext.Request.GetRealUrl();
 
-            string body = httpContext.Request.Body.StreamToString();
+            //string body = httpContext.Request.Body.StreamToString();
+            string body = SystemProperties.BODY_TEM;
 
             //Taking depth form headers.
             //Depth 0 means that it looks for prop only in the collection
@@ -233,7 +234,7 @@ namespace CalDAV.Core
         {
             #region Extracting Properties
             string principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
-            
+
             string url = httpContext.Request.GetRealUrl();
 
             var body = httpContext.Request.Body.StreamToString();
@@ -281,7 +282,7 @@ namespace CalDAV.Core
                     var props = ExtractPropertiesNameMainNS((XmlTreeStructure)xmlTree);
 
                     //take the principalId from the properties
-                   //TODO:cambiar await
+                    //TODO:cambiar await
                     var principal = _principalRepository.FindUrl(principalUrl);
                     await PropFindMethods.CHSetPropMethod(url, props, responseTree, principal);
                     break;
@@ -750,7 +751,7 @@ namespace CalDAV.Core
 
             string ifmatch = httpContext.Request.GetIfMatchValues();
             var ifMatchEtags = new List<string>();
-     
+
             if (ifmatch != null)
                 ifMatchEtags = ifmatch.Split(',').ToList();
 
@@ -764,7 +765,7 @@ namespace CalDAV.Core
             // the can't do anything
             var collectionUrl = url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1);
             if (!StorageManagement.ExistCalendarCollection(collectionUrl) &&
-                //todo : poner await
+                 //todo : poner await
                  _collectionRespository.FindUrl(collectionUrl) == null)
                 return true;
             //todo poner await
@@ -872,7 +873,7 @@ namespace CalDAV.Core
             //Must return the Etag header of the COR
 
             //TODO:cambiar await
-            var calendarRes =  _resourceRespository.FindUrl(url);
+            var calendarRes = _resourceRespository.FindUrl(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
@@ -910,14 +911,14 @@ namespace CalDAV.Core
 
             string ifmatch = httpContext.Request.GetIfMatchValues();
             var ifMatchEtags = new List<string>();
-           
+
             if (ifmatch != null)
                 ifMatchEtags = ifmatch.Split(',').ToList();
 
 
             string ifnonematch = httpContext.Request.GetIfNoneMatchValues();
             var ifNoneMatchEtags = new List<string>();
-         
+
             if (ifnonematch != null)
             {
                 ifNoneMatchEtags = ifnonematch.Split(',').ToList();
@@ -989,7 +990,8 @@ namespace CalDAV.Core
 
             string url = httpContext.Request.GetRealUrl();
 
-            string body = httpContext.Request.Body.StreamToString();
+            //string body = httpContext.Request.Body.StreamToString();
+            string body = SystemProperties.BODY_TEM;
 
             httpContext.Response.GetTypedHeaders();
 
@@ -1030,12 +1032,13 @@ namespace CalDAV.Core
             #region Extracting Properties
 
             string url = httpContext.Request.GetRealUrl();
-            
-            string body = httpContext.Request.Body.StreamToString();
-            
+
+            //string body = httpContext.Request.Body.StreamToString();
+            string body = SystemProperties.BODY_TEM;
+
             //var headers = response.GetTypedHeaders();
 
-            #endregion  
+            #endregion
 
             //var iCal = new VCalendar(body);
 
@@ -1092,7 +1095,7 @@ namespace CalDAV.Core
             #region Extracting Properties
 
             string calendarResourceId = httpContext.Request.GetResourceId();
-           
+
             string url = httpContext.Request.GetRealUrl();
 
             string principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
@@ -1109,7 +1112,7 @@ namespace CalDAV.Core
 
             //add the owner property  
             //TODO:CAMBIaR await         
-            var principal =  _principalRepository.FindUrl(principalUrl);
+            var principal = _principalRepository.FindUrl(principalUrl);
 
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));

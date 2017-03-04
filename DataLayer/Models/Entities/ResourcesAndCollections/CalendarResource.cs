@@ -41,6 +41,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         ///     The collection where the resource is defined.
         /// </summary>
         public CalendarCollection CalendarCollection { get; set; }
+        public string CalendarCollectionId { get; set; }
 
         /// <summary>
         /// The CalendarResource have others CalendarResource related. 

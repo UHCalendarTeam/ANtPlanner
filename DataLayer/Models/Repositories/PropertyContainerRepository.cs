@@ -81,8 +81,8 @@ namespace DataLayer.Models.Repositories
                 return false;
             }
             collection?.Properties.Remove(property);
-            //await SaveChangesAsync();
-            await SaveChanges();
+            await SaveChangesAsync();
+            //await SaveChanges();
             return true;
         }
 
@@ -118,8 +118,8 @@ namespace DataLayer.Models.Repositories
 
             //if all previous conditions don't pass then the value of the property is changed.
             property.Value = propValue;
-            //await SaveChangesAsync();
-            await SaveChanges();
+            await SaveChangesAsync();
+            //await SaveChanges();
             return true;
         }
     }

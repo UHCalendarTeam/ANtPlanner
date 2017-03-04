@@ -6,6 +6,7 @@ using CalDAV.Core;
 using CalDAV.Core.Method_Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using DataLayer;
 
 namespace CalDavServices.Controllers
 {
@@ -207,8 +208,9 @@ namespace CalDavServices.Controllers
                 //{
                 //    propertiesAndHeaders.Add("content-length", contentSize);
                 //}
-
+                SystemProperties.BODY_TEM = Request.Body.StreamToString();
                 await CalDavRepository.AddCalendarObjectResource(HttpContext);
+                SystemProperties.BODY_TEM = "";
             }
         }
 
