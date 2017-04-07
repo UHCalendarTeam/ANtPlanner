@@ -1,37 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
-using CalDAV.Core.Method_Extensions;
+using CalDAV.Core.ConditionsCheck;
 using CalDAV.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
-using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
 
-namespace CalDAV.Core.ConditionsCheck
+namespace CalDAV.ConditionsCheck.Preconditions
 {
-    public class MKCalendarPrecondition : IPrecondition
+    public class MkCalendarPrecondition : IPrecondition
     {
-        private readonly CollectionRepository _collectionRepository;
+        private readonly ICollectionRepository _collectionRepository;
         private readonly IPermissionChecker _permissionChecker;
         public IFileManagement fs { get; }
         private readonly IAuthenticate _autheticate;
-        public MKCalendarPrecondition(IFileManagement fileManagement,
-            IRepository<CalendarCollection, string> collectionRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public MkCalendarPrecondition(IFileManagement fileManagement,
+            ICollectionRepository collectionRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
             fs = fileManagement;
-            _collectionRepository = collectionRepository as CollectionRepository;
+            _collectionRepository = collectionRepository;
             _permissionChecker = permissionChecker;
             _autheticate = authenticate;
         }
-
-
-
 
         public async Task<bool> PreconditionsOK(HttpContext httpContext)
         {

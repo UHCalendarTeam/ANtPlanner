@@ -363,7 +363,7 @@ namespace CalDAV.Core
 
             //propertiesAndHeaders.Add("body", body);
 
-            PreconditionCheck = new MKCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker, _authenticate);
+            PreconditionCheck = new MkCalendarPrecondition(StorageManagement, _collectionRespository, _permissionChecker, _authenticate);
             PosconditionCheck = new MKCalendarPosCondition(StorageManagement, _collectionRespository);
 
             //Checking that all precondition pass

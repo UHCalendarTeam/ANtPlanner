@@ -15,15 +15,15 @@ namespace CalDAV.ConditionsCheck.Preconditions
     public class PropfindPrecondition : IPrecondition
     {
         private readonly ICollectionRepository _collectionRepository;
-        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarResourceRepository _calendar_resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
 
-        public PropfindPrecondition(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public PropfindPrecondition(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository;
+            _calendar_resourceRespository = resourceRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }
@@ -45,7 +45,7 @@ namespace CalDAV.ConditionsCheck.Preconditions
                 return false;
             }
             //todo: cambiar para que funcione el await
-            var b = _resourceRespository.FindUrl(url);
+            var b = _calendar_resourceRespository.FindUrl(url);
             if (calendarResourceId != null && b == null)
             {
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
