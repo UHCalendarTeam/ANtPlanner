@@ -19,15 +19,15 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
     public class DeleteResourcePrecondition : IPrecondition
     {
         private readonly ICollectionRepository _collectionRepository;
-        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarResourceRepository _calendar_resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate; 
 
-        public DeleteResourcePrecondition(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public DeleteResourcePrecondition(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository;
+            _calendar_resourceRespository = resourceRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }

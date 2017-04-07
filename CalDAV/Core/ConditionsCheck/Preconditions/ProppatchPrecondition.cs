@@ -1,31 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
-using CalDAV.Core.Method_Extensions;
+using CalDAV.Core.ConditionsCheck;
 using CalDAV.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
-using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
-namespace CalDAV.Core.ConditionsCheck.Preconditions
+namespace CalDAV.ConditionsCheck.Preconditions
 {
     public class ProppatchPrecondition : IPrecondition
     {
         private readonly ICollectionRepository _collectionRepository;
-        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarResourceRepository _calendarResourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
 
-        public ProppatchPrecondition(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public ProppatchPrecondition(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository calendarResourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository;
+            _calendarResourceRespository = calendarResourceRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }
@@ -43,7 +39,7 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;
             }
-            if (calendarResourceId != null && !await _resourceRespository.Exist(url))
+            if (calendarResourceId != null && !await _calendarResourceRespository.Exist(url))
             {
                 httpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return false;

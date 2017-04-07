@@ -1,33 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
-using CalDAV.Core.Method_Extensions;
+using CalDAV.Core.ConditionsCheck;
 using CalDAV.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
-using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
 
-namespace CalDAV.Core.ConditionsCheck.Preconditions
+namespace CalDAV.ConditionsCheck.Preconditions
 {
     public class DeleteCollectionPrecondition:IPrecondition
     {
         private readonly ICollectionRepository _collectionRepository;
-        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarResourceRepository _calendar_resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
 
-        public DeleteCollectionPrecondition(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public DeleteCollectionPrecondition(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository;
+            _calendar_resourceRespository = resourceRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }
@@ -39,8 +32,6 @@ namespace CalDAV.Core.ConditionsCheck.Preconditions
             string principalUrl = (await _authenticate.AuthenticateRequestAsync(httpContext))?.PrincipalUrl;
             
             return PermissionCheck(url, principalUrl, httpContext.Response);
-
-
         }
         private bool PermissionCheck(string url, string principalUrl, HttpResponse response)
         {

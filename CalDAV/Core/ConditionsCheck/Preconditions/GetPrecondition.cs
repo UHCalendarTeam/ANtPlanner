@@ -14,15 +14,15 @@ namespace CalDAV.ConditionsCheck.Preconditions
     public class GetPrecondition : IPrecondition
     {
         private readonly ICollectionRepository _collectionRepository;
-        private readonly ICalendarResourceRepository _resourceRespository;
+        private readonly ICalendarResourceRepository _calendar_resourceRespository;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
 
-        public GetPrecondition(IRepository<CalendarCollection, string> collectionRepository,
-            IRepository<CalendarResource, string> resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public GetPrecondition(ICollectionRepository collectionRepository,
+            ICalendarResourceRepository resourceRepository, IPermissionChecker permissionChecker, IAuthenticate authenticate)
         {
-            _collectionRepository = collectionRepository as ICollectionRepository;
-            _resourceRespository = resourceRepository as ICalendarResourceRepository;
+            _collectionRepository = collectionRepository ;
+            _calendar_resourceRespository = resourceRepository;
             _permissionChecker = permissionChecker;
             _authenticate = authenticate;
         }
@@ -38,7 +38,7 @@ namespace CalDAV.ConditionsCheck.Preconditions
                 httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
             }
-            if (!await _resourceRespository.Exist(url))
+            if (!await _calendar_resourceRespository.Exist(url))
             {
                 httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 return false;
