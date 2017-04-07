@@ -124,7 +124,12 @@ namespace DataLayer.Models.Method_Extensions
         }
 
         /// <summary>
-        ///     Create a property instance with the given values
+        ///     Create a property instance with
+        /// 
+        /// 
+        /// 
+        /// 
+        ///  the given values
         /// </summary>
         /// <param name="nodeName">The name for the node. ej:displayname</param>
         /// <param name="nodePrefix">The ns prefix of the node. ej: the prefix of DAV: is D, so pass D</param>

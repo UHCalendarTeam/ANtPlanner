@@ -247,7 +247,8 @@ namespace CalDAV.Core
             //witch contains a "response" element for each collection and resource analized witch url is included in a "href" element as a child of "response".
             //As a child of the "response" there is a list of "propstat". One for each different status obtained
             //trying to get the specified properties.
-            //Inside every "propstatus" there are a xml element "prop" with all the properties that match with
+            //Inside every "propstatus" there are a xml element "prop" 
+            //all the properties that match with
             //the given "status" and a "status" xml containing the message of his "propstat".
 
             ////checking Precondtions

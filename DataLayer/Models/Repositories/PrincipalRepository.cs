@@ -41,7 +41,10 @@ namespace DataLayer.Models.Repositories
         }
 
         /// <summary>
-        ///     Verify if the provided password match with the user's password.
+        ///     Verify if the provided password match with
+        /// 
+        /// 
+        ///  the user's password.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="userEmail">The user email (this is out username)</param>

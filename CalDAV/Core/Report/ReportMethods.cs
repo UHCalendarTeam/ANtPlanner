@@ -69,7 +69,12 @@ namespace CalDAV.Core
                     break;
                 default:
                     throw new NotImplementedException(
-                        $"The REPORT request {xmlBody.NodeName} with ns equal to {xmlBody.MainNamespace} is not implemented yet .");
+                        $"The REPORT request {xmlBody.NodeName} " +
+                        $"with" +
+                        $"" +
+                        $"" +
+                        $"" +
+                        $" ns equal to {xmlBody.MainNamespace} is not implemented yet .");
             }
         }
 

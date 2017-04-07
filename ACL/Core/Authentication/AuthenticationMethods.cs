@@ -29,7 +29,11 @@ namespace ACL.Core.Authentication
         ///     Check if the user exist in the system, if does then check if the authentication
         ///     credential are OK.
         ///     If dont then take the user data from UH apis and create the user in the
-        ///     system with this data.
+        ///     system with
+        /// 
+        /// 
+        /// 
+        ///  this data.
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>

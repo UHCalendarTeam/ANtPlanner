@@ -17,18 +17,18 @@ namespace DataLayer.Models.Repositories
             
         }
 
-        public  CalendarHome FindWihtPropertiesAndCalendarCollections(string url)
+        public  CalendarHome FindWithPropertiesAndCalendarCollections(string url)
         {
             return Context.CalendarHomeCollections.Include(p => p.Properties).
               Include(r => r.CalendarCollections).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == url);
         }
 
-        public CalendarHome FindWihtProperties(string url)
+        public override CalendarHome FindWithProperties(string url)
         {
             return Context.CalendarHomeCollections.Include(p => p.Properties).FirstOrDefault(c => c.Url == url);
         }
 
-        public  CalendarHome FindWihtCalendarCollections(string url)
+        public  CalendarHome FindWithCalendarCollections(string url)
         {
             return Context.CalendarHomeCollections.
               Include(r => r.CalendarCollections).ThenInclude(rp => rp.Properties).FirstOrDefault(c => c.Url == url);
