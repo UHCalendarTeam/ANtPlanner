@@ -522,6 +522,7 @@ namespace CalDAV.Core
             IXMLTreeStructure xmlTree;
             try
             {
+               
                 xmlTree = XmlTreeStructure.Parse(body);
             }
             catch (Exception)
