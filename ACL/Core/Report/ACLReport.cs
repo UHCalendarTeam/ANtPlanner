@@ -115,7 +115,7 @@ namespace ACL.Core
             //take all the principals with its url equal to the givens
             foreach (var pUrl in principalsURLs)
             {
-                var principal = _principalRepository.Find(pUrl.Value);
+                var principal = _principalRepository.FindUrl(pUrl.Value);
                 if (principal != null)
                     principals.Add(principal, null);
             }
@@ -142,7 +142,7 @@ namespace ACL.Core
             HttpResponse response)
         {
             //take the collection with the given href
-            var col = _collectionRepository.Find(href);
+            var col = _collectionRepository.FindUrl(href);
 
             //if the collection doesnt exit then return an error
             if (col == null)
