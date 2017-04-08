@@ -947,7 +947,8 @@ namespace CalDAV.Core
             {
                 if (resourceExist)
                 {
-                    var resource = _resourceRespository.FindUrl(url);
+                    var resource = _resourceRespository.FindWithProperties(url);
+                    
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;

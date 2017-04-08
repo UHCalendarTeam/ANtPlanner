@@ -596,7 +596,7 @@ namespace CalDAV.Core.Propfind
                         }
                         propertiesCol.Add((XmlTreeStructure)prop);
                     }
-                    //take the acl property
+                    //take the acl property   ////////////problem to resource is null
                     aclProperty = resource.Properties.FirstOrDefault(x => x.Name == "acl");
                 }
             }

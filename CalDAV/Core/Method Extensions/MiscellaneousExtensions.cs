@@ -95,9 +95,11 @@ namespace CalDAV.Method_Extensions
             //and the number 5 means that is at least a resource with 3 it is a calendar home and with 4 a collection.
             if ((url.StartsWith("collections") || url.StartsWith("/collections")) && elements.Length > 5)
             {
-                collectionName = elements[4];
-                //collectionName = elements[5];
+                //collectionName = elements[4];
+                collectionName = elements[5];
             }
+            if (collectionName.Equals(""))
+                return null;
             return collectionName;
         }
 
