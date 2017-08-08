@@ -4,6 +4,7 @@ using ACL.Core.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using CalDAV.Method_Extensions;
 
 namespace CalDavServices.Middlewares
 {
@@ -29,6 +30,10 @@ namespace CalDavServices.Middlewares
         public async Task Invoke(HttpContext context)
         {
             _logger.LogInformation("Handling authorization in resource: " + context.Request.Path);
+
+            //var requestStream = context.Request.Body
+           // string requestString = context.Request.Body.StreamToString();
+            //_logger.LogInformation($"ReguestBody: {requestString}");
             var principal = _authenticate.AuthenticateRequest(context);
 
             if (principal == null)
@@ -40,7 +45,11 @@ namespace CalDavServices.Middlewares
             _logger.LogInformation($"Authorization granted for principal: {principal.PrincipalStringIdentifier}");
             await _next.Invoke(context);
 
+           //l string responseString = context.Response.Body.StreamToString();
+           // _logger.LogInformation($"ReguestBody: {responseString}");
+
             _logger.LogInformation("Finished handling request.");
+
         }
     }
 }

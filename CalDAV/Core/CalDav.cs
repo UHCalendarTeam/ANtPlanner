@@ -877,7 +877,7 @@ namespace CalDAV.Core
             //Must return the Etag header of the COR
 
             //TODO:cambiar await
-            var calendarRes = _resourceRespository.FindUrl(url);
+            var calendarRes = _resourceRespository.FindWithProperties(url);
 
             if (calendarRes == null || !StorageManagement.ExistCalendarObjectResource(url))
             {
