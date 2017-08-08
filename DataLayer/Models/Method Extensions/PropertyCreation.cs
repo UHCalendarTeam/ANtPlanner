@@ -87,15 +87,9 @@ namespace DataLayer.Models.Method_Extensions
 
         public static Property CreateCalHomeSetWithHref(string href)
         {
-            string publicCalUrl;
-            if (SystemProperties.PublicCalendarCreated)
-            {
-                publicCalUrl = $"<D:href>{SystemProperties.PublicCalendarHomeUrl}</D:href>";
-            }else
-            {
-                publicCalUrl="";
-            }
-            
+            var publicCalUrl = SystemProperties.PublicCalendarCreated
+                 ? $"<D:href>{SystemProperties.PublicCalendarHomeUrl}</D:href>"
+                 : "";
             var property = new Property("calendar-home-set", "urn:ietf:params:xml:ns:caldav")
             {
                 Value = $"<C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\" xmlns:D=\"DAV:\">" +
