@@ -192,6 +192,8 @@ namespace DataLayer.Models.Repositories
                 Console.WriteLine(e.Message);
             }
 
+            principal.CalendarHome = calHome;
+            
             return principal;
         }
 

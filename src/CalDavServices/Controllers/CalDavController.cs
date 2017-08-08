@@ -184,7 +184,6 @@ namespace CalDavServices.Controllers
 
             var headers = Request.GetTypedHeaders();
 
-
             if (headers.ContentType != null && !string.IsNullOrEmpty(headers.ContentType.MediaType) &&
                 headers.ContentType.MediaType != "text/calendar")
             {
