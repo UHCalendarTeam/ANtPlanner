@@ -233,8 +233,6 @@ namespace DataLayer
             return @"User ID=postgres;Password=draco;Host=localhost;Port=5432;Database=UHCalendar;Pooling=true;";
         }
         #endregion
-
-
         //TODO:temporar hasta que me digan como cambiarlo.
          public static string BODY_TEM { get; set; }
     }
