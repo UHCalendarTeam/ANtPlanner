@@ -230,11 +230,9 @@ namespace DataLayer
 
         public static string NpgsqlConnectionString()
         {
-            return @"User ID=postgres;Password=Adarosa9103;Host=localhost;Port=5432;Database=UHCalendar;Pooling=true;";
+            return @"User ID=postgres;Password=1234;Host=localhost;Port=5432;Database=UHCalendar;Pooling=true;";
         }
         #endregion
-
-
         //TODO:temporar hasta que me digan como cambiarlo.
          public static string BODY_TEM { get; set; }
     }

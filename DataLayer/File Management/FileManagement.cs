@@ -130,7 +130,13 @@ namespace DataLayer
                 var fileName = file.Substring(lstIndex + 1);
                 var temp = await GetCalendarObjectResource(file);
                 if (temp != null)
-                    calendarObjectResources.Add(path + fileName, temp);
+                {
+                    var retUrl = path + fileName;
+                    retUrl = retUrl.Replace(Path.DirectorySeparatorChar, '/');
+
+                    calendarObjectResources.Add(retUrl, temp);
+                }
+                    
             }
             return true;
         }

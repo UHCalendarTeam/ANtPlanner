@@ -72,7 +72,7 @@ namespace CalDavServices.Controllers
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
             Response.StatusCode = 207;
-
+            string strDepth = HttpContext.Request.GetIfMatchValues();
             await CalDavRepository.ACLProfind(HttpContext);
         }
 
@@ -99,7 +99,7 @@ namespace CalDavServices.Controllers
         public async Task CollectionRootProfind(string groupOrUser, string principalId)
         {
             Response.ContentType = @"application/xml; charset=""utf-8""";
-            
+            string strDepth = HttpContext.Request.GetIfMatchValues();
             await CalDavRepository.CHSetPropfind(HttpContext);
         }
 
@@ -108,8 +108,8 @@ namespace CalDavServices.Controllers
         public async Task PropFind(string groupOrUser, string principalId, string collectionName)
         {
             //var principal = await _authenticate.AuthenticateRequestAsync(HttpContext);
-            Response.ContentType = @"application/xml; charset=""utf-8""";            
-
+            Response.ContentType = @"application/xml; charset=""utf-8""";
+            string strDepth = HttpContext.Request.GetIfMatchValues();
             await CalDavRepository.PropFind(HttpContext);
         }
 
