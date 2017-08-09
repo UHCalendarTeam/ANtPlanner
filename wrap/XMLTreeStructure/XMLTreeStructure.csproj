@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>dnx451</TargetFramework>
+    <AssemblyName>XMLTreeStructure</AssemblyName>
+    <PackageId>XMLTreeStructure</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'dnx451' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

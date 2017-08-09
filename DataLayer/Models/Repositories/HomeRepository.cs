@@ -101,7 +101,7 @@ namespace DataLayer.Models.Repositories
 
 
             //if the principal is admin then create the public calendars
-            if (!created && adminUser)
+            if (created && adminUser)
                 CreatePublicCollections(calHome, owner, aclProperty, ownerProp);
 
 
