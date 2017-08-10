@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.Entities.ACL;
 
 namespace DataLayer.Models.Entities.ResourcesAndCollections
 {
@@ -26,5 +27,9 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         {
             CalendarCollections = new List<CalendarCollection>();
         }
+
+        public Principal Principal { get; set; }
+
+        public string PrincipalId {get;set;}
     }
 }

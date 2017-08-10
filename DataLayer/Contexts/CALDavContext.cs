@@ -29,7 +29,7 @@ namespace DataLayer
         public CalDavContext(DbContextOptions options)
             : base(options)
         {
-           // Database.EnsureCreated();
+            // Database.EnsureCreated();
         }
 
         /// <summary>
@@ -96,6 +96,11 @@ namespace DataLayer
 
             modelBuilder.Entity<Principal>().HasAlternateKey(p => p.PrincipalUrl);
 
+            modelBuilder.Entity<Principal>()
+            .HasOne(p => p.CalendarHome)
+            .WithOne(i => i.Principal)
+            .HasForeignKey<CalendarHome>(c => c.PrincipalId);
+
             //modelBuilder.Entity<CalendarCollection>()
             //    .HasOne(u => u.Principal)
             //    .WithMany(cl => cl.CalendarCollections)
@@ -117,10 +122,10 @@ namespace DataLayer
 
             modelBuilder.Entity<CalendarResource>().HasAlternateKey(c => c.Href);
 
-             modelBuilder.Entity<Property>()
-                .HasOne(c => c.CalendarCollection)
-                .WithMany(p => p.Properties)
-                .HasForeignKey(k => k.CalendarCollectionId);
+            modelBuilder.Entity<Property>()
+               .HasOne(c => c.CalendarCollection)
+               .WithMany(p => p.Properties)
+               .HasForeignKey(k => k.CalendarCollectionId);
 
             modelBuilder.Entity<Property>()
                 .HasOne(r => r.CalendarResource)
