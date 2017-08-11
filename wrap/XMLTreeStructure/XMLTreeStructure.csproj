@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net451</TargetFramework>
     <AssemblyName>XMLTreeStructure</AssemblyName>
     <PackageId>XMLTreeStructure</PackageId>
   </PropertyGroup>
