@@ -10,12 +10,9 @@ using ACL.Core.CheckPermissions;
 using CalDAV.ConditionsCheck.Preconditions;
 using CalDAV.Core.ConditionsCheck;
 using CalDAV.Core.ConditionsCheck.Preconditions;
-using CalDAV.Core.Method_Extensions;
 using CalDAV.Core.Propfind;
 using CalDAV.Method_Extensions;
 using DataLayer;
-using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
 using DataLayer.Models.Method_Extensions;
@@ -23,7 +20,6 @@ using DataLayer.Models.Repositories;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -525,7 +521,7 @@ namespace CalDAV.Core
             IXMLTreeStructure xmlTree;
             try
             {
-               
+
                 xmlTree = XmlTreeStructure.Parse(body);
             }
             catch (Exception)
@@ -950,7 +946,7 @@ namespace CalDAV.Core
                 if (resourceExist)
                 {
                     var resource = _resourceRespository.FindWithProperties(url);
-                    
+
                     var resourceEtag =
                         XmlTreeStructure.Parse(resource.Properties.FirstOrDefault(x => x.Name == "getetag")?.Value)
                             .Value;
@@ -1009,7 +1005,7 @@ namespace CalDAV.Core
 
             //filling the resource
             var resource = await FillResource(iCal, httpContext);
-            
+
 
             //adding the resource to the db
             var collection = _collectionRespository.FindWithProperties(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
@@ -1049,14 +1045,9 @@ namespace CalDAV.Core
 
             #endregion
 
-            //var iCal = new VCalendar(body);
-
-            //Fill the resource
-            //var resource = FillResource(propertiesAndHeaders, iCal, response);
-
+            // calculate etag that will notice a change in the resource
             var etag = $"\"{Guid.NewGuid()}\"";
             httpContext.Response.Headers["etag"] = etag;
-            //headers.ETag = new EntityTagHeaderValue(etag, false);
 
             var errorStack = new Stack<string>();
 
@@ -1113,30 +1104,23 @@ namespace CalDAV.Core
 
             #endregion
 
-            // calculate etag that will notice a change in the resource
-            var etag = $"\"{Guid.NewGuid()}\"";
+            var resource = new CalendarResource(url, calendarResourceId);
+            ((CalendarResourceRespository)_resourceRespository).InitializeStandardProperties(resource, resource.Name);
+            //getting the etag generated in order to added to the httpResponse
+            var etagValue = resource.Properties.First(p => p.Name == "getetag").Value;
+            var etag = etagValue.Substring(etagValue.Length - 49, Guid.NewGuid().ToString().Length);
             httpContext.Response.Headers["etag"] = etag;
 
-            var resource = new CalendarResource(url, calendarResourceId);
-            ((CalendarResourceRespository)_resourceRespository).InitializeStandardProperties(resource,resource.Name);
+
             //add the owner property  
             //TODO:CAMBIaR await         
             var principal = _principalRepository.FindUrl(principalUrl);
-            
+
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateSupportedPrivilegeSetForResources());
-
-            // await _resourceRespository.Add(resource);
-
-            //adding the calculated etag in the getetag property of the resource
-            var errorStack = new Stack<string>();
-            await
-                _resourceRespository.CreatePropertyForResource(resource, "getetag", "DAV:",
-                    $"<D:getetag {_namespaces["D"]}>{etag}</D:getetag>",
-                    errorStack, true);
-
+            
             //updating the ctag of the collection noticing this way that the collection has changed.
             var stack = new Stack<string>();
             await
