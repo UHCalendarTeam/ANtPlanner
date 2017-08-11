@@ -4,6 +4,7 @@ using System.Text;
 using DataLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
 
 namespace CalDAV.Method_Extensions
 {
@@ -117,6 +118,20 @@ namespace CalDAV.Method_Extensions
             }
             return null;
         }
+
+        /// <summary>
+        /// Returns the Depth values from the headers of the Request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string GetDepthValues(this HttpRequest request)
+        {
+            StringValues result;
+            if (request.Headers.TryGetValue("Depth", out result))
+               return result[0].ToString();
+            return null;
+        }
+
 
         /// <summary>
         /// Returns the If-None-Match values from the headers of the Request.

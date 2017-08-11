@@ -124,7 +124,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.FindUrl(url);
+                var collection = _collectionRepository.FindwithCalendarResource(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -175,7 +175,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.FindUrl(url);
+                var collection = _collectionRepository.FindwithPropetiesAndCalendarResource(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -217,7 +217,7 @@ namespace CalDAV.Core.Propfind
 
             if (calendarResourceId == null && depth == 1 || depth == -1)
             {
-                var collection = _collectionRepository.FindUrl(url);
+                var collection = _collectionRepository.FindwithCalendarResource(url);
 
                 foreach (var calendarResource in collection.CalendarResources)
                 {
@@ -550,7 +550,7 @@ namespace CalDAV.Core.Propfind
             //retrieve.
             if (calendarResourceId == null)
             {
-                collection = _collectionRepository.FindUrl(url);
+                collection = _collectionRepository.FindWithProperties(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
@@ -576,7 +576,7 @@ namespace CalDAV.Core.Propfind
             }
             else
             {
-                resource = _resourceRespository.FindUrl(url);
+                resource = _resourceRespository.FindWithProperties(url);
                 if (propertiesNameNamespace != null)
                 {
                     foreach (var addProperty in propertiesNameNamespace)
