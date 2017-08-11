@@ -23,6 +23,7 @@ using DataLayer.Models.Repositories;
 using ICalendar.Calendar;
 using ICalendar.GeneralInterfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using TreeForXml;
 
 namespace CalDAV.Core
@@ -134,7 +135,7 @@ namespace CalDAV.Core
             //Depth 1 means that it looks in their childs too.
             //And infinitum that looks in the enly tree.
             int depth;
-            string strDepth = httpContext.Request.GetIfMatchValues();
+            string strDepth = httpContext.Request.GetDepthValues();
             try
             {
                 depth = strDepth != null ? int.Parse(strDepth) : 0;
@@ -143,6 +144,7 @@ namespace CalDAV.Core
             {
                 depth = -1;
             }
+
 
             #endregion
 
@@ -1007,9 +1009,10 @@ namespace CalDAV.Core
 
             //filling the resource
             var resource = await FillResource(iCal, httpContext);
+            
 
             //adding the resource to the db
-            var collection = _collectionRespository.FindUrl(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
+            var collection = _collectionRespository.FindWithProperties(url?.Remove(url.LastIndexOf("/", StringComparison.Ordinal) + 1));
             resource.CalendarCollectionId = collection.Id;
             collection.CalendarResources.Add(resource);
 
@@ -1115,11 +1118,11 @@ namespace CalDAV.Core
             httpContext.Response.Headers["etag"] = etag;
 
             var resource = new CalendarResource(url, calendarResourceId);
-
+            ((CalendarResourceRespository)_resourceRespository).InitializeStandardProperties(resource,resource.Name);
             //add the owner property  
             //TODO:CAMBIaR await         
             var principal = _principalRepository.FindUrl(principalUrl);
-
+            
 
             resource.Properties.Add(PropertyCreation.CreateOwner(principalUrl));
             resource.Properties.Add(PropertyCreation.CreateAclPropertyForUserCollections(principalUrl));

@@ -23,7 +23,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
 
         public CalendarResource(string url, string name, params Property[] properties) : this(url, name)
         {
-
+          
         }
 
         /// <summary>
