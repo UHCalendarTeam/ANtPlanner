@@ -1106,6 +1106,7 @@ namespace CalDAV.Core
 
             var resource = new CalendarResource(url, calendarResourceId);
             ((CalendarResourceRespository)_resourceRespository).InitializeStandardProperties(resource, resource.Name);
+
             //getting the etag generated in order to added to the httpResponse
             var etagValue = resource.Properties.First(p => p.Name == "getetag").Value;
             var etag = etagValue.Substring(etagValue.Length - 49, Guid.NewGuid().ToString().Length);

@@ -6,7 +6,6 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>CalDAV</AssemblyName>
     <PackageId>CalDAV</PackageId>
-    <RuntimeFrameworkVersion>1.1.0</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
