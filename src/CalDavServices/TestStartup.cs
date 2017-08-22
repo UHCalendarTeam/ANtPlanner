@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Data.Sqlite;
 using DataLayer;
 using DataLayer.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
-using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
@@ -42,11 +38,11 @@ namespace CalDavServices
                 optionsBuilder => optionsBuilder.UseInMemoryDatabase());
         }
 
-        private async Task MockDatabase(CalDavContext _context)
+        private async Task MockDatabase(CalDavContext context)
         {
            #region FIlling Database
 
-            DbContextSeedData seed =new DbContextSeedData(_context);
+            DbContextSeedData seed =new DbContextSeedData(context);
             seed.Seed();
 
             //FileManagement fs = new FileManagement();            
@@ -73,7 +69,7 @@ namespace CalDavServices
             #endregion            
 
             #region CalendarHome
-            var calHome = HomeRepository.CreateCalendarHome(principal);
+            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
 
 
             //var homeCollection = new CalendarHome("/collections/groups/public/", "PubicCollections");
@@ -92,19 +88,19 @@ namespace CalDavServices
 
 
             //user.Resources = resources;
-            _context.Users.Add(user);
-            _context.Principals.Add(principal);
-            _context.CalendarHomeCollections.Add(calHome);
-            _context.CalendarCollections.AddRange(calHome.CalendarCollections);
-            await _context.SaveChangesAsync();
+            context.Users.Add(user);
+            context.Principals.Add(principal);
+            context.CalendarHomeCollections.Add(calHome);
+            context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            await context.SaveChangesAsync();
 
-            var collectionRepo = new CollectionRepository(_context);
+            var collectionRepo = new CollectionRepository(context);
 
             var collectionC212 = collectionRepo.FindUrl("/collections/groups/public/C212/");
 
             collectionC212.CalendarResources.Add(resources[0]);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
 
             #endregion

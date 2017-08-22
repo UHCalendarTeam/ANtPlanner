@@ -27,6 +27,7 @@ namespace CalDAV.Core.Propfind
         /// <param name="depth">Depth that method should hit</param>
         /// <param name="propertiesReq">List with all the properties to retrieve</param>
         /// <param name="multistatusTree">Response structure, element to be fill</param>
+        /// <param name="principal"></param>
         /// <returns></returns>
         Task PropMethod(string url, string calendarResourceId, int? depth,
             List<KeyValuePair<string, string>> propertiesReq, XmlTreeStructure multistatusTree, Principal principal);

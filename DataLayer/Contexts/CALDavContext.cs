@@ -26,7 +26,7 @@ namespace DataLayer
             // Database.EnsureCreated();
         }
 
-        public CalDavContext(DbContextOptions options)
+        public CalDavContext(DbContextOptions<CalDavContext> options)
             : base(options)
         {
             // Database.EnsureCreated();

@@ -4,7 +4,6 @@
     <Authors>UHCalendarTeam</Authors>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>DataLayer</AssemblyName>
-    <OutputType>Exe</OutputType>
     <PackageId>DataLayer</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>

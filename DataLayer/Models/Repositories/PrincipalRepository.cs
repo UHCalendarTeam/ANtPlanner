@@ -24,7 +24,7 @@ namespace DataLayer.Models.Repositories
         public PrincipalRepository(CalDavContext context) : base(context)
         {
             _collectionRepository = new  CalendarCollectionRepository(context);
-            _homeRepository = new HomeRepository(context);
+            _homeRepository = new CalendarHomeRepository(context);
             _userRepository = new UserRepository(context);
         }
 
@@ -148,7 +148,7 @@ namespace DataLayer.Models.Repositories
 
 
             //create the cal home for the principal
-            var calHome = HomeRepository.CreateCalendarHome(principal);
+            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
 
             var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
             principal.Properties.Add(calHomeSet);

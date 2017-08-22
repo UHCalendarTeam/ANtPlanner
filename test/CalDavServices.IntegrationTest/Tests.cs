@@ -1,5 +1,4 @@
-﻿//todo:remove after resolve dependecy using CalDavServices;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Xunit;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Headers;
+using CalDavServices;
 
 namespace Tests
 {
@@ -34,19 +34,19 @@ namespace Tests
         {
             //_client = fixture.Client;      
             _server = new TestServer(new WebHostBuilder()
-                                    //todo:remove after resolve dependecy    .UseStartup<TestStartup>()
+                                    .UseStartup<TestStartup>()
                                     .UseEnvironment("Development"));
             _client = _server.CreateClient();
            // _context = new CalDavContext();
             //var controller = new CalDavController();
         }
 
-         [Fact]
-        public async Task MkCalendarTest()
-        {
-            var response = await _client.GetAsync("");
-            //todo:remove after resolve dependecy Assert.True(true);
-        }
+//         [Fact]
+//        public async Task MkCalendarTest()
+//        {
+//            var response = await _client.GetAsync("");
+//           Assert.True(true);
+//        }
 
          [Fact]
         public async Task PropfindPropnameTest()
@@ -56,11 +56,11 @@ namespace Tests
 <D:propfind xmlns:D=""DAV:"">
    <propname/>
 </D:propfind>");
-            request.Headers.Add("Authorization", "Basic YWRtaW5AYWRtaW4udWguY3U6YWRtaW4=");
+            request.Headers.Add("Authorization", "Basic YWRtaW5AYWRtaW4udWguY3U6MTIzNA==");
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
 
             var response = await _client.SendAsync(request);
-            //todo:remove after resolve dependecy  Assert.Equal(response.StatusCode, (HttpStatusCode)207);
+            Assert.Equal(response.StatusCode, (HttpStatusCode)207);
 
         }
     }

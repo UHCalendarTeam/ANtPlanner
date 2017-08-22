@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Models.Repositories
 {
-    public class HomeRepository : CaldavEntitiesRepository<CalendarHome>,IHomeRepository
+    public class CalendarHomeRepository : CaldavEntitiesRepository<CalendarHome>,IHomeRepository
     {
-        public HomeRepository(CalDavContext context) : base(context)
+        public CalendarHomeRepository(CalDavContext context) : base(context)
         {
             
         }
