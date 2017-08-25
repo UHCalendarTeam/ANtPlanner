@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ASPNET_Core_1_0.Models;
+using DataLayer.Models.Identity;
 
 namespace ASPNET_Core_1_0.Data
 {

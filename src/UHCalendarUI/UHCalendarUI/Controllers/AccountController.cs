@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 using ASPNET_Core_1_0.Models;
 using ASPNET_Core_1_0.Models.AccountViewModels;
 using ASPNET_Core_1_0.Services;
+using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Identity;
+using DataLayer.Models.Interfaces.Repositories;
 
 namespace ASPNET_Core_1_0.Controllers
 {
@@ -22,19 +25,23 @@ namespace ASPNET_Core_1_0.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly IPrincipalRepository _principalRepository;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IPrincipalRepository principalRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _principalRepository = principalRepository;
+
         }
 
         //
@@ -106,6 +113,7 @@ namespace ASPNET_Core_1_0.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                _principalRepository.CreateUserAppPrincipalInSystem(user);
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

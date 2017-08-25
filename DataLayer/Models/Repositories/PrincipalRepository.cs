@@ -7,6 +7,7 @@ using DataLayer.ExtensionMethods;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces.Repositories;
 using DataLayer.Models.Method_Extensions;
 using Microsoft.AspNetCore.Identity;
@@ -122,6 +123,7 @@ namespace DataLayer.Models.Repositories
             var passHasher = new PasswordHasher<User>();
             var fsm = new FileManagement();
 
+            //Todo: Eliminar la entidad User ya que se esta usando Application
             var user = new User
             {
                 Email = email,
@@ -194,6 +196,65 @@ namespace DataLayer.Models.Repositories
 
             principal.CalendarHome = calHome;
             
+            return principal;
+        }
+
+        public Principal CreateUserAppPrincipalInSystem(ApplicationUser userApp)
+        {
+            //create the core passHasher
+            var passHasher = new PasswordHasher<ApplicationUser>();
+            var fsm = new FileManagement();
+
+            var defaultCalName = "DefaultCalendar";
+            var defaultCalHomeName = "HomeCollection";
+
+            //create useful properties for the principal
+            //var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
+            //    defaultCalHomeName);
+            var displayName = PropertyCreation.CreateProperty("displayname", "D", userApp.Email);
+
+
+            //create the principal the represents the user
+            var principal = new Principal(userApp.Email, SystemProperties.PrincipalType.User,
+                displayName);
+
+            //create the cal home for the principal
+            var calHome = CalendarHomeRepository.CreateCalendarHome(principal);
+
+            var calHomeSet = PropertyCreation.CreateCalHomeSetWithHref(calHome.Url);
+            principal.Properties.Add(calHomeSet);
+
+            calHome.PrincipalId = principal.Id;
+            principal.CalendarHomeId = calHome.Id;
+
+            var collection = calHome.CalendarCollections;
+            calHome.CalendarCollections = null;
+            _homeRepository.Add(calHome);
+
+            _collectionRepository.AddRange(collection);
+
+            principal.ApplicationUser = userApp;
+            
+            Add(principal);
+
+            principal.CalendarHome = calHome;
+
+            //Context.CalendarCollections.AddRange(calHome.CalendarCollections);
+            //_collectionRepository.AddRange(calHome.CalendarCollections);
+            //Context.Properties.AddRange(calHome.Properties);
+            //Context.Properties.AddRange(principal.Properties);
+//            try
+//            {
+//                Context.SaveChanges();
+//
+//            }
+//            catch (Exception e)
+//            {
+//                Console.WriteLine(e.Message);
+//            }
+
+//            principal.CalendarHome = calHome;
+
             return principal;
         }
 

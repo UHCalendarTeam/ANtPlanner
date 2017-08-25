@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Identity;
 
 namespace DataLayer.Models.Interfaces.Repositories
 {
@@ -42,6 +44,16 @@ namespace DataLayer.Models.Interfaces.Repositories
         /// </returns>
         Principal CreateUserInSystem(string email, string fullName,
            string password);
+
+        /// <summary>
+        ///     Add a user to the system.
+        /// </summary>
+        /// <returns>
+        ///     The instance of the new User. Have to change the changes with the
+        ///     returned object.
+        /// </returns>
+        Principal CreateUserAppPrincipalInSystem(ApplicationUser user);
+
 
         /// <summary>
         ///     Initialize a student in the system.

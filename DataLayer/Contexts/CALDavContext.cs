@@ -8,6 +8,8 @@ using DataLayer.Models.Entities.OtherEnt.RelationsEnt;
 using DataLayer.Models.Entities.OtherEnt.Resource;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -17,7 +19,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 namespace DataLayer
 {
-    public class CalDavContext : DbContext
+    public class CalDavContext : IdentityDbContext<ApplicationUser>
     {
         public readonly IConfigurationRoot Configuration;
 
@@ -87,6 +89,7 @@ namespace DataLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             #region First relations
 
             modelBuilder.Entity<Principal>()

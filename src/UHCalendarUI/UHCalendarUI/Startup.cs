@@ -12,6 +12,10 @@ using Microsoft.Extensions.Logging;
 using ASPNET_Core_1_0.Data;
 using ASPNET_Core_1_0.Models;
 using ASPNET_Core_1_0.Services;
+using DataLayer;
+using DataLayer.Models.Identity;
+using DataLayer.Models.Interfaces.Repositories;
+using DataLayer.Models.Repositories;
 
 namespace ASPNET_Core_1_0
 {
@@ -45,11 +49,17 @@ namespace ASPNET_Core_1_0
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //            services.AddDbContext<ApplicationDbContext>(options =>
+            //                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            //Todo check if this is necesary or if can get the dependency injection from CalDavServices
+//            services.AddEntityFrameworkNpgsql().AddDbContext<CalDavContext>();
+//            services.AddTransient<CalDavContext>();
+            services.AddDbContext<CalDavContext>(options =>
+                options.UseNpgsql(SystemProperties.NpgsqlConnectionString()));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<CalDavContext>()
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
@@ -57,6 +67,8 @@ namespace ASPNET_Core_1_0
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+
+            services.AddScoped<IPrincipalRepository, PrincipalRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

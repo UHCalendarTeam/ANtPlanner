@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces.Repositories;
 using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -64,17 +65,19 @@ namespace ACL.Core.Authentication
                     }
                 }
 
-                //if the user is new in our system then create him
-                //TODO: change this if dont want the new user automatic creation behavior
+
 
                 //Temporaly if the WCF services doesnt work we are gonna create
                 // the users automatically in the system.
                 // TODO: check if is a student or teacher
+
+                //if the user is new in our system then create him
+                //TODO: change this if dont want the new user automatic creation behavior
                 else
                 {
-                    principal = _principalRepository.CreateUserInSystem(username, username, password);
-
-                    Console.WriteLine($"------Created user with username: {username}");
+//                    principal = _principalRepository.CreateUserInSystem(username, username, password);
+//
+//                    Console.WriteLine($"------Created user with username: {username}");
                 }
 
 
@@ -165,9 +168,9 @@ namespace ACL.Core.Authentication
                 }
                 else
                 {
-                     principal = _principalRepository.CreateUserInSystem(username, username, password);
-
-                    Console.WriteLine($"------Created user with username: {username}");
+//                    principal = _principalRepository.CreateUserInSystem(username, username, password);
+//
+//                    Console.WriteLine($"------Created user with username: {username}");
                 }
 
                 //TODO: change to this when work the WCF service
@@ -222,7 +225,6 @@ namespace ACL.Core.Authentication
             return null;
             //return await Task.FromResult(principal);
         }
-
 
         /// <summary>
         ///     Verifies if the client session cookie match with the one
@@ -339,7 +341,6 @@ namespace ACL.Core.Authentication
         //{
         //    throw new NotImplementedException("The Digest Authentication method is not supported yet.");
         //}
-
         /// <summary>
         ///     Create the nonce for the client and set the
         ///     authentication header of the response specifying
@@ -351,24 +352,12 @@ namespace ACL.Core.Authentication
         //{
         //    throw new NotImplementedException("The Digest Authentication method is not supported yet.");
         //}
-
-
         /// <summary>
         ///     Set in the response the 401 - Unauthorized
         ///     and add a message to the response body.
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-
-
-
-
-
-
-
-
-      
-
         private void SetUnauthorizedRequest(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -393,10 +382,6 @@ namespace ACL.Core.Authentication
         {
             throw new NotImplementedException("Digest Authentication is not supported yet.");
         }
-
-
-
-
 
         #endregion
     }

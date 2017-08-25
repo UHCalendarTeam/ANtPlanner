@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
+using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces;
 
 namespace DataLayer.Models.Entities.ACL
@@ -97,5 +98,10 @@ namespace DataLayer.Models.Entities.ACL
         ///     authenticated.
         /// </summary>
         public string SessionId { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }
