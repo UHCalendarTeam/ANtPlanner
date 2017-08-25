@@ -14,7 +14,7 @@ namespace ASPNET_Core_1_0.Controllers
             ViewData["SubTitle"] = "Welcome " + User.Identity.Name;
             ViewData["Message"] =  "This is your Home Page";
 
-            return View();
+            return View("~/Views/Calendar/Calendar.cshtml");
         }
 
         public IActionResult Minor()

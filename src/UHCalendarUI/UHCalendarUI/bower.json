@@ -5,6 +5,7 @@
     "bootstrap": "3.3.7",
     "jquery-validation": "1.17.0",
     "jquery-validation-unobtrusive": "3.2.6",
+    "jquery-ui": "1.12.1",
     "font-awesome": "4.7.0",
     "metisMenu": "v2.7.0",
     "pace": "~1.0.2",
