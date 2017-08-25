@@ -10,9 +10,9 @@ namespace ASPNET_Core_1_0.Controllers
     {
         public IActionResult Index()
         {
-
-            ViewData["SubTitle"] = "Welcome in ASP.NET Core 1.0 INSPINIA SeedProject ";
-            ViewData["Message"] = "It is an application skeleton for a typical ASP.NET Core project. You can use it to quickly bootstrap your webapp projects.";
+           
+            ViewData["SubTitle"] = "Welcome " + User.Identity.Name;
+            ViewData["Message"] =  "This is your Home Page";
 
             return View();
         }

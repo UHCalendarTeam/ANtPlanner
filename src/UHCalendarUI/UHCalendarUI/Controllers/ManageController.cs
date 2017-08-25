@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ASPNET_Core_1_0.Models;
 using ASPNET_Core_1_0.Models.ManageViewModels;
 using ASPNET_Core_1_0.Services;
+using DataLayer.Models.Identity;
 
 namespace ASPNET_Core_1_0.Controllers
 {
