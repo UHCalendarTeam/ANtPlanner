@@ -7,7 +7,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>UHCalendarUI</PackageId>
     <UserSecretsId>aspnet-UHCalendarUI-d45dd8d2-a9c7-41e0-8bdb-cd440166156a</UserSecretsId> 
-   <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
+   <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>

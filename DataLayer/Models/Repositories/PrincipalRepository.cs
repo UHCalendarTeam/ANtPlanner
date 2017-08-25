@@ -90,6 +90,24 @@ namespace DataLayer.Models.Repositories
             }
         }
 
+        public Principal FindByPrincipalId(string principalId)
+        {
+            return Context.Principals.Include(p => p.ApplicationUser)
+                .Include(p => p.Properties)
+                .Include(p => p.CalendarHome)
+                .FirstOrDefault(u => u.Id == principalId);
+        }
+
+        public Principal FindByPrincipalIdWithAll(string principalId)
+        {
+            return Context.Principals.Include(p => p.ApplicationUser)
+                .Include(p => p.Properties)
+                .Include(p => p.CalendarHome)
+                .ThenInclude(ch => ch.CalendarCollections)
+                .ThenInclude(c => c.CalendarResources)
+                .FirstOrDefault(u => u.Id == principalId);
+        }
+
         /// <summary>
         ///     Get a principal with the given cookie value
         /// </summary>

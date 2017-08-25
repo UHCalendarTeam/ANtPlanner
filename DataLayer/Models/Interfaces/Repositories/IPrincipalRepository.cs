@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
+using DataLayer.Models.Entities;
 using DataLayer.Models.Entities.ACL;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
 using DataLayer.Models.Identity;
 
@@ -21,6 +23,21 @@ namespace DataLayer.Models.Interfaces.Repositories
         Task<Principal> FindByIdentifierAsync(string identifier);
 
         Principal FindByIdentifier(string identifier);
+
+        /// <summary>
+        /// Find a <see cref="Principal"/> given a its PrincipalId
+        /// </summary>
+        /// <param name="principalId">Primary Key of the Principal</param>
+        /// <returns></returns>
+        Principal FindByPrincipalId(string principalId);
+
+        /// <summary>
+        /// Find a <see cref="Principal"/> given a its PrincipalId including
+        /// it's <see cref="Property"/>, <see cref="CalendarHome"/>, <see cref="CalendarCollection"/>, <see cref="CalendarResource"/> and <see cref="ApplicationUser"/> 
+        /// </summary>
+        /// <param name="principalId">Primary Key of the Principal</param>
+        /// <returns></returns>
+        Principal FindByPrincipalIdWithAll(string principalId);
 
         /// <summary>
         ///     Get a principal with the given cookie value
