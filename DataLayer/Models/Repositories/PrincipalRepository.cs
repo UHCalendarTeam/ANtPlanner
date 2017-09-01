@@ -59,8 +59,8 @@ namespace DataLayer.Models.Repositories
                 return false;
 
             var user = principal.User;
-            var passwordHasher = new PasswordHasher<User>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+            var result = passwordHasher.VerifyHashedPassword(principal.ApplicationUser, principal.ApplicationUser.PasswordHash, password);
 
             //return the result of the password verification
             return result != PasswordVerificationResult.Failed;
@@ -85,6 +85,7 @@ namespace DataLayer.Models.Repositories
             {
                 return context.Principals.Include(p => p.User)
                     .Include(p => p.Properties)
+                    .Include(p => p.ApplicationUser)
                     .Include(p => p.CalendarHome)
                     .FirstOrDefault(u => u.PrincipalStringIdentifier == identifier);
             }
@@ -226,6 +227,14 @@ namespace DataLayer.Models.Repositories
             var defaultCalName = "DefaultCalendar";
             var defaultCalHomeName = "HomeCollection";
 
+            //Todo: Eliminar la entidad User ya que se esta usando Application
+            var user = new User
+            {
+                Email = userApp.Email,
+                Password = userApp.PasswordHash,
+                DisplayName = userApp.UserName
+            };
+
             //create useful properties for the principal
             //var calHomeSet = PropertyCreation.CreateCalendarHomeSet(SystemProperties.PrincipalType.User, email,
             //    defaultCalHomeName);
@@ -252,7 +261,16 @@ namespace DataLayer.Models.Repositories
             _collectionRepository.AddRange(collection);
 
             principal.ApplicationUser = userApp;
-            
+            principal.ApplicationUser.Id = userApp.Id;
+            userApp.PrincipalId = principal.Id;
+            userApp.Principal = principal;
+
+            //todo delete if user is not used
+            principal.User = user;
+            principal.UserId = user.Id;
+            user.PrincipalId = principal.Id;
+            user.Principal = principal;
+
             Add(principal);
 
             principal.CalendarHome = calHome;

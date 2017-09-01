@@ -24,6 +24,19 @@ namespace CalDAV.Method_Extensions
         public static string GetRealUrl(this HttpRequest request)
         {
             var url = request.GetEncodedUrl();
+            var host = "http://" + request.Host.Value;
+            url = url.Replace(host, "");
+            return url;
+        }
+
+        /// <summary>
+        ///     Remove the base url from the requested url. (i.e:http://...com/api/easycalendar/caldav/)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string GetRealUrlInEasyController(this HttpRequest request)
+        {
+            var url = request.GetEncodedUrl();
             var host = "http://" + request.Host.Value + SystemProperties._baseUrl;
             url = url.Replace(host, "");
             return url;

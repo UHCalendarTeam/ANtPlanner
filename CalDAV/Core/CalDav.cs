@@ -107,6 +107,7 @@ namespace CalDAV.Core
         #region PROPFIND methods
 
         //TODO: Nacho
+        /// <inheritdoc />
         /// <summary>
         ///     This PROFIND is used for the collection and the resources.
         /// </summary>

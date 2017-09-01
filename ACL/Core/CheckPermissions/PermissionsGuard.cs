@@ -49,6 +49,7 @@ namespace ACL.Core.CheckPermissions
             _calendarRepo = calRepository ;
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Check the permission needed to perform an action
         ///     by the given method.

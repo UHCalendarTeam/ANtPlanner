@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.Entities.ResourcesAndCollections;
 using Microsoft.AspNetCore.Mvc;
 using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
+using UHCalendarUI.Models;
 
 namespace ASPNET_Core_1_0.Controllers
 {
@@ -29,14 +31,30 @@ namespace ASPNET_Core_1_0.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            if (user != null)
+            if (user == null)
             {
-                var principal = _principalRepository.FindByPrincipalIdWithAll(user.PrincipalId);
-
-                return View("~/Views/Calendar/Calendar.cshtml", principal);
+                return this.View();
             }
 
-            return View();
+            var principal = this._principalRepository.FindByPrincipalIdWithAll(user.PrincipalId);
+            var principalVM = new PrincipalViewModel()
+            {
+                CalendarHomeName = principal.CalendarHome.Name,
+                Email = principal.PrincipalStringIdentifier,
+                Url = principal.PrincipalUrl,
+                CalendarCollections = principal.CalendarHome.CalendarCollections
+            };
+            var first = principal.CalendarHome.CalendarCollections.FirstOrDefault(
+                c => c.Name == "DefaultCollection" || c.Name == "PublicEvents");
+            var currentCalendars = new List<CalendarCollection>();
+            if (first != null)
+            {
+                currentCalendars.Add(first);
+            }
+
+            principalVM.CurrentCallendars = currentCalendars;
+
+            return this.View("~/Views/Calendar/Calendar.cshtml", principalVM);
         }
 
         public IActionResult Minor()

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using ICalendar.Calendar;
 
 namespace DataLayer
 {
     public class FileManagement : IFileManagement
-    {      
+    {
+        private string prefix = "../CalDavServices/";
+        private string prefix2 = "../UHCalendarUI/";
+
         public bool CreateFolder(string url)
         {
             url = RemoveInitialSlash(url);

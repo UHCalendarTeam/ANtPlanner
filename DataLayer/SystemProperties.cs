@@ -107,7 +107,7 @@ namespace DataLayer
         /// <summary>
         ///     Contains the base url path for the system.
         /// </summary>
-        public static readonly string _baseUrl = "";
+        public static readonly string _baseUrl = "/api/easycalendar";
 
         /// <summary>
         ///     Contains the url for the user's collections

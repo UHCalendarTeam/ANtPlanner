@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using ASPNET_Core_1_0.Data;
 using ASPNET_Core_1_0.Models;
 using ASPNET_Core_1_0.Services;
+using AutoMapper;
 using DataLayer;
 using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces.Repositories;
@@ -63,6 +64,8 @@ namespace ASPNET_Core_1_0
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
+
+            services.AddAutoMapper();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();

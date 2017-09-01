@@ -1,4 +1,5 @@
-﻿using DataLayer.Models.Entities.ACL;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using DataLayer.Models.Entities.ACL;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace DataLayer.Models.Identity
@@ -14,7 +15,7 @@ namespace DataLayer.Models.Identity
 
         /// <summary>
         /// Inverse Navigation Key
-        /// </summary>
+        /// </summary>//
         public string PrincipalId { get; set; }
     }
 }

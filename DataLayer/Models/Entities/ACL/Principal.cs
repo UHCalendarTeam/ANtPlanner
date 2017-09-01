@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Entities.Users;
 using DataLayer.Models.Identity;
@@ -7,6 +8,7 @@ using DataLayer.Models.Interfaces;
 
 namespace DataLayer.Models.Entities.ACL
 {
+    /// <inheritdoc cref="Entity" />
     /// <summary>
     ///     Entity for the properties of the principals.
     ///     A principal may be a user or a group that contains many users.
@@ -100,8 +102,12 @@ namespace DataLayer.Models.Entities.ACL
         public string SessionId { get; set; }
 
         /// <summary>
-        /// 
+        /// This represents a user in the Identity Aunthentication system.
         /// </summary>
+        [ForeignKey("ApplicationUserId")]
         public ApplicationUser ApplicationUser { get; set; }
+
+        
+        public string ApplicationUserId { get; set; }
     }
 }

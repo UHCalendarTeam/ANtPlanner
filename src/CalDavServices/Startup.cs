@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System;
 using ACL.Core;
 using ACL.Core.Authentication;
 using ACL.Core.CheckPermissions;
@@ -9,9 +8,6 @@ using CalDAV.Core.ConditionsCheck.Preconditions;
 using CalDAV.Core.ConditionsCheck.Preconditions.Report;
 using DataLayer;
 using DataLayer.Contexts;
-using DataLayer.Models.Entities;
-using DataLayer.Models.Entities.ACL;
-using DataLayer.Models.Entities.ResourcesAndCollections;
 using DataLayer.Models.Interfaces.Repositories;
 using DataLayer.Models.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -20,9 +16,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using Serilog;
-using Serilog.Sinks.RollingFile;
+using AutoMapper;
+using CalDAV.Core.BusinessServices;
+using CalDAV.Core.Interfaces;
 
 namespace CalDavServices
 {
@@ -53,11 +50,12 @@ namespace CalDavServices
         {
 
             //Add Cors
-            // services.AddCors(options =>
-            // {
-            //     options.AddPolicy("AllowAllOrigins", builder =>
-            //         builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            // });            
+//             services.AddCors(options =>
+//             {
+//                 options.AddPolicy("AllowAllOrigins", builder =>
+//                     builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+//             }); 
+            services.AddCors();
 
             //This method is the one that add the database services.
             ConfigureDatabase(services);
@@ -65,11 +63,14 @@ namespace CalDavServices
             services.AddMvc();
 
             services.AddScoped<ICalDav, CalDav>();
-            services.AddScoped<IFileManagement, FileManagement>();
+            services.AddSingleton<IFileManagement, FileManagement>();
             services.AddTransient<IAuthenticate, UhCalendarAuthentication>();
             services.AddScoped<IACLProfind, ACLProfind>();
             services.AddScoped<ICollectionReport, CollectionReport>();
             //services.AddScoped<CalDavContext>();
+            services.AddScoped<IEasyCalendarService, EasyCalendarService>();
+            // add AutoMapper service
+            services.AddAutoMapper();
 
 
             #region old
@@ -91,6 +92,7 @@ namespace CalDavServices
             services.AddScoped<IHomeRepository, CalendarHomeRepository>();
             services.AddScoped<IPermissionChecker, PermissionsGuard>();
             services.AddScoped<IReportPreconditions, ReportPreconditions>();
+//            services.AddScoped<IEasyCalendarService>()
 
             // add by yasmany (working in contextseed)
             //services.AddScoped<CalDavContext>();
@@ -114,7 +116,13 @@ namespace CalDavServices
 
             ConfigureInDev(app, env);          
 
-            app.UseCors("AllowAllOrigins");            
+//            app.UseCors("AllowAllOrigins");
+            app.UseCors(builder =>
+                builder.WithOrigins("http://localhost:5000")
+                .AllowAnyHeader().AllowAnyMethod());
+
+           
+
             //use the authentication middleware
             app.UseAuthorization();
 
@@ -167,8 +175,8 @@ namespace CalDavServices
         {
             var host = new WebHostBuilder()
               .UseKestrel()
-              //.UseUrls("http://localhost:5003")
-              .UseUrls("http://192.168.1.16:5003")
+              .UseUrls("http://localhost:5003")
+//              .UseUrls("http://192.168.137.1:5003")
               .UseContentRoot(Directory.GetCurrentDirectory())
               .UseIISIntegration()
               .UseStartup<Startup>()

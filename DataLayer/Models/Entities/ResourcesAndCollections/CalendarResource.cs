@@ -66,7 +66,7 @@ namespace DataLayer.Models.Entities.ResourcesAndCollections
         public int CalendarResourseType { get; set; }
 
 
-        #region auxiliary properties
+        #region Namespaces
 
         public readonly Dictionary<string, string> Namespaces = new Dictionary<string, string>
         {
