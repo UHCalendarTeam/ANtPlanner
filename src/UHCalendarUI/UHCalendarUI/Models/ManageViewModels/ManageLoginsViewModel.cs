@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 
-namespace ASPNET_Core_1_0.Models.ManageViewModels
+namespace UHCalendarUI.Models.ManageViewModels
 {
     public class ManageLoginsViewModel
     {

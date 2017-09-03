@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASPNET_Core_1_0.Models.AccountViewModels
+namespace UHCalendarUI.Models.AccountViewModels
 {
     public class ForgotPasswordViewModel
     {

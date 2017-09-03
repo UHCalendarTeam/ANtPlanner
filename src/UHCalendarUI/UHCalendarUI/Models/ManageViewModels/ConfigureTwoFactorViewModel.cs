@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace ASPNET_Core_1_0.Models.ManageViewModels
+namespace UHCalendarUI.Models.ManageViewModels
 {
     public class ConfigureTwoFactorViewModel
     {

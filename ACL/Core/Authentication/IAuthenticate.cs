@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataLayer.Models.Entities.ACL;
 using DataLayer.Models.Identity;
 using Microsoft.AspNetCore.Http;
@@ -24,5 +25,12 @@ namespace ACL.Core.Authentication
         Task<Principal> AuthenticateRequestAsync(HttpContext httpContext);
 
         Principal AuthenticateRequest(HttpContext httpContext);
+
+        /// <summary>
+        /// Decripts Username and Password from the HttpContext using the Authorization Header
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        KeyValuePair<string, string> TakeCredentials(HttpContext context);
     }
 }

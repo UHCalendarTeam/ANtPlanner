@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -8,14 +6,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using ASPNET_Core_1_0.Models;
-using ASPNET_Core_1_0.Models.AccountViewModels;
-using ASPNET_Core_1_0.Services;
-using DataLayer.Models.Entities.ACL;
+using UHCalendarUI.Models.AccountViewModels;
+using UHCalendarUI.Services;
 using DataLayer.Models.Identity;
 using DataLayer.Models.Interfaces.Repositories;
 
-namespace ASPNET_Core_1_0.Controllers
+namespace UHCalendarUI.Controllers
 {
     [Authorize]
     public class AccountController : Controller

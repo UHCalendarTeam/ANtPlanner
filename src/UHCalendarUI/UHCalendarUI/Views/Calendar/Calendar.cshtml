@@ -1,8 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Calendar";
 }
-@using DataLayer.Models.Repositories
-@using DataLayer.Models.Entities
 @using UHCalendarUI.Models
 
 @model PrincipalViewModel
@@ -206,27 +204,45 @@
 
             $.ajax({
 
-                xhrFields: {
-                    withCredentials: true
-                },
+//                xhrFields: {
+//                    withCredentials: true
+//                },
                 headers: {
-                    'Authorization': 'Basic ' + btoa('admin@admin.uh.cu:Dr@c04Ev3rKing')
+                    'Authorization': 'Basic ' + btoa('@Model.Email:@Model.Password')
                 },
+                crossDomain: true,
                 type: "GET",
-                url: "http://localhost:5003/api/easycalendar/collections/groups/public/C111/",
+                url: "http://192.168.137.1:5003/api/easycalendar/collections/groups/public/C111/",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                crossDomain: true,
-                success: function(doc) {
+
+                success: function(data) {
                     // var events = [];
                     //var docd = doc.d;
 
-
-                    eventFeed = $.parseJSON(doc.d);
+                    eventFeed = data;
+//                    var toParse = data[0];
+//                    eventFeed = $.parseJSON(toParse);
                     console.log(eventFeed);
 
 
-                    console.log(events);
+                    console.log(eventFeed);
+
+                    $('#calendar').fullCalendar({
+                        header: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'month,agendaWeek,agendaDay'
+                        },
+                        eventClick: function() {
+
+                        },
+
+                        editable: false, //this allows move events inside the calendar by drag and drop
+                        droppable: false, // this allows things to be dropped onto the calendar
+
+                        events: eventFeed //Just pass obj to events
+                    });
 
                 },
                 error: function(xhr, status, error) {
@@ -234,20 +250,7 @@
                 }
             });
 
-            $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
-                },
-                eventClick: function() {
-
-                },
-
-                editable: false,
-
-                events: eventFeed //Just pass obj to events
-            });
+            
 //            $('#calendar').fullCalendar({
 //                header: {
 //                    left: 'prev,next today',

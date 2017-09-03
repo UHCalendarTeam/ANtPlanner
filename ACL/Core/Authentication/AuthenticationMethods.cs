@@ -226,6 +226,21 @@ namespace ACL.Core.Authentication
             //return await Task.FromResult(principal);
         }
 
+        public KeyValuePair<string, string> TakeCredentials(HttpContext context)
+        {
+            //take the creadentials from the request
+            string authHeader = context.Request.Headers["Authorization"];
+            
+
+            if (!string.IsNullOrEmpty(authHeader))
+            {
+                var credentials = TakeCredentials(authHeader);
+
+                return credentials;
+            }
+            return new KeyValuePair<string, string>(null, null);
+        }
+
         /// <summary>
         ///     Verifies if the client session cookie match with the one
         ///     that it says to represent.

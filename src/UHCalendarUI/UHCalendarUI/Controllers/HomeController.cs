@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,12 +8,15 @@ using DataLayer.Models.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 using UHCalendarUI.Models;
 
-namespace ASPNET_Core_1_0.Controllers
+
+namespace UHCalendarUI.Controllers
 {
     public class HomeController : Controller
     {
         UserManager<ApplicationUser> _userManager;
         private IPrincipalRepository _principalRepository;
+     
+
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
@@ -22,6 +24,7 @@ namespace ASPNET_Core_1_0.Controllers
         {
             _userManager = userManager;
             _principalRepository = principalRepository;
+   
         }
 
         public async Task<IActionResult> Index()
@@ -30,6 +33,7 @@ namespace ASPNET_Core_1_0.Controllers
             ViewData["Message"] = "This is your Home Page";
 
             var user = await _userManager.GetUserAsync(User);
+//            var password = 
 
             if (user == null)
             {
@@ -42,7 +46,8 @@ namespace ASPNET_Core_1_0.Controllers
                 CalendarHomeName = principal.CalendarHome.Name,
                 Email = principal.PrincipalStringIdentifier,
                 Url = principal.PrincipalUrl,
-                CalendarCollections = principal.CalendarHome.CalendarCollections
+                CalendarCollections = principal.CalendarHome.CalendarCollections,
+                Password = "Dr@c04Ev3rKing",
             };
             var first = principal.CalendarHome.CalendarCollections.FirstOrDefault(
                 c => c.Name == "DefaultCollection" || c.Name == "PublicEvents");

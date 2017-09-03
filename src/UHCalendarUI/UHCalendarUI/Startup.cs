@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ASPNET_Core_1_0.Data;
-using ASPNET_Core_1_0.Models;
-using ASPNET_Core_1_0.Services;
-using AutoMapper;
-using DataLayer;
-using DataLayer.Models.Identity;
-using DataLayer.Models.Interfaces.Repositories;
-using DataLayer.Models.Repositories;
-
-namespace ASPNET_Core_1_0
+﻿namespace UHCalendarUI
 {
+    using AutoMapper;
+    using DataLayer;
+    using DataLayer.Models.Identity;
+    using DataLayer.Models.Interfaces.Repositories;
+    using DataLayer.Models.Repositories;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Services;
+
     public class Startup
     {
         public Startup(IHostingEnvironment env)

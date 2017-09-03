@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ASPNET_Core_1_0.Models;
+using UHCalendarUI.Models;
 using DataLayer.Models.Identity;
 
-namespace ASPNET_Core_1_0.Data
+namespace UHCalendarUI.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {

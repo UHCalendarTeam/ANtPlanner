@@ -33,8 +33,8 @@ namespace CalDavServices.Controllers
         }
 
         // GET: api/EasyCalendar
-        [HttpGet("collections/{groupOrUser}/{principalId}/collectionName")]
-        public async Task<IEnumerable<EasyCalendarEvent>> Get()
+        [HttpGet("collections/{groupOrUser}/{principalId}/{collectionName}/")]
+        public async Task<IEnumerable<EasyCalendarEvent>> Get(string collectionName)
         {
             return await _easyCalendarService.GetEasyCalendarEventsWithinMonthRangeAsync(2, HttpContext);
         }

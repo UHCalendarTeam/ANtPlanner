@@ -14,6 +14,8 @@ namespace UHCalendarUI.Models
 
         public string CalendarHomeName { get; set; }
 
+        public string Password { get; set; }
+
         public IEnumerable<CalendarCollection> CalendarCollections { get; set; }
 
         public List<CalendarCollection> CurrentCallendars { get; set; }

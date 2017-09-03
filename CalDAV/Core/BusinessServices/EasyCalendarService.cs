@@ -43,7 +43,7 @@ namespace CalDAV.Core.BusinessServices
 
             var strBuilderStart = new StringBuilder();
             var strBuilderEnd = new StringBuilder();
-            var start = DateTime.Now.Subtract(new TimeSpan(30*monthRange));
+            var start = DateTime.Now.Subtract(new TimeSpan(30*monthRange,0,0,0));
             var end = DateTime.Now.AddMonths(monthRange);
             strBuilderStart.Append(start.ToString("yyyyMMddTHHmmss") + (start.Kind == DateTimeKind.Utc ? "Z" : ""));
             strBuilderEnd.Append(end.ToString("yyyyMMddTHHmmss") + (end.Kind == DateTimeKind.Utc ? "Z" : ""));
