@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Models.Entities;
 
-namespace DataLayer.Models.NonMappedEntities
+namespace DataLayer.Models
 {
     public class EasyCalendarEvent
     {
@@ -25,6 +26,8 @@ namespace DataLayer.Models.NonMappedEntities
         public string borderColor { get; set; }
 
         public string textColor { get; set; }
+
+        public string id { get; set; }
 
 
         public EasyCalendarEvent()

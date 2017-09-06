@@ -10,7 +10,7 @@ using CalDAV.Core.Method_Extensions;
 using CalDAV.Method_Extensions;
 using CalDAV.Utils;
 using DataLayer;
-using DataLayer.Models.NonMappedEntities;
+using DataLayer.Models;
 using ICalendar.Calendar;
 using Microsoft.AspNetCore.Http;
 using TreeForXml;
@@ -18,20 +18,23 @@ using TreeForXml;
 namespace CalDAV.Core.BusinessServices
 {
     /// <inheritdoc />
-    public class EasyCalendarService:IEasyCalendarService
+    public class EasyCalendarService : IEasyCalendarService
     {
         private readonly IFileManagement _fileManagement;
         private readonly IPermissionChecker _permissionChecker;
         private readonly IAuthenticate _authenticate;
 
-        public EasyCalendarService(IFileManagement fileManagement, IPermissionChecker permissionChecker, IAuthenticate authenticate)
+        public EasyCalendarService(IFileManagement fileManagement, IPermissionChecker permissionChecker,
+            IAuthenticate authenticate)
         {
             _permissionChecker = permissionChecker;
             _fileManagement = fileManagement;
             _authenticate = authenticate;
         }
+
         /// <inheritdoc />
-        public async Task<IEnumerable<EasyCalendarEvent>> GetEasyCalendarEventsWithinMonthRangeAsync(int monthRange, HttpContext context)
+        public async Task<IEnumerable<EasyCalendarEvent>> GetEasyCalendarEventsWithinMonthRangeAsync(int monthRange,
+            HttpContext context)
         {
             var url = context.Request.GetRealUrlInEasyController();
             var principalUrl = (await _authenticate.AuthenticateRequestAsync(context))?.PrincipalUrl;
@@ -39,11 +42,11 @@ namespace CalDAV.Core.BusinessServices
             if (!_permissionChecker.CheckPermisionForMethod(url, principalUrl, context.Response,
                 SystemProperties.HttpMethod.Get))
                 return null;
-            
+
 
             var strBuilderStart = new StringBuilder();
             var strBuilderEnd = new StringBuilder();
-            var start = DateTime.Now.Subtract(new TimeSpan(30*monthRange,0,0,0));
+            var start = DateTime.Now.Subtract(new TimeSpan(30 * monthRange, 0, 0, 0));
             var end = DateTime.Now.AddMonths(monthRange);
             strBuilderStart.Append(start.ToString("yyyyMMddTHHmmss") + (start.Kind == DateTimeKind.Utc ? "Z" : ""));
             strBuilderEnd.Append(end.ToString("yyyyMMddTHHmmss") + (end.Kind == DateTimeKind.Utc ? "Z" : ""));
@@ -59,7 +62,7 @@ namespace CalDAV.Core.BusinessServices
 
             var filter = XmlTreeStructure.Parse(filterstr);
 
-           
+
             var userResources = new Dictionary<string, string>();
             await _fileManagement.GetAllCalendarObjectResource(url, userResources);
             var userCalendars = userResources.ToDictionary(userResource => userResource.Key,
@@ -67,7 +70,7 @@ namespace CalDAV.Core.BusinessServices
 
             //apply the filters to the calendars
             var filteredCalendars = userCalendars.Where(x => x.Value.FilterResource(filter));
-            var easyEvents = filteredCalendars.Select(fc => fc.Value.ToEasyCalendarEvent()).ToList();
+            var easyEvents = filteredCalendars.Select(fc => fc.Value.ToEasyCalendarEvent(fc.Key)).ToList();
             return easyEvents;
         }
     }

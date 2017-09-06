@@ -1,20 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ACL.Core.Authentication;
 using CalDAV.Core.Interfaces;
-using CalDAV.Core.Method_Extensions;
-using CalDAV.Method_Extensions;
-using CalDAV.Utils;
-using DataLayer;
-using DataLayer.Models.NonMappedEntities;
-using ICalendar.Calendar;
-using ICalendar.CalendarComponents;
-using Microsoft.AspNetCore.Cors;
+using DataLayer.Models;
 using Microsoft.AspNetCore.Mvc;
-using TreeForXml;
 
 namespace CalDavServices.Controllers
 {

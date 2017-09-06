@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DataLayer;
-using DataLayer.Models.NonMappedEntities;
+using DataLayer.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace CalDAV.Core.Interfaces
